@@ -1,0 +1,15 @@
+abstract class AbstractController {
+  protected asyncWrapper: Wrapper;
+  protected commonValidator = new CommonValidator();
+  constructor() {
+    this.asyncWrapper = new Wrapper();
+  }
+  protected StatusCode = StatusCode;
+  protected error(message?: string, status?: number) {
+    throw new CustomError(
+      message || ResMsg.HTTP_INTERNAL_SERVER_ERROR,
+      status || StatusCode.HTTP_INTERNAL_SERVER_ERROR
+    );
+  }
+}
+export default AbstractController;

@@ -32,11 +32,6 @@ class App {
     cron.schedule('0 0 */3 * *', async () => {
       await services.getSabreToken();
     });
-
-    // Run every day at 12:01 AM
-    cron.schedule('1 0 * * *', async () => {
-      await services.sendEmailForPartialPaymentDue();
-    });
   }
 
   //start server
