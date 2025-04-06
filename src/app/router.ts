@@ -4,6 +4,8 @@ import AuthRootRouter from '../features/auth/authRoot.router';
 import AgentRootRouter from '../features/agent/agentRoot.router';
 import B2CRootRouter from '../features/B2C/b2cRoot.router';
 import AdminRootRouter from '../features/admin/adminRoot.router';
+import AgentB2CRootRouter from '../features/agentB2C/agentB2CRoot.router';
+import ExternalRootRouter from '../features/external/externalRoot.router';
 
 export default class RootRouter {
   public v2Router = Router();
@@ -12,6 +14,8 @@ export default class RootRouter {
   private agentRootRouter = new AgentRootRouter();
   private b2cRootRouter = new B2CRootRouter();
   private adminRootRouter = new AdminRootRouter();
+  private agentB2CRootRouter = new AgentB2CRootRouter();
+  private externalRootRouter = new ExternalRootRouter();
 
   constructor() {
     this.callV2Router();
@@ -34,9 +38,9 @@ export default class RootRouter {
     this.v2Router.use('/admin', this.adminRootRouter.Router);
 
     // Agent B2C Routes
-    this.v2Router.use('/agent-b2c');
+    this.v2Router.use('/agent-b2c', this.agentB2CRootRouter.Router);
 
     // External Routes
-    this.v2Router.use('/external');
+    this.v2Router.use('/external', this.externalRootRouter.Router);
   }
 }

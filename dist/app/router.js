@@ -9,6 +9,8 @@ const authRoot_router_1 = __importDefault(require("../features/auth/authRoot.rou
 const agentRoot_router_1 = __importDefault(require("../features/agent/agentRoot.router"));
 const b2cRoot_router_1 = __importDefault(require("../features/B2C/b2cRoot.router"));
 const adminRoot_router_1 = __importDefault(require("../features/admin/adminRoot.router"));
+const agentB2CRoot_router_1 = __importDefault(require("../features/agentB2C/agentB2CRoot.router"));
+const externalRoot_router_1 = __importDefault(require("../features/external/externalRoot.router"));
 class RootRouter {
     constructor() {
         this.v2Router = (0, express_1.Router)();
@@ -17,6 +19,8 @@ class RootRouter {
         this.agentRootRouter = new agentRoot_router_1.default();
         this.b2cRootRouter = new b2cRoot_router_1.default();
         this.adminRootRouter = new adminRoot_router_1.default();
+        this.agentB2CRootRouter = new agentB2CRoot_router_1.default();
+        this.externalRootRouter = new externalRoot_router_1.default();
         this.callV2Router();
     }
     callV2Router() {
@@ -31,9 +35,9 @@ class RootRouter {
         // Admin Routes
         this.v2Router.use('/admin', this.adminRootRouter.Router);
         // Agent B2C Routes
-        this.v2Router.use('/agent-b2c');
+        this.v2Router.use('/agent-b2c', this.agentB2CRootRouter.Router);
         // External Routes
-        this.v2Router.use('/external');
+        this.v2Router.use('/external', this.externalRootRouter.Router);
     }
 }
 exports.default = RootRouter;

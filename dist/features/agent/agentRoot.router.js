@@ -57,7 +57,7 @@ class AgentRootRouter {
         this.Router.use('/report', this.agentReportRouter.router);
         this.Router.use('/administration', this.agentAdministrationRouter.router);
         // Agent B2C Root Routes
-        this.Router.use('/b2c', this.agentB2CRouter.Router);
+        this.Router.use('/b2c', this.agentB2CRouter.router);
     }
 }
 exports.default = AgentRootRouter;
