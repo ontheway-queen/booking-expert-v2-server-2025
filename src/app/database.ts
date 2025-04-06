@@ -1,7 +1,7 @@
 import knex from 'knex';
 import config from '../config/config';
 
-const createDbCon = () => {
+export const createDbCon = () => {
   const connection = knex({
     client: 'pg',
     connection: {
@@ -20,7 +20,6 @@ const createDbCon = () => {
     },
   });
 
-  console.log('Trabill OTA Database Is Connected...💻');
   return connection;
 };
 

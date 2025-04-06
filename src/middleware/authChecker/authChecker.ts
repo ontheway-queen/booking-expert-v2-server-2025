@@ -3,11 +3,6 @@ import StatusCode from '../../utils/miscellaneous/statusCode';
 import ResMsg from '../../utils/miscellaneous/responseMessage';
 import Lib from '../../utils/lib/lib';
 import config from '../../config/config';
-import {
-  IAdmin,
-  IB2BAgencyUser,
-  IUser,
-} from '../../features/public/commonUtils/types/commonTypes';
 
 class AuthChecker {
   // admin auth checker
