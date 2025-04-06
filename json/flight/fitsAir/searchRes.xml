@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KIU_AirShoppingRS EchoToken="SHOPPEXAMPLEDOCS" TimeStamp="2025-03-25T10:24:26+00:00" Target="Testing" Version="3.0" SequenceNmbr="1">
+    <Success/>
+    <Parameters>
+        <CurrCode>BDT</CurrCode>
+        <DecimalPlaces>2</DecimalPlaces>
+        <TotalPricedCount>2</TotalPricedCount>
+    </Parameters>
+    <ShoppingCarrier Code="8D" Count="2">
+        <FareFamilyGroup>
+            <FamilyName Order="1">ECONOMY PROMO</FamilyName>
+            <FamilyName Order="2">ECONOMY BASIC</FamilyName>
+            <FamilyName Order="3">ECONOMY CLASSIC</FamilyName>
+            <FamilyName Order="4">ECONOMY FLEX</FamilyName>
+            <FamilyName Order="5">BUSINESS</FamilyName>
+        </FareFamilyGroup>
+        <AirPricedItineraries>
+            <AirItineraryPriced OptionID="1">
+                <JourneyInformation>
+                    <AirItinerary TripID="1">
+                        <OriginLocation LocationCode="DAC"/>
+                        <DestinationLocation LocationCode="KUL"/>
+                        <DepartureDate>2025-04-23</DepartureDate>
+                    </AirItinerary>
+                </JourneyInformation>
+                <FareInfo>
+                    <FareFamily OriginDestRPH="1" Name="ECONOMY FLEX">
+                        <FareBasisCodes>
+                            <FareBasisCode FareBaseID="1" Cabin="ECONOMY" IDFare="580998" RBD="Y">YOWBD</FareBasisCode>
+                            <FareBasisCode FareBaseID="1" Cabin="ECONOMY" IDFare="580998" RBD="Y">YOWBD</FareBasisCode>
+                        </FareBasisCodes>
+                    </FareFamily>
+                </FareInfo>
+                <AirItinTotalFare>
+                    <BaseFare CurrCode="BDT">45000.00</BaseFare>
+                    <EquivFare CurrCode="BDT">45000.00</EquivFare>
+                    <TotalTax>9881.00</TotalTax>
+                    <TotalFees>0.00</TotalFees>
+                    <TotalFare>54881.00</TotalFare>
+                </AirItinTotalFare>
+                <PTC_BreakDowns>
+                    <PTC_BreakDown>
+                        <PTC>ADT</PTC>
+                        <Quantity>1</Quantity>
+                        <FareInfo>
+                            <BaseFare CurrCode="BDT">45000.00</BaseFare>
+                            <EquivAmount CurrCode="BDT" BSR="1.00000">45000.00</EquivAmount>
+                        </FareInfo>
+                        <Taxes>
+                            <Tax>
+                                <Code>BD</Code>
+                                <Amount>500.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>E5</Code>
+                                <Amount>441.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>OW</Code>
+                                <Amount>2500.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>P7</Code>
+                                <Amount>1220.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>P8</Code>
+                                <Amount>1220.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>UT</Code>
+                                <Amount>4000.00</Amount>
+                            </Tax>
+                        </Taxes>
+                        <FeesAmount/>
+                        <TotalFare>54881.00</TotalFare>
+                        <FareConstruction/>
+                        <FareConstructionDetail>
+                            <FareComponent FareComponentID="1" OriginDestRPH="1">
+                                <ComponentPoint/>
+                                <CurrencyCode/>
+                                <ComponentAmount Surcharge="" Stopover="">368.91</ComponentAmount>
+                            </FareComponent>
+                        </FareConstructionDetail>
+                    </PTC_BreakDown>
+                </PTC_BreakDowns>
+                <AirItinInformation>
+                    <OriginDestinationInfo OriginDestRPH="1" FlightID="1">
+                        <FlightSegment FareBaseID="1">
+                            <SegmentNbr>1</SegmentNbr>
+                            <CarrierCode>8D</CarrierCode>
+                            <FlightNbr>861</FlightNbr>
+                            <RBD>Y</RBD>
+                            <Posting>9</Posting>
+                            <DepartureDate>2025-04-23</DepartureDate>
+                            <EQP>320</EQP>
+                            <DepartureAirport>DAC</DepartureAirport>
+                            <ArrivalAirport>CMB</ArrivalAirport>
+                            <DepartureTime>01:55</DepartureTime>
+                            <ArrivalTime>04:30</ArrivalTime>
+                            <ChangeDayInd>0</ChangeDayInd>
+                            <Stops>0</Stops>
+                            <ElapsedTime>03:05</ElapsedTime>
+                            <SSR_inventory>
+                                <SSR Code="PNNC" Quatity="10" Category="ARPT" Description="NAME CHANGE"/>
+                                <SSR Code="PDML" Quatity="10" Category="MEAL" Description="MEAL OR BEVERAGE (CHARGEABLE)"/>
+                                <SSR Code="PBGB" Quatity="8" Category="BAGG" Description="B BAGGAGE"/>
+                                <SSR Code="WCHR" Quatity="4" Category="MEDC" Description="WHEELCHAIR R FOR RAMP"/>
+                                <SSR Code="PDBG" Quatity="8" Category="BAGG" Description="PREPAID BAGGAGE"/>
+                                <SSR Code="INFT" Quatity="8" Category="STND" Description="INFANT"/>
+                            </SSR_inventory>
+                        </FlightSegment>
+                        <FlightSegment FareBaseID="1">
+                            <SegmentNbr>2</SegmentNbr>
+                            <CarrierCode>8D</CarrierCode>
+                            <FlightNbr>721</FlightNbr>
+                            <RBD>Y</RBD>
+                            <Posting>9</Posting>
+                            <DepartureDate>2025-04-23</DepartureDate>
+                            <EQP>320</EQP>
+                            <DepartureAirport>CMB</DepartureAirport>
+                            <ArrivalAirport>KUL</ArrivalAirport>
+                            <DepartureTime>12:00</DepartureTime>
+                            <ArrivalTime>18:25</ArrivalTime>
+                            <ChangeDayInd>0</ChangeDayInd>
+                            <Stops>0</Stops>
+                            <ElapsedTime>03:55</ElapsedTime>
+                            <SSR_inventory>
+                                <SSR Code="PNNC" Quatity="10" Category="ARPT" Description="NAME CHANGE"/>
+                                <SSR Code="PNRP" Quatity="10" Category="ARPT" Description="RE ISSUANCE PENALTY FEE"/>
+                                <SSR Code="PBGB" Quatity="8" Category="BAGG" Description="B BAGGAGE"/>
+                                <SSR Code="WCHR" Quatity="4" Category="MEDC" Description="WHEELCHAIR R FOR RAMP"/>
+                                <SSR Code="PDBG" Quatity="8" Category="BAGG" Description="PREPAID BAGGAGE"/>
+                                <SSR Code="INFT" Quatity="8" Category="STND" Description="INFANT"/>
+                            </SSR_inventory>
+                        </FlightSegment>
+                    </OriginDestinationInfo>
+                </AirItinInformation>
+            </AirItineraryPriced>
+            <AirItineraryPriced OptionID="2">
+                <JourneyInformation>
+                    <AirItinerary TripID="1">
+                        <OriginLocation LocationCode="DAC"/>
+                        <DestinationLocation LocationCode="KUL"/>
+                        <DepartureDate>2025-04-23</DepartureDate>
+                    </AirItinerary>
+                </JourneyInformation>
+                <FareInfo>
+                    <FareFamily OriginDestRPH="1" Name="ECONOMY FLEX">
+                        <FareBasisCodes>
+                            <FareBasisCode FareBaseID="1" Cabin="ECONOMY" IDFare="580998" RBD="Y">YOWBD</FareBasisCode>
+                            <FareBasisCode FareBaseID="1" Cabin="ECONOMY" IDFare="580998" RBD="Y">YOWBD</FareBasisCode>
+                        </FareBasisCodes>
+                    </FareFamily>
+                </FareInfo>
+                <AirItinTotalFare>
+                    <BaseFare CurrCode="BDT">45000.00</BaseFare>
+                    <EquivFare CurrCode="BDT">45000.00</EquivFare>
+                    <TotalTax>12413.00</TotalTax>
+                    <TotalFees>0.00</TotalFees>
+                    <TotalFare>57413.00</TotalFare>
+                </AirItinTotalFare>
+                <PTC_BreakDowns>
+                    <PTC_BreakDown>
+                        <PTC>ADT</PTC>
+                        <Quantity>1</Quantity>
+                        <FareInfo>
+                            <BaseFare CurrCode="BDT">45000.00</BaseFare>
+                            <EquivAmount CurrCode="BDT" BSR="1.00000">45000.00</EquivAmount>
+                        </FareInfo>
+                        <Taxes>
+                            <Tax>
+                                <Code>BD</Code>
+                                <Amount>500.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>E5</Code>
+                                <Amount>273.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>LK</Code>
+                                <Amount>7320.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>OW</Code>
+                                <Amount>1000.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>P7</Code>
+                                <Amount>600.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>P8</Code>
+                                <Amount>720.00</Amount>
+                            </Tax>
+                            <Tax>
+                                <Code>UT</Code>
+                                <Amount>2000.00</Amount>
+                            </Tax>
+                        </Taxes>
+                        <FeesAmount/>
+                        <TotalFare>57413.00</TotalFare>
+                        <FareConstruction/>
+                        <FareConstructionDetail>
+                            <FareComponent FareComponentID="1" OriginDestRPH="1">
+                                <ComponentPoint/>
+                                <CurrencyCode/>
+                                <ComponentAmount Surcharge="" Stopover="">368.91</ComponentAmount>
+                            </FareComponent>
+                        </FareConstructionDetail>
+                    </PTC_BreakDown>
+                </PTC_BreakDowns>
+                <AirItinInformation>
+                    <OriginDestinationInfo OriginDestRPH="1" FlightID="2">
+                        <FlightSegment FareBaseID="1">
+                            <SegmentNbr>1</SegmentNbr>
+                            <CarrierCode>8D</CarrierCode>
+                            <FlightNbr>861</FlightNbr>
+                            <RBD>Y</RBD>
+                            <Posting>9</Posting>
+                            <DepartureDate>2025-04-23</DepartureDate>
+                            <EQP>320</EQP>
+                            <DepartureAirport>DAC</DepartureAirport>
+                            <ArrivalAirport>CMB</ArrivalAirport>
+                            <DepartureTime>01:55</DepartureTime>
+                            <ArrivalTime>04:30</ArrivalTime>
+                            <ChangeDayInd>0</ChangeDayInd>
+                            <Stops>0</Stops>
+                            <ElapsedTime>03:05</ElapsedTime>
+                            <SSR_inventory>
+                                <SSR Code="PNNC" Quatity="10" Category="ARPT" Description="NAME CHANGE"/>
+                                <SSR Code="PDML" Quatity="10" Category="MEAL" Description="MEAL OR BEVERAGE (CHARGEABLE)"/>
+                                <SSR Code="PBGB" Quatity="8" Category="BAGG" Description="B BAGGAGE"/>
+                                <SSR Code="WCHR" Quatity="4" Category="MEDC" Description="WHEELCHAIR R FOR RAMP"/>
+                                <SSR Code="PDBG" Quatity="8" Category="BAGG" Description="PREPAID BAGGAGE"/>
+                                <SSR Code="INFT" Quatity="8" Category="STND" Description="INFANT"/>
+                            </SSR_inventory>
+                        </FlightSegment>
+                        <FlightSegment FareBaseID="1">
+                            <SegmentNbr>2</SegmentNbr>
+                            <CarrierCode>8D</CarrierCode>
+                            <FlightNbr>900</FlightNbr>
+                            <RBD>Y</RBD>
+                            <Posting>9</Posting>
+                            <DepartureDate>2025-04-24</DepartureDate>
+                            <EQP>320</EQP>
+                            <DepartureAirport>CMB</DepartureAirport>
+                            <ArrivalAirport>KUL</ArrivalAirport>
+                            <DepartureTime>04:00</DepartureTime>
+                            <ArrivalTime>16:00</ArrivalTime>
+                            <ChangeDayInd>0</ChangeDayInd>
+                            <Stops>1</Stops>
+                            <ElapsedTime>09:30</ElapsedTime>
+                            <SSR_inventory>
+                                <SSR Code="WCHR" Quatity="5" Category="MEDC" Description="WHEELCHAIR R FOR RAMP"/>
+                                <SSR Code="INFT" Quatity="8" Category="STND" Description="INFANT"/>
+                            </SSR_inventory>
+                        </FlightSegment>
+                    </OriginDestinationInfo>
+                </AirItinInformation>
+            </AirItineraryPriced>
+        </AirPricedItineraries>
+    </ShoppingCarrier>
+</KIU_AirShoppingRS>

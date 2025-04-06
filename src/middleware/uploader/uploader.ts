@@ -2,9 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import multerS3 from 'multer-s3';
 import multer from 'multer';
 import path from 'path';
-import { allowAllFileTypes, rootFileFolder } from './uploaderConstants';
-import CommonAbstractStorage from '../../features/common/commonAbstract/common.abstract.storage';
+import { allowAllFileTypes, ROOT_FILE_FOLDER } from './uploaderConstants';
 import config from '../../config/config';
+import CommonAbstractStorage from '../../abstract/abstract.storatge';
 import CustomError from '../../utils/lib/customError';
 
 class Uploader extends CommonAbstractStorage {
@@ -13,7 +13,7 @@ class Uploader extends CommonAbstractStorage {
   }
 
   // cloud upload raw
-  public  cloudUploadRaw(folder: string, types: string[] = allowAllFileTypes) {
+  public cloudUploadRaw(folder: string, types: string[] = allowAllFileTypes) {
     return (req: Request, res: Response, next: NextFunction): void => {
       req.upFiles = [];
       const upload = multer({
@@ -35,7 +35,7 @@ class Uploader extends CommonAbstractStorage {
 
             file.filename = fileWithFolder;
             req.upFiles.push(fileWithFolder);
-            cb(null, `${rootFileFolder}/${fileWithFolder}`);
+            cb(null, `${ROOT_FILE_FOLDER}/${fileWithFolder}`);
           },
         }),
         fileFilter: function (_req, file, cb) {

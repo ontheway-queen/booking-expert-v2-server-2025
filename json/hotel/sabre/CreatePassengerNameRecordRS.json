@@ -1,0 +1,704 @@
+{
+    "CreatePassengerNameRecordRS": {
+        "ApplicationResults": {
+            "status": "Complete",
+            "Success": [
+                {
+                    "timeStamp": "2024-05-11T06:48:11.911Z"
+                }
+            ]
+        },
+        "ItineraryRef": {
+            "ID": "OZMGJU"
+        },
+        "TravelItineraryRead": {
+            "TravelItinerary": {
+                "CustomerInfo": {
+                    "Address": {
+                        "AddressLine": [
+                            {
+                                "Id": "6",
+                                "type": "O",
+                                "content": "BEFRESH LIMITED"
+                            },
+                            {
+                                "Id": "7",
+                                "type": "O",
+                                "content": "3150 SABRE DRIVE"
+                            },
+                            {
+                                "Id": "8",
+                                "type": "O",
+                                "content": "CHITTAGONG BD"
+                            },
+                            {
+                                "Id": "9",
+                                "type": "O",
+                                "content": "4000"
+                            }
+                        ]
+                    },
+                    "ContactNumbers": {
+                        "ContactNumber": [
+                            {
+                                "LocationCode": "CGP",
+                                "Phone": "8801730042535-H-1.1",
+                                "RPH": "001",
+                                "Id": "5"
+                            }
+                        ]
+                    },
+                    "PersonName": [
+                        {
+                            "WithInfant": "false",
+                            "NameNumber": "01.01",
+                            "NameReference": "ABC123",
+                            "PassengerType": "ADT",
+                            "RPH": "1",
+                            "elementId": "pnr-3.1",
+                            "GivenName": "MAHBUB",
+                            "Surname": "RAHMAN"
+                        }
+                    ]
+                },
+                "ItineraryInfo": {
+                    "ReservationItems": {
+                        "Item": [
+                            {
+                                "RPH": "1",
+                                "Hotel": {
+                                    "DayOfWeekInd": "7",
+                                    "NumberInParty": "01",
+                                    "NumberOfUnits": "1",
+                                    "SegmentNumber": "0001",
+                                    "Status": "HK",
+                                    "Type": "HHL",
+                                    "IsPast": false,
+                                    "Id": "16",
+                                    "BasicPropertyInfo": {
+                                        "ChainCode": "7B",
+                                        "HotelCityCode": "LHR",
+                                        "HotelCode": "0",
+                                        "HotelName": "SKY NIGHTS HOTEL LONDON HEATHRO",
+                                        "Address": {
+                                            "AddressLine": [
+                                                "129 STATION ROAD"
+                                            ],
+                                            "CountryCode": "GB"
+                                        },
+                                        "CancelPenalty": [
+                                            {
+                                                "PolicyCode": "01D"
+                                            }
+                                        ],
+                                        "ConfirmationNumber": [
+                                            "0-"
+                                        ]
+                                    },
+                                    "Customer": {
+                                        "ReserveUnderName": [
+                                            "RAHMAN MAHBUB"
+                                        ]
+                                    },
+                                    "Guarantee": "MC5XXXXXXXXXXX0973EXP 03 26-RAIHAN",
+                                    "POS": {
+                                        "Source": {
+                                            "RequestorID": [
+                                                "42306773"
+                                            ]
+                                        }
+                                    },
+                                    "RoomRates": {
+                                        "Commission": {
+                                            "NonCommission": false,
+                                            "content": ""
+                                        },
+                                        "Rate": {
+                                            "Amount": "95.40",
+                                            "CurrencyCode": "GBP",
+                                            "RoomTypeCode": "null",
+                                            "HotelTotalPricing": {
+                                                "ApproximateTotal": {
+                                                    "AmountAndCurrency": "190.80 GBP"
+                                                },
+                                                "Disclaimer": [
+                                                    {
+                                                        "Id": "DS1",
+                                                        "content": "INCLUDES TAX"
+                                                    },
+                                                    {
+                                                        "Id": "DS2",
+                                                        "content": "EXCLUDES SURCHARGES"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "TimeSpan": {
+                                        "Duration": "002",
+                                        "End": "06-25",
+                                        "Start": "06-23"
+                                    }
+                                },
+                                "Product": {
+                                    "ProductBase": {
+                                        "SegmentReference": 16
+                                    },
+                                    "ProductDetails": {
+                                        "productCategory": "AGTLCSSEGMENT",
+                                        "productType": "HHL",
+                                        "vendorCode": "7B",
+                                        "statusCode": "HK",
+                                        "startPoint": "LHR",
+                                        "startDateTime": "2024-06-23T00:00:00",
+                                        "endPoint": "LHR",
+                                        "endDateTime": "2024-06-25T00:00:00",
+                                        "ProductName": {
+                                            "type": "HHL",
+                                            "content": "Lodging"
+                                        },
+                                        "Lodging": {
+                                            "ResGlobalInfo": {
+                                                "BookingInfo": {
+                                                    "Status": "39",
+                                                    "InfoSource": "113",
+                                                    "RateKey": "y0NC2bN/07B/32rwconI9Qoi2QX1kXZ4Eb4C1UY8rDSRk5QJLm+qzhm1ionr7Ng9b+rK0K6hBmKIik6C5tLcI2lZqRF1ZECPMeqcMWld3hcICiYhNKhP3iqmSq3O3P9IMg6bQKEqH5kUcq4qOiepV2PHPsdqzFXvH7ba/vxhP5wapiMGm5QGlSZb9jWFL67U4EoJiOFSsxPynMBWXHWYmHnbnWoYWVI+sthaM3gxYtFTd3tmJihYEPMwe4yH8KvgbZnlRnOYPRPqzQ2FbWF40uuWlOA43Py/OnJ0v1nBVzdlRSwY26GOIlWR+DUTX9IIoUlUSxhrsMqk5vLey2+6geCedvDSdK6Jyu5egaWyekZGR3j7aCEdPS5jTB1VnuZ3OwjfXIeILxGUKGiRkQuVtsBEGRaZrLG+maUuNiklwfwEJ/8X+o5pcFkKbZTHZIdcxXcSI04L/mu7vNr1S9/N3n4H1ft+rGbCaNGpoutr1xfKNfvBMifW1FW9J4W4DQ1izNFV74sI0UDpevHyzvvJbw==",
+                                                    "PartialCancelAllowed": false,
+                                                    "BookingKey": "lw1d9nxpoy",
+                                                    "HotelReservationIds": {
+                                                        "HotelReservation": [
+                                                            {
+                                                                "Id": "0",
+                                                                "Type": 40
+                                                            },
+                                                            {
+                                                                "Id": "OZMGJU011715410088IATA42306773",
+                                                                "Type": 16
+                                                            },
+                                                            {
+                                                                "Id": "OZMGJU",
+                                                                "Type": 24
+                                                            },
+                                                            {
+                                                                "Id": "0000",
+                                                                "Type": 18
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "HotelInfo": {
+                                                    "HotelCode": "101398892",
+                                                    "CodeContext": "GLOBAL",
+                                                    "GlobalChainCode": "7B",
+                                                    "HotelName": "Sky Nights Hotel London Heathrow",
+                                                    "BrandCode": "10000",
+                                                    "SabreRating": "3.0",
+                                                    "BrandName": "undefined",
+                                                    "SupplierChainCode": "7B",
+                                                    "SourceHotelCode": "0000",
+                                                    "LocationInfo": {
+                                                        "Latitude": "51.50634",
+                                                        "Longitude": "-0.46966",
+                                                        "Address": {
+                                                            "AddressLine1": "129 Station Road",
+                                                            "CityName": {
+                                                                "CityCode": "LHR",
+                                                                "content": "Hillingdon"
+                                                            },
+                                                            "PostalCode": "UB7 7ND",
+                                                            "CountryName": {
+                                                                "Code": "GB",
+                                                                "content": "United Kingdom"
+                                                            }
+                                                        }
+                                                    },
+                                                    "Amenities": {
+                                                        "Amenity": [
+                                                            {
+                                                                "Code": 179,
+                                                                "Description": "Wireless internet connection in public areas"
+                                                            },
+                                                            {
+                                                                "Code": 198,
+                                                                "Description": "Non-smoking rooms (generic)"
+                                                            },
+                                                            {
+                                                                "Code": 223,
+                                                                "Description": "Internet services"
+                                                            },
+                                                            {
+                                                                "Code": 242,
+                                                                "Description": "Heated guest rooms"
+                                                            },
+                                                            {
+                                                                "Code": 268,
+                                                                "Description": "All public areas non-smoking"
+                                                            },
+                                                            {
+                                                                "Code": 3,
+                                                                "Description": "24-hour security"
+                                                            },
+                                                            {
+                                                                "Code": 64,
+                                                                "Description": "On-Site parking"
+                                                            },
+                                                            {
+                                                                "Code": 87,
+                                                                "Description": "Storage space"
+                                                            },
+                                                            {
+                                                                "Code": 68,
+                                                                "Description": "Parking"
+                                                            },
+                                                            {
+                                                                "Code": 42,
+                                                                "Description": "Free Parking"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "PropertyTypeInfo": {
+                                                        "PropertyType": [
+                                                            {
+                                                                "Code": 20,
+                                                                "Description": "Hotel"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "StayDateRange": {
+                                                    "StartDate": "2024-06-23",
+                                                    "EndDate": "2024-06-25"
+                                                },
+                                                "Total": {
+                                                    "AmountAfterTax": 190.8,
+                                                    "AmountBeforeTax": 190.8,
+                                                    "CurrencyCode": "GBP"
+                                                },
+                                                "Commission": {
+                                                    "CommissionIndicator": true,
+                                                    "Percent": 2.25,
+                                                    "Amount": 4.4,
+                                                    "CurrencyCode": "GBP",
+                                                    "Type": "Amount"
+                                                }
+                                            },
+                                            "Rooms": {
+                                                "NumberOfRooms": 1,
+                                                "Room": [
+                                                    {
+                                                        "RoomType": "Guest room",
+                                                        "InvBlockCode": "AGRPRD",
+                                                        "SegmentNumber": 1,
+                                                        "GuestRoomInfo": 42,
+                                                        "NonSmoking": true,
+                                                        "RoomIndex": 1,
+                                                        "Guests": {
+                                                            "Count": 1,
+                                                            "Guest": [
+                                                                {
+                                                                    "Type": 10,
+                                                                    "Email": "mahbub73@hotmail.com",
+                                                                    "Index": 1,
+                                                                    "LeadGuest": true,
+                                                                    "FirstName": "MAHBUB",
+                                                                    "LastName": "RAHMAN",
+                                                                    "Contact": {
+                                                                        "Phone": "8801730042535"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        },
+                                                        "RoomDescription": {
+                                                            "Name": "King Room with Air Conditioning - Booking.com rate",
+                                                            "Text": "Providing free toiletries, this double room includes a private bathroom with a shower. This double room features air conditioning, heating and a flat-screen TV. The unit offers 1 bed."
+                                                        },
+                                                        "BookingStatus": "HK",
+                                                        "RatePlan": {
+                                                            "RatePlanName": "King Room with Air Conditioning - Booking.com rate",
+                                                            "RatePlanType": "13",
+                                                            "PrepaidIndicator": false,
+                                                            "RatePlanDescription": {
+                                                                "Text": [
+                                                                    "King Room with Air Conditioning - Booking.com rate"
+                                                                ]
+                                                            },
+                                                            "RatePlanInclusions": {
+                                                                "RatePlanInclusionDescription": [
+                                                                    {
+                                                                        "Name": "Free high speed internet connection",
+                                                                        "Code": 222
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "MealsIncluded": {
+                                                                "MealIncluded": [
+                                                                    {
+                                                                        "Breakfast": false,
+                                                                        "Lunch": false,
+                                                                        "Dinner": false,
+                                                                        "MealPlanCode": "14"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "RateInfo": {
+                                                                "AmountBeforeTax": 190.8,
+                                                                "AmountAfterTax": 190.8,
+                                                                "CurrencyCode": "GBP",
+                                                                "NightlyRate": 95.4,
+                                                                "AdditionalFeesInclusive": false,
+                                                                "TaxInclusive": true,
+                                                                "AdditionalDetails": {
+                                                                    "AdditionalDetail": [
+                                                                        {
+                                                                            "Code": 32,
+                                                                            "Text": [
+                                                                                "INCLUDES TAX",
+                                                                                "EXCLUDES SURCHARGES"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "Code": 8,
+                                                                            "CurrencyCode": "GBP",
+                                                                            "Text": [
+                                                                                "Guests are required to show a photo identification and credit card upon check-in. Please note that all Special Requests are subject to availability and additional charges may apply. Please inform Sky Nights Hotel London Heathrow in advance of your expected arrival time. You can use the Special Requests box when booking, or contact the property directly with the contact details provided in your confirmation. Guests under the age of 18 can only check in with a parent or official guardian. A damage deposit of GBP 50 is required on arrival. This will be collected by credit card. You should be reimbursed within 14 days of check-out. Your deposit will be refunded in full via credit card, subject to an inspection of the property. Late check-in after 23:00 is possible for an additional fee of GBP 10 per hour. Please note that the budget double room only comes with a toilet and sink. There is no shower with this room. Visitors are not allowed to meet guests in their rooms, but they can be seen in the lounge. Failure to check-out by 11:00 will incur a fee of GBP 10 per hour. When booking 4 rooms or more, different policies and additional supplements will apply. Guests are kindly asked to keep the noise down after 22:00. This hotel cannot accept American Express card details. Partying groups are not allowed."
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "Code": 29,
+                                                                            "CurrencyCode": "GBP",
+                                                                            "Text": [
+                                                                                "No prepayment is needed."
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "CancelPenalties": {
+                                                                    "CancelPenalty": [
+                                                                        {
+                                                                            "Refundable": true,
+                                                                            "Deadline": {
+                                                                                "AbsoluteDeadline": "2024-06-22T00:00:00.000"
+                                                                            },
+                                                                            "AmountPercent": {
+                                                                                "Amount": 190.8,
+                                                                                "CurrencyCode": "GBP"
+                                                                            },
+                                                                            "PenaltyDescription": {
+                                                                                "Text": "You may cancel free of charge until 1 day before arrival. You will be charged the total price of the reservation if you cancel within 1 day before arrival."
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "Guarantee": {
+                                                                    "GuaranteeType": "GUAR",
+                                                                    "GuaranteesAccepted": {
+                                                                        "GuaranteeAccepted": [
+                                                                            {
+                                                                                "GuaranteeTypeCode": 5,
+                                                                                "PaymentCards": {
+                                                                                    "PaymentCard": [
+                                                                                        {
+                                                                                            "CardCode": "IK",
+                                                                                            "content": "MASTER CARD"
+                                                                                        },
+                                                                                        {
+                                                                                            "CardCode": "VI",
+                                                                                            "content": "VISA"
+                                                                                        },
+                                                                                        {
+                                                                                            "CardCode": "MC",
+                                                                                            "content": "MASTER CARD"
+                                                                                        },
+                                                                                        {
+                                                                                            "CardCode": "VS",
+                                                                                            "content": "VISA"
+                                                                                        },
+                                                                                        {
+                                                                                            "CardCode": "CA",
+                                                                                            "content": "MASTERCARD"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                "Commission": {
+                                                                    "CommissionIndicator": true,
+                                                                    "Percent": 2.25,
+                                                                    "Amount": 4.4,
+                                                                    "CurrencyCode": "GBP",
+                                                                    "Type": "Amount"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "PaymentInformation": {
+                                                "Type": "GUARANTEE",
+                                                "FormOfPaymentReference": {
+                                                    "newRef": "1"
+                                                }
+                                            },
+                                            "POS": {
+                                                "Source": {
+                                                    "AgencyName": "BEFRESH LIMITED",
+                                                    "ISOCountryCode": "BD",
+                                                    "PseudoCityCode": "T7KD",
+                                                    "RequestorID": {
+                                                        "Type": 5,
+                                                        "Id": "42306773",
+                                                        "IdContext": "IATA"
+                                                    },
+                                                    "AgencyAddress": {
+                                                        "AddressLine1": "BEFRESH",
+                                                        "AddressLine2": "CGP",
+                                                        "CityName": {
+                                                            "CityCode": "BD",
+                                                            "content": ""
+                                                        },
+                                                        "PostalCode": "4000",
+                                                        "CountryName": {
+                                                            "Code": "BD",
+                                                            "content": ""
+                                                        }
+                                                    },
+                                                    "AgencyContact": {
+                                                        "Mobile": "880125785592"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "ItineraryRef": {
+                    "AirExtras": false,
+                    "ID": "OZMGJU",
+                    "InhibitCode": "U",
+                    "PartitionID": "AA",
+                    "PrimeHostID": "1B",
+                    "Source": {
+                        "AAA_PseudoCityCode": "T7KD",
+                        "CreateDateTime": "2024-05-11T01:48",
+                        "CreationAgent": "AWC",
+                        "HomePseudoCityCode": "T7KD",
+                        "PseudoCityCode": "T7KD",
+                        "ReceivedFrom": "SP BEFRESH",
+                        "LastUpdateDateTime": "2024-05-11T01:48",
+                        "SequenceNumber": "1"
+                    }
+                },
+                "SpecialServiceInfo": [
+                    {
+                        "RPH": "001",
+                        "Type": "GFX",
+                        "Id": "10",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 101398892 AGRPRD  D KING ROOM WITH AIR CONDITION"
+                            ]
+                        }
+                    },
+                    {
+                        "RPH": "002",
+                        "Type": "GFX",
+                        "Id": "11",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 101398892 AGRPRD  C YOU MAY CANCEL FREE OF CHARG"
+                            ]
+                        }
+                    },
+                    {
+                        "RPH": "003",
+                        "Type": "GFX",
+                        "Id": "12",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 101398892 AGRPRD  D PROVIDING FREE TOILETRIES, T"
+                            ]
+                        }
+                    },
+                    {
+                        "RPH": "004",
+                        "Type": "GFX",
+                        "Id": "13",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 101398892 AGRPRD  D HIS DOUBLE ROOM INCLUDES A P"
+                            ]
+                        }
+                    },
+                    {
+                        "RPH": "005",
+                        "Type": "GFX",
+                        "Id": "14",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 101398892 AGRPRD  TP 190.80 GBP APPROX. TTL PRIC"
+                            ]
+                        }
+                    },
+                    {
+                        "RPH": "006",
+                        "Type": "GFX",
+                        "Id": "15",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 101398892 AGRPRD  TD INCLUDES TAX"
+                            ]
+                        }
+                    }
+                ],
+                "OpenReservationElements": {
+                    "OpenReservationElement": [
+                        {
+                            "id": "10",
+                            "type": "SRVC",
+                            "elementId": "pnr-10",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 101398892 AGRPRD  D KING ROOM WITH AIR CONDITION",
+                                "FullText": "7B HHL 101398892 AGRPRD  D KING ROOM WITH AIR CONDITION"
+                            }
+                        },
+                        {
+                            "id": "11",
+                            "type": "SRVC",
+                            "elementId": "pnr-11",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 101398892 AGRPRD  C YOU MAY CANCEL FREE OF CHARG",
+                                "FullText": "7B HHL 101398892 AGRPRD  C YOU MAY CANCEL FREE OF CHARG"
+                            }
+                        },
+                        {
+                            "id": "12",
+                            "type": "SRVC",
+                            "elementId": "pnr-12",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 101398892 AGRPRD  D PROVIDING FREE TOILETRIES, T",
+                                "FullText": "7B HHL 101398892 AGRPRD  D PROVIDING FREE TOILETRIES, T"
+                            }
+                        },
+                        {
+                            "id": "13",
+                            "type": "SRVC",
+                            "elementId": "pnr-13",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 101398892 AGRPRD  D HIS DOUBLE ROOM INCLUDES A P",
+                                "FullText": "7B HHL 101398892 AGRPRD  D HIS DOUBLE ROOM INCLUDES A P"
+                            }
+                        },
+                        {
+                            "id": "14",
+                            "type": "SRVC",
+                            "elementId": "pnr-14",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 101398892 AGRPRD  TP 190.80 GBP APPROX. TTL PRIC",
+                                "FullText": "7B HHL 101398892 AGRPRD  TP 190.80 GBP APPROX. TTL PRIC"
+                            }
+                        },
+                        {
+                            "id": "15",
+                            "type": "SRVC",
+                            "elementId": "pnr-15",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 101398892 AGRPRD  TD INCLUDES TAX",
+                                "FullText": "7B HHL 101398892 AGRPRD  TD INCLUDES TAX"
+                            }
+                        }
+                    ]
+                },
+                "AssociationMatrices": {
+                    "AssociationMatrix": [
+                        {
+                            "Name": "PssIDType",
+                            "Parent": {
+                                "ref": "pnr-16"
+                            },
+                            "Child": [
+                                {
+                                    "ref": "pnr-10"
+                                },
+                                {
+                                    "ref": "pnr-11"
+                                },
+                                {
+                                    "ref": "pnr-12"
+                                },
+                                {
+                                    "ref": "pnr-13"
+                                },
+                                {
+                                    "ref": "pnr-14"
+                                },
+                                {
+                                    "ref": "pnr-15"
+                                },
+                                {
+                                    "ref": "pnr-or-3"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "Links": [
+        {
+            "rel": "self",
+            "href": "https://api.cert.platform.sabre.com/v2.4.0/passenger/records?mode=create"
+        },
+        {
+            "rel": "linkTemplate",
+            "href": "https://api.cert.platform.sabre.com/<version>/passenger/records?mode=<mode>"
+        }
+    ]
+}

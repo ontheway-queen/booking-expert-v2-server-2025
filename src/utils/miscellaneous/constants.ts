@@ -22,3 +22,10 @@ export const OTP_FOR = 'Verification';
 
 // Default data get limit
 export const DATA_LIMIT = 100;
+
+//error logs level
+export const ERROR_LEVEL_DEBUG = 'DEBUG';
+export const ERROR_LEVEL_INFO = 'INFO';
+export const ERROR_LEVEL_WARNING = 'WARNING';
+export const ERROR_LEVEL_ERROR = 'ERROR';
+export const ERROR_LEVEL_CRITICAL = 'CRITICAL';

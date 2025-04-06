@@ -1,0 +1,56 @@
+{
+    "GetHotelAvailRQ": {
+      "POS": {
+        "Source": {
+          "PseudoCityCode": "{{pcc}}"
+        }
+      },
+      "SearchCriteria": {
+        "OffSet": 1,
+        "SortBy": "TotalRate",
+        "SortOrder": "ASC",
+        "PageSize": 200,
+        "TierLabels": true,
+        "GeoSearch": {
+          "GeoRef": {
+            "Radius": 30,
+            "UOM": "MI",
+            "RefPoint": {
+              "Value": "LHR",
+              "ValueContext": "CODE",
+              "RefPointType": "6",
+              "CountryCode": "UK"
+            }
+          }
+        },
+        "RateInfoRef": {
+          "CurrencyCode": "BDT",
+          "BestOnly": "1",
+          "PrepaidQualifier": "IncludePrepaid",
+          "RefundableOnly": true,
+          "ConvertedRateInfoOnly": true,
+          "TravellerCountry": "BD",
+          "StayDateTimeRange": {
+            "StartDate": "2024-06-23",
+            "EndDate": "2024-06-25"
+          },
+          "Rooms": {
+            "Room": [
+              {
+                "Index": 1,
+                "Adults": 1,
+                "Children": 0,
+                "ChildAges": ""
+              }
+            ]
+          },
+          "RateSource": "100,112,113"
+        },
+        "ImageRef": {
+          "Type": "MEDIUM",
+          "CategoryCode": 3,
+          "LanguageCode": "EN"
+        }
+      }
+    }
+  }

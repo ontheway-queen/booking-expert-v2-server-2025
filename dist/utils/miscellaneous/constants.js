@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DATA_LIMIT = exports.OTP_FOR = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_IMAGE_URL = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL_2 = exports.PROJECT_EMAIL = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPE_FORGET_AGENT = exports.OTP_TYPE_FORGET_ADMIN = exports.origin = void 0;
+exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.DATA_LIMIT = exports.OTP_FOR = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_IMAGE_URL = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL_2 = exports.PROJECT_EMAIL = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPE_FORGET_AGENT = exports.OTP_TYPE_FORGET_ADMIN = exports.origin = void 0;
 exports.origin = ['http://localhost:3000'];
 // OTP types constants
 exports.OTP_TYPE_FORGET_ADMIN = 'reset_admin';
@@ -19,3 +19,9 @@ exports.OTP_EMAIL_SUBJECT = 'Your One Time Password For Verification';
 exports.OTP_FOR = 'Verification';
 // Default data get limit
 exports.DATA_LIMIT = 100;
+//error logs level
+exports.ERROR_LEVEL_DEBUG = 'DEBUG';
+exports.ERROR_LEVEL_INFO = 'INFO';
+exports.ERROR_LEVEL_WARNING = 'WARNING';
+exports.ERROR_LEVEL_ERROR = 'ERROR';
+exports.ERROR_LEVEL_CRITICAL = 'CRITICAL';

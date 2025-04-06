@@ -1,0 +1,136 @@
+{
+    "CreatePassengerNameRecordRQ": {
+        "version": "2.5.0",
+        "targetCity": "T7KD",
+        "TravelItineraryAddInfo": {
+            "AgencyInfo": {
+                "Address": {
+                    "AddressLine": "BEFRESH LIMITED",
+                    "CityName": "CHITTAGONG",
+                    "CountryCode": "BD",
+                    "PostalCode": "4000",
+                    "StreetNmbr": "3150 SABRE DRIVE"
+                }
+            },
+            "CustomerInfo": {
+                "ContactNumbers": {
+                    "ContactNumber": [
+                        {
+                            "NameNumber": "1.1",
+                            "Phone": "8801730042535",
+                            "PhoneUseType": "H"
+                        }
+                    ]
+                },
+                "PersonName": [
+                    {
+                        "NameNumber": "1.1",
+                        "NameReference": "ABC123",
+                        "PassengerType": "ADT",
+                        "GivenName": "MAHBUB",
+                        "Surname": "RAHMAN"
+                    }
+                ]
+            }
+        },
+        "HotelBook": {
+            "bookGDSviaCSL": true,
+            "BookingInfo": {
+                "BookingKey": "lw1d9nxpoy"
+            },
+            "Rooms": {
+                "Room": [
+                    {
+                        "Guests": {
+                            "Guest": [
+                                {
+                                    "Contact": {
+                                        "Phone": "8801730042535"
+                                    },
+                                    "FirstName": "MAHBUB",
+                                    "LastName": "RAHMAN",
+                                    "Index": 1,
+                                    "LeadGuest": true,
+                                    "Type": 10,
+                                    "Email": "mahbub73@hotmail.com"
+                                }
+                            ]
+                        },
+                        "RoomIndex": 1
+                    }
+                ]
+            },
+            "PaymentInformation": {
+                "FormOfPayment": {
+                    "PaymentCard": {
+                        "PaymentType": "CC",
+                        "CardCode": "MC",
+                        "CardNumber": "5374921152370973",
+                        "ExpiryMonth": 3,
+                        "ExpiryYear": "2026",
+                        "FullCardHolderName": {
+                            "FirstName": "MD KAISER",
+                            "LastName": "RAIHAN",
+                            "Email": "mahbub73@hotmail.com"
+                        },
+                        "CSC": "796",
+                        "Address": {
+                            "AddressLine": [
+                                "Wadowicka 6"
+                            ],
+                            "CityName": "CHITTAGONG",
+                            "PostCode": "4000",
+                            "CountryCodes": {
+                                "Code": [
+                                    {
+                                        "content": "BD"
+                                    }
+                                ]
+                            }
+                        },
+                        "Phone": {
+                            "PhoneNumber": "8801730042535"
+                        }
+                    }
+                },
+                "Type": "GUARANTEE"
+            },
+            "POS": {
+                "Source": {
+                    "RequestorID": {
+                        "Type": 5,
+                        "Id": "42306773",
+                        "IdContext": "IATA"
+                    },
+                    "AgencyAddress": {
+                        "AddressLine1": "BEFRESH",
+                        "AddressLine2": "CGP",
+                        "PostalCode": "4000",
+                        "CityName": {
+                            "CityCode": "BD"
+                        },
+                        "CountryName": {
+                            "Code": "BD"
+                        }
+                    },
+                    "AgencyName": "BEFRESH LIMITED",
+                    "AgencyContact": {
+                        "Mobile": "880125785592"
+                    },
+                    "ISOCountryCode": "BD",
+                    "PseudoCityCode": "T7KD"
+                }
+            }
+        },
+        "PostProcessing": {
+            "EndTransaction": {
+                "Source": {
+                    "ReceivedFrom": "SP BEFRESH"
+                }
+            },
+            "RedisplayReservation": {
+                "waitInterval": 100
+            }
+        }
+    }
+}

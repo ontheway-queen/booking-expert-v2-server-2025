@@ -32,12 +32,27 @@ class ErrorHandler {
                 method: req.method,
                 stack: err.stack,
                 user_id: ((_a = req.user) === null || _a === void 0 ? void 0 : _a.id) || ((_b = req.agency) === null || _b === void 0 ? void 0 : _b.id) || ((_c = req.admin) === null || _c === void 0 ? void 0 : _c.id),
-                source: req.agency ? "B2B" : req.admin ? "ADMIN" : "B2C"
+                source: req.agency
+                    ? 'B2B'
+                    : req.admin
+                        ? 'ADMIN'
+                        : 'B2C',
             };
             console.log(err, 'custom error');
             try {
                 if (err.status == 500 || !err.status) {
-                    yield new rootModel_1.default().errorLogsModel().insert({ level: err.level || "ERROR", message: errorDetails.message || "Internal Server Error", stack_trace: errorDetails.stack, source: errorDetails.source, user_id: errorDetails.user_id, url: errorDetails.route, http_method: errorDetails.method, metadata: err.metadata });
+                    yield new rootModel_1.default()
+                        .errorLogsModel()
+                        .insert({
+                        level: err.level || 'ERROR',
+                        message: errorDetails.message || 'Internal Server Error',
+                        stack_trace: errorDetails.stack,
+                        source: errorDetails.source,
+                        user_id: errorDetails.user_id,
+                        url: errorDetails.route,
+                        http_method: errorDetails.method,
+                        metadata: err.metadata,
+                    });
                 }
             }
             catch (err) {
@@ -50,7 +65,7 @@ class ErrorHandler {
         this.customError = {
             success: false,
             message: 'Internal server error!',
-            level: 'ERROR'
+            level: 'ERROR',
         };
         this.manageFile = new manageFile_1.default();
     }

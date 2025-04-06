@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import CommonValidator from '../features/common/commonUtils/validators/commonValidator';
+import CommonValidator from '../features/public/commonUtils/validators/commonValidator';
 import FileFolder from '../utils/miscellaneous/fileFolders';
 import Uploader from '../middleware/uploader/uploader';
 

@@ -1,0 +1,112 @@
+{
+    "GetHotelDetailsRQ": {
+      "POS": {
+        "Source": {
+          "PseudoCityCode": "{{pcc}}"
+        }
+      },
+      "SearchCriteria": {
+        "HotelRefs": {
+          "HotelRef": {
+            "HotelCode": "101398892",
+            "CodeContext": "GLOBAL"
+          }
+        },
+        "RateInfoRef": {
+          "CurrencyCode": "BDT",
+          "PrepaidQualifier": "IncludePrepaid",
+          "RefundableOnly": true,
+          "ConvertedRateInfoOnly": true,
+          "ShowNegotiatedRatesFirst": true,
+          "StayDateTimeRange": {
+            "StartDate": "2024-06-23",
+            "EndDate": "2024-06-25"
+          },
+          "Rooms": {
+            "RoomSetTypes": {
+              "RoomSet": [
+                {
+                  "Type": "RoomView"
+                }
+              ]
+            },
+            "Room": [
+              {
+                "Index": 1,
+                "Adults": 1,
+                "Children": 0,
+                "ChildAges": ""
+              }
+            ]
+          }
+        },
+        "HotelContentRef": {
+          "DescriptiveInfoRef": {
+            "PropertyInfo": true,
+            "LocationInfo": true,
+            "Amenities": true,
+            "Descriptions": {
+              "Description": [
+                {
+                  "Type": "ShortDescription"
+                }
+              ]
+            },
+            "SecurityFeatures": true
+          },
+          "MediaRef": {
+            "MaxItems": "10",
+            "MediaTypes": {
+              "Images": {
+                "Image": [
+                  {
+                    "Type": "MEDIUM"
+                  }
+                ]
+              },
+              "PanoramicMedias": {
+                "PanoramicMedia": [
+                  {
+                    "Type": "HD360"
+                  }
+                ]
+              },
+              "Videos": {
+                "Video": [
+                  {
+                    "Type": "VIDEO360"
+                  }
+                ]
+              }
+            },
+            "Categories": {
+              "Category": [
+                {
+                  "Code": 1
+                }
+              ]
+            },
+            "AdditionalInfo": {
+              "Info": [
+                {
+                  "Type": "CAPTION",
+                  "value": true
+                },
+                {
+                  "Type": "ROOM_TYPE_CODE",
+                  "value": false
+                }
+              ]
+            },
+            "Languages": {
+              "Language": [
+                {
+                  "Code": "EN"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }

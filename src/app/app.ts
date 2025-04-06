@@ -5,6 +5,9 @@ import { Server } from 'http';
 import { origin } from '../utils/miscellaneous/constants';
 import { SocketServer, io } from './socket';
 import cron from 'node-cron';
+import CustomError from '../utils/lib/customError';
+import ErrorHandler from '../middleware/errorHandler/errorHandler';
+import RootRouter from './router';
 
 class App {
   public app: Application = express();
@@ -26,11 +29,9 @@ class App {
 
   // Run cron jobs
   private async runCron() {
-    const services = new commonService();
-
     // Run every 3 days at 12:00 AM
     cron.schedule('0 0 */3 * *', async () => {
-      await services.getSabreToken();
+      // await services.getSabreToken();
     });
   }
 
@@ -38,7 +39,7 @@ class App {
   public startServer() {
     this.server.listen(this.port, () => {
       console.log(
-        `Trabill OTA server has started successfully at port: ${this.port}...🚀`
+        `Booking Expert V2 OTA server has started successfully at port: ${this.port}...🚀`
       );
     });
   }
@@ -65,13 +66,6 @@ class App {
       const { id, type } = socket.handshake.auth;
       console.log(socket.id, '-', id, '-', type, ' is connected ⚡');
 
-      //update socket_id
-      if (type === 'admin') {
-        await new commonService().updateAdmin({ socket_id: socket.id }, id);
-      } else if (type === 'Agent') {
-        await new commonService().updateB2B({ socket_id: socket.id }, id);
-      }
-
       socket.on('disconnect', async (event) => {
         console.log(socket.id, '-', id, '-', type, ' disconnected...');
         socket.disconnect();
@@ -82,9 +76,14 @@ class App {
   // init routers
   private initRouters() {
     this.app.get('/', (_req: Request, res: Response) => {
-      res.send(`Trabill OTA server is running successfully...🚀`);
+      res.send(`Booking Expert OTA server is running successfully...🚀`);
     });
-    this.app.use('/api/v1', new RootRouter().v1Router);
+
+    this.app.get('/api', (_req: Request, res: Response) => {
+      res.send(`Booking Expert OTA API is active...🚀`);
+    });
+
+    this.app.use('/api/v2', new RootRouter().v2Router);
   }
 
   // not found router

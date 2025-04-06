@@ -18,6 +18,9 @@ const cors_1 = __importDefault(require("cors"));
 const constants_1 = require("../utils/miscellaneous/constants");
 const socket_1 = require("./socket");
 const node_cron_1 = __importDefault(require("node-cron"));
+const customError_1 = __importDefault(require("../utils/lib/customError"));
+const errorHandler_1 = __importDefault(require("../middleware/errorHandler/errorHandler"));
+const router_1 = __importDefault(require("./router"));
 class App {
     constructor(port) {
         this.app = (0, express_1.default)();
@@ -35,17 +38,16 @@ class App {
     // Run cron jobs
     runCron() {
         return __awaiter(this, void 0, void 0, function* () {
-            const services = new commonService();
             // Run every 3 days at 12:00 AM
             node_cron_1.default.schedule('0 0 */3 * *', () => __awaiter(this, void 0, void 0, function* () {
-                yield services.getSabreToken();
+                // await services.getSabreToken();
             }));
         });
     }
     //start server
     startServer() {
         this.server.listen(this.port, () => {
-            console.log(`Trabill OTA server has started successfully at port: ${this.port}...🚀`);
+            console.log(`Booking Expert V2 OTA server has started successfully at port: ${this.port}...🚀`);
         });
     }
     //init middleware
@@ -69,13 +71,6 @@ class App {
         socket_1.io.on('connection', (socket) => __awaiter(this, void 0, void 0, function* () {
             const { id, type } = socket.handshake.auth;
             console.log(socket.id, '-', id, '-', type, ' is connected ⚡');
-            //update socket_id
-            if (type === 'admin') {
-                yield new commonService().updateAdmin({ socket_id: socket.id }, id);
-            }
-            else if (type === 'Agent') {
-                yield new commonService().updateB2B({ socket_id: socket.id }, id);
-            }
             socket.on('disconnect', (event) => __awaiter(this, void 0, void 0, function* () {
                 console.log(socket.id, '-', id, '-', type, ' disconnected...');
                 socket.disconnect();
@@ -85,19 +80,22 @@ class App {
     // init routers
     initRouters() {
         this.app.get('/', (_req, res) => {
-            res.send(`Trabill OTA server is running successfully...🚀`);
+            res.send(`Booking Expert OTA server is running successfully...🚀`);
         });
-        this.app.use('/api/v1', new RootRouter().v1Router);
+        this.app.get('/api', (_req, res) => {
+            res.send(`Booking Expert OTA API is active...🚀`);
+        });
+        this.app.use('/api/v2', new router_1.default().v2Router);
     }
     // not found router
     notFoundRouter() {
         this.app.use('*', (_req, _res, next) => {
-            next(new CustomError('Cannot found the route', 404));
+            next(new customError_1.default('Cannot found the route', 404));
         });
     }
     // error handler
     errorHandle() {
-        this.app.use(new ErrorHandler().handleErrors);
+        this.app.use(new errorHandler_1.default().handleErrors);
     }
     //disable x-powered-by
     disableXPoweredBy() {

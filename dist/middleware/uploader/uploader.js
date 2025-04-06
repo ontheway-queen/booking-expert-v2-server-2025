@@ -7,10 +7,10 @@ const multer_s3_1 = __importDefault(require("multer-s3"));
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const uploaderConstants_1 = require("./uploaderConstants");
-const common_abstract_storage_1 = __importDefault(require("../../features/common/commonAbstract/common.abstract.storage"));
 const config_1 = __importDefault(require("../../config/config"));
+const abstract_storatge_1 = __importDefault(require("../../abstract/abstract.storatge"));
 const customError_1 = __importDefault(require("../../utils/lib/customError"));
-class Uploader extends common_abstract_storage_1.default {
+class Uploader extends abstract_storatge_1.default {
     constructor() {
         super();
     }
@@ -35,7 +35,7 @@ class Uploader extends common_abstract_storage_1.default {
                             path_1.default.extname(file.originalname);
                         file.filename = fileWithFolder;
                         req.upFiles.push(fileWithFolder);
-                        cb(null, `${uploaderConstants_1.rootFileFolder}/${fileWithFolder}`);
+                        cb(null, `${uploaderConstants_1.ROOT_FILE_FOLDER}/${fileWithFolder}`);
                     },
                 }),
                 fileFilter: function (_req, file, cb) {

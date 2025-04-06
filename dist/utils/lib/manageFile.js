@@ -21,10 +21,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = __importDefault(require("../../config/config"));
 const fs_1 = __importDefault(require("fs"));
-const common_abstract_storage_1 = __importDefault(require("../../features/common/commonAbstract/common.abstract.storage"));
 const client_s3_1 = require("@aws-sdk/client-s3");
 const uploaderConstants_1 = require("../../middleware/uploader/uploaderConstants");
-class ManageFile extends common_abstract_storage_1.default {
+const abstract_storatge_1 = __importDefault(require("../../abstract/abstract.storatge"));
+class ManageFile extends abstract_storatge_1.default {
     constructor() {
         super();
         // delete from cloud
@@ -64,7 +64,7 @@ class ManageFile extends common_abstract_storage_1.default {
             try {
                 if (files.length) {
                     for (let i = 0; i < files.length; i++) {
-                        const path = `${__dirname}/../../../${rootFileFolder}/${files[i]}`;
+                        const path = `${__dirname}/../../../${uploaderConstants_1.ROOT_FILE_FOLDER}/${files[i]}`;
                         yield fs_1.default.promises.unlink(path);
                     }
                 }
@@ -94,8 +94,8 @@ class ManageFile extends common_abstract_storage_1.default {
             try {
                 const params = {
                     Bucket: config_1.default.AWS_S3_BUCKET,
-                    CopySource: `${config_1.default.AWS_S3_BUCKET}/${rootFileFolder}/${source}`,
-                    Key: `${rootFileFolder}/${target}`,
+                    CopySource: `${config_1.default.AWS_S3_BUCKET}/${uploaderConstants_1.ROOT_FILE_FOLDER}/${source}`,
+                    Key: `${uploaderConstants_1.ROOT_FILE_FOLDER}/${target}`,
                 };
                 const copyCommand = new client_s3_1.CopyObjectCommand(params);
                 const res = yield this.s3Client.send(copyCommand);
@@ -110,7 +110,7 @@ class ManageFile extends common_abstract_storage_1.default {
         this.getFileCloud = (file) => __awaiter(this, void 0, void 0, function* () {
             const params = {
                 Bucket: config_1.default.AWS_S3_BUCKET,
-                Key: `${rootFileFolder}/${file}`,
+                Key: `${uploaderConstants_1.ROOT_FILE_FOLDER}/${file}`,
             };
             const getCommand = new client_s3_1.GetObjectCommand(params);
             const res = yield this.s3Client.send(getCommand);
@@ -138,7 +138,7 @@ class ManageFile extends common_abstract_storage_1.default {
             try {
                 const params = {
                     Bucket: config_1.default.AWS_S3_BUCKET,
-                    Key: `${rootFileFolder}/${pathName}`,
+                    Key: `${uploaderConstants_1.ROOT_FILE_FOLDER}/${pathName}`,
                     Body: file,
                     ACL: 'public-read',
                 };

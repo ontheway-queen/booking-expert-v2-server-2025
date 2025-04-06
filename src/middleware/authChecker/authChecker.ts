@@ -7,7 +7,7 @@ import {
   IAdmin,
   IB2BAgencyUser,
   IUser,
-} from '../../features/common/commonUtils/types/commonTypes';
+} from '../../features/public/commonUtils/types/commonTypes';
 
 class AuthChecker {
   // admin auth checker
@@ -178,9 +178,6 @@ class AuthChecker {
       authSplit[1],
       config.JWT_SECRET_AGENT
     ) as IB2BAgencyUser;
-  
-
-
 
     if (!verify) {
       return res

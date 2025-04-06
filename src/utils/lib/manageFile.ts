@@ -1,6 +1,6 @@
 import config from '../../config/config';
 import fs from 'fs';
-import CommonAbstractStorage from '../../features/common/commonAbstract/common.abstract.storage';
+
 import {
   CopyObjectCommand,
   DeleteObjectCommand,
@@ -8,6 +8,7 @@ import {
   PutObjectCommand,
 } from '@aws-sdk/client-s3';
 import { ROOT_FILE_FOLDER } from '../../middleware/uploader/uploaderConstants';
+import CommonAbstractStorage from '../../abstract/abstract.storatge';
 
 class ManageFile extends CommonAbstractStorage {
   constructor() {
@@ -37,7 +38,7 @@ class ManageFile extends CommonAbstractStorage {
     try {
       if (files.length) {
         for (let i = 0; i < files.length; i++) {
-          const path = `${__dirname}/../../../${rootFileFolder}/${files[i]}`;
+          const path = `${__dirname}/../../../${ROOT_FILE_FOLDER}/${files[i]}`;
           await fs.promises.unlink(path);
         }
       } else {
@@ -71,8 +72,8 @@ class ManageFile extends CommonAbstractStorage {
     try {
       const params = {
         Bucket: config.AWS_S3_BUCKET,
-        CopySource: `${config.AWS_S3_BUCKET}/${rootFileFolder}/${source}`,
-        Key: `${rootFileFolder}/${target}`,
+        CopySource: `${config.AWS_S3_BUCKET}/${ROOT_FILE_FOLDER}/${source}`,
+        Key: `${ROOT_FILE_FOLDER}/${target}`,
       };
 
       const copyCommand = new CopyObjectCommand(params);
@@ -88,7 +89,7 @@ class ManageFile extends CommonAbstractStorage {
   public getFileCloud = async (file: string) => {
     const params = {
       Bucket: config.AWS_S3_BUCKET,
-      Key: `${rootFileFolder}/${file}`,
+      Key: `${ROOT_FILE_FOLDER}/${file}`,
     };
     const getCommand = new GetObjectCommand(params);
 
@@ -119,7 +120,7 @@ class ManageFile extends CommonAbstractStorage {
     try {
       const params = {
         Bucket: config.AWS_S3_BUCKET,
-        Key: `${rootFileFolder}/${pathName}`,
+        Key: `${ROOT_FILE_FOLDER}/${pathName}`,
         Body: file,
         ACL: 'public-read',
       };

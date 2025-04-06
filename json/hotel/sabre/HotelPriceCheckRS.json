@@ -1,0 +1,384 @@
+{
+    "HotelPriceCheckRS": {
+        "ApplicationResults": {
+            "status": "Complete",
+            "Success": [
+                {
+                    "timeStamp": "2024-05-11T01:47:50.153-05:00"
+                }
+            ]
+        },
+        "version": "4.0.0",
+        "PriceCheckInfo": {
+            "BookingKey": "lw1d9nxpoy",
+            "PriceChange": false,
+            "PriceDifference": "0.0",
+            "CurrencyCode": "GBP",
+            "ConvertedPriceChange": false,
+            "ConvertedPriceDifference": "0",
+            "ConvertedCurrencyCode": "BDT",
+            "HotelInfo": {
+                "HotelCode": "101398892",
+                "CodeContext": "GLOBAL",
+                "HotelName": "Sky Nights Hotel London Heathrow",
+                "ChainCode": "7B",
+                "BrandCode": "10000",
+                "BrandName": "undefined",
+                "SabreRating": "3.0",
+                "LocationInfo": {
+                    "Latitude": "51.50634",
+                    "Longitude": "-0.46966",
+                    "Address": {
+                        "AddressLine1": "129 Station Road",
+                        "CityName": {
+                            "CityCode": "LHR",
+                            "value": "Hillingdon"
+                        },
+                        "PostalCode": "UB7 7ND",
+                        "CountryName": {
+                            "Code": "GB",
+                            "value": "United Kingdom"
+                        }
+                    }
+                }
+            },
+            "HotelRateInfo": {
+                "RateInfos": {
+                    "RateInfo": [
+                        {
+                            "StartDate": "2024-06-23",
+                            "EndDate": "2024-06-25",
+                            "AmountBeforeTax": "190.80",
+                            "AmountAfterTax": "190.80",
+                            "AverageNightlyRate": "95.40",
+                            "AverageNightlyRateBeforeTax": "95.40",
+                            "CurrencyCode": "GBP",
+                            "AdditionalFeesInclusive": false,
+                            "TaxInclusive": true,
+                            "RateSource": "113",
+                            "RateKey": "y0NC2bN/07B/32rwconI9Qoi2QX1kXZ4Eb4C1UY8rDSRk5QJLm+qzhm1ionr7Ng9b+rK0K6hBmKIik6C5tLcI2lZqRF1ZECPMeqcMWld3hcICiYhNKhP3iqmSq3O3P9IMg6bQKEqH5kUcq4qOiepV2PHPsdqzFXvH7ba/vxhP5wapiMGm5QGlSZb9jWFL67U4EoJiOFSsxPynMBWXHWYmHnbnWoYWVI+sthaM3gxYtFTd3tmJihYEPMwe4yH8KvgbZnlRnOYPRPqzQ2FbWF40uuWlOA43Py/OnJ0v1nBVzdlRSwY26GOIlWR+DUTX9IIoUlUSxhrsMqk5vLey2+6geCedvDSdK6Jyu5egaWyekZGR3j7aCEdPS5jTB1VnuZ3OwjfXIeILxGUKGiRkQuVtsBEGRaZrLG+maUuNiklwfwEJ/8X+o5pcFkKbZTHZIdcxXcSI04L/mu7vNr1S9/N3n4H1ft+rGbCaNGpoutr1xfKNfvBMifW1FW9J4W4DQ1izNFV74sI0UDpevHyzvvJbw==",
+                            "Commission": {
+                                "Percent": 2.25,
+                                "Amount": "4.40",
+                                "CurrencyCode": "GBP",
+                                "Type": "Amount"
+                            }
+                        }
+                    ],
+                    "ConvertedRateInfo": [
+                        {
+                            "StartDate": "2024-06-23",
+                            "EndDate": "2024-06-25",
+                            "AmountBeforeTax": "26924",
+                            "AmountAfterTax": "26924",
+                            "AverageNightlyRate": "13462",
+                            "AverageNightlyRateBeforeTax": "13462",
+                            "CurrencyCode": "BDT",
+                            "AdditionalFeesInclusive": false,
+                            "TaxInclusive": true,
+                            "RateSource": "113",
+                            "RateKey": "y0NC2bN/07B/32rwconI9Qoi2QX1kXZ4Eb4C1UY8rDSRk5QJLm+qzhm1ionr7Ng9b+rK0K6hBmKIik6C5tLcI2lZqRF1ZECPMeqcMWld3hcICiYhNKhP3iqmSq3O3P9IMg6bQKEqH5kUcq4qOiepV2PHPsdqzFXvH7ba/vxhP5wapiMGm5QGlSZb9jWFL67U4EoJiOFSsxPynMBWXHWYmHnbnWoYWVI+sthaM3gxYtFTd3tmJihYEPMwe4yH8KvgbZnlRnOYPRPqzQ2FbWF40uuWlOA43Py/OnJ0v1nBVzdlRSwY26GOIlWR+DUTX9IIoUlUSxhrsMqk5vLey2+6geCedvDSdK6Jyu5egaWyekZGR3j7aCEdPS5jTB1VnuZ3OwjfXIeILxGUKGiRkQuVtsBEGRaZrLG+maUuNiklwfwEJ/8X+o5pcFkKbZTHZIdcxXcSI04L/mu7vNr1S9/N3n4H1ft+rGbCaNGpoutr1xfKNfvBMifW1FW9J4W4DQ1izNFV74sI0UDpevHyzvvJbw==",
+                            "Commission": {
+                                "Percent": 2.25,
+                                "Amount": "620",
+                                "CurrencyCode": "BDT",
+                                "Type": "Amount"
+                            }
+                        }
+                    ]
+                },
+                "Rooms": {
+                    "Room": [
+                        {
+                            "RoomIndex": 1,
+                            "RoomType": "Guest room",
+                            "RoomTypeCode": 42,
+                            "NonSmoking": true,
+                            "BedTypeOptions": {
+                                "BedTypes": [
+                                    {
+                                        "BedType": [
+                                            {
+                                                "Code": 5,
+                                                "Description": "Queen",
+                                                "Count": 1
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            "RoomDescription": {
+                                "Name": "King Room with Air Conditioning - Booking.com rate",
+                                "Text": [
+                                    "Providing free toiletries, this double room includes a private bathroom with a shower. This double room features air conditioning, heating and a flat-screen TV. The unit offers 1 bed."
+                                ]
+                            },
+                            "Amenities": {
+                                "Amenity": [
+                                    {
+                                        "Code": 142,
+                                        "Description": "Shower",
+                                        "value": ""
+                                    },
+                                    {
+                                        "Code": 251,
+                                        "Description": "TV",
+                                        "value": ""
+                                    },
+                                    {
+                                        "Code": 2,
+                                        "Description": "Air conditioning",
+                                        "value": ""
+                                    },
+                                    {
+                                        "Code": 157,
+                                        "Description": "Ceiling fan",
+                                        "value": ""
+                                    },
+                                    {
+                                        "Code": 85,
+                                        "Description": "Private bathroom",
+                                        "value": ""
+                                    },
+                                    {
+                                        "Code": 166,
+                                        "Description": "Self-controlled heating/cooling system",
+                                        "value": ""
+                                    },
+                                    {
+                                        "Code": 273,
+                                        "Description": "Widescreen TV",
+                                        "value": ""
+                                    },
+                                    {
+                                        "Code": 17,
+                                        "Description": "Bottled water",
+                                        "value": ""
+                                    }
+                                ]
+                            },
+                            "Occupancy": {
+                                "Max": 2
+                            },
+                            "RatePlans": {
+                                "RatePlan": [
+                                    {
+                                        "RatePlanName": "King Room with Air Conditioning - Booking.com rate",
+                                        "RatePlanType": "13",
+                                        "PrepaidIndicator": false,
+                                        "AvailableQuantity": 3,
+                                        "RateSource": "113",
+                                        "RateKey": "y0NC2bN/07B/32rwconI9Qoi2QX1kXZ4Eb4C1UY8rDSRk5QJLm+qzhm1ionr7Ng9b+rK0K6hBmKIik6C5tLcI2lZqRF1ZECPMeqcMWld3hcICiYhNKhP3iqmSq3O3P9IMg6bQKEqH5kUcq4qOiepV2PHPsdqzFXvH7ba/vxhP5wapiMGm5QGlSZb9jWFL67U4EoJiOFSsxPynMBWXHWYmHnbnWoYWVI+sthaM3gxYtFTd3tmJihYEPMwe4yH8KvgbZnlRnOYPRPqzQ2FbWF40uuWlOA43Py/OnJ0v1nBVzdlRSwY26GOIlWR+DUTX9IIoUlUSxhrsMqk5vLey2+6geCedvDSdK6Jyu5egaWyekZGR3j7aCEdPS5jTB1VnuZ3OwjfXIeILxGUKGiRkQuVtsBEGRaZrLG+maUuNiklwfwEJ/8X+o5pcFkKbZTHZIdcxXcSI04L/mu7vNr1S9/N3n4H1ft+rGbCaNGpoutr1xfKNfvBMifW1FW9J4W4DQ1izNFV74sI0UDpevHyzvvJbw==",
+                                        "LoyaltyPoints": false,
+                                        "RatePlanDescription": {
+                                            "Text": "King Room with Air Conditioning - Booking.com rate"
+                                        },
+                                        "RatePlanInclusions": {
+                                            "RatePlanInclusion": [
+                                                {
+                                                    "Description": "Free high speed internet connection",
+                                                    "Code": 222
+                                                }
+                                            ]
+                                        },
+                                        "MealsIncluded": {
+                                            "Breakfast": false,
+                                            "Lunch": false,
+                                            "Dinner": false,
+                                            "MealPlanCode": 14,
+                                            "MealPlanDescription": "Room only"
+                                        },
+                                        "RateInfo": {
+                                            "StartDate": "2024-06-23",
+                                            "EndDate": "2024-06-25",
+                                            "AmountBeforeTax": "190.80",
+                                            "AmountAfterTax": "190.80",
+                                            "AverageNightlyRate": "95.40",
+                                            "AverageNightlyRateBeforeTax": "95.40",
+                                            "CurrencyCode": "GBP",
+                                            "AdditionalFeesInclusive": false,
+                                            "TaxInclusive": true,
+                                            "CancelPenalties": {
+                                                "CancelPenalty": [
+                                                    {
+                                                        "Refundable": true,
+                                                        "Deadline": {
+                                                            "AbsoluteDeadline": "2024-06-22T00:00:00"
+                                                        },
+                                                        "AmountPercent": {
+                                                            "Amount": "190.80",
+                                                            "CurrencyCode": "GBP"
+                                                        },
+                                                        "PenaltyDescription": {
+                                                            "Text": "You may cancel free of charge until 1 day before arrival. You will be charged the total price of the reservation if you cancel within 1 day before arrival."
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "Guarantee": {
+                                                "GuaranteeType": "GUAR",
+                                                "GuaranteesAccepted": {
+                                                    "GuaranteeAccepted": [
+                                                        {
+                                                            "GuaranteeTypeCode": 5,
+                                                            "GuaranteeTypeDescription": "Credit card",
+                                                            "PaymentCards": {
+                                                                "CVVRequired": true,
+                                                                "PaymentCard": [
+                                                                    {
+                                                                        "CardCode": "IK",
+                                                                        "value": "MASTER CARD"
+                                                                    },
+                                                                    {
+                                                                        "CardCode": "VI",
+                                                                        "value": "VISA"
+                                                                    },
+                                                                    {
+                                                                        "CardCode": "MC",
+                                                                        "value": "MASTER CARD"
+                                                                    },
+                                                                    {
+                                                                        "CardCode": "VS",
+                                                                        "value": "VISA"
+                                                                    },
+                                                                    {
+                                                                        "CardCode": "CA",
+                                                                        "value": "MASTERCARD"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "AdditionalDetails": {
+                                                "AdditionalDetail": [
+                                                    {
+                                                        "Code": 32,
+                                                        "Description": "Rate disclaimer information",
+                                                        "Text": [
+                                                            "INCLUDES TAX",
+                                                            "EXCLUDES SURCHARGES"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "Code": 8,
+                                                        "Description": "Check in check out information",
+                                                        "CurrencyCode": "GBP",
+                                                        "Text": [
+                                                            "Guests are required to show a photo identification and credit card upon check-in. Please note that all Special Requests are subject to availability and additional charges may apply. Please inform Sky Nights Hotel London Heathrow in advance of your expected arrival time. You can use the Special Requests box when booking, or contact the property directly with the contact details provided in your confirmation. Guests under the age of 18 can only check in with a parent or official guardian. A damage deposit of GBP 50 is required on arrival. This will be collected by credit card. You should be reimbursed within 14 days of check-out. Your deposit will be refunded in full via credit card, subject to an inspection of the property. Late check-in after 23:00 is possible for an additional fee of GBP 10 per hour. Please note that the budget double room only comes with a toilet and sink. There is no shower with this room. Visitors are not allowed to meet guests in their rooms, but they can be seen in the lounge. Failure to check-out by 11:00 will incur a fee of GBP 10 per hour. When booking 4 rooms or more, different policies and additional supplements will apply. Guests are kindly asked to keep the noise down after 22:00. This hotel cannot accept American Express card details. Partying groups are not allowed."
+                                                        ]
+                                                    },
+                                                    {
+                                                        "Code": 29,
+                                                        "Description": "Booking guidelines",
+                                                        "CurrencyCode": "GBP",
+                                                        "Text": [
+                                                            "No prepayment is needed."
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "ConvertedRateInfo": {
+                                            "StartDate": "2024-06-23",
+                                            "EndDate": "2024-06-25",
+                                            "AmountBeforeTax": "26924",
+                                            "AmountAfterTax": "26924",
+                                            "AverageNightlyRate": "13462",
+                                            "AverageNightlyRateBeforeTax": "13462",
+                                            "CurrencyCode": "BDT",
+                                            "AdditionalFeesInclusive": false,
+                                            "TaxInclusive": true,
+                                            "CancelPenalties": {
+                                                "CancelPenalty": [
+                                                    {
+                                                        "Refundable": true,
+                                                        "Deadline": {
+                                                            "AbsoluteDeadline": "2024-06-22T00:00:00"
+                                                        },
+                                                        "AmountPercent": {
+                                                            "Amount": "26924",
+                                                            "CurrencyCode": "BDT"
+                                                        },
+                                                        "PenaltyDescription": {
+                                                            "Text": "You may cancel free of charge until 1 day before arrival. You will be charged the total price of the reservation if you cancel within 1 day before arrival."
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "Guarantee": {
+                                                "GuaranteeType": "GUAR",
+                                                "GuaranteesAccepted": {
+                                                    "GuaranteeAccepted": [
+                                                        {
+                                                            "GuaranteeTypeCode": 5,
+                                                            "GuaranteeTypeDescription": "Credit card",
+                                                            "PaymentCards": {
+                                                                "CVVRequired": true,
+                                                                "PaymentCard": [
+                                                                    {
+                                                                        "CardCode": "IK",
+                                                                        "value": "MASTER CARD"
+                                                                    },
+                                                                    {
+                                                                        "CardCode": "VI",
+                                                                        "value": "VISA"
+                                                                    },
+                                                                    {
+                                                                        "CardCode": "MC",
+                                                                        "value": "MASTER CARD"
+                                                                    },
+                                                                    {
+                                                                        "CardCode": "VS",
+                                                                        "value": "VISA"
+                                                                    },
+                                                                    {
+                                                                        "CardCode": "CA",
+                                                                        "value": "MASTERCARD"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "AdditionalDetails": {
+                                                "AdditionalDetail": [
+                                                    {
+                                                        "Code": 32,
+                                                        "Description": "Rate disclaimer information",
+                                                        "Text": [
+                                                            "INCLUDES TAX",
+                                                            "EXCLUDES SURCHARGES"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "Code": 8,
+                                                        "Description": "Check in check out information",
+                                                        "CurrencyCode": "BDT",
+                                                        "Text": [
+                                                            "Guests are required to show a photo identification and credit card upon check-in. Please note that all Special Requests are subject to availability and additional charges may apply. Please inform Sky Nights Hotel London Heathrow in advance of your expected arrival time. You can use the Special Requests box when booking, or contact the property directly with the contact details provided in your confirmation. Guests under the age of 18 can only check in with a parent or official guardian. A damage deposit of GBP 50 is required on arrival. This will be collected by credit card. You should be reimbursed within 14 days of check-out. Your deposit will be refunded in full via credit card, subject to an inspection of the property. Late check-in after 23:00 is possible for an additional fee of GBP 10 per hour. Please note that the budget double room only comes with a toilet and sink. There is no shower with this room. Visitors are not allowed to meet guests in their rooms, but they can be seen in the lounge. Failure to check-out by 11:00 will incur a fee of GBP 10 per hour. When booking 4 rooms or more, different policies and additional supplements will apply. Guests are kindly asked to keep the noise down after 22:00. This hotel cannot accept American Express card details. Partying groups are not allowed."
+                                                        ]
+                                                    },
+                                                    {
+                                                        "Code": 29,
+                                                        "Description": "Booking guidelines",
+                                                        "CurrencyCode": "BDT",
+                                                        "Text": [
+                                                            "No prepayment is needed."
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

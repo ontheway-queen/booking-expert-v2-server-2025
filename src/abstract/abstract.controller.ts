@@ -1,3 +1,9 @@
+import CommonValidator from '../features/public/utils/validators/publicOTP.validator';
+import Wrapper from '../middleware/asyncWrapper/middleware';
+import CustomError from '../utils/lib/customError';
+import ResMsg from '../utils/miscellaneous/responseMessage';
+import StatusCode from '../utils/miscellaneous/statusCode';
+
 abstract class AbstractController {
   protected asyncWrapper: Wrapper;
   protected commonValidator = new CommonValidator();
