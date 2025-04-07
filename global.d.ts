@@ -1,4 +1,5 @@
 import {} from '';
+import { Knex } from 'knex';
 import {
   ITokenParseAdmin,
   ITokenParseAgency,

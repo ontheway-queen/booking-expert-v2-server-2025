@@ -6,6 +6,7 @@ import B2CRootRouter from '../features/B2C/b2cRoot.router';
 import AdminRootRouter from '../features/admin/adminRoot.router';
 import AgentB2CRootRouter from '../features/agentB2C/agentB2CRoot.router';
 import ExternalRootRouter from '../features/external/externalRoot.router';
+import AuthChecker from '../middleware/authChecker/authChecker';
 
 export default class RootRouter {
   public v2Router = Router();
@@ -17,6 +18,8 @@ export default class RootRouter {
   private agentB2CRootRouter = new AgentB2CRootRouter();
   private externalRootRouter = new ExternalRootRouter();
 
+  // Auth checker
+  private authChecker = new AuthChecker();
   constructor() {
     this.callV2Router();
   }
@@ -35,7 +38,11 @@ export default class RootRouter {
     this.v2Router.use('/b2c', this.b2cRootRouter.Router);
 
     // Admin Routes
-    this.v2Router.use('/admin', this.adminRootRouter.Router);
+    this.v2Router.use(
+      '/admin',
+      this.authChecker.adminAuthChecker,
+      this.adminRootRouter.Router
+    );
 
     // Agent B2C Routes
     this.v2Router.use('/agent-b2c', this.agentB2CRootRouter.Router);

@@ -10,7 +10,7 @@ import {
   ITokenParseUser,
 } from '../../features/public/utils/types/publicCommon.types';
 
-class AuthChecker {
+export default class AuthChecker {
   // admin auth checker
   public adminAuthChecker = async (
     req: Request,
@@ -19,18 +19,20 @@ class AuthChecker {
   ) => {
     const { authorization } = req.headers;
     if (!authorization) {
-      return res
+      res
         .status(StatusCode.HTTP_UNAUTHORIZED)
         .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
+      return;
     }
 
     const authSplit = authorization.split(' ');
 
     if (authSplit.length !== 2) {
-      return res.status(StatusCode.HTTP_UNAUTHORIZED).json({
+      res.status(StatusCode.HTTP_UNAUTHORIZED).json({
         success: false,
         message: ResMsg.HTTP_UNAUTHORIZED,
       });
+      return;
     }
 
     const verify = Lib.verifyToken(
@@ -39,10 +41,12 @@ class AuthChecker {
     ) as ITokenParseAdmin;
 
     if (!verify) {
-      return res
+      res
         .status(StatusCode.HTTP_UNAUTHORIZED)
         .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
+      return;
     } else {
+      // Check admin user status from database first
       req.admin = verify as ITokenParseAdmin;
       next();
     }
@@ -181,5 +185,3 @@ class AuthChecker {
     next();
   };
 }
-
-export default AuthChecker;

@@ -2,12 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class Schema {
     constructor() {
-        this.ADMIN_SCHEMA = "admin";
-        this.DBO_SCHEMA = "dbo";
-        this.BTOC_SCHEMA = "btoc";
-        this.SERVICE_SCHEMA = "services";
-        this.BTOB_SCHEMA = "b2b";
-        this.BOOKING_SCHEMA = 'booking';
+        this.PUBLIC_SCHEMA = 'public';
+        this.ADMIN_SCHEMA = 'admin';
+        this.DBO_SCHEMA = 'dbo';
+        this.B2C_SCHEMA = 'btoc';
+        this.SERVICE_SCHEMA = 'services';
+        this.AGENT_SCHEMA = 'agent';
+        this.AGENT_B2C_SCHEMA = 'agent_btoc';
+        this.EXTERNAL_SCHEMA = 'external';
     }
 }
 exports.default = Schema;

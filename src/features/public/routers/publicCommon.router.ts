@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import AbstractRouter from '../../../abstract/abstract.router';
 
 export default class PublicCommonRouter extends AbstractRouter {
@@ -6,5 +7,8 @@ export default class PublicCommonRouter extends AbstractRouter {
     this.callRouter();
   }
 
-  private callRouter() {}
+  private callRouter() {
+    // Airport
+    this.router.get('/airport');
+  }
 }

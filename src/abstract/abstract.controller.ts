@@ -11,6 +11,7 @@ abstract class AbstractController {
     this.asyncWrapper = new Wrapper();
   }
   protected StatusCode = StatusCode;
+  protected ResMsg = ResMsg;
   protected error(message?: string, status?: number) {
     throw new CustomError(
       message || ResMsg.HTTP_INTERNAL_SERVER_ERROR,

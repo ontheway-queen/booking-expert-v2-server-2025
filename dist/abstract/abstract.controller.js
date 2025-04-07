@@ -12,6 +12,7 @@ class AbstractController {
     constructor() {
         this.commonValidator = new publicCommon_validator_1.default();
         this.StatusCode = statusCode_1.default;
+        this.ResMsg = responseMessage_1.default;
         this.asyncWrapper = new middleware_1.default();
     }
     error(message, status) {

@@ -9,6 +9,9 @@ class PublicCommonRouter extends abstract_router_1.default {
         super();
         this.callRouter();
     }
-    callRouter() { }
+    callRouter() {
+        // Airport
+        this.router.get('/airport');
+    }
 }
 exports.default = PublicCommonRouter;

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.db = exports.createDbCon = void 0;
+exports.db = void 0;
 const knex_1 = __importDefault(require("knex"));
 const config_1 = __importDefault(require("../config/config"));
 const createDbCon = () => {
@@ -15,9 +15,9 @@ const createDbCon = () => {
             user: config_1.default.DB_USER,
             password: config_1.default.DB_PASS,
             database: config_1.default.DB_NAME,
-            ssl: {
-                rejectUnauthorized: false,
-            },
+            // ssl: {
+            //   rejectUnauthorized: false,
+            // },
         },
         pool: {
             min: 0,
@@ -26,5 +26,4 @@ const createDbCon = () => {
     });
     return connection;
 };
-exports.createDbCon = createDbCon;
-exports.db = (0, exports.createDbCon)();
+exports.db = createDbCon();

@@ -1,7 +1,7 @@
 import knex from 'knex';
 import config from '../config/config';
 
-export const createDbCon = () => {
+const createDbCon = (): knex.Knex<any, unknown[]> => {
   const connection = knex({
     client: 'pg',
     connection: {
@@ -10,9 +10,9 @@ export const createDbCon = () => {
       user: config.DB_USER,
       password: config.DB_PASS,
       database: config.DB_NAME,
-      ssl: {
-        rejectUnauthorized: false,
-      },
+      // ssl: {
+      //   rejectUnauthorized: false,
+      // },
     },
     pool: {
       min: 0,
