@@ -1,4 +1,7 @@
+import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
+import { OTP_TYPES } from '../../../utils/miscellaneous/constants';
+import CustomError from '../../../utils/lib/customError';
 
 export default class PublicEmailOTPService extends AbstractServices {
   constructor() {
@@ -8,41 +11,27 @@ export default class PublicEmailOTPService extends AbstractServices {
   // send email otp service
   public async sendEmailOtp(req: Request) {
     const { email, type } = req.body;
-
-    let error = false;
-
     switch (type) {
-      case OTP_TYPE_RESET_BTOC_USER:
-        const { agency_id } = req.btocAgency;
-        const btocUserModel = this.Model.userModel();
-
-        const checkbtocUser = await btocUserModel.getUser({ agency_id, email });
-
-        if (!checkbtocUser.length) {
-          error = true;
-        }
-        break;
-      case OTP_TYPE_RESET_BTOB_USER:
-        const btobUserModel = this.Model.btobUsersModel();
-        const checkbtobUser = await btobUserModel.getSingleUser({ email });
-
-        if (!checkbtobUser.length) {
-          error = true;
-        }
-        break;
-      case OTP_TYPE_RESET_ADMIN_USER:
-        const adminModel = this.Model.adminModel();
-        const checkAdmin = await adminModel.getSingleAdmin({
-          email,
-        });
-
-        if (!checkAdmin.length) {
-          error = true;
-        }
-        break;
+      case OTP_TYPES.reset_admin:
+        return await this.sendOTPAdminSubService({ email });
+      case OTP_TYPES.verify_admin:
+        return await this.sendOTPAdminSubService({ email });
+      case OTP_TYPES.reset_agent:
+        return await this.sendOTPAgentSubService({ email });
+      case OTP_TYPES.verify_agent:
+        return await this.sendOTPAgentSubService({ email });
+      case OTP_TYPES.reset_b2c:
+        return await this.sendOTPB2CSubService({ email });
+      case OTP_TYPES.verify_b2c:
+        return await this.sendOTPB2CSubService({ email });
       default:
-        throw new Error('Invalid type.');
         break;
     }
   }
+
+  private async sendOTPAdminSubService({ email }: { email: string }) {}
+
+  private async sendOTPAgentSubService({ email }: { email: string }) {}
+
+  private async sendOTPB2CSubService({ email }: { email: string }) {}
 }

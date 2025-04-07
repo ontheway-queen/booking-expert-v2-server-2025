@@ -28,14 +28,16 @@ class Lib {
         });
     }
     // verify password
-    static compare(password, hashedPassword) {
+    static comparePass(password, hashedPassword) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield bcryptjs_1.default.compare(password, hashedPassword);
         });
     }
     // create token
     static createToken(creds, secret, maxAge) {
-        return jsonwebtoken_1.default.sign(creds, secret, { expiresIn: maxAge });
+        return jsonwebtoken_1.default.sign(creds, secret, {
+            expiresIn: maxAge,
+        });
     }
     // verify token
     static verifyToken(token, secret) {

@@ -15,17 +15,15 @@ class Lib {
   }
 
   // verify password
-  public static async compare(password: string, hashedPassword: string) {
+  public static async comparePass(password: string, hashedPassword: string) {
     return await bcrypt.compare(password, hashedPassword);
   }
 
   // create token
-  public static createToken(
-    creds: object,
-    secret: string,
-    maxAge: number | string
-  ) {
-    return jwt.sign(creds, secret, { expiresIn: maxAge });
+  public static createToken(creds: object, secret: string, maxAge: number) {
+    return jwt.sign(creds, secret, {
+      expiresIn: maxAge,
+    });
   }
 
   // verify token

@@ -4,14 +4,14 @@ import {
   ERROR_LEVEL_ERROR,
   ERROR_LEVEL_INFO,
   ERROR_LEVEL_WARNING,
-} from "../miscellaneous/constants";
+} from '../miscellaneous/constants';
 
 interface IError {
-  status: number;
   message: string;
+  status: number;
 }
 
-class CustomError extends Error implements IError {
+export default class CustomError extends Error implements IError {
   message: string;
   status: number;
   level?:
@@ -39,5 +39,3 @@ class CustomError extends Error implements IError {
     this.metadata = metadata;
   }
 }
-
-export default CustomError;

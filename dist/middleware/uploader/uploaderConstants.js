@@ -18,6 +18,6 @@ exports.allowAllFileTypes = [
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
 // Root file folder name
-exports.ROOT_FILE_FOLDER = 'ota-files';
+exports.ROOT_FILE_FOLDER = 'booking-expert-v2';
 // file storage host
-exports.FILE_STORAGE_HOST = 'https://m360ict.s3.ap-south-1.amazonaws.com/ota-files';
+exports.FILE_STORAGE_HOST = 'https://m360ict.s3.ap-south-1.amazonaws.com/booking-expert-v2';

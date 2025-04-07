@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import ManageFile from '../../utils/lib/manageFile';
-import Models from '../../models/rootModel';
 import CustomError from '../../utils/lib/customError';
 
 interface ICustomError {
@@ -9,23 +8,14 @@ interface ICustomError {
   level?: string;
 }
 
-class ErrorHandler {
-  private customError: ICustomError;
+export default class ErrorHandler {
   private manageFile: ManageFile;
 
   constructor() {
-    this.customError = {
-      success: false,
-      message: 'Internal server error!',
-      level: 'ERROR',
-    };
-
     this.manageFile = new ManageFile();
   }
 
-  /**
-   * handleErrors
-   */
+  // handleErrors
   public handleErrors = async (
     err: CustomError,
     req: Request,
@@ -39,42 +29,8 @@ class ErrorHandler {
       await this.manageFile.deleteFromCloud(files);
     }
 
-    const errorDetails = {
-      message: err.message,
-      route: req.originalUrl,
-      method: req.method,
-      stack: err.stack,
-      user_id: req.user?.id || req.agency?.id || req.admin?.id,
-      source: req.agency
-        ? ('B2B' as 'B2B')
-        : req.admin
-        ? ('ADMIN' as 'ADMIN')
-        : ('B2C' as 'B2C'),
-    };
-
-    console.log(err, 'custom error');
-    try {
-      if (err.status == 500 || !err.status) {
-        await new Models()
-          .errorLogsModel()
-          .insert({
-            level: err.level || 'ERROR',
-            message: errorDetails.message || 'Internal Server Error',
-            stack_trace: errorDetails.stack,
-            source: errorDetails.source,
-            user_id: errorDetails.user_id,
-            url: errorDetails.route,
-            http_method: errorDetails.method,
-            metadata: err.metadata,
-          });
-      }
-    } catch (err: any) {
-      console.log({ err });
-    }
     res
       .status(err.status || 500)
       .json({ success: false, message: err.message });
   };
 }
-
-export default ErrorHandler;

@@ -40,29 +40,12 @@ class AuthChecker {
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
             }
             else {
-                // if (verify.type !== 'admin' || verify.status === 0) {
-                //   return res.status(StatusCode.HTTP_UNAUTHORIZED).json({
-                //     success: false,
-                //     message: ResMsg.HTTP_UNAUTHORIZED,
-                //   });
-                // } else {
-                //   req.admin = verify as IAdmin;
-                //   next();
-                // }
-                if (verify.status === false) {
-                    return res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
-                        success: false,
-                        message: responseMessage_1.default.HTTP_UNAUTHORIZED,
-                    });
-                }
-                else {
-                    req.admin = verify;
-                    next();
-                }
+                req.admin = verify;
+                next();
             }
         });
-        // user auth checker
-        this.userAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        //B2C user auth checker
+        this.b2cUserAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { authorization } = req.headers;
             if (!authorization) {
                 return res
@@ -83,56 +66,13 @@ class AuthChecker {
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
             }
             else {
-                if (verify.status === false) {
-                    return res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
-                        success: false,
-                        message: responseMessage_1.default.HTTP_UNAUTHORIZED,
-                    });
-                }
-                else {
-                    req.user = verify;
-                    console.log({ user: req.user });
-                    next();
-                }
-            }
-        });
-        // user public auth checker
-        this.userPublicAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const { authorization } = req.headers;
-            if (!authorization) {
+                req.user = verify;
+                console.log({ user: req.user });
                 next();
             }
-            else {
-                const authSplit = authorization.split(' ');
-                if (authSplit.length !== 2) {
-                    return res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
-                        success: false,
-                        message: responseMessage_1.default.HTTP_UNAUTHORIZED,
-                    });
-                }
-                const verify = lib_1.default.verifyToken(authSplit[1], config_1.default.JWT_SECRET_USER);
-                if (!verify) {
-                    return res
-                        .status(statusCode_1.default.HTTP_UNAUTHORIZED)
-                        .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
-                }
-                else {
-                    if (verify.status === false) {
-                        return res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
-                            success: false,
-                            message: responseMessage_1.default.HTTP_UNAUTHORIZED,
-                        });
-                    }
-                    else {
-                        req.user = verify;
-                        console.log({ user: req.user });
-                        next();
-                    }
-                }
-            }
         });
-        // b2b auth checker
-        this.b2bAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        // agency user auth checker
+        this.agencyUserAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { authorization } = req.headers;
             if (!authorization) {
                 return res
@@ -153,17 +93,46 @@ class AuthChecker {
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
             }
             else {
-                if (verify.user_status == false || verify.agency_status == false) {
-                    return res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
-                        success: false,
-                        message: responseMessage_1.default.HTTP_FORBIDDEN,
-                    });
-                }
-                else {
-                    req.agency = verify;
-                    next();
-                }
+                req.agencyUser = verify;
+                next();
             }
+        });
+        //Agency B2C user auth checker
+        this.AgencyB2CUserAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            const { authorization } = req.headers;
+            if (!authorization) {
+                return res
+                    .status(statusCode_1.default.HTTP_UNAUTHORIZED)
+                    .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+            }
+            const authSplit = authorization.split(' ');
+            if (authSplit.length !== 2) {
+                return res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                    success: false,
+                    message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                });
+            }
+            const verify = lib_1.default.verifyToken(authSplit[1], config_1.default.JWT_SECRET_USER);
+            if (!verify) {
+                return res
+                    .status(statusCode_1.default.HTTP_UNAUTHORIZED)
+                    .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+            }
+            else {
+                req.agencyB2CUser = verify;
+                console.log({ user: req.user });
+                next();
+            }
+        });
+        // Agency B2C API Authorizer
+        this.AgencyB2CAPIAccessChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            req.agent = { agency_email: '', agency_id: 1, agency_name: '' };
+            next();
+        });
+        // External API Authorizer
+        this.ExternalAPIAccessChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            req.external = { external_email: '', external_id: 1, external_name: '' };
+            next();
         });
     }
 }

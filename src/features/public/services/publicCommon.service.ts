@@ -1,31 +1,13 @@
-import { Request } from 'express';
 import axios from 'axios';
 import qs from 'qs';
 import AbstractServices from '../../../abstract/abstract.service';
+import config from '../../../config/config';
+import SabreAPIEndpoints from '../../../utils/miscellaneous/sabreApiEndpoints';
+import { SABRE_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstent';
 
 export default class PublicCommonService extends AbstractServices {
   constructor() {
     super();
-  }
-
-  // Create pnr
-  public async getStartupToken(req: Request) {
-    const conn = this.Model.authModel();
-    const { agency_id, name, id: user_id } = req.agency;
-
-    const organization_info = await conn.getAgencyInfo(agency_id);
-
-    const user = {
-      user_full_name: name,
-      user_id,
-      organization_info,
-    };
-    return {
-      success: true,
-      message: 'Trabill agency startup token',
-      user,
-      code: this.StatusCode.HTTP_OK,
-    };
   }
 
   // Get Sebre token
@@ -40,7 +22,7 @@ export default class PublicCommonService extends AbstractServices {
       let axiosConfig = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: `${config.SABRE_URL}/${GET_TOKEN_ENDPOINT}`,
+        url: `${config.SABRE_URL}/${SabreAPIEndpoints.GET_TOKEN_ENDPOINT}`,
         headers: {
           Authorization: `Basic ${config.SABRE_AUTH_TOKEN}`,
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -53,10 +35,10 @@ export default class PublicCommonService extends AbstractServices {
         .then(async (response) => {
           const data = response.data;
 
-          const authModel = this.Model.authModel();
-          await authModel.updateEnv(SEBRE_TOKEN_ENV_ID, {
-            value: data.access_token,
-          });
+          // const authModel = this.Model.authModel();
+          // await authModel.updateEnv(SABRE_TOKEN_ENV, {
+          //   value: data.access_token,
+          // });
         })
         .catch((error) => {
           console.log(error);

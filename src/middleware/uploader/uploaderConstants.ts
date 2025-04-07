@@ -16,8 +16,8 @@ export const allowAllFileTypes: string[] = [
 ];
 
 // Root file folder name
-export const ROOT_FILE_FOLDER = 'ota-files';
+export const ROOT_FILE_FOLDER = 'booking-expert-v2';
 
 // file storage host
 export const FILE_STORAGE_HOST =
-  'https://m360ict.s3.ap-south-1.amazonaws.com/ota-files';
+  'https://m360ict.s3.ap-south-1.amazonaws.com/booking-expert-v2';

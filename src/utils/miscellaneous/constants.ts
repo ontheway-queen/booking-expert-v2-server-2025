@@ -1,17 +1,24 @@
 export const origin: string[] = ['http://localhost:3000'];
 
 // OTP types constants
-export const OTP_TYPE_FORGET_ADMIN = 'reset_admin';
-export const OTP_TYPE_FORGET_AGENT = 'reset_agent';
+export const OTP_TYPES = {
+  reset_admin: 'reset_admin',
+  verify_admin: 'verify_admin',
+  reset_agent: 'reset_agent',
+  verify_agent: 'verify_agent',
+  reset_b2c: 'reset_b2c',
+  verify_b2c: 'verify_b2c',
+  reset_agent_b2c: 'reset_agent_b2c',
+  verify_agent_b2c: 'verify_agent_b2c',
+};
 
 //Project Info
-export const PROJECT_NAME = 'Trabill OTA';
+export const PROJECT_NAME = 'Booking Expert=';
 export const PROJECT_LOGO = 'https://ticket.trabill.biz/assets/logo.png';
 export const PROJECT_EMAIL = 'sup.m360ict@gmail.com';
 export const PROJECT_EMAIL_2 = 'sup.m360ict@gmail.com';
 export const PROJECT_NUMBER = '+8801958398339';
-export const PROJECT_IMAGE_URL =
-  'https://m360-trabill.s3.ap-south-1.amazonaws.com/trabill-ota-v2-storage';
+export const PROJECT_IMAGE_URL = 'https://ticket.trabill.biz/assets/logo.png';
 export const PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 
 // Email subject

@@ -13,6 +13,8 @@ interface ENV {
   DB_PORT: string | undefined;
   DB_HOST: string | undefined;
   JWT_SECRET_ADMIN: string | undefined;
+  JWT_SECRET_AGENT_B2C: string | undefined;
+  JWT_SECRET_USER: string | undefined;
   JWT_SECRET_AGENT: string | undefined;
   EMAIL_SEND_EMAIL_ID: string | undefined;
   EMAIL_SEND_PASSWORD: string | undefined;
@@ -41,6 +43,8 @@ interface Config {
   DB_HOST: string;
   JWT_SECRET_ADMIN: string;
   JWT_SECRET_AGENT: string;
+  JWT_SECRET_AGENT_B2C: string;
+  JWT_SECRET_USER: string;
   EMAIL_SEND_EMAIL_ID: string;
   EMAIL_SEND_PASSWORD: string;
   AWS_S3_BUCKET: string;
@@ -69,6 +73,8 @@ const getConfig = (): ENV => {
     DB_PORT: process.env.DB_PORT,
     JWT_SECRET_ADMIN: process.env.JWT_SECRET_ADMIN,
     JWT_SECRET_AGENT: process.env.JWT_SECRET_AGENT,
+    JWT_SECRET_AGENT_B2C: process.env.JWT_SECRET_AGENT_B2C,
+    JWT_SECRET_USER: process.env.JWT_SECRET_USER,
     EMAIL_SEND_EMAIL_ID: process.env.EMAIL_SEND_EMAIL_ID,
     EMAIL_SEND_PASSWORD: process.env.EMAIL_SEND_PASSWORD,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,

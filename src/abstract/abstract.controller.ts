@@ -1,4 +1,4 @@
-import CommonValidator from '../features/public/utils/validators/publicOTP.validator';
+import CommonValidator from '../features/public/utils/validators/publicCommon.validator';
 import Wrapper from '../middleware/asyncWrapper/middleware';
 import CustomError from '../utils/lib/customError';
 import ResMsg from '../utils/miscellaneous/responseMessage';

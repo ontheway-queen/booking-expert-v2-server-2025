@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
+const constants_1 = require("../../../utils/miscellaneous/constants");
 class PublicEmailOTPService extends abstract_service_1.default {
     constructor() {
         super();
@@ -21,37 +22,32 @@ class PublicEmailOTPService extends abstract_service_1.default {
     sendEmailOtp(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, type } = req.body;
-            let error = false;
             switch (type) {
-                case OTP_TYPE_RESET_BTOC_USER:
-                    const { agency_id } = req.btocAgency;
-                    const btocUserModel = this.Model.userModel();
-                    const checkbtocUser = yield btocUserModel.getUser({ agency_id, email });
-                    if (!checkbtocUser.length) {
-                        error = true;
-                    }
-                    break;
-                case OTP_TYPE_RESET_BTOB_USER:
-                    const btobUserModel = this.Model.btobUsersModel();
-                    const checkbtobUser = yield btobUserModel.getSingleUser({ email });
-                    if (!checkbtobUser.length) {
-                        error = true;
-                    }
-                    break;
-                case OTP_TYPE_RESET_ADMIN_USER:
-                    const adminModel = this.Model.adminModel();
-                    const checkAdmin = yield adminModel.getSingleAdmin({
-                        email,
-                    });
-                    if (!checkAdmin.length) {
-                        error = true;
-                    }
-                    break;
+                case constants_1.OTP_TYPES.reset_admin:
+                    return yield this.sendOTPAdminSubService({ email });
+                case constants_1.OTP_TYPES.verify_admin:
+                    return yield this.sendOTPAdminSubService({ email });
+                case constants_1.OTP_TYPES.reset_agent:
+                    return yield this.sendOTPAgentSubService({ email });
+                case constants_1.OTP_TYPES.verify_agent:
+                    return yield this.sendOTPAgentSubService({ email });
+                case constants_1.OTP_TYPES.reset_b2c:
+                    return yield this.sendOTPB2CSubService({ email });
+                case constants_1.OTP_TYPES.verify_b2c:
+                    return yield this.sendOTPB2CSubService({ email });
                 default:
-                    throw new Error('Invalid type.');
                     break;
             }
         });
+    }
+    sendOTPAdminSubService(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ email }) { });
+    }
+    sendOTPAgentSubService(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ email }) { });
+    }
+    sendOTPB2CSubService(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ email }) { });
     }
 }
 exports.default = PublicEmailOTPService;

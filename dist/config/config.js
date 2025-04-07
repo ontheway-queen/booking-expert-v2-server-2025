@@ -18,6 +18,8 @@ const getConfig = () => {
         DB_PORT: process.env.DB_PORT,
         JWT_SECRET_ADMIN: process.env.JWT_SECRET_ADMIN,
         JWT_SECRET_AGENT: process.env.JWT_SECRET_AGENT,
+        JWT_SECRET_AGENT_B2C: process.env.JWT_SECRET_AGENT_B2C,
+        JWT_SECRET_USER: process.env.JWT_SECRET_USER,
         EMAIL_SEND_EMAIL_ID: process.env.EMAIL_SEND_EMAIL_ID,
         EMAIL_SEND_PASSWORD: process.env.EMAIL_SEND_PASSWORD,
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
