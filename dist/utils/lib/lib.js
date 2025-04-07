@@ -18,7 +18,6 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const staticData_1 = require("../miscellaneous/staticData");
 class Lib {
     // make hashed password
     static hashPass(password) {
@@ -148,14 +147,6 @@ class Lib {
     // compare object
     static compareObj(a, b) {
         return JSON.stringify(a) == JSON.stringify(b);
-    }
-    // get meal by code
-    static getMeal(code) {
-        return staticData_1.mealData.find((item) => item.code === code);
-    }
-    // get cabin by code
-    static getCabin(code) {
-        return staticData_1.cabinCode.find((item) => item.code === code);
     }
     // get time value
     static getTimeValue(timeString) {

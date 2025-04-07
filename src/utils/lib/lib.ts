@@ -182,16 +182,6 @@ class Lib {
     return JSON.stringify(a) == JSON.stringify(b);
   }
 
-  // get meal by code
-  public static getMeal(code: string) {
-    return mealData.find((item) => item.code === code);
-  }
-
-  // get cabin by code
-  public static getCabin(code: string) {
-    return cabinCode.find((item) => item.code === code);
-  }
-
   // get time value
   public static getTimeValue(timeString: string) {
     // Extract hours, minutes, and seconds
