@@ -54,7 +54,7 @@ export interface IGetSingleAdminData {
   created_by_name: string;
 }
 
-export interface IUpdateProfilePayload {
+export interface IUpdateAdminPayload {
   name?: string;
   gender?: string;
   email?: string;
@@ -63,4 +63,56 @@ export interface IUpdateProfilePayload {
   photo?: string;
   role_id?: number;
   status?: boolean;
+}
+
+export interface ICreateRolePayload {
+  name: string;
+}
+
+export interface IGetRoleListQuery {
+  name?: string;
+  status?: boolean;
+}
+
+export interface IGetRoleListData {
+  id: number;
+  name: string;
+  status: boolean;
+  is_main_role: boolean;
+}
+
+export interface IUpdateRolePayload {
+  name?: string;
+  status?: number;
+}
+
+export interface IGetAllPErmissionsData {
+  id: number;
+  name: string;
+  created_by: string;
+  created_at: string;
+}
+
+export interface IGetSingleRoleWithPermissionsData {
+  role_id: number;
+  role_name: string;
+  status: boolean;
+  is_main_role: boolean;
+  permissions: {
+    permission_id: number;
+    permission_name: string;
+    read: boolean;
+    write: boolean;
+    update: boolean;
+    delete: boolean;
+  }[];
+}
+
+export interface IInsertRolePermissionPayload {
+  role_id: number;
+  permission_id: number;
+  read?: boolean;
+  write?: boolean;
+  update?: boolean;
+  delete?: boolean;
 }
