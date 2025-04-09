@@ -78,5 +78,26 @@ class AgencyUserModel extends schema_1.default {
             return { data: data, total: (_a = total[0]) === null || _a === void 0 ? void 0 : _a.total };
         });
     }
+    // check agency user
+    checkUser(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ email, username, id, }) {
+            return yield this.db('agency_user AS au')
+                .withSchema(this.AGENT_SCHEMA)
+                .select('au.id', 'au.agency_id', 'au.email', 'au.mobile_number', 'au.photo', 'au.name', 'au.username', 'au.hashed_password', 'au.two_fa', 'au.role_id', 'au.status', 'au.socket_id', 'au.is_main_user', 'a.status AS agency_status', 'a.agency_no', 'a.allow_api', 'a.white_label')
+                .leftJoin('agency AS a', 'au.agency_id', 'a.id')
+                .where((qb) => {
+                if (email) {
+                    qb.orWhere('au.email', email);
+                }
+                if (username) {
+                    qb.orWhere('au.username', username);
+                }
+                if (id) {
+                    qb.andWhere('au.id', id);
+                }
+            })
+                .first();
+        });
+    }
 }
 exports.default = AgencyUserModel;

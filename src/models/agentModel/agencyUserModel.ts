@@ -2,8 +2,9 @@ import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import { DATA_LIMIT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
+  ICheckAgencyUserData,
   ICreateAgencyUserPayload,
-  IGetAgencyUserData,
+  IGetAgencyUserListData,
   IGetAgencyUserListQuery,
   IUpdateAgencyUserPayload,
 } from '../../utils/modelTypes/agentModel/agencyUserModelTypes';
@@ -37,7 +38,7 @@ export default class AgencyUserModel extends Schema {
   public async getUserList(
     query: IGetAgencyUserListQuery,
     need_total: boolean = false
-  ): Promise<{ data: IGetAgencyUserData[]; total?: number }> {
+  ): Promise<{ data: IGetAgencyUserListData[]; total?: number }> {
     const data = await this.db('agency_user as au')
       .withSchema(this.AGENT_SCHEMA)
       .select(
@@ -87,5 +88,52 @@ export default class AgencyUserModel extends Schema {
     }
 
     return { data: data, total: total[0]?.total };
+  }
+
+  // check agency user
+  public async checkUser({
+    email,
+    username,
+    id,
+  }: {
+    email?: string;
+    username?: string;
+    id?: number;
+  }): Promise<ICheckAgencyUserData | null> {
+    return await this.db('agency_user AS au')
+      .withSchema(this.AGENT_SCHEMA)
+      .select(
+        'au.id',
+        'au.agency_id',
+        'au.email',
+        'au.mobile_number',
+        'au.photo',
+        'au.name',
+        'au.username',
+        'au.hashed_password',
+        'au.two_fa',
+        'au.role_id',
+        'au.status',
+        'au.socket_id',
+        'au.is_main_user',
+        'a.status AS agency_status',
+        'a.agency_no',
+        'a.allow_api',
+        'a.white_label'
+      )
+      .leftJoin('agency AS a', 'au.agency_id', 'a.id')
+      .where((qb) => {
+        if (email) {
+          qb.orWhere('au.email', email);
+        }
+        if (username) {
+          qb.orWhere('au.username', username);
+        }
+
+        if (id) {
+          qb.andWhere('au.id', id);
+        }
+      })
+      .first();
   }
 }

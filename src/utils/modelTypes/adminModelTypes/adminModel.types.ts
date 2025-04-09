@@ -46,6 +46,7 @@ export interface IGetSingleAdminData {
   photo?: string;
   role_id: number;
   is_main_user: boolean;
+  two_fa: boolean;
   status: boolean;
   socket_id?: string;
   role_name: string;
@@ -63,6 +64,22 @@ export interface IUpdateAdminPayload {
   photo?: string;
   role_id?: number;
   status?: boolean;
+  two_fa?: boolean;
+}
+
+export interface ICheckUserAdmin {
+  id: number;
+  username: string;
+  name: string;
+  phone_number: string;
+  role_id: number;
+  password_hash: string;
+  gender: string;
+  photo: string | null;
+  email: string;
+  status: boolean;
+  is_main_user: boolean;
+  two_fa: boolean;
 }
 
 export interface ICreateRolePayload {

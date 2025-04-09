@@ -2,6 +2,7 @@ import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   IAdminCreatePayload,
+  ICheckUserAdmin,
   ICreateRolePayload,
   IGetAdminData,
   IGetAdminListFilterQuery,
@@ -120,6 +121,48 @@ export default class AdminModel extends Schema {
         }
         if (payload.status !== undefined) {
           qb.where('ua.status', payload.status);
+        }
+      })
+      .first();
+  }
+
+  // Check user admin with email or username or id
+  public async checkUserAdmin({
+    email,
+    id,
+    username,
+  }: {
+    id?: number;
+    email?: string;
+    username?: string;
+  }): Promise<ICheckUserAdmin | null> {
+    return await this.db('user_admin as ua')
+      .select(
+        'ua.id',
+        'ua.username',
+        'ua.name',
+        'ua.phone_number',
+        'ua.role_id',
+        'ua.password_hash',
+        'ua.gender',
+        'ua.photo',
+        'ua.email',
+        'ua.status',
+        'ua.is_main_user',
+        'ua.two_fa'
+      )
+      .withSchema(this.ADMIN_SCHEMA)
+      .where((qb) => {
+        if (email) {
+          qb.orWhere('ua.email', email);
+        }
+
+        if (username) {
+          qb.orWhere('ua.username', username);
+        }
+
+        if (id) {
+          qb.andWhere('ua.id', id);
         }
       })
       .first();

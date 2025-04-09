@@ -99,6 +99,26 @@ class AdminModel extends schema_1.default {
                 .first();
         });
     }
+    // Check user admin with email or username or id
+    checkUserAdmin(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ email, id, username, }) {
+            return yield this.db('user_admin as ua')
+                .select('ua.id', 'ua.username', 'ua.name', 'ua.phone_number', 'ua.role_id', 'ua.password_hash', 'ua.gender', 'ua.photo', 'ua.email', 'ua.status', 'ua.is_main_user', 'ua.two_fa')
+                .withSchema(this.ADMIN_SCHEMA)
+                .where((qb) => {
+                if (email) {
+                    qb.orWhere('ua.email', email);
+                }
+                if (username) {
+                    qb.orWhere('ua.username', username);
+                }
+                if (id) {
+                    qb.andWhere('ua.id', id);
+                }
+            })
+                .first();
+        });
+    }
     //update user admin
     updateUserAdmin(payload, where) {
         return __awaiter(this, void 0, void 0, function* () {

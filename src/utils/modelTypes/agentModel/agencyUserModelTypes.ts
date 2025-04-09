@@ -31,7 +31,7 @@ export interface IGetAgencyUserListQuery {
   skip?: string;
 }
 
-export interface IGetAgencyUserData {
+export interface IGetAgencyUserListData {
   id: number;
   username: string;
   name: string;
@@ -42,4 +42,23 @@ export interface IGetAgencyUserData {
   is_main_user: boolean;
   status: boolean;
   socket_id?: string;
+}
+
+export interface ICheckAgencyUserData {
+  id: number;
+  agency_id: number;
+  email: string;
+  name: string;
+  photo: string;
+  mobile_number: string;
+  username: string;
+  hashed_password: string;
+  two_fa: boolean;
+  role_id: number;
+  status: boolean;
+  agency_status: 'Pending' | 'Active' | 'Inactive' | 'Rejected';
+  agency_no: string;
+  allow_api: boolean;
+  is_main_user: boolean;
+  white_label: boolean;
 }
