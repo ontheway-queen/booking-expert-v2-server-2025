@@ -6,14 +6,17 @@ export const OTP_TYPES = {
   verify_admin: 'verify_admin',
   reset_agent: 'reset_agent',
   verify_agent: 'verify_agent',
+  register_agent: 'register_agent',
   reset_b2c: 'reset_b2c',
   verify_b2c: 'verify_b2c',
+  register_b2c: 'register_b2c',
   reset_agent_b2c: 'reset_agent_b2c',
   verify_agent_b2c: 'verify_agent_b2c',
+  register_agent_b2c: 'register_agent_b2c',
 };
 
 //Project Info
-export const PROJECT_NAME = 'Booking Expert=';
+export const PROJECT_NAME = 'Booking Expert V2';
 export const PROJECT_LOGO = 'https://ticket.trabill.biz/assets/logo.png';
 export const PROJECT_EMAIL = 'sup.m360ict@gmail.com';
 export const PROJECT_EMAIL_2 = 'sup.m360ict@gmail.com';
@@ -24,9 +27,6 @@ export const PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 // Email subject
 export const OTP_EMAIL_SUBJECT = 'Your One Time Password For Verification';
 
-// OTP for
-export const OTP_FOR = 'Verification';
-
 // Default data get limit
 export const DATA_LIMIT = 100;
 
@@ -36,3 +36,40 @@ export const ERROR_LEVEL_INFO = 'INFO';
 export const ERROR_LEVEL_WARNING = 'WARNING';
 export const ERROR_LEVEL_ERROR = 'ERROR';
 export const ERROR_LEVEL_CRITICAL = 'CRITICAL';
+
+// Priority airport on search
+export const priorityAirports = [
+  'DAC',
+  'CGP',
+  'ZYL',
+  'CXB',
+  'SPD',
+  'RJH',
+  'JSR',
+  'BZL',
+  'JED',
+  'MCT',
+  'DOH',
+  'RUH',
+  'DXB',
+  'KUL',
+  'DMM',
+  'SIN',
+  'SHJ',
+  'MED',
+  'BKK',
+  'KTM',
+  'AUH',
+  'KWI',
+  'LHR',
+  'MAA',
+  'CAN',
+  'JFK',
+  'AHB',
+  'CMB',
+  'DEL',
+  'CCU',
+  'MLE',
+  'IXA',
+  'BOM',
+];

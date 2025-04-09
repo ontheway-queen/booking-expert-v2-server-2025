@@ -3,7 +3,6 @@ import qs from 'qs';
 import AbstractServices from '../../../abstract/abstract.service';
 import config from '../../../config/config';
 import SabreAPIEndpoints from '../../../utils/miscellaneous/sabreApiEndpoints';
-import { SABRE_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstent';
 
 export default class PublicCommonService extends AbstractServices {
   constructor() {

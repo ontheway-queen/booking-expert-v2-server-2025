@@ -30,7 +30,7 @@ class ResMsg {
   static readonly OTP_MATCHED = 'OTP matched successfully';
   static readonly OTP_INVALID = 'Invalid OTP';
   static readonly OTP_EXPIRED = 'OTP has been expired';
-  static readonly OTP_NOT_SENT = 'Cannot send OTP';
+  static readonly OTP_NOT_SENT = 'Cannot send OTP now. Try again later.';
   static readonly THREE_TIMES_EXPIRED =
     'Cannot send another OTP within 3 minutes';
   static readonly TOO_MUCH_ATTEMPT =

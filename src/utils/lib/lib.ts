@@ -5,17 +5,19 @@ import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
 import { Attachment } from 'nodemailer/lib/mailer';
-import { cabinCode, mealData } from '../miscellaneous/staticData';
 
 class Lib {
-  // make hashed password
-  public static async hashPass(password: string) {
+  // Create hash string
+  public static async hashValue(password: string) {
     const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);
   }
 
-  // verify password
-  public static async comparePass(password: string, hashedPassword: string) {
+  // verify hash string
+  public static async compareHashValue(
+    password: string,
+    hashedPassword: string
+  ) {
     return await bcrypt.compare(password, hashedPassword);
   }
 

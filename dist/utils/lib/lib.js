@@ -19,15 +19,15 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 class Lib {
-    // make hashed password
-    static hashPass(password) {
+    // Create hash string
+    static hashValue(password) {
         return __awaiter(this, void 0, void 0, function* () {
             const salt = yield bcryptjs_1.default.genSalt(10);
             return yield bcryptjs_1.default.hash(password, salt);
         });
     }
-    // verify password
-    static comparePass(password, hashedPassword) {
+    // verify hash string
+    static compareHashValue(password, hashedPassword) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield bcryptjs_1.default.compare(password, hashedPassword);
         });
