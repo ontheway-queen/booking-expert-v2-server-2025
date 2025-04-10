@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const constants_1 = require("../../utils/miscellaneous/constants");
+const flightConstent_1 = require("../../utils/miscellaneous/flightConstent");
 const schema_1 = __importDefault(require("../../utils/miscellaneous/schema"));
 class CommonModel extends schema_1.default {
     constructor(db) {
@@ -233,9 +233,7 @@ class CommonModel extends schema_1.default {
                     qb.where('air.iata_code', params.code);
                 }
             })
-                .orderByRaw(`ARRAY_POSITION(ARRAY[${constants_1.priorityAirports
-                .map(() => '?')
-                .join(', ')}]::TEXT[], air.iata_code) ASC NULLS LAST, air.id ASC`, constants_1.priorityAirports)
+                .orderByRaw(`ARRAY_POSITION(ARRAY[${flightConstent_1.PRIORITY_AIRPORTS.map(() => '?').join(', ')}]::TEXT[], air.iata_code) ASC NULLS LAST, air.id ASC`, flightConstent_1.PRIORITY_AIRPORTS)
                 .limit(params.limit ? params.limit : 100)
                 .offset(params.skip ? params.skip : 0)
                 .orderBy('air.id', 'asc');

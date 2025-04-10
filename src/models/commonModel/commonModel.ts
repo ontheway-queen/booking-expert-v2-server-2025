@@ -1,5 +1,5 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { priorityAirports } from '../../utils/miscellaneous/constants';
+import { PRIORITY_AIRPORTS } from '../../utils/miscellaneous/flightConstent';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   ICreateAirlinesPayload,
@@ -242,10 +242,10 @@ class CommonModel extends Schema {
         }
       })
       .orderByRaw(
-        `ARRAY_POSITION(ARRAY[${priorityAirports
-          .map(() => '?')
-          .join(', ')}]::TEXT[], air.iata_code) ASC NULLS LAST, air.id ASC`,
-        priorityAirports
+        `ARRAY_POSITION(ARRAY[${PRIORITY_AIRPORTS.map(() => '?').join(
+          ', '
+        )}]::TEXT[], air.iata_code) ASC NULLS LAST, air.id ASC`,
+        PRIORITY_AIRPORTS
       )
       .limit(params.limit ? params.limit : 100)
       .offset(params.skip ? params.skip : 0)

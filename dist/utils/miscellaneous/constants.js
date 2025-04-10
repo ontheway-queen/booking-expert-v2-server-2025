@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.priorityAirports = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_IMAGE_URL = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL_2 = exports.PROJECT_EMAIL = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
+exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_IMAGE_URL = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL_2 = exports.PROJECT_EMAIL = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
 exports.origin = ['http://localhost:3000'];
 // OTP types constants
 exports.OTP_TYPES = {
@@ -34,39 +34,3 @@ exports.ERROR_LEVEL_INFO = 'INFO';
 exports.ERROR_LEVEL_WARNING = 'WARNING';
 exports.ERROR_LEVEL_ERROR = 'ERROR';
 exports.ERROR_LEVEL_CRITICAL = 'CRITICAL';
-// Priority airport on search
-exports.priorityAirports = [
-    'DAC',
-    'CGP',
-    'ZYL',
-    'CXB',
-    'SPD',
-    'RJH',
-    'JSR',
-    'BZL',
-    'JED',
-    'MCT',
-    'DOH',
-    'RUH',
-    'DXB',
-    'KUL',
-    'DMM',
-    'SIN',
-    'SHJ',
-    'MED',
-    'BKK',
-    'KTM',
-    'AUH',
-    'KWI',
-    'LHR',
-    'MAA',
-    'CAN',
-    'JFK',
-    'AHB',
-    'CMB',
-    'DEL',
-    'CCU',
-    'MLE',
-    'IXA',
-    'BOM',
-];

@@ -6,124 +6,45 @@ export const SABRE_FLIGHT_ITINS = '200ITINS';
 // API Name Const
 export const SABRE_API = 'SABRE';
 
-// airlines commission const
-export const COM_TYPE_PER = 'PER';
-export const COM_TYPE_FLAT = 'FLAT';
-export const COM_MODE_INCREASE = 'INCREASE';
-export const COM_MODE_DECREASE = 'DECREASE';
+// airlines MARKUP const
+export const MARKUP_TYPE_PER = 'PER';
+export const MARKUP_TYPE_FLAT = 'FLAT';
+export const MARKUP_MODE_INCREASE = 'INCREASE';
+export const MARKUP_MODE_DECREASE = 'DECREASE';
 
-// BD Airport
-export const BD_AIRPORT = [
+// Priority airport on search
+export const PRIORITY_AIRPORTS = [
   'DAC',
   'CGP',
   'ZYL',
   'CXB',
+  'SPD',
+  'RJH',
   'JSR',
   'BZL',
-  'RJH',
-  'SPD',
-  'IRD',
-];
-
-// meal data for sabre code
-export const SABRE_MEAL_CODE = [
-  {
-    id: 1,
-    code: 'B',
-    name: 'Breakfast',
-  },
-  {
-    id: 2,
-    code: 'K',
-    name: 'Continental breakfast',
-  },
-  {
-    id: 3,
-    code: 'L',
-    name: 'Lunch',
-  },
-  {
-    id: 4,
-    code: 'S',
-    name: 'Snack',
-  },
-  {
-    id: 5,
-    code: 'D',
-    name: 'Dinner',
-  },
-  {
-    id: 6,
-    code: 'M',
-    name: 'Meal',
-  },
-  {
-    id: 7,
-    code: 'F',
-    name: 'Food for purchase',
-  },
-  {
-    id: 8,
-    code: 'G',
-    name: 'Food/Beverages for purchase',
-  },
-  {
-    id: 9,
-    code: 'P',
-    name: 'Alcoholic beverages for purchase',
-  },
-  {
-    id: 10,
-    code: 'C',
-    name: 'Complimentary alcoholic beverages',
-  },
-  {
-    id: 11,
-    code: 'N',
-    name: 'No meal service',
-  },
-  {
-    id: 12,
-    code: 'R',
-    name: 'Complimentary refreshments',
-  },
-  {
-    id: 13,
-    code: 'V',
-    name: 'Refreshments for purchase',
-  },
-];
-
-// cabin data for sabre code
-export const SABRE_CABIN_CODE = [
-  {
-    id: 1,
-    code: 'P',
-    name: 'Premium First',
-  },
-  {
-    id: 2,
-    code: 'F',
-    name: 'First',
-  },
-  {
-    id: 3,
-    code: 'J',
-    name: 'Premium Business',
-  },
-  {
-    id: 4,
-    code: 'C',
-    name: 'Business',
-  },
-  {
-    id: 5,
-    code: 'S',
-    name: 'Premium Economy',
-  },
-  {
-    id: 6,
-    code: 'Y',
-    name: 'Economy',
-  },
+  'JED',
+  'MCT',
+  'DOH',
+  'RUH',
+  'DXB',
+  'KUL',
+  'DMM',
+  'SIN',
+  'SHJ',
+  'MED',
+  'BKK',
+  'KTM',
+  'AUH',
+  'KWI',
+  'LHR',
+  'MAA',
+  'CAN',
+  'JFK',
+  'AHB',
+  'CMB',
+  'DEL',
+  'CCU',
+  'MLE',
+  'IXA',
+  'BOM',
 ];

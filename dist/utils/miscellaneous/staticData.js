@@ -1,8 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cabinCode = exports.mealData = void 0;
+exports.SABRE_CABIN_CODE = exports.SABRE_MEAL_CODE = exports.BD_AIRPORT = void 0;
+// BD Airport
+exports.BD_AIRPORT = [
+    'DAC',
+    'CGP',
+    'ZYL',
+    'CXB',
+    'JSR',
+    'BZL',
+    'RJH',
+    'SPD',
+    'IRD',
+];
 // meal data for sabre code
-exports.mealData = [
+exports.SABRE_MEAL_CODE = [
     {
         id: 1,
         code: 'B',
@@ -70,7 +82,7 @@ exports.mealData = [
     },
 ];
 // cabin data for sabre code
-exports.cabinCode = [
+exports.SABRE_CABIN_CODE = [
     {
         id: 1,
         code: 'P',

@@ -1,5 +1,18 @@
+// BD Airport
+export const BD_AIRPORT = [
+  'DAC',
+  'CGP',
+  'ZYL',
+  'CXB',
+  'JSR',
+  'BZL',
+  'RJH',
+  'SPD',
+  'IRD',
+];
+
 // meal data for sabre code
-export const mealData = [
+export const SABRE_MEAL_CODE = [
   {
     id: 1,
     code: 'B',
@@ -68,7 +81,7 @@ export const mealData = [
 ];
 
 // cabin data for sabre code
-export const cabinCode = [
+export const SABRE_CABIN_CODE = [
   {
     id: 1,
     code: 'P',
