@@ -6,6 +6,11 @@ import AgencyB2CUserModel from './agencyB2CModel/agencyB2CUserModel';
 import AgencyModel from './agentModel/agencyModel';
 import AgencyUserModel from './agentModel/agencyUserModel';
 import B2CUserModel from './b2cModel/b2cUserModel';
+import MarkupSetModel from './markupSetModel/markupSetModel';
+import FlightApiModel from './markupSetModel/flightApiModel';
+import MarkupSetFlightApiModel from './markupSetModel/markupSetFlightApiModel';
+import FlightMarkupsModel from './markupSetModel/flightMarkupsModel';
+import B2CMarkupConfigModel from './markupSetModel/b2cMarkupConfigModel';
 
 export default class Models {
   //Common model
@@ -36,5 +41,30 @@ export default class Models {
   //booking request models
   public B2CUserModel(trx?: Knex.Transaction) {
     return new B2CUserModel(trx || db);
+  }
+
+  //Markup Set Model
+  public MarkupSetModel(trx?: Knex.Transaction) {
+    return new MarkupSetModel(trx || db);
+  }
+
+  //Flight API Model
+  public FlightApiModel(trx?: Knex.Transaction) {
+    return new FlightApiModel(trx || db);
+  }
+
+  //Markup Set Flight Api Model
+  public MarkupSetFlightApiModel(trx?: Knex.Transaction) {
+    return new MarkupSetFlightApiModel(trx || db);
+  }
+
+  //Flight Markups Model
+  public FlightMarkupsModel(trx?: Knex.Transaction) {
+    return new FlightMarkupsModel(trx || db);
+  }
+
+  //B2C Markup Config Model
+  public B2CMarkupConfigModel(trx?: Knex.Transaction) {
+    return new B2CMarkupConfigModel(trx || db);
   }
 }
