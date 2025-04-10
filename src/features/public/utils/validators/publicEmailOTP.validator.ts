@@ -1,17 +1,16 @@
 import Joi from 'joi';
 import { OTP_TYPES } from '../../../../utils/miscellaneous/constants';
 
-export default class PublicOTPValidator {
+export default class PublicEmailOTPValidator {
   // send email otp input validator
   public sendOtpInputValidator = Joi.object({
     type: Joi.string()
       .valid(
         OTP_TYPES.reset_admin,
-        OTP_TYPES.verify_admin,
         OTP_TYPES.reset_agent,
-        OTP_TYPES.verify_agent,
         OTP_TYPES.reset_b2c,
-        OTP_TYPES.verify_b2c
+        OTP_TYPES.register_agent,
+        OTP_TYPES.register_b2c
       )
       .required()
       .messages({
@@ -28,23 +27,22 @@ export default class PublicOTPValidator {
 
   // match email otp input validator
   public matchEmailOtpInputValidator = Joi.object({
-    email: Joi.string().email().lowercase().required().messages({
+    email: Joi.string().email().lowercase().trim().required().messages({
       'string.base': 'Enter valid email',
       'string.email': 'Enter valid email',
       'any.required': 'Email is required',
     }),
-    otp: Joi.string().required().messages({
+    otp: Joi.string().length(6).required().messages({
       'string.base': 'Enter valid otp',
       'any.required': 'OTP is required',
     }),
     type: Joi.string()
       .valid(
         OTP_TYPES.reset_admin,
-        OTP_TYPES.verify_admin,
         OTP_TYPES.reset_agent,
-        OTP_TYPES.verify_agent,
         OTP_TYPES.reset_b2c,
-        OTP_TYPES.verify_b2c
+        OTP_TYPES.register_agent,
+        OTP_TYPES.register_b2c
       )
       .required()
       .messages({

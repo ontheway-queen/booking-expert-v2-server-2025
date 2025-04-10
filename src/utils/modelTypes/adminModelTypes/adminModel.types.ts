@@ -84,6 +84,7 @@ export interface ICheckUserAdmin {
 
 export interface ICreateRolePayload {
   name: string;
+  id_main_role?: boolean;
 }
 
 export interface IGetRoleListQuery {
@@ -103,7 +104,7 @@ export interface IUpdateRolePayload {
   status?: number;
 }
 
-export interface IGetAllPErmissionsData {
+export interface IGetAllPermissionsData {
   id: number;
   name: string;
   created_by: string;

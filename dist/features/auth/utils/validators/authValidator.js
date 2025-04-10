@@ -9,7 +9,7 @@ class AuthValidator {
         // common login input validator
         this.loginValidator = joi_1.default.object({
             user_or_email: joi_1.default.string().required().lowercase().trim(),
-            password: joi_1.default.string().min(8).required().messages({
+            password: joi_1.default.string().min(8).max(100).trim().required().messages({
                 'string.base': 'Enter valid password',
                 'string.min': 'Enter valid password minimum length 8',
                 'any.required': 'Password is required',
@@ -17,12 +17,11 @@ class AuthValidator {
         });
         //common register validator
         this.registerValidator = joi_1.default.object({
-            username: joi_1.default.string().min(1).max(255).required(),
             first_name: joi_1.default.string().min(1).max(255).required(),
             last_name: joi_1.default.string().min(1).max(255).required(),
             gender: joi_1.default.string().valid('Male', 'Female', 'Other').required(),
             email: joi_1.default.string().email().lowercase().min(1).max(255).required(),
-            password: joi_1.default.string().min(8).max(100).required(),
+            password: joi_1.default.string().min(8).max(100).required().trim(),
             phone_number: joi_1.default.string().min(7).max(20).required(),
         });
         //login with google validator
@@ -31,6 +30,11 @@ class AuthValidator {
             image: joi_1.default.string().optional(),
             name: joi_1.default.string().min(1).max(255).required(),
             email: joi_1.default.string().email().lowercase().min(1).max(255).required(),
+        });
+        // reset password validator
+        this.resetPasswordValidator = joi_1.default.object({
+            token: joi_1.default.string().required(),
+            password: joi_1.default.string().min(8).max(100).required().trim(),
         });
     }
 }

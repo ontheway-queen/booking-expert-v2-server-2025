@@ -1,4 +1,5 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
+import { OTP_DEFAULT_EXPIRY } from '../../utils/miscellaneous/constants';
 import { PRIORITY_AIRPORTS } from '../../utils/miscellaneous/flightConstent';
 import Schema from '../../utils/miscellaneous/schema';
 import {
@@ -27,7 +28,9 @@ class CommonModel extends Schema {
       .andWhere('type', payload.type)
       .andWhere('matched', 0)
       .andWhere('tried', '<', 3)
-      .andWhereRaw(`"create_date" + interval '3 minutes' > NOW()`);
+      .andWhereRaw(
+        `"create_date" + interval '${OTP_DEFAULT_EXPIRY} minutes' > NOW()`
+      );
 
     return check;
   }
