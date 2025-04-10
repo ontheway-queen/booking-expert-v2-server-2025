@@ -13,9 +13,9 @@ ResMsg.HTTP_NOT_FOUND = 'The requested data could not be found but may be availa
 ResMsg.HTTP_CONFLICT = 'The resource you are trying to create already exists.';
 ResMsg.HTTP_UNPROCESSABLE_ENTITY = 'The request payload is unprocessable, please provide valid payload';
 ResMsg.HTTP_INTERNAL_SERVER_ERROR = 'Internal server error';
-ResMsg.HTTP_ACCOUNT_INACTIVE = 'Your account is deactivated. Please contact us!';
+ResMsg.HTTP_ACCOUNT_INACTIVE = 'Your account is disabled! Please contact us.';
 // without http
-ResMsg.WRONG_CREDENTIALS = 'Email or password is wrong';
+ResMsg.WRONG_CREDENTIALS = 'Wrong username/email or password.';
 ResMsg.PASSWORD_CHANGED = 'Password changed successfully';
 ResMsg.PASSWORD_NOT_CHANGED = 'Password cannot changed';
 // OTP

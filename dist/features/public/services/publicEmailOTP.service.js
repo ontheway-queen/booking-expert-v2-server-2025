@@ -18,14 +18,15 @@ const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 const config_1 = __importDefault(require("../../../config/config"));
 const sendEmailOtp_1 = require("../../../utils/templates/sendEmailOtp");
 class PublicEmailOTPService extends abstract_service_1.default {
-    constructor() {
+    constructor(DBCon) {
         super();
+        this.DBCon = DBCon || this.db;
     }
     // send email otp service
-    sendEmailOtp(req) {
+    sendEmailOtp(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { email, type } = req.body;
+            return yield this.DBCon.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { email, type } = payload;
                 let OTP_FOR = '';
                 switch (type) {
                     case constants_1.OTP_TYPES.reset_admin:
@@ -83,6 +84,12 @@ class PublicEmailOTPService extends abstract_service_1.default {
                             };
                         }
                         OTP_FOR = 'registration.';
+                    case constants_1.OTP_TYPES.verify_admin:
+                        OTP_FOR = 'admin login.';
+                    case constants_1.OTP_TYPES.verify_agent:
+                        OTP_FOR = 'agent login.';
+                    case constants_1.OTP_TYPES.verify_b2c:
+                        OTP_FOR = 'user login.';
                     default:
                         break;
                 }
@@ -145,12 +152,15 @@ class PublicEmailOTPService extends abstract_service_1.default {
         });
     }
     //match email otp service
-    matchEmailOtpService(req) {
+    matchEmailOtpService(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { email, otp, type } = req.body;
+            return this.DBCon.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { email, otp, type } = payload;
                 const commonModel = this.Model.CommonModel(trx);
-                const checkOtp = yield commonModel.getOTP({ email, type });
+                const checkOtp = yield commonModel.getOTP({
+                    email,
+                    type,
+                });
                 if (!checkOtp.length) {
                     return {
                         success: false,
@@ -174,6 +184,7 @@ class PublicEmailOTPService extends abstract_service_1.default {
                     }, { id: email_otp_id });
                     //--change it for member
                     let secret = config_1.default.JWT_SECRET_ADMIN;
+                    let tokenValidity = '3m';
                     switch (type) {
                         case constants_1.OTP_TYPES.reset_admin:
                             secret = config_1.default.JWT_SECRET_ADMIN;
@@ -182,8 +193,16 @@ class PublicEmailOTPService extends abstract_service_1.default {
                         case constants_1.OTP_TYPES.reset_b2c:
                             secret = config_1.default.JWT_SECRET_USER;
                         case constants_1.OTP_TYPES.register_agent:
+                            tokenValidity = '15m';
                             secret = config_1.default.JWT_SECRET_AGENT;
                         case constants_1.OTP_TYPES.register_b2c:
+                            tokenValidity = '15m';
+                            secret = config_1.default.JWT_SECRET_USER;
+                        case constants_1.OTP_TYPES.verify_admin:
+                            secret = config_1.default.JWT_SECRET_ADMIN;
+                        case constants_1.OTP_TYPES.verify_agent:
+                            secret = config_1.default.JWT_SECRET_AGENT;
+                        case constants_1.OTP_TYPES.verify_b2c:
                             secret = config_1.default.JWT_SECRET_USER;
                         default:
                             break;
@@ -191,7 +210,7 @@ class PublicEmailOTPService extends abstract_service_1.default {
                     const token = lib_1.default.createToken({
                         email: email,
                         type: type,
-                    }, secret + type, 5000);
+                    }, secret + type, tokenValidity);
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_ACCEPTED,

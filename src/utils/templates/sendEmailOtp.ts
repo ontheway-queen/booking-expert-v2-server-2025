@@ -1,4 +1,8 @@
-import { PROJECT_LOGO, PROJECT_NAME } from '../miscellaneous/constants';
+import {
+  OTP_DEFAULT_EXPIRY,
+  PROJECT_LOGO,
+  PROJECT_NAME,
+} from '../miscellaneous/constants';
 
 export const sendEmailOtpTemplate = (otp: string, otpFor: string) => {
   return `
@@ -93,7 +97,7 @@ export const sendEmailOtpTemplate = (otp: string, otpFor: string) => {
                     line-height: 1.5;
                   "
                 >
-                  Validity for OTP is 3 minute. Keep this code private.
+                  Validity for this OTP is ${OTP_DEFAULT_EXPIRY} minutes. Keep this code private.
                 </p>
               </td>
             </tr>

@@ -36,6 +36,14 @@ class AgencyUserModel extends schema_1.default {
                 .where('id', id);
         });
     }
+    updateUserByEmail(payload, email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('agency_user')
+                .withSchema(this.AGENT_SCHEMA)
+                .update(payload)
+                .where('email', email);
+        });
+    }
     // get user list
     getUserList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, need_total = false) {
@@ -83,7 +91,7 @@ class AgencyUserModel extends schema_1.default {
         return __awaiter(this, arguments, void 0, function* ({ email, username, id, }) {
             return yield this.db('agency_user AS au')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('au.id', 'au.agency_id', 'au.email', 'au.mobile_number', 'au.photo', 'au.name', 'au.username', 'au.hashed_password', 'au.two_fa', 'au.role_id', 'au.status', 'au.socket_id', 'au.is_main_user', 'a.status AS agency_status', 'a.agency_no', 'a.allow_api', 'a.white_label')
+                .select('au.id', 'au.agency_id', 'au.email', 'au.mobile_number', 'au.photo', 'au.name', 'au.username', 'au.hashed_password', 'au.two_fa', 'au.role_id', 'au.status', 'au.socket_id', 'au.is_main_user', 'a.status AS agency_status', 'a.agency_no', 'a.email AS agency_email', 'a.agency_name', 'a.agency_logo', 'a.allow_api', 'a.white_label')
                 .leftJoin('agency AS a', 'au.agency_id', 'a.id')
                 .where((qb) => {
                 if (email) {
@@ -97,6 +105,104 @@ class AgencyUserModel extends schema_1.default {
                 }
             })
                 .first();
+        });
+    }
+    // Create role
+    createRole(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('roles')
+                .withSchema(this.AGENT_SCHEMA)
+                .insert(payload, 'id');
+        });
+    }
+    // Get all roles
+    getAllRoles(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('roles')
+                .withSchema(this.AGENT_SCHEMA)
+                .select('id', 'name', 'status', 'is_main_role')
+                .andWhere('agency_id', payload.agency_id)
+                .where((qb) => {
+                if (payload.name) {
+                    qb.andWhere('name', 'ilike', `%${payload.name}%`);
+                }
+                if (payload.status !== undefined) {
+                    qb.andWhere('status', payload.status);
+                }
+            })
+                .orderBy('name', 'asc');
+        });
+    }
+    // update role
+    updateRole(payload, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('roles')
+                .withSchema(this.AGENT_SCHEMA)
+                .update(payload)
+                .where({ id });
+        });
+    }
+    // Get single role with permissions
+    getSingleRoleWithPermissions(id, agency_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('roles as rol')
+                .withSchema(this.AGENT_SCHEMA)
+                .select('rol.id as role_id', 'rol.name as role_name', 'rol.status', 'rol.is_main_role', this.db.raw(`
+        case when exists (
+          select 1
+          from ${this.AGENT_SCHEMA}.role_permissions rp
+          where rp.role_id = rol.id
+        ) then (
+          select json_agg(
+            json_build_object(
+              'permission_id', per.id,
+              'permission_name', per.name,
+              'read', rp.read,
+              'write', rp.write,
+              'update', rp.update,
+              'delete', rp.delete
+            )
+                  order by per.name asc
+          )
+          from ${this.AGENT_SCHEMA}.role_permissions rp
+          left join ${this.AGENT_SCHEMA}.permissions per
+          on rp.permission_id = per.id
+          where rp.role_id = rol.id
+          group by rp.role_id
+        ) else '[]' end as permissions
+      `))
+                .andWhere('rol.id', id)
+                .andWhere('rol.agency_id', agency_id)
+                .first();
+        });
+    }
+    // insert roles permissions
+    insertRolePermission(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('role_permissions')
+                .withSchema(this.AGENT_SCHEMA)
+                .insert(payload);
+        });
+    }
+    // Delete Role permissions
+    deleteRolePermissions(role_id, agency_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('role_permissions')
+                .withSchema(this.AGENT_SCHEMA)
+                .delete()
+                .andWhere('role_id', role_id)
+                .andWhere('agency_id', agency_id);
+        });
+    }
+    // update role permission
+    updateRolePermission(payload, permission_id, role_id, agency_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('role_permissions')
+                .withSchema(this.AGENT_SCHEMA)
+                .update(payload)
+                .andWhere('agency_id', agency_id)
+                .andWhere('role_id', role_id)
+                .andWhere('permission_id', permission_id);
         });
     }
 }

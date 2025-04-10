@@ -6,7 +6,7 @@ import {
   ICreateRolePayload,
   IGetAdminData,
   IGetAdminListFilterQuery,
-  IGetAllPErmissionsData,
+  IGetAllPermissionsData,
   IGetRoleListData,
   IGetRoleListQuery,
   IGetSingleAdminData,
@@ -176,15 +176,22 @@ export default class AdminModel extends Schema {
     return await this.db('user_admin')
       .withSchema(this.ADMIN_SCHEMA)
       .update(payload)
-      .where((qb) => {
-        if (where.id) {
-          qb.where('id', where.id);
-        }
-      });
+      .where('id', where.id);
+  }
+
+  //update user admin by email
+  public async updateUserAdminByEmail(
+    payload: IUpdateAdminPayload,
+    where: { email: string }
+  ) {
+    return await this.db('user_admin')
+      .withSchema(this.ADMIN_SCHEMA)
+      .update(payload)
+      .where('email', where.email);
   }
 
   // Get all permissions
-  public async getAllPermissions(): Promise<IGetAllPErmissionsData[]> {
+  public async getAllPermissions(): Promise<IGetAllPermissionsData[]> {
     return await this.db('permissions')
       .withSchema(this.ADMIN_SCHEMA)
       .select('per.id', 'per.name', 'ua.name as created_by', 'per.created_at')

@@ -10,21 +10,23 @@ export interface ITokenParseAgency {
   user_id: number;
   user_email: string;
   username: string;
-  user_full_name: string;
+  name: string;
+  is_main_user: boolean;
 }
 
 export interface ITokenParseUser {
   user_id: number;
   username: string;
-  user_full_name: string;
+  name: string;
   user_email: string;
 }
 
 export interface ITokenParseAdmin {
   user_id: number;
   username: string;
-  user_full_name: string;
+  name: string;
   user_email: string;
+  is_main_user: boolean;
 }
 
 export interface ITokenParseAgencyB2CUser {
@@ -34,7 +36,7 @@ export interface ITokenParseAgencyB2CUser {
   user_id: number;
   user_email: string;
   username: string;
-  user_full_name: string;
+  name: string;
 }
 
 export interface IValidateAPIAgencyData {

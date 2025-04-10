@@ -1,22 +1,30 @@
-import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 import {
+  OTP_DEFAULT_EXPIRY,
   OTP_EMAIL_SUBJECT,
   OTP_TYPES,
 } from '../../../utils/miscellaneous/constants';
 import Lib from '../../../utils/lib/lib';
 import config from '../../../config/config';
 import { sendEmailOtpTemplate } from '../../../utils/templates/sendEmailOtp';
+import {
+  IMatchOTPReqBody,
+  ISendEmailOTPReqBody,
+} from '../utils/types/publicOTP.types';
+import { TDB } from '../utils/types/publicCommon.types';
+import { SignOptions } from 'jsonwebtoken';
 
 export default class PublicEmailOTPService extends AbstractServices {
-  constructor() {
+  private DBCon: TDB;
+  constructor(DBCon?: TDB) {
     super();
+    this.DBCon = DBCon || this.db;
   }
 
   // send email otp service
-  public async sendEmailOtp(req: Request) {
-    return await this.db.transaction(async (trx) => {
-      const { email, type } = req.body;
+  public async sendEmailOtp(payload: ISendEmailOTPReqBody) {
+    return await this.DBCon.transaction(async (trx) => {
+      const { email, type } = payload;
 
       let OTP_FOR = '';
       switch (type) {
@@ -75,6 +83,12 @@ export default class PublicEmailOTPService extends AbstractServices {
             };
           }
           OTP_FOR = 'registration.';
+        case OTP_TYPES.verify_admin:
+          OTP_FOR = 'admin login.';
+        case OTP_TYPES.verify_agent:
+          OTP_FOR = 'agent login.';
+        case OTP_TYPES.verify_b2c:
+          OTP_FOR = 'user login.';
         default:
           break;
       }
@@ -141,11 +155,14 @@ export default class PublicEmailOTPService extends AbstractServices {
   }
 
   //match email otp service
-  public async matchEmailOtpService(req: Request) {
-    return this.db.transaction(async (trx) => {
-      const { email, otp, type } = req.body;
+  public async matchEmailOtpService(payload: IMatchOTPReqBody) {
+    return this.DBCon.transaction(async (trx) => {
+      const { email, otp, type } = payload;
       const commonModel = this.Model.CommonModel(trx);
-      const checkOtp = await commonModel.getOTP({ email, type });
+      const checkOtp = await commonModel.getOTP({
+        email,
+        type,
+      });
 
       if (!checkOtp.length) {
         return {
@@ -181,6 +198,7 @@ export default class PublicEmailOTPService extends AbstractServices {
 
         //--change it for member
         let secret = config.JWT_SECRET_ADMIN;
+        let tokenValidity: SignOptions['expiresIn'] = '3m';
 
         switch (type) {
           case OTP_TYPES.reset_admin:
@@ -190,8 +208,16 @@ export default class PublicEmailOTPService extends AbstractServices {
           case OTP_TYPES.reset_b2c:
             secret = config.JWT_SECRET_USER;
           case OTP_TYPES.register_agent:
+            tokenValidity = '15m';
             secret = config.JWT_SECRET_AGENT;
           case OTP_TYPES.register_b2c:
+            tokenValidity = '15m';
+            secret = config.JWT_SECRET_USER;
+          case OTP_TYPES.verify_admin:
+            secret = config.JWT_SECRET_ADMIN;
+          case OTP_TYPES.verify_agent:
+            secret = config.JWT_SECRET_AGENT;
+          case OTP_TYPES.verify_b2c:
             secret = config.JWT_SECRET_USER;
           default:
             break;
@@ -203,7 +229,7 @@ export default class PublicEmailOTPService extends AbstractServices {
             type: type,
           },
           secret + type,
-          5000
+          tokenValidity
         );
 
         return {

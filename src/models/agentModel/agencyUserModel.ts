@@ -3,9 +3,15 @@ import { DATA_LIMIT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   ICheckAgencyUserData,
+  ICreateAgencyRolePayload,
   ICreateAgencyUserPayload,
+  IGetAgencyRoleListData,
+  IGetAgencyRoleListQuery,
   IGetAgencyUserListData,
   IGetAgencyUserListQuery,
+  IGetSingleAgencyRoleWithPermissionsData,
+  IInsertAgencyRolePermissionPayload,
+  IUpdateAgencyRolePayload,
   IUpdateAgencyUserPayload,
 } from '../../utils/modelTypes/agentModel/agencyUserModelTypes';
 
@@ -32,6 +38,16 @@ export default class AgencyUserModel extends Schema {
       .withSchema(this.AGENT_SCHEMA)
       .update(payload)
       .where('id', id);
+  }
+
+  public async updateUserByEmail(
+    payload: IUpdateAgencyUserPayload,
+    email: string
+  ) {
+    return await this.db('agency_user')
+      .withSchema(this.AGENT_SCHEMA)
+      .update(payload)
+      .where('email', email);
   }
 
   // get user list
@@ -118,6 +134,9 @@ export default class AgencyUserModel extends Schema {
         'au.is_main_user',
         'a.status AS agency_status',
         'a.agency_no',
+        'a.email AS agency_email',
+        'a.agency_name',
+        'a.agency_logo',
         'a.allow_api',
         'a.white_label'
       )
@@ -135,5 +154,119 @@ export default class AgencyUserModel extends Schema {
         }
       })
       .first();
+  }
+
+  // Create role
+  public async createRole(payload: ICreateAgencyRolePayload) {
+    return await this.db('roles')
+      .withSchema(this.AGENT_SCHEMA)
+      .insert(payload, 'id');
+  }
+
+  // Get all roles
+  public async getAllRoles(
+    payload: IGetAgencyRoleListQuery
+  ): Promise<IGetAgencyRoleListData[]> {
+    return await this.db('roles')
+      .withSchema(this.AGENT_SCHEMA)
+      .select('id', 'name', 'status', 'is_main_role')
+      .andWhere('agency_id', payload.agency_id)
+      .where((qb) => {
+        if (payload.name) {
+          qb.andWhere('name', 'ilike', `%${payload.name}%`);
+        }
+        if (payload.status !== undefined) {
+          qb.andWhere('status', payload.status);
+        }
+      })
+      .orderBy('name', 'asc');
+  }
+
+  // update role
+  public async updateRole(payload: IUpdateAgencyRolePayload, id: number) {
+    return await this.db('roles')
+      .withSchema(this.AGENT_SCHEMA)
+      .update(payload)
+      .where({ id });
+  }
+
+  // Get single role with permissions
+  public async getSingleRoleWithPermissions(
+    id: number,
+    agency_id: number
+  ): Promise<IGetSingleAgencyRoleWithPermissionsData> {
+    return await this.db('roles as rol')
+      .withSchema(this.AGENT_SCHEMA)
+      .select(
+        'rol.id as role_id',
+        'rol.name as role_name',
+        'rol.status',
+        'rol.is_main_role',
+        this.db.raw(`
+        case when exists (
+          select 1
+          from ${this.AGENT_SCHEMA}.role_permissions rp
+          where rp.role_id = rol.id
+        ) then (
+          select json_agg(
+            json_build_object(
+              'permission_id', per.id,
+              'permission_name', per.name,
+              'read', rp.read,
+              'write', rp.write,
+              'update', rp.update,
+              'delete', rp.delete
+            )
+                  order by per.name asc
+          )
+          from ${this.AGENT_SCHEMA}.role_permissions rp
+          left join ${this.AGENT_SCHEMA}.permissions per
+          on rp.permission_id = per.id
+          where rp.role_id = rol.id
+          group by rp.role_id
+        ) else '[]' end as permissions
+      `)
+      )
+      .andWhere('rol.id', id)
+      .andWhere('rol.agency_id', agency_id)
+      .first();
+  }
+
+  // insert roles permissions
+  public async insertRolePermission(
+    payload: IInsertAgencyRolePermissionPayload[]
+  ) {
+    return await this.db('role_permissions')
+      .withSchema(this.AGENT_SCHEMA)
+      .insert(payload);
+  }
+
+  // Delete Role permissions
+  public async deleteRolePermissions(role_id: number, agency_id: number) {
+    return await this.db('role_permissions')
+      .withSchema(this.AGENT_SCHEMA)
+      .delete()
+      .andWhere('role_id', role_id)
+      .andWhere('agency_id', agency_id);
+  }
+
+  // update role permission
+  public async updateRolePermission(
+    payload: {
+      write: boolean;
+      update: boolean;
+      delete: boolean;
+      read: boolean;
+    },
+    permission_id: number,
+    role_id: number,
+    agency_id: number
+  ) {
+    return await this.db('role_permissions')
+      .withSchema(this.AGENT_SCHEMA)
+      .update(payload)
+      .andWhere('agency_id', agency_id)
+      .andWhere('role_id', role_id)
+      .andWhere('permission_id', permission_id);
   }
 }

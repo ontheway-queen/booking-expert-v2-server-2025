@@ -1,5 +1,5 @@
 import config from '../../config/config';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
 import fs from 'fs';
@@ -22,10 +22,12 @@ class Lib {
   }
 
   // create token
-  public static createToken(creds: object, secret: string, maxAge: number) {
-    return jwt.sign(creds, secret, {
-      expiresIn: maxAge,
-    });
+  public static createToken(
+    payload: object,
+    secret: string,
+    expiresIn: SignOptions['expiresIn']
+  ) {
+    return jwt.sign(payload, secret, { expiresIn });
   }
 
   // verify token
@@ -33,7 +35,6 @@ class Lib {
     try {
       return jwt.verify(token, secret);
     } catch (err) {
-      console.log(err);
       return false;
     }
   }

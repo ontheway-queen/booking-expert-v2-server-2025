@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const constants_1 = require("../../utils/miscellaneous/constants");
 const flightConstent_1 = require("../../utils/miscellaneous/flightConstent");
 const schema_1 = __importDefault(require("../../utils/miscellaneous/schema"));
 class CommonModel extends schema_1.default {
@@ -60,7 +61,7 @@ class CommonModel extends schema_1.default {
                 .andWhere('type', payload.type)
                 .andWhere('matched', 0)
                 .andWhere('tried', '<', 3)
-                .andWhereRaw(`"create_date" + interval '3 minutes' > NOW()`);
+                .andWhereRaw(`"create_date" + interval '${constants_1.OTP_DEFAULT_EXPIRY} minutes' > NOW()`);
             return check;
         });
     }

@@ -125,11 +125,16 @@ class AdminModel extends schema_1.default {
             return yield this.db('user_admin')
                 .withSchema(this.ADMIN_SCHEMA)
                 .update(payload)
-                .where((qb) => {
-                if (where.id) {
-                    qb.where('id', where.id);
-                }
-            });
+                .where('id', where.id);
+        });
+    }
+    //update user admin by email
+    updateUserAdminByEmail(payload, where) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('user_admin')
+                .withSchema(this.ADMIN_SCHEMA)
+                .update(payload)
+                .where('email', where.email);
         });
     }
     // Get all permissions

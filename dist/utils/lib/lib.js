@@ -33,10 +33,8 @@ class Lib {
         });
     }
     // create token
-    static createToken(creds, secret, maxAge) {
-        return jsonwebtoken_1.default.sign(creds, secret, {
-            expiresIn: maxAge,
-        });
+    static createToken(payload, secret, expiresIn) {
+        return jsonwebtoken_1.default.sign(payload, secret, { expiresIn });
     }
     // verify token
     static verifyToken(token, secret) {
@@ -44,7 +42,6 @@ class Lib {
             return jsonwebtoken_1.default.verify(token, secret);
         }
         catch (err) {
-            console.log(err);
             return false;
         }
     }

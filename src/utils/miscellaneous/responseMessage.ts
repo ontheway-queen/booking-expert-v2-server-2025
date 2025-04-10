@@ -18,10 +18,10 @@ class ResMsg {
     'The request payload is unprocessable, please provide valid payload';
   static readonly HTTP_INTERNAL_SERVER_ERROR = 'Internal server error';
   static readonly HTTP_ACCOUNT_INACTIVE =
-    'Your account is deactivated. Please contact us!';
+    'Your account is disabled! Please contact us.';
 
   // without http
-  static readonly WRONG_CREDENTIALS = 'Email or password is wrong';
+  static readonly WRONG_CREDENTIALS = 'Wrong username/email or password.';
   static readonly PASSWORD_CHANGED = 'Password changed successfully';
   static readonly PASSWORD_NOT_CHANGED = 'Password cannot changed';
 
