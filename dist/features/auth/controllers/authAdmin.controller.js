@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -21,8 +32,16 @@ class AuthAdminController extends abstract_controller_1.default {
         this.service = new authAdmin_service_1.default();
         this.validator = new authValidator_1.default();
         this.login = this.asyncWrapper.wrap({ bodySchema: this.validator.loginValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            // const { code, ...data } = await this.service.createRole(req);
-            // res.status(code).json(data);
+            const _a = yield this.service.login(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.login2FA = this.asyncWrapper.wrap({ bodySchema: this.validator.login2FAValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.login2FA(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.resetPassword = this.asyncWrapper.wrap({ bodySchema: this.validator.resetPasswordValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.resetPassword(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
         }));
     }
 }

@@ -5,10 +5,14 @@ import Schema from '../../utils/miscellaneous/schema';
 import {
   ICreateAirlinesPayload,
   ICreateAirportPayload,
+  IGetLastIdData,
+  IGetLastIdParams,
   IGetOTPPayload,
+  IInsertLastNoPayload,
   IInsertOTPPayload,
   IUpdateAirlinesPayload,
   IUpdateAirportPayload,
+  IUpdateLastNoPayload,
 } from '../../utils/modelTypes/commonModelTypes/commonModelTypes';
 
 class CommonModel extends Schema {
@@ -72,6 +76,29 @@ class CommonModel extends Schema {
       .withSchema(this.DBO_SCHEMA)
       .update({ value })
       .where({ key });
+  }
+
+  public async insertLastNo(payload: IInsertLastNoPayload) {
+    return await this.db('last_no')
+      .withSchema(this.DBO_SCHEMA)
+      .insert(payload, 'id');
+  }
+
+  public async updateLastNo(payload: IUpdateLastNoPayload, id: number) {
+    return await this.db('last_no')
+      .withSchema(this.DBO_SCHEMA)
+      .update(payload)
+      .where('id', id);
+  }
+
+  public async getLastId({
+    type,
+  }: IGetLastIdParams): Promise<IGetLastIdData | null> {
+    return await this.db('last_no')
+      .withSchema(this.DBO_SCHEMA)
+      .select('id', 'last_id')
+      .where('type', type)
+      .first();
   }
 
   // Get airlines

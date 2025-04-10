@@ -9,6 +9,7 @@ import {
   IGetAgencyRoleListQuery,
   IGetAgencyUserListData,
   IGetAgencyUserListQuery,
+  IGetAllAgencyPermissionsData,
   IGetSingleAgencyRoleWithPermissionsData,
   IInsertAgencyRolePermissionPayload,
   IUpdateAgencyRolePayload,
@@ -24,9 +25,7 @@ export default class AgencyUserModel extends Schema {
   }
 
   //create user
-  public async createUser(
-    payload: ICreateAgencyUserPayload
-  ): Promise<number[]> {
+  public async createUser(payload: ICreateAgencyUserPayload) {
     return await this.db('agency_user')
       .withSchema(this.AGENT_SCHEMA)
       .insert(payload, 'id');
@@ -182,6 +181,13 @@ export default class AgencyUserModel extends Schema {
       .orderBy('name', 'asc');
   }
 
+  public async getAllPermissions(): Promise<IGetAllAgencyPermissionsData[]> {
+    return await this.db('permissions')
+      .withSchema(this.AGENT_SCHEMA)
+      .select('per.id', 'per.name', 'ua.name as created_by', 'per.created_at')
+      .leftJoin('user_admin as ua', 'ua.id', 'per.created_by')
+      .orderBy('per.name', 'asc');
+  }
   // update role
   public async updateRole(payload: IUpdateAgencyRolePayload, id: number) {
     return await this.db('roles')

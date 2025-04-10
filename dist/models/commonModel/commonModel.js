@@ -106,6 +106,30 @@ class CommonModel extends schema_1.default {
                 .where({ key });
         });
     }
+    insertLastNo(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('last_no')
+                .withSchema(this.DBO_SCHEMA)
+                .insert(payload, 'id');
+        });
+    }
+    updateLastNo(payload, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('last_no')
+                .withSchema(this.DBO_SCHEMA)
+                .update(payload)
+                .where('id', id);
+        });
+    }
+    getLastId(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ type, }) {
+            return yield this.db('last_no')
+                .withSchema(this.DBO_SCHEMA)
+                .select('id', 'last_id')
+                .where('type', type)
+                .first();
+        });
+    }
     // Get airlines
     getAirlines(airlineCode) {
         return __awaiter(this, void 0, void 0, function* () {

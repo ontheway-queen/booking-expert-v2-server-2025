@@ -5,21 +5,25 @@ export interface ICreateAgencyPayload {
   email: string;
   phone: string;
   address: string;
+  national_id?: string;
+  civil_aviation?: string;
+  trade_license?: string;
   flight_markup_set?: number;
   hotel_markup_set?: number;
   created_by?: number;
   ref_id?: number;
   white_label?: boolean;
   allow_api?: boolean;
-  status: 'Pending' | 'Active';
+  status: 'Pending' | 'Active' | 'Incomplete';
 }
+
 export interface IUpdateAgencyPayload {
   agency_logo?: string;
   agency_name?: string;
   email?: string;
   phone?: string;
   address?: string;
-  status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected';
+  status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   flight_markup_set?: number;
   hotel_markup_set?: number;
   white_label?: boolean;
