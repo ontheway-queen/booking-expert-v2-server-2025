@@ -7,7 +7,6 @@ import {
 
 export const registrationVerificationTemplate = (
   agency_name: string,
-  creds: { username: string; pass: string },
   verificationLink: string
 ) => {
   return `
@@ -53,33 +52,6 @@ export const registrationVerificationTemplate = (
                   style="display: block; width: 80px; margin-bottom: 10px;"
                 />
               </td>
-            </tr>
-              <tr>
-              <td align="center" style="padding: 0 20px 20px;">
-                <p
-                  style="
-                    font-size: 12px;
-                    color: #7c7b7b;
-                    margin: 0;
-                    line-height: 1.5;
-                  "
-                >
-                 <b>Agency Login:</b>
-                </p>
-                  <p
-                  style="
-                    font-size: 12px;
-                    color: #7c7b7b;
-                    margin: 0;
-                    line-height: 1.5;
-                  "
-                >
-                 <b>Username:</b> ${creds.username}
-                 <br/>
-                 <b>Password:</b> ${creds.pass}
-                </p>
-              </td>
-            </tr>
             <tr>
               <td align="center" style="padding: 0 20px;">
                 <!-- Heading -->

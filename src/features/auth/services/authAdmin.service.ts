@@ -217,6 +217,8 @@ export default class AuthAdminService extends AbstractServices {
       config.JWT_SECRET_ADMIN + OTP_TYPES.reset_admin
     );
 
+    console.log({ data });
+
     if (!data) {
       return {
         success: false,

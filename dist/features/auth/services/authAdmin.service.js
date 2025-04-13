@@ -170,6 +170,7 @@ class AuthAdminService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { password, token } = req.body;
             const data = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_ADMIN + constants_1.OTP_TYPES.reset_admin);
+            console.log({ data });
             if (!data) {
                 return {
                     success: false,

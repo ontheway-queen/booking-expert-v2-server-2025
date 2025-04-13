@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.registrationVerificationTemplate = void 0;
+exports.registrationVerificationCompletedTemplate = void 0;
 const constants_1 = require("../miscellaneous/constants");
-const registrationVerificationTemplate = (agency_name, creds, verificationLink) => {
+const registrationVerificationCompletedTemplate = (agency_name, creds) => {
     return `
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Agency Registration Confirmation</title>
+    <title>Registration Completed - ${agency_name}</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: Arial, sans-serif;">
     <!-- Outer table to center the content -->
@@ -46,7 +46,6 @@ const registrationVerificationTemplate = (agency_name, creds, verificationLink) 
                   style="display: block; width: 80px; margin-bottom: 10px;"
                 />
               </td>
-            </tr>
             <tr>
               <td align="center" style="padding: 0 20px;">
                 <!-- Heading -->
@@ -58,7 +57,33 @@ const registrationVerificationTemplate = (agency_name, creds, verificationLink) 
                     margin: 0 0 20px;
                   "
                 >
-                  Verification Code
+                              </tr>
+              <tr>
+              <td align="center" style="padding: 0 20px 20px;">
+                <p
+                  style="
+                    font-size: 12px;
+                    color: #7c7b7b;
+                    margin: 0;
+                    line-height: 1.5;
+                  "
+                >
+                 <b>Agency Login:</b>
+                </p>
+                  <p
+                  style="
+                    font-size: 12px;
+                    color: #7c7b7b;
+                    margin: 0;
+                    line-height: 1.5;
+                  "
+                >
+                 <b>Username:</b> ${creds.email}
+                 <br/>
+                 <b>Password:</b> ${creds.password}
+                </p>
+              </td>
+            </tr>
                 </h1>
                 <!-- Subtext -->
                 <p
@@ -69,7 +94,7 @@ const registrationVerificationTemplate = (agency_name, creds, verificationLink) 
                     line-height: 1.5;
                   "
                 >
-                  Use the following OTP to complete the procedure for ${otpFor}.
+                  Use the following link to login.
                 </p>
                 <!-- OTP -->
                 <div
@@ -80,7 +105,7 @@ const registrationVerificationTemplate = (agency_name, creds, verificationLink) 
                     margin: 20px 0;
                   "
                 >
-                 ${otp}
+                 ${constants_1.PROJECT_LINK}/login
                 </div>
               </td>
             </tr>
@@ -95,7 +120,7 @@ const registrationVerificationTemplate = (agency_name, creds, verificationLink) 
                     line-height: 1.5;
                   "
                 >
-                  Validity for this OTP is ${constants_1.OTP_DEFAULT_EXPIRY} minutes. Keep this code private.
+                  Validity for this link is 24 hour. Keep this link private.
                 </p>
               </td>
             </tr>
@@ -108,4 +133,4 @@ const registrationVerificationTemplate = (agency_name, creds, verificationLink) 
 </html>
     `;
 };
-exports.registrationVerificationTemplate = registrationVerificationTemplate;
+exports.registrationVerificationCompletedTemplate = registrationVerificationCompletedTemplate;

@@ -40,10 +40,11 @@ class PublicEmailOTPService extends abstract_service_1.default {
                             };
                         }
                         OTP_FOR = 'reset password.';
+                        break;
                     case constants_1.OTP_TYPES.reset_agent:
                         const agencyUserModel = this.Model.AgencyUserModel(trx);
-                        const checkAdmin = yield agencyUserModel.checkUser({ email });
-                        if (!checkAdmin) {
+                        const checkAgent = yield agencyUserModel.checkUser({ email });
+                        if (!checkAgent) {
                             return {
                                 success: false,
                                 code: this.StatusCode.HTTP_NOT_FOUND,
@@ -51,6 +52,7 @@ class PublicEmailOTPService extends abstract_service_1.default {
                             };
                         }
                         OTP_FOR = 'reset password.';
+                        break;
                     case constants_1.OTP_TYPES.reset_b2c:
                         const b2cUserModel = this.Model.B2CUserModel(trx);
                         const checkUser = yield b2cUserModel.checkUser({ email });
@@ -62,6 +64,7 @@ class PublicEmailOTPService extends abstract_service_1.default {
                             };
                         }
                         OTP_FOR = 'reset password.';
+                        break;
                     case constants_1.OTP_TYPES.register_agent:
                         const agencyUserModel2 = this.Model.AgencyUserModel(trx);
                         const checkAdmin2 = yield agencyUserModel2.checkUser({ email });
@@ -73,6 +76,7 @@ class PublicEmailOTPService extends abstract_service_1.default {
                             };
                         }
                         OTP_FOR = 'register as an agent.';
+                        break;
                     case constants_1.OTP_TYPES.register_b2c:
                         const b2cUserModel2 = this.Model.B2CUserModel(trx);
                         const checkUser2 = yield b2cUserModel2.checkUser({ email });
@@ -84,15 +88,20 @@ class PublicEmailOTPService extends abstract_service_1.default {
                             };
                         }
                         OTP_FOR = 'registration.';
+                        break;
                     case constants_1.OTP_TYPES.verify_admin:
                         OTP_FOR = 'admin login.';
+                        break;
                     case constants_1.OTP_TYPES.verify_agent:
                         OTP_FOR = 'agent login.';
+                        break;
                     case constants_1.OTP_TYPES.verify_b2c:
                         OTP_FOR = 'user login.';
+                        break;
                     default:
                         break;
                 }
+                console.log({ OTP_FOR });
                 const commonModel = this.Model.CommonModel(trx);
                 const checkOtp = yield commonModel.getOTP({
                     email: email,
@@ -188,22 +197,30 @@ class PublicEmailOTPService extends abstract_service_1.default {
                     switch (type) {
                         case constants_1.OTP_TYPES.reset_admin:
                             secret = config_1.default.JWT_SECRET_ADMIN;
+                            break;
                         case constants_1.OTP_TYPES.reset_agent:
                             secret = config_1.default.JWT_SECRET_AGENT;
+                            break;
                         case constants_1.OTP_TYPES.reset_b2c:
                             secret = config_1.default.JWT_SECRET_USER;
+                            break;
                         case constants_1.OTP_TYPES.register_agent:
                             tokenValidity = '15m';
                             secret = config_1.default.JWT_SECRET_AGENT;
+                            break;
                         case constants_1.OTP_TYPES.register_b2c:
                             tokenValidity = '15m';
                             secret = config_1.default.JWT_SECRET_USER;
+                            break;
                         case constants_1.OTP_TYPES.verify_admin:
                             secret = config_1.default.JWT_SECRET_ADMIN;
+                            break;
                         case constants_1.OTP_TYPES.verify_agent:
                             secret = config_1.default.JWT_SECRET_AGENT;
+                            break;
                         case constants_1.OTP_TYPES.verify_b2c:
                             secret = config_1.default.JWT_SECRET_USER;
+                            break;
                         default:
                             break;
                     }

@@ -8,6 +8,7 @@ import {
 } from '../../../utils/miscellaneous/constants';
 import PublicEmailOTPService from '../../public/services/publicEmailOTP.service';
 import {
+  ICompleteRegisterParsedTokenData,
   ILogin2FAReqBody,
   ILoginReqBody,
   IRegisterAgentReqBody,
@@ -17,6 +18,7 @@ import { ITokenParseAgency } from '../../public/utils/types/publicCommon.types';
 import CustomError from '../../../utils/lib/customError';
 import { IInsertAgencyRolePermissionPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
 import { registrationVerificationTemplate } from '../../../utils/templates/registrationVerificationTemplate';
+import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
 
 export default class AuthAgentService extends AbstractServices {
   constructor() {
@@ -155,10 +157,7 @@ export default class AuthAgentService extends AbstractServices {
         emailSub: `Booking Expert Agency Registration Verification`,
         emailBody: registrationVerificationTemplate(
           agency_name,
-          {
-            username,
-            pass: password,
-          },
+
           '/registration/verification?token=' + verificationToken
         ),
       });
@@ -166,7 +165,7 @@ export default class AuthAgentService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: this.ResMsg.HTTP_SUCCESSFUL,
+        message: `Your registration has been successfully placed. Agency ID: ${agent_no}. To complete your registration please check your email and complete registration with the link we have sent to your email.`,
         data: {
           email,
         },
@@ -174,7 +173,55 @@ export default class AuthAgentService extends AbstractServices {
     });
   }
 
-  public async registerComplete(req: Request) {}
+  public async registerComplete(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { token } = req.body as { token: string };
+      const AgentModel = this.Model.AgencyModel(trx);
+      const AgencyUserModel = this.Model.AgencyUserModel(trx);
+
+      const parsedToken = Lib.verifyToken(
+        token,
+        config.JWT_SECRET_AGENT + OTP_TYPES.register_agent
+      ) as ICompleteRegisterParsedTokenData | false;
+
+      if (!parsedToken) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_UNAUTHORIZED,
+          message: 'Invalid token or token expired. Please contact us.',
+        };
+      }
+
+      const { agency_id, email, user_id, agency_name } = parsedToken;
+
+      await AgentModel.updateAgency({ status: 'Pending' }, agency_id);
+
+      const password = Lib.generateRandomPassword(8);
+      const hashed_password = await Lib.hashValue(password);
+
+      await AgencyUserModel.updateUser(
+        {
+          hashed_password,
+        },
+        user_id
+      );
+
+      await Lib.sendEmail({
+        email,
+        emailSub: `Booking Expert Agency Registration Verification`,
+        emailBody: registrationVerificationCompletedTemplate(agency_name, {
+          email,
+          password,
+        }),
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: `Registration successful. Please check you will receive login credentials at the email address ${email}.`,
+      };
+    });
+  }
 
   public async login(req: Request) {
     return this.db.transaction(async (trx) => {

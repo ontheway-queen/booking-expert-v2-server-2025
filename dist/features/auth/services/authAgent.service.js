@@ -30,6 +30,7 @@ const constants_1 = require("../../../utils/miscellaneous/constants");
 const publicEmailOTP_service_1 = __importDefault(require("../../public/services/publicEmailOTP.service"));
 const customError_1 = __importDefault(require("../../../utils/lib/customError"));
 const registrationVerificationTemplate_1 = require("../../../utils/templates/registrationVerificationTemplate");
+const registrationVerificationCompletedTemplate_1 = require("../../../utils/templates/registrationVerificationCompletedTemplate");
 class AuthAgentService extends abstract_service_1.default {
     constructor() {
         super();
@@ -137,15 +138,12 @@ class AuthAgentService extends abstract_service_1.default {
                 yield lib_1.default.sendEmail({
                     email,
                     emailSub: `Booking Expert Agency Registration Verification`,
-                    emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, {
-                        username,
-                        pass: password,
-                    }, '/registration/verification?token=' + verificationToken),
+                    emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, '/registration/verification?token=' + verificationToken),
                 });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                    message: `Your registration has been successfully placed. Agency ID: ${agent_no}. To complete your registration please check your email and complete registration with the link we have sent to your email.`,
                     data: {
                         email,
                     },
@@ -154,7 +152,41 @@ class AuthAgentService extends abstract_service_1.default {
         });
     }
     registerComplete(req) {
-        return __awaiter(this, void 0, void 0, function* () { });
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { token } = req.body;
+                const AgentModel = this.Model.AgencyModel(trx);
+                const AgencyUserModel = this.Model.AgencyUserModel(trx);
+                const parsedToken = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent);
+                if (!parsedToken) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_UNAUTHORIZED,
+                        message: 'Invalid token or token expired. Please contact us.',
+                    };
+                }
+                const { agency_id, email, user_id, agency_name } = parsedToken;
+                yield AgentModel.updateAgency({ status: 'Pending' }, agency_id);
+                const password = lib_1.default.generateRandomPassword(8);
+                const hashed_password = yield lib_1.default.hashValue(password);
+                yield AgencyUserModel.updateUser({
+                    hashed_password,
+                }, user_id);
+                yield lib_1.default.sendEmail({
+                    email,
+                    emailSub: `Booking Expert Agency Registration Verification`,
+                    emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(agency_name, {
+                        email,
+                        password,
+                    }),
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: `Registration successful. Please check you will receive login credentials at the email address ${email}.`,
+                };
+            }));
+        });
     }
     login(req) {
         return __awaiter(this, void 0, void 0, function* () {
