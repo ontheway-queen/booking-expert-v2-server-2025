@@ -11,14 +11,18 @@ export default class AuthValidator {
     }),
   });
 
-  //common register validator
-  public registerValidator = Joi.object({
-    first_name: Joi.string().min(1).max(255).required(),
-    last_name: Joi.string().min(1).max(255).required(),
-    gender: Joi.string().valid('Male', 'Female', 'Other').required(),
-    email: Joi.string().email().lowercase().min(1).max(255).required(),
-    password: Joi.string().min(8).max(100).required().trim(),
-    phone_number: Joi.string().min(7).max(20).required(),
+  public login2FAValidator = Joi.object({
+    email: Joi.string().required().lowercase().trim(),
+    otp: Joi.string().length(6).trim().required(),
+  });
+
+  //agency register validator
+  public agencyRegisterValidator = Joi.object({
+    user_name: Joi.string().trim().min(4).max(255).required(),
+    agency_name: Joi.string().trim().min(4).max(255).required(),
+    email: Joi.string().email().trim().lowercase().max(255).required(),
+    address: Joi.string().min(8).max(100).required().trim(),
+    phone: Joi.string().min(7).max(20).required().trim(),
   });
 
   //login with google validator

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.MARKUP_SET_TYPE_HOTEL = exports.MARKUP_SET_TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_IMAGE_URL = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL_2 = exports.PROJECT_EMAIL = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
+exports.WHITE_LABEL_PERMISSIONS_MODULES = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.MARKUP_SET_TYPE_HOTEL = exports.MARKUP_SET_TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL = exports.PROJECT_LINK = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
 exports.origin = ['http://localhost:3000'];
 // OTP types constants
 exports.OTP_TYPES = {
@@ -19,10 +19,9 @@ exports.OTP_TYPES = {
 //Project Info
 exports.PROJECT_NAME = 'Booking Expert V2';
 exports.PROJECT_LOGO = 'https://ticket.trabill.biz/assets/logo.png';
+exports.PROJECT_LINK = 'https://ticket.trabill.biz';
 exports.PROJECT_EMAIL = 'sup.m360ict@gmail.com';
-exports.PROJECT_EMAIL_2 = 'sup.m360ict@gmail.com';
 exports.PROJECT_NUMBER = '+8801958398339';
-exports.PROJECT_IMAGE_URL = 'https://ticket.trabill.biz/assets/logo.png';
 exports.PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 // Email subject
 exports.OTP_EMAIL_SUBJECT = 'Your One Time Password For Verification';
@@ -38,3 +37,5 @@ exports.ERROR_LEVEL_INFO = 'INFO';
 exports.ERROR_LEVEL_WARNING = 'WARNING';
 exports.ERROR_LEVEL_ERROR = 'ERROR';
 exports.ERROR_LEVEL_CRITICAL = 'CRITICAL';
+// White label permissions modules
+exports.WHITE_LABEL_PERMISSIONS_MODULES = [];

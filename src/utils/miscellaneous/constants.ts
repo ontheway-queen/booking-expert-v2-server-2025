@@ -18,10 +18,9 @@ export const OTP_TYPES = {
 //Project Info
 export const PROJECT_NAME = 'Booking Expert V2';
 export const PROJECT_LOGO = 'https://ticket.trabill.biz/assets/logo.png';
+export const PROJECT_LINK = 'https://ticket.trabill.biz';
 export const PROJECT_EMAIL = 'sup.m360ict@gmail.com';
-export const PROJECT_EMAIL_2 = 'sup.m360ict@gmail.com';
 export const PROJECT_NUMBER = '+8801958398339';
-export const PROJECT_IMAGE_URL = 'https://ticket.trabill.biz/assets/logo.png';
 export const PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 
 // Email subject
@@ -41,3 +40,6 @@ export const ERROR_LEVEL_INFO = 'INFO';
 export const ERROR_LEVEL_WARNING = 'WARNING';
 export const ERROR_LEVEL_ERROR = 'ERROR';
 export const ERROR_LEVEL_CRITICAL = 'CRITICAL';
+
+// White label permissions modules
+export const WHITE_LABEL_PERMISSIONS_MODULES: string[] = [];

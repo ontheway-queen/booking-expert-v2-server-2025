@@ -33,7 +33,11 @@ export default class MarkupSetModel extends Schema {
                 if (query.status !== undefined) {
                     qb.andWhere('status', query.status);
                 }
-            });
+                if(query.type) {
+                    qb.andWhere('type', query.type);
+                }
+            })
+            .andWhere("is_deleted", false);
 
         return data;
     }
@@ -49,6 +53,7 @@ export default class MarkupSetModel extends Schema {
                     qb.andWhere('status', status);
                 }
             })
+            .andWhere("is_deleted", false)
             .first();
     }
 
@@ -59,10 +64,4 @@ export default class MarkupSetModel extends Schema {
             .where({ id });
     }
 
-    public async deleteMarkupSet(id: number) {
-        return await this.db('markup_set')
-            .withSchema(this.DBO_SCHEMA)
-            .delete()
-            .where({ id });
-    }
 }

@@ -17,4 +17,58 @@ export default class AdminMarkupSetController extends AbstractController {
             res.status(code).json(data);
         }
     );
+
+    public getMarkupSet = this.asyncWrapper.wrap(
+        { querySchema: this.validator.getMarkupSetSchema },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.getMarkupSet(req);
+            res.status(code).json(data);
+        }
+    );
+
+    public getSingleMarkupSet = this.asyncWrapper.wrap(
+        { paramSchema: this.commonValidator.singleParamNumValidator() },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.getSingleMarkupSet(req);
+            res.status(code).json(data);
+        }
+    );
+
+    public updateMarkupSet = this.asyncWrapper.wrap(
+        {
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+            bodySchema: this.validator.updateCommissionSetSchema
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.updateMarkupSet(req);
+            res.status(code).json(data);
+        }
+    );
+
+    public deleteMarkupSet = this.asyncWrapper.wrap(
+        { paramSchema: this.commonValidator.singleParamNumValidator() },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.deleteMarkupSet(req);
+            res.status(code).json(data);
+        }
+    );
+
+    public getMarkupSetFlightApiDetails = this.asyncWrapper.wrap(
+        { paramSchema: this.commonValidator.multipleParamsNumValidator(["set_id", "set_api_id"]) },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.getMarkupSetFlightApiDetails(req);
+            res.status(code).json(data);
+        }
+    );
+
+    public updateMarkupSetFlightApi = this.asyncWrapper.wrap(
+        {
+            paramSchema: this.commonValidator.multipleParamsNumValidator(["set_id", "set_api_id"]),
+            bodySchema: this.validator.updateFlightMarkupsSchema
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.updateMarkupSetFlightApi(req);
+            res.status(code).json(data);
+        }
+    );
 }

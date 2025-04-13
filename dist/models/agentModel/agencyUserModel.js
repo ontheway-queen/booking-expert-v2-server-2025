@@ -133,6 +133,15 @@ class AgencyUserModel extends schema_1.default {
                 .orderBy('name', 'asc');
         });
     }
+    getAllPermissions() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('permissions')
+                .withSchema(this.AGENT_SCHEMA)
+                .select('per.id', 'per.name', 'ua.name as created_by', 'per.created_at')
+                .leftJoin('user_admin as ua', 'ua.id', 'per.created_by')
+                .orderBy('per.name', 'asc');
+        });
+    }
     // update role
     updateRole(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -8,9 +8,10 @@ export interface ICreateMarkupSetPayload extends markupType {
 }
 
 
-export interface IUpdateMarkupSetPayload extends markupType {
+export interface IUpdateMarkupSetPayload{
     name?: string;
     status?: boolean;
+    is_deleted?: true;
 }
 
 export interface IGetMarkupSetData extends markupType {
@@ -19,6 +20,7 @@ export interface IGetMarkupSetData extends markupType {
     status: boolean;
     created_by: number;
     created_at: Date;
+    is_deleted: false;
 }
 
 export interface IGetMarkupListFilterQuery{

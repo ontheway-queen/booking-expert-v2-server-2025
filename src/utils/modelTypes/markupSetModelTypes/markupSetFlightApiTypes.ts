@@ -8,7 +8,7 @@ export interface IUpdateMarkupSetFlightApiPayload {
 }
 
 export interface IGetMarkupSetFlightApiListFilterQuery {
-    id:number;
+    id?:number;
     status?: boolean;
     markup_set_id?: number;
     flight_api_id?: number;

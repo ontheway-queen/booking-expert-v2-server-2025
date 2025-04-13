@@ -40,7 +40,11 @@ class MarkupSetModel extends schema_1.default {
                 if (query.status !== undefined) {
                     qb.andWhere('status', query.status);
                 }
-            });
+                if (query.type) {
+                    qb.andWhere('type', query.type);
+                }
+            })
+                .andWhere("is_deleted", false);
             return data;
         });
     }
@@ -55,6 +59,7 @@ class MarkupSetModel extends schema_1.default {
                     qb.andWhere('status', status);
                 }
             })
+                .andWhere("is_deleted", false)
                 .first();
         });
     }
@@ -63,14 +68,6 @@ class MarkupSetModel extends schema_1.default {
             return yield this.db('markup_set')
                 .withSchema(this.DBO_SCHEMA)
                 .update(payload)
-                .where({ id });
-        });
-    }
-    deleteMarkupSet(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('markup_set')
-                .withSchema(this.DBO_SCHEMA)
-                .delete()
                 .where({ id });
         });
     }

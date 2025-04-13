@@ -59,7 +59,7 @@ export interface ICheckAgencyUserData {
   two_fa: boolean;
   role_id: number;
   status: boolean;
-  agency_status: 'Pending' | 'Active' | 'Inactive' | 'Rejected';
+  agency_status: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   agency_no: string;
   allow_api: boolean;
   is_main_user: boolean;
@@ -70,6 +70,13 @@ export interface ICreateAgencyRolePayload {
   name: string;
   id_main_role?: boolean;
   agency_id: number;
+}
+
+export interface IGetAllAgencyPermissionsData {
+  id: number;
+  name: string;
+  created_by: string;
+  created_at: string;
 }
 
 export interface IGetAgencyRoleListQuery {

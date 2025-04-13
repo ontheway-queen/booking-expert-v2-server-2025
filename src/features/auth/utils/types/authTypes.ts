@@ -12,3 +12,11 @@ export interface ILogin2FAReqBody {
   otp: string;
   email: string;
 }
+
+export interface IRegisterAgentReqBody {
+  user_name: string;
+  agency_name: string;
+  address: string;
+  phone: string;
+  email: string;
+}

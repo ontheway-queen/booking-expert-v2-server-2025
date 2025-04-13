@@ -14,7 +14,7 @@ export interface ICreateFlightMarkupsPayload extends IMarkupTypes {
     created_by: number;
 }
 
-export interface IUpdateFlightMarkupsPayload extends IMarkupTypes {
+export interface IUpdateFlightMarkupsPayload {
     airline?: string;
     markup_domestic?: number;
     markup_from_dac?: number;
@@ -23,6 +23,8 @@ export interface IUpdateFlightMarkupsPayload extends IMarkupTypes {
     status?: boolean;
     updated_by: number;
     updated_at: Date;
+    markup_type?: 'PER' | 'FLAT';
+    markup_mode?: 'INCREASE' | 'DECREASE';
 }
 
 export interface IGetFlightMarkupsData extends IMarkupTypes {

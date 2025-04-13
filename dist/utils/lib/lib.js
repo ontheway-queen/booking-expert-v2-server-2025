@@ -18,6 +18,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const commonModel_1 = __importDefault(require("../../models/commonModel/commonModel"));
 class Lib {
     // Create hash string
     static hashValue(password) {
@@ -54,6 +55,11 @@ class Lib {
             otp += numbers[randomNumber];
         }
         return otp;
+    }
+    static sendEmail(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.sendEmailDefault(payload);
+        });
     }
     // send email by nodemailer
     static sendEmailDefault(_a) {
@@ -243,6 +249,74 @@ class Lib {
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
         return `${hours > 0 ? hours + ' hour' + (hours > 1 ? 's' : '') : ''} ${mins > 0 ? mins + ' minute' + (mins > 1 ? 's' : '') : ''}`.trim();
+    }
+    static generateUsername(full_name) {
+        const newName = full_name.split(' ').join('');
+        return newName.toLowerCase();
+    }
+    static generateNo(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ trx, type }) {
+            let newId = 10001;
+            const currYear = new Date().getFullYear();
+            const commonModel = new commonModel_1.default(trx);
+            let NoCode = '';
+            const lastId = yield commonModel.getLastId({ type });
+            if (lastId) {
+                newId = lastId.last_id + 1;
+                yield commonModel.updateLastNo({ last_id: newId, last_update: new Date() }, lastId === null || lastId === void 0 ? void 0 : lastId.id);
+            }
+            else {
+                yield commonModel.insertLastNo({
+                    last_id: newId,
+                    last_update: new Date(),
+                    type,
+                });
+            }
+            switch (type) {
+                case 'Agent':
+                    NoCode = 'A';
+                    break;
+                case 'Agent_Flight':
+                    NoCode = 'AF';
+                    break;
+                case 'Agent_GroupFare':
+                    NoCode = 'AGF';
+                    break;
+                case 'Agent_Hotel':
+                    NoCode = 'AH';
+                    break;
+                case 'Agent_Tour':
+                    NoCode = 'AT';
+                    break;
+                case 'Agent_Umrah':
+                    NoCode = 'AU';
+                    break;
+                case 'Agent_Visa':
+                    NoCode = 'AV';
+                    break;
+                case 'Agent_SupportTicket':
+                    NoCode = 'AST';
+                    break;
+                case 'User_Flight':
+                    NoCode = 'CF';
+                    break;
+                case 'User_Tour':
+                    NoCode = 'CT';
+                    break;
+                case 'User_Umrah':
+                    NoCode = 'CU';
+                    break;
+                case 'User_Visa':
+                    NoCode = 'CV';
+                    break;
+                case 'User_SupportTicket':
+                    NoCode = 'CST';
+                    break;
+                default:
+                    break;
+            }
+            return 'BE' + NoCode + currYear + newId;
+        });
     }
 }
 exports.default = Lib;

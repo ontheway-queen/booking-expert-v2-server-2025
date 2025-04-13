@@ -6,7 +6,7 @@ import {
 } from '../../../utils/miscellaneous/constants';
 import Lib from '../../../utils/lib/lib';
 import config from '../../../config/config';
-import { sendEmailOtpTemplate } from '../../../utils/templates/sendEmailOtp';
+import { sendEmailOtpTemplate } from '../../../utils/templates/sendEmailOtpTemplate';
 import {
   IMatchOTPReqBody,
   ISendEmailOTPReqBody,
@@ -113,7 +113,7 @@ export default class PublicEmailOTPService extends AbstractServices {
       try {
         const [send_email] = await Promise.all([
           email
-            ? Lib.sendEmailDefault({
+            ? Lib.sendEmail({
                 email,
                 emailSub: OTP_EMAIL_SUBJECT,
                 emailBody: sendEmailOtpTemplate(otp, OTP_FOR),

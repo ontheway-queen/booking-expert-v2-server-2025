@@ -15,14 +15,17 @@ class AuthValidator {
                 'any.required': 'Password is required',
             }),
         });
-        //common register validator
-        this.registerValidator = joi_1.default.object({
-            first_name: joi_1.default.string().min(1).max(255).required(),
-            last_name: joi_1.default.string().min(1).max(255).required(),
-            gender: joi_1.default.string().valid('Male', 'Female', 'Other').required(),
-            email: joi_1.default.string().email().lowercase().min(1).max(255).required(),
-            password: joi_1.default.string().min(8).max(100).required().trim(),
-            phone_number: joi_1.default.string().min(7).max(20).required(),
+        this.login2FAValidator = joi_1.default.object({
+            email: joi_1.default.string().required().lowercase().trim(),
+            otp: joi_1.default.string().length(6).trim().required(),
+        });
+        //agency register validator
+        this.agencyRegisterValidator = joi_1.default.object({
+            user_name: joi_1.default.string().trim().min(4).max(255).required(),
+            agency_name: joi_1.default.string().trim().min(4).max(255).required(),
+            email: joi_1.default.string().email().trim().lowercase().max(255).required(),
+            address: joi_1.default.string().min(8).max(100).required().trim(),
+            phone: joi_1.default.string().min(7).max(20).required().trim(),
         });
         //login with google validator
         this.loginWithGoogleValidator = joi_1.default.object({

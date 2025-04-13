@@ -5,6 +5,8 @@ import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
 import { Attachment } from 'nodemailer/lib/mailer';
+import { TDB } from '../../features/public/utils/types/publicCommon.types';
+import CommonModel from '../../models/commonModel/commonModel';
 
 class Lib {
   // Create hash string
@@ -53,8 +55,17 @@ class Lib {
     return otp;
   }
 
+  public static async sendEmail(payload: {
+    email: string;
+    emailSub: string;
+    emailBody: string;
+    attachments?: Attachment[];
+  }) {
+    return await this.sendEmailDefault(payload);
+  }
+
   // send email by nodemailer
-  public static async sendEmailDefault({
+  private static async sendEmailDefault({
     email,
     emailBody,
     emailSub,
@@ -94,7 +105,7 @@ class Lib {
   }
 
   // send email google
-  public static async sendEmailGoogle({
+  private static async sendEmailGoogle({
     email,
     emailBody,
     emailSub,
@@ -138,7 +149,7 @@ class Lib {
   }
 
   // send email hostinger
-  public static async sendEmailHostinger({
+  private static async sendEmailHostinger({
     email,
     emailBody,
     emailSub,
@@ -314,5 +325,97 @@ class Lib {
       mins > 0 ? mins + ' minute' + (mins > 1 ? 's' : '') : ''
     }`.trim();
   }
+
+  public static generateUsername(full_name: string) {
+    const newName = full_name.split(' ').join('');
+    return newName.toLowerCase();
+  }
+
+  public static async generateNo({ trx, type }: IGenNoParams) {
+    let newId = 10001;
+    const currYear = new Date().getFullYear();
+    const commonModel = new CommonModel(trx);
+    let NoCode = '';
+
+    const lastId = await commonModel.getLastId({ type });
+
+    if (lastId) {
+      newId = lastId.last_id + 1;
+      await commonModel.updateLastNo(
+        { last_id: newId, last_update: new Date() },
+        lastId?.id
+      );
+    } else {
+      await commonModel.insertLastNo({
+        last_id: newId,
+        last_update: new Date(),
+        type,
+      });
+    }
+
+    switch (type) {
+      case 'Agent':
+        NoCode = 'A';
+        break;
+      case 'Agent_Flight':
+        NoCode = 'AF';
+        break;
+      case 'Agent_GroupFare':
+        NoCode = 'AGF';
+        break;
+      case 'Agent_Hotel':
+        NoCode = 'AH';
+        break;
+      case 'Agent_Tour':
+        NoCode = 'AT';
+        break;
+      case 'Agent_Umrah':
+        NoCode = 'AU';
+        break;
+      case 'Agent_Visa':
+        NoCode = 'AV';
+        break;
+      case 'Agent_SupportTicket':
+        NoCode = 'AST';
+        break;
+      case 'User_Flight':
+        NoCode = 'CF';
+        break;
+      case 'User_Tour':
+        NoCode = 'CT';
+        break;
+      case 'User_Umrah':
+        NoCode = 'CU';
+        break;
+      case 'User_Visa':
+        NoCode = 'CV';
+        break;
+      case 'User_SupportTicket':
+        NoCode = 'CST';
+        break;
+      default:
+        break;
+    }
+
+    return 'BE' + NoCode + currYear + newId;
+  }
 }
 export default Lib;
+
+interface IGenNoParams {
+  trx: TDB;
+  type:
+    | 'Agent'
+    | 'Agent_Flight'
+    | 'Agent_Visa'
+    | 'Agent_Tour'
+    | 'Agent_Umrah'
+    | 'Agent_GroupFare'
+    | 'Agent_SupportTicket'
+    | 'Agent_Hotel'
+    | 'User_Flight'
+    | 'User_Visa'
+    | 'User_Tour'
+    | 'User_Umrah'
+    | 'User_SupportTicket';
+}

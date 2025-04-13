@@ -2,19 +2,179 @@ import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 import config from '../../../config/config';
 import Lib from '../../../utils/lib/lib';
-import { OTP_TYPES } from '../../../utils/miscellaneous/constants';
+import {
+  OTP_TYPES,
+  WHITE_LABEL_PERMISSIONS_MODULES,
+} from '../../../utils/miscellaneous/constants';
 import PublicEmailOTPService from '../../public/services/publicEmailOTP.service';
 import {
   ILogin2FAReqBody,
   ILoginReqBody,
+  IRegisterAgentReqBody,
   IResetPassReqBody,
 } from '../utils/types/authTypes';
 import { ITokenParseAgency } from '../../public/utils/types/publicCommon.types';
+import CustomError from '../../../utils/lib/customError';
+import { IInsertAgencyRolePermissionPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
+import { registrationVerificationTemplate } from '../../../utils/templates/registrationVerificationTemplate';
 
 export default class AuthAgentService extends AbstractServices {
   constructor() {
     super();
   }
+
+  public async register(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { email, agency_name, user_name, address, phone } =
+        req.body as IRegisterAgentReqBody;
+      const AgentModel = this.Model.AgencyModel(trx);
+      const AgencyUserModel = this.Model.AgencyUserModel(trx);
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      const checkAgentName = await AgentModel.checkAgency({
+        name: agency_name,
+      });
+      const checkAgentUser = await AgencyUserModel.checkUser({ email });
+
+      if (checkAgentUser) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_CONFLICT,
+          message: 'Email already exist. Please use another email.',
+        };
+      }
+
+      if (checkAgentName) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_CONFLICT,
+          message:
+            'Duplicate agency name! Already exist an agency with this name.',
+        };
+      }
+
+      let logo = '';
+      let civil_aviation = '';
+      let trade_license = '';
+      let national_id = '';
+
+      files.forEach((file) => {
+        switch (file.fieldname) {
+          case logo:
+            logo = file.filename;
+            break;
+          case civil_aviation:
+            civil_aviation = file.filename;
+            break;
+          case trade_license:
+            trade_license = file.filename;
+            break;
+          case national_id:
+            national_id = file.filename;
+            break;
+          default:
+            throw new CustomError(
+              'Invalid files. Please provide valid trade license, civil aviation, NID, logo.',
+              this.StatusCode.HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
+      });
+
+      const agent_no = await Lib.generateNo({ trx, type: 'Agent' });
+
+      const newAgency = await AgentModel.createAgency({
+        address,
+        status: 'Incomplete',
+        agent_no,
+        agency_name,
+        email,
+        phone,
+        agency_logo: logo,
+        civil_aviation,
+        trade_license,
+        national_id,
+      });
+
+      const newRole = await AgencyUserModel.createRole({
+        agency_id: newAgency[0].id,
+        name: 'Super Admin',
+        id_main_role: true,
+      });
+
+      const permissions = await AgencyUserModel.getAllPermissions();
+
+      const permissionPayload: IInsertAgencyRolePermissionPayload[] = [];
+
+      permissions.forEach((item) => {
+        if (!WHITE_LABEL_PERMISSIONS_MODULES.includes(item.name)) {
+          permissionPayload.push({
+            agency_id: newAgency[0].id,
+            role_id: newRole[0].id,
+            permission_id: item.id,
+            delete: true,
+            read: true,
+            update: true,
+            write: true,
+          });
+        }
+      });
+
+      await AgencyUserModel.insertRolePermission(permissionPayload);
+
+      let username = Lib.generateUsername(user_name);
+
+      let suffix = 1;
+
+      while (await AgencyUserModel.checkUser({ username })) {
+        username = `${username}${suffix}`;
+        suffix += 1;
+      }
+      const password = Lib.generateRandomPassword(8);
+
+      const hashed_password = await Lib.hashValue(password);
+
+      const newUser = await AgencyUserModel.createUser({
+        agency_id: newAgency[0].id,
+        email,
+        hashed_password,
+        is_main_user: true,
+        name: user_name,
+        phone_number: phone,
+        role_id: newRole[0].id,
+        username,
+      });
+
+      const verificationToken = Lib.createToken(
+        { agency_id: newAgency[0].id, email, user_id: newUser[0].id },
+        config.JWT_SECRET_AGENT + OTP_TYPES.register_agent,
+        '24h'
+      );
+
+      await Lib.sendEmail({
+        email,
+        emailSub: `Booking Expert Agency Registration Verification`,
+        emailBody: registrationVerificationTemplate(
+          agency_name,
+          {
+            username,
+            pass: password,
+          },
+          '/registration/verification?token=' + verificationToken
+        ),
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
+        data: {
+          email,
+        },
+      };
+    });
+  }
+
+  public async registerComplete(req: Request) {}
 
   public async login(req: Request) {
     return this.db.transaction(async (trx) => {
@@ -56,7 +216,7 @@ export default class AuthAgentService extends AbstractServices {
         is_main_user,
       } = checkUserAgency;
 
-      if (agency_status === 'Inactive') {
+      if (agency_status === 'Inactive' || agency_status === 'Incomplete') {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,

@@ -1,6 +1,6 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import Schema from '../../utils/miscellaneous/schema';
-import { ICreateMarkupSetFlightApiPayload, IGetMarkupSetFlightApiData, IGetMarkupSetFlightApiListFilterQuery } from '../../utils/modelTypes/markupSetModelTypes/markupSetFlightApiTypes';
+import { ICreateMarkupSetFlightApiPayload, IGetMarkupSetFlightApiData, IGetMarkupSetFlightApiListFilterQuery, IUpdateMarkupSetFlightApiPayload } from '../../utils/modelTypes/markupSetModelTypes/markupSetFlightApiTypes';
 
 
 export default class MarkupSetFlightApiModel extends Schema {
@@ -45,7 +45,7 @@ export default class MarkupSetFlightApiModel extends Schema {
         return data;
     }
 
-    public async updateMarkupSetFlightApi(payload: ICreateMarkupSetFlightApiPayload, id: number) {
+    public async updateMarkupSetFlightApi(payload: IUpdateMarkupSetFlightApiPayload, id: number) {
         return await this.db('markup_set_flight_api')
             .withSchema(this.DBO_SCHEMA)
             .update(payload)

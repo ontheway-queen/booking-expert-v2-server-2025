@@ -50,8 +50,12 @@ export default class FlightMarkupsModel extends Schema {
                 'fm.updated_by',
                 'uad.id',
             ])
-            .leftJoin('set_flight_api_view AS fa', 'fm.set_flight_api_id', 'fa.id')
-            .leftJoin('airlines', 'fm.airline', 'airlines.code')
+            .leftJoin('set_flight_api_view AS fa', 'fm.markup_set_flight_api_id', 'fa.id')
+            .joinRaw('left join ?? on ?? = ??', [
+                `${this.PUBLIC_SCHEMA}.airlines`,
+                'fm.airline',
+                'airlines.code',
+            ])
             .where((qb) => {
                 if (query.api_status) {
                     qb.andWhere('fa.status', query.api_status);
@@ -77,7 +81,7 @@ export default class FlightMarkupsModel extends Schema {
                 .count(
                     'fm.id as total'
                 )
-                .leftJoin('flight_api AS fa', 'fm.set_flight_api_id', 'fa.id')
+                .leftJoin('flight_api AS fa', 'fm.markup_set_flight_api_id', 'fa.id')
                 .where((qb) => {
                     if (query.api_status) {
                         qb.andWhere('fa.status', query.api_status);
@@ -115,10 +119,16 @@ export default class FlightMarkupsModel extends Schema {
             .where({ id });
     }
 
-    public async deleteFlightMarkups(id: number) {
+    public async deleteFlightMarkups(id: number | number[]) {
         return await this.db('flight_markups')
             .withSchema(this.DBO_SCHEMA)
             .delete()
-            .where({ id });
+            .where((qb) => {
+                if (typeof id === 'number') {
+                  qb.andWhere('id', id);
+                } else {
+                  qb.whereIn('id', id);
+                }
+              });
     }
 }
