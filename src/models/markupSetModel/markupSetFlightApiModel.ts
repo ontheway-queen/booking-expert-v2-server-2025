@@ -11,7 +11,7 @@ export default class MarkupSetFlightApiModel extends Schema {
         this.db = db;
     }
 
-    public async createMarkupSetFlightApi(payload: ICreateMarkupSetFlightApiPayload): Promise<number[]> {
+    public async createMarkupSetFlightApi(payload: ICreateMarkupSetFlightApiPayload): Promise<{ id: number }[]> {
         return await this.db('markup_set_flight_api')
             .withSchema(this.DBO_SCHEMA)
             .insert(payload, 'id');

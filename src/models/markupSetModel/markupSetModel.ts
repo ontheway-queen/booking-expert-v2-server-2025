@@ -10,7 +10,7 @@ export default class MarkupSetModel extends Schema {
         this.db = db;
     }
 
-    public async createMarkupSet(payload: ICreateMarkupSetPayload): Promise<number[]> {
+    public async createMarkupSet(payload: ICreateMarkupSetPayload): Promise<{ id: number }[]> {
         return await this.db('markup_set')
             .withSchema(this.DBO_SCHEMA)
             .insert(payload, 'id');

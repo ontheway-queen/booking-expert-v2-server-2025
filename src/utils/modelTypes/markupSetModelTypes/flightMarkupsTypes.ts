@@ -1,6 +1,6 @@
 interface IMarkupTypes {
     markup_type: 'PER' | 'FLAT';
-    markup_value: 'INCREASE' | 'DECREASE';
+    markup_mode: 'INCREASE' | 'DECREASE';
 }
 
 

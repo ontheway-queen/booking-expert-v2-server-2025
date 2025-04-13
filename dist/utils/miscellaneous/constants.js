@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_IMAGE_URL = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL_2 = exports.PROJECT_EMAIL = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
+exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.MARKUP_SET_TYPE_HOTEL = exports.MARKUP_SET_TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_IMAGE_URL = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL_2 = exports.PROJECT_EMAIL = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
 exports.origin = ['http://localhost:3000'];
 // OTP types constants
 exports.OTP_TYPES = {
@@ -29,6 +29,9 @@ exports.OTP_EMAIL_SUBJECT = 'Your One Time Password For Verification';
 // Default data get limit
 exports.DATA_LIMIT = 100;
 exports.OTP_DEFAULT_EXPIRY = 3;
+// markup set types
+exports.MARKUP_SET_TYPE_FLIGHT = 'Flight';
+exports.MARKUP_SET_TYPE_HOTEL = 'Hotel';
 //error logs level
 exports.ERROR_LEVEL_DEBUG = 'DEBUG';
 exports.ERROR_LEVEL_INFO = 'INFO';

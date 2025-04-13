@@ -10,7 +10,7 @@ export default class FlightMarkupsModel extends Schema {
         this.db = db;
     }
 
-    public async createFlightMarkups(payload: ICreateFlightMarkupsPayload): Promise<number[]> {
+    public async createFlightMarkups(payload: ICreateFlightMarkupsPayload | ICreateFlightMarkupsPayload[]): Promise<number[]> {
         return await this.db('flight_markups')
             .withSchema(this.DBO_SCHEMA)
             .insert(payload, 'id');
