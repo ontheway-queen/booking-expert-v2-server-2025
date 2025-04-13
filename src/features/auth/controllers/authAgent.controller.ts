@@ -31,7 +31,7 @@ export default class AuthAgentController extends AbstractController {
   );
 
   public registerComplete = this.asyncWrapper.wrap(
-    { bodySchema: this.validator.agencyRegisterValidator },
+    { bodySchema: this.validator.agencyRegisterCompleteValidator },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.registerComplete(req);
       res.status(code).json(data);

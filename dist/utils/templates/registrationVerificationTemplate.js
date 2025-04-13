@@ -73,8 +73,7 @@ const registrationVerificationTemplate = (agency_name, verificationLink) => {
                 <!-- OTP -->
                 <div
                   style="
-                    font-size: 25px;
-                    font-weight: bold;
+                    font-size: 6px;
                     color: #0491e2;
                     margin: 20px 0;
                   "

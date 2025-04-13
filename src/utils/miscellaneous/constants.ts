@@ -21,7 +21,10 @@ export const OTP_TYPES = {
 
 //Project Info
 export const PROJECT_NAME = 'Booking Expert V2';
-export const PROJECT_LOGO = 'https://ticket.trabill.biz/assets/logo.png';
+export const PROJECT_LOGO =
+  'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_logo.png';
+export const PROJECT_ICON =
+  'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_icon.png';
 export const PROJECT_LINK = 'http://10.10.220.31:3000';
 export const PROJECT_EMAIL = 'sup.m360ict@gmail.com';
 export const PROJECT_NUMBER = '+8801958398339';

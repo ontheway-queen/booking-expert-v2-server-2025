@@ -65,17 +65,18 @@ class AuthAgentService extends abstract_service_1.default {
                 let trade_license = '';
                 let national_id = '';
                 files.forEach((file) => {
+                    console.log(file.fieldname);
                     switch (file.fieldname) {
-                        case logo:
+                        case 'logo':
                             logo = file.filename;
                             break;
-                        case civil_aviation:
+                        case 'civil_aviation':
                             civil_aviation = file.filename;
                             break;
-                        case trade_license:
+                        case 'trade_license':
                             trade_license = file.filename;
                             break;
-                        case national_id:
+                        case 'national_id':
                             national_id = file.filename;
                             break;
                         default:
@@ -98,7 +99,7 @@ class AuthAgentService extends abstract_service_1.default {
                 const newRole = yield AgencyUserModel.createRole({
                     agency_id: newAgency[0].id,
                     name: 'Super Admin',
-                    id_main_role: true,
+                    is_main_role: true,
                 });
                 const permissions = yield AgencyUserModel.getAllPermissions();
                 const permissionPayload = [];
@@ -205,7 +206,7 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, mobile_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkUserAgency;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkUserAgency;
                 if (agency_status === 'Inactive' || agency_status === 'Incomplete') {
                     return {
                         success: false,
@@ -293,7 +294,7 @@ class AuthAgentService extends abstract_service_1.default {
                             agency_email,
                             agency_name,
                             agency_status,
-                            mobile_number,
+                            phone_number,
                             agency_logo,
                         },
                         role,
@@ -321,7 +322,7 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, mobile_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkAgencyUser;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, phone_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkAgencyUser;
                 if (!status) {
                     return {
                         success: false,
@@ -389,7 +390,7 @@ class AuthAgentService extends abstract_service_1.default {
                             agency_email,
                             agency_name,
                             agency_status,
-                            mobile_number,
+                            phone_number,
                             agency_logo,
                         },
                         role,
@@ -422,7 +423,7 @@ class AuthAgentService extends abstract_service_1.default {
             }
             const AgencyUserModel = this.Model.AgencyUserModel();
             const hashed_password = yield lib_1.default.hashValue(password);
-            yield AgencyUserModel.updateUser({ hashed_password }, email);
+            yield AgencyUserModel.updateUserByEmail({ hashed_password }, email);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,

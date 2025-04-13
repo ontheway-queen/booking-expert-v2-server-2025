@@ -27,6 +27,10 @@ class AuthValidator {
             address: joi_1.default.string().min(8).max(100).required().trim(),
             phone: joi_1.default.string().min(7).max(20).required().trim(),
         });
+        //Complete Registration Validator
+        this.agencyRegisterCompleteValidator = joi_1.default.object({
+            token: joi_1.default.string().required(),
+        });
         //login with google validator
         this.loginWithGoogleValidator = joi_1.default.object({
             accessToken: joi_1.default.string().required(),

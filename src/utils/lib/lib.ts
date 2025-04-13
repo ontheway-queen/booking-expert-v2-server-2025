@@ -342,13 +342,13 @@ class Lib {
     if (lastId) {
       newId = lastId.last_id + 1;
       await commonModel.updateLastNo(
-        { last_id: newId, last_update: new Date() },
+        { last_id: newId, last_updated: new Date() },
         lastId?.id
       );
     } else {
       await commonModel.insertLastNo({
         last_id: newId,
-        last_update: new Date(),
+        last_updated: new Date(),
         type,
       });
     }

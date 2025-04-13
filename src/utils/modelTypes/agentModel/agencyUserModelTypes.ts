@@ -50,7 +50,7 @@ export interface ICheckAgencyUserData {
   email: string;
   name: string;
   photo: string;
-  mobile_number: string;
+  phone_number: string;
   username: string;
   hashed_password: string;
   agency_name: string;
@@ -68,15 +68,13 @@ export interface ICheckAgencyUserData {
 
 export interface ICreateAgencyRolePayload {
   name: string;
-  id_main_role?: boolean;
+  is_main_role?: boolean;
   agency_id: number;
 }
 
 export interface IGetAllAgencyPermissionsData {
   id: number;
   name: string;
-  created_by: string;
-  created_at: string;
 }
 
 export interface IGetAgencyRoleListQuery {

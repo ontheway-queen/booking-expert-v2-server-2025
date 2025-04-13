@@ -25,6 +25,11 @@ export default class AuthValidator {
     phone: Joi.string().min(7).max(20).required().trim(),
   });
 
+  //Complete Registration Validator
+  public agencyRegisterCompleteValidator = Joi.object({
+    token: Joi.string().required(),
+  });
+
   //login with google validator
   public loginWithGoogleValidator = Joi.object({
     accessToken: Joi.string().required(),

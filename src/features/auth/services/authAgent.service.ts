@@ -61,17 +61,18 @@ export default class AuthAgentService extends AbstractServices {
       let national_id = '';
 
       files.forEach((file) => {
+        console.log(file.fieldname);
         switch (file.fieldname) {
-          case logo:
+          case 'logo':
             logo = file.filename;
             break;
-          case civil_aviation:
+          case 'civil_aviation':
             civil_aviation = file.filename;
             break;
-          case trade_license:
+          case 'trade_license':
             trade_license = file.filename;
             break;
-          case national_id:
+          case 'national_id':
             national_id = file.filename;
             break;
           default:
@@ -100,7 +101,7 @@ export default class AuthAgentService extends AbstractServices {
       const newRole = await AgencyUserModel.createRole({
         agency_id: newAgency[0].id,
         name: 'Super Admin',
-        id_main_role: true,
+        is_main_role: true,
       });
 
       const permissions = await AgencyUserModel.getAllPermissions();
@@ -255,7 +256,7 @@ export default class AuthAgentService extends AbstractServices {
         agent_no,
         agency_status,
         hashed_password,
-        mobile_number,
+        phone_number,
         white_label,
         agency_email,
         agency_logo,
@@ -368,7 +369,7 @@ export default class AuthAgentService extends AbstractServices {
             agency_email,
             agency_name,
             agency_status,
-            mobile_number,
+            phone_number,
             agency_logo,
           },
           role,
@@ -411,7 +412,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_id,
         agent_no,
         agency_status,
-        mobile_number,
+        phone_number,
         white_label,
         agency_email,
         agency_logo,
@@ -504,7 +505,7 @@ export default class AuthAgentService extends AbstractServices {
             agency_email,
             agency_name,
             agency_status,
-            mobile_number,
+            phone_number,
             agency_logo,
           },
           role,
@@ -545,7 +546,7 @@ export default class AuthAgentService extends AbstractServices {
 
     const hashed_password = await Lib.hashValue(password);
 
-    await AgencyUserModel.updateUser({ hashed_password }, email);
+    await AgencyUserModel.updateUserByEmail({ hashed_password }, email);
 
     return {
       success: true,

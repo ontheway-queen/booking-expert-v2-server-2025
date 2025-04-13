@@ -263,12 +263,12 @@ class Lib {
             const lastId = yield commonModel.getLastId({ type });
             if (lastId) {
                 newId = lastId.last_id + 1;
-                yield commonModel.updateLastNo({ last_id: newId, last_update: new Date() }, lastId === null || lastId === void 0 ? void 0 : lastId.id);
+                yield commonModel.updateLastNo({ last_id: newId, last_updated: new Date() }, lastId === null || lastId === void 0 ? void 0 : lastId.id);
             }
             else {
                 yield commonModel.insertLastNo({
                     last_id: newId,
-                    last_update: new Date(),
+                    last_updated: new Date(),
                     type,
                 });
             }
