@@ -4,16 +4,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_router_1 = __importDefault(require("../../../abstract/abstract.router"));
+const agentProfile_controller_1 = __importDefault(require("../controllers/agentProfile.controller"));
 class AgentProfileRouter extends abstract_router_1.default {
     constructor() {
         super();
+        this.controller = new agentProfile_controller_1.default();
         this.callRouter();
     }
     callRouter() {
         // Profile API
-        this.router.route('/');
+        this.router
+            .route('/')
+            .get(this.controller.getProfile)
+            .patch(this.controller.updateProfile);
         // Change Password
-        this.router.route('/change-password');
+        this.router.route('/change-password').post(this.controller.changePassword);
     }
 }
 exports.default = AgentProfileRouter;

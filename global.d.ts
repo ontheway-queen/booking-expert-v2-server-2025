@@ -4,6 +4,7 @@ import {
   ITokenParseAdmin,
   ITokenParseAgency,
   ITokenParseAgencyB2CUser,
+  ITokenParseAgencyUser,
   ITokenParseUser,
   IValidateAPIAgencyData,
   IValidateAPIExternalData,
@@ -11,11 +12,11 @@ import {
 declare global {
   namespace Express {
     interface Request {
-      agencyUser: ITokenParseAgency;
+      agencyUser: ITokenParseAgencyUser;
       user: ITokenParseUser;
       admin: ITokenParseAdmin;
       agencyB2CUser: ITokenParseAgencyB2CUser;
-      agent: IValidateAPIAgencyData;
+      agentAPI: IValidateAPIAgencyData;
       external: IValidateAPIExternalData;
       upFiles: string[];
     }

@@ -104,7 +104,7 @@ export default class AdminModel extends Schema {
   //get single admin
   public async getSingleAdmin(
     payload: IGetSingleAdminQuery
-  ): Promise<IGetSingleAdminData> {
+  ): Promise<IGetSingleAdminData | null> {
     return await this.db('user_admin as ua')
       .select(
         'ua.*',

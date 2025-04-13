@@ -79,6 +79,7 @@ class AuthAdminService extends abstract_service_1.default {
                     user_email: email,
                     name,
                     is_main_user,
+                    photo,
                 };
                 const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_ADMIN, '24h');
                 const role = yield AdminModel.getSingleRoleWithPermissions(role_id);
@@ -141,6 +142,7 @@ class AuthAdminService extends abstract_service_1.default {
                     user_email: email,
                     name,
                     is_main_user,
+                    photo,
                 };
                 const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_ADMIN, '24h');
                 const role = yield AdminModel.getSingleRoleWithPermissions(role_id);

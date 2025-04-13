@@ -14,7 +14,7 @@ import {
   IRegisterAgentReqBody,
   IResetPassReqBody,
 } from '../utils/types/authTypes';
-import { ITokenParseAgency } from '../../public/utils/types/publicCommon.types';
+import { ITokenParseAgencyUser } from '../../public/utils/types/publicCommon.types';
 import CustomError from '../../../utils/lib/customError';
 import { IInsertAgencyRolePermissionPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
 import { registrationVerificationTemplate } from '../../../utils/templates/registrationVerificationTemplate';
@@ -204,7 +204,7 @@ export default class AuthAgentService extends AbstractServices {
         {
           hashed_password,
         },
-        user_id
+        { agency_id, id: user_id }
       );
 
       await Lib.sendEmail({
@@ -264,7 +264,11 @@ export default class AuthAgentService extends AbstractServices {
         is_main_user,
       } = checkUserAgency;
 
-      if (agency_status === 'Inactive' || agency_status === 'Incomplete') {
+      if (
+        agency_status === 'Inactive' ||
+        agency_status === 'Incomplete' ||
+        agency_status === 'Rejected'
+      ) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -332,7 +336,7 @@ export default class AuthAgentService extends AbstractServices {
         whiteLabelPermissions = rest;
       }
 
-      const tokenData: ITokenParseAgency = {
+      const tokenData: ITokenParseAgencyUser = {
         user_id: id,
         username,
         user_email: email,
@@ -341,6 +345,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_email,
         agency_name,
         is_main_user,
+        photo,
       };
 
       const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
@@ -464,7 +469,7 @@ export default class AuthAgentService extends AbstractServices {
         whiteLabelPermissions = rest;
       }
 
-      const tokenData: ITokenParseAgency = {
+      const tokenData: ITokenParseAgencyUser = {
         user_id: id,
         username,
         user_email,
@@ -473,6 +478,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_email,
         agency_name,
         is_main_user,
+        photo,
       };
 
       const authToken = Lib.createToken(

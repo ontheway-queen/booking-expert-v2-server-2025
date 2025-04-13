@@ -94,6 +94,7 @@ export default class AuthAdminService extends AbstractServices {
         user_email: email,
         name,
         is_main_user,
+        photo,
       };
 
       const token = Lib.createToken(tokenData, config.JWT_SECRET_ADMIN, '24h');
@@ -177,6 +178,7 @@ export default class AuthAdminService extends AbstractServices {
         user_email: email,
         name,
         is_main_user,
+        photo,
       };
 
       const authToken = Lib.createToken(

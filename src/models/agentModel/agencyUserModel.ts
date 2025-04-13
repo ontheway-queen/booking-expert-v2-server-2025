@@ -32,11 +32,15 @@ export default class AgencyUserModel extends Schema {
   }
 
   // update user
-  public async updateUser(payload: IUpdateAgencyUserPayload, id: number) {
+  public async updateUser(
+    payload: IUpdateAgencyUserPayload,
+    { agency_id, id }: { id: number; agency_id: number }
+  ) {
     return await this.db('agency_user')
       .withSchema(this.AGENT_SCHEMA)
       .update(payload)
-      .where('id', id);
+      .andWhere('id', id)
+      .andWhere('agency_id', agency_id);
   }
 
   public async updateUserByEmail(
@@ -110,7 +114,9 @@ export default class AgencyUserModel extends Schema {
     email,
     username,
     id,
+    agency_id,
   }: {
+    agency_id?: number;
     email?: string;
     username?: string;
     id?: number;
@@ -150,6 +156,10 @@ export default class AgencyUserModel extends Schema {
 
         if (id) {
           qb.andWhere('au.id', id);
+        }
+
+        if (agency_id) {
+          qb.andWhere('au.agency_id', agency_id);
         }
       })
       .first();
