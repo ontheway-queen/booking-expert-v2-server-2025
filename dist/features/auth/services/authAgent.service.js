@@ -205,7 +205,7 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agency_no, agency_status, hashed_password, mobile_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkUserAgency;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, mobile_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkUserAgency;
                 if (agency_status === 'Inactive' || agency_status === 'Incomplete') {
                     return {
                         success: false,
@@ -289,7 +289,7 @@ class AuthAgentService extends abstract_service_1.default {
                         is_main_user,
                         agency: {
                             agency_id,
-                            agency_no,
+                            agent_no,
                             agency_email,
                             agency_name,
                             agency_status,
@@ -321,7 +321,7 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agency_no, agency_status, mobile_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkAgencyUser;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, mobile_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkAgencyUser;
                 if (!status) {
                     return {
                         success: false,
@@ -385,7 +385,7 @@ class AuthAgentService extends abstract_service_1.default {
                         is_main_user,
                         agency: {
                             agency_id,
-                            agency_no,
+                            agent_no,
                             agency_email,
                             agency_name,
                             agency_status,

@@ -46,7 +46,7 @@ class AgencyModel extends schema_1.default {
                 .where((qb) => {
                 if (query.filter) {
                     qb.where('ag.agency_name', 'like', `%${query.filter}%`)
-                        .orWhere('ag.agency_no', query.filter)
+                        .orWhere('ag.agent_no', query.filter)
                         .orWhere('ag.email', 'like', `%${query.filter}%`);
                 }
                 if (query.status) {
@@ -64,7 +64,7 @@ class AgencyModel extends schema_1.default {
                     .where((qb) => {
                     if (query.filter) {
                         qb.where('ag.agency_name', 'like', `%${query.filter}%`)
-                            .orWhere('ag.agency_no', query.filter)
+                            .orWhere('ag.agent_no', query.filter)
                             .orWhere('ag.email', 'like', `%${query.filter}%`);
                     }
                     if (query.status) {
@@ -77,7 +77,7 @@ class AgencyModel extends schema_1.default {
     }
     // check Agency
     checkAgency(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ agency_id, email, name, agency_no, }) {
+        return __awaiter(this, arguments, void 0, function* ({ agency_id, email, name, agent_no, }) {
             return yield this.db('agency')
                 .withSchema(this.AGENT_SCHEMA)
                 .select('id', 'email', 'phone', 'agency_name', 'agent_no', 'status', 'white_label', 'allow_api', 'usable_loan', 'flight_markup_set', 'hotel_markup_set')
@@ -91,8 +91,8 @@ class AgencyModel extends schema_1.default {
                 if (name) {
                     qb.where('agency_name', name);
                 }
-                if (agency_no) {
-                    qb.where('agent_no', agency_no);
+                if (agent_no) {
+                    qb.where('agent_no', agent_no);
                 }
             })
                 .first();
@@ -118,7 +118,7 @@ class AgencyModel extends schema_1.default {
                 .where((qb) => {
                 if (query.search_value) {
                     qb.where('ag.agency_name', 'like', `%${query.search_value}%`)
-                        .orWhere('ag.agency_no', query.search_value)
+                        .orWhere('ag.agent_no', query.search_value)
                         .orWhere('ag.email', 'like', `%${query.search_value}%`);
                 }
                 if (query.status) {
@@ -136,7 +136,7 @@ class AgencyModel extends schema_1.default {
                     .where((qb) => {
                     if (query.search_value) {
                         qb.where('ag.agency_name', 'like', `%${query.search_value}%`)
-                            .orWhere('ag.agency_no', query.search_value)
+                            .orWhere('ag.agent_no', query.search_value)
                             .orWhere('ag.email', 'like', `%${query.search_value}%`);
                     }
                     if (query.status) {

@@ -60,7 +60,7 @@ export interface ICheckAgencyUserData {
   role_id: number;
   status: boolean;
   agency_status: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
-  agency_no: string;
+  agent_no: string;
   allow_api: boolean;
   is_main_user: boolean;
   white_label: boolean;

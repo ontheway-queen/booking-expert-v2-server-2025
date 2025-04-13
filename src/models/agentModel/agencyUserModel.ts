@@ -132,7 +132,7 @@ export default class AgencyUserModel extends Schema {
         'au.socket_id',
         'au.is_main_user',
         'a.status AS agency_status',
-        'a.agency_no',
+        'a.agent_no',
         'a.email AS agency_email',
         'a.agency_name',
         'a.agency_logo',

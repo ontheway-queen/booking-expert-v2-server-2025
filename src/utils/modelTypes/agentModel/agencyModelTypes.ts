@@ -95,7 +95,7 @@ export interface ICheckAgencyQuery {
   agency_id?: number;
   email?: string;
   name?: string;
-  agency_no?: string;
+  agent_no?: string;
 }
 
 export interface ICheckAgencyData {

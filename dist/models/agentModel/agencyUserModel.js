@@ -91,7 +91,7 @@ class AgencyUserModel extends schema_1.default {
         return __awaiter(this, arguments, void 0, function* ({ email, username, id, }) {
             return yield this.db('agency_user AS au')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('au.id', 'au.agency_id', 'au.email', 'au.mobile_number', 'au.photo', 'au.name', 'au.username', 'au.hashed_password', 'au.two_fa', 'au.role_id', 'au.status', 'au.socket_id', 'au.is_main_user', 'a.status AS agency_status', 'a.agency_no', 'a.email AS agency_email', 'a.agency_name', 'a.agency_logo', 'a.allow_api', 'a.white_label')
+                .select('au.id', 'au.agency_id', 'au.email', 'au.mobile_number', 'au.photo', 'au.name', 'au.username', 'au.hashed_password', 'au.two_fa', 'au.role_id', 'au.status', 'au.socket_id', 'au.is_main_user', 'a.status AS agency_status', 'a.agent_no', 'a.email AS agency_email', 'a.agency_name', 'a.agency_logo', 'a.allow_api', 'a.white_label')
                 .leftJoin('agency AS a', 'au.agency_id', 'a.id')
                 .where((qb) => {
                 if (email) {
