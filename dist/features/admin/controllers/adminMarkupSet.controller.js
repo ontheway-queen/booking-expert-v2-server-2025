@@ -39,19 +39,19 @@ class AdminMarkupSetController extends abstract_controller_1.default {
             const _a = yield this.service.getMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
-        this.getSingleMarkupSet = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.getSingleMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
+        this.getSingleFlightMarkupSet = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getSingleFlightMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
-        this.updateMarkupSet = this.asyncWrapper.wrap({
+        this.updateFlightMarkupSet = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),
             bodySchema: this.validator.updateCommissionSetSchema
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.updateMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
+            const _a = yield this.service.updateFlightMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
-        this.deleteMarkupSet = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.deleteMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
+        this.deleteFlightMarkupSet = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.deleteFlightMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
         this.getMarkupSetFlightApiDetails = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.multipleParamsNumValidator(["set_id", "set_api_id"]) }, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -63,6 +63,10 @@ class AdminMarkupSetController extends abstract_controller_1.default {
             bodySchema: this.validator.updateFlightMarkupsSchema
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.updateMarkupSetFlightApi(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.getAllFlightApi = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getAllFlightApi(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
     }

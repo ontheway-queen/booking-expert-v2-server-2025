@@ -26,29 +26,29 @@ export default class AdminMarkupSetController extends AbstractController {
         }
     );
 
-    public getSingleMarkupSet = this.asyncWrapper.wrap(
+    public getSingleFlightMarkupSet = this.asyncWrapper.wrap(
         { paramSchema: this.commonValidator.singleParamNumValidator() },
         async (req: Request, res: Response) => {
-            const { code, ...data } = await this.service.getSingleMarkupSet(req);
+            const { code, ...data } = await this.service.getSingleFlightMarkupSet(req);
             res.status(code).json(data);
         }
     );
 
-    public updateMarkupSet = this.asyncWrapper.wrap(
+    public updateFlightMarkupSet = this.asyncWrapper.wrap(
         {
             paramSchema: this.commonValidator.singleParamNumValidator(),
             bodySchema: this.validator.updateCommissionSetSchema
         },
         async (req: Request, res: Response) => {
-            const { code, ...data } = await this.service.updateMarkupSet(req);
+            const { code, ...data } = await this.service.updateFlightMarkupSet(req);
             res.status(code).json(data);
         }
     );
 
-    public deleteMarkupSet = this.asyncWrapper.wrap(
+    public deleteFlightMarkupSet = this.asyncWrapper.wrap(
         { paramSchema: this.commonValidator.singleParamNumValidator() },
         async (req: Request, res: Response) => {
-            const { code, ...data } = await this.service.deleteMarkupSet(req);
+            const { code, ...data } = await this.service.deleteFlightMarkupSet(req);
             res.status(code).json(data);
         }
     );
@@ -68,6 +68,14 @@ export default class AdminMarkupSetController extends AbstractController {
         },
         async (req: Request, res: Response) => {
             const { code, ...data } = await this.service.updateMarkupSetFlightApi(req);
+            res.status(code).json(data);
+        }
+    );
+
+    public getAllFlightApi = this.asyncWrapper.wrap(
+        null,
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.getAllFlightApi(req);
             res.status(code).json(data);
         }
     );

@@ -1,4 +1,4 @@
-export const origin: string[] = ['http://localhost:3000'];
+export const origin: string[] = ['http://localhost:3000','http://localhost:5000','http://10.10.220.47:5000'];
 
 // OTP types constants
 export const OTP_TYPES = {

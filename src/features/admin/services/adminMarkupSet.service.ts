@@ -128,7 +128,7 @@ export class AdminMarkupSetService extends AbstractServices {
     }
 
 
-    public async getSingleMarkupSet(req: Request) {
+    public async getSingleFlightMarkupSet(req: Request) {
         return this.db.transaction(async (trx) => {
             const { id } = req.params;
 
@@ -166,7 +166,7 @@ export class AdminMarkupSetService extends AbstractServices {
     }
 
 
-    public async updateMarkupSet(req: Request) {
+    public async updateFlightMarkupSet(req: Request) {
         return this.db.transaction(async (trx) => {
             const { name, add, update } = req.body as IUpdateMarkupSetReqBody;
             const { id } = req.params;
@@ -237,7 +237,7 @@ export class AdminMarkupSetService extends AbstractServices {
         });
     }
 
-    public async deleteMarkupSet(req: Request) {
+    public async deleteFlightMarkupSet(req: Request) {
         return this.db.transaction(async (trx) => {
             const { id } = req.params;
             const markupSetModel = this.Model.MarkupSetModel(trx);
@@ -394,7 +394,7 @@ export class AdminMarkupSetService extends AbstractServices {
 
             //remove existing markup of airlines
             if (remove) {
-                console.log({remove});
+                console.log({ remove });
                 await flightMarkupsModel.deleteFlightMarkups(remove);
             }
 
@@ -403,6 +403,18 @@ export class AdminMarkupSetService extends AbstractServices {
                 code: this.StatusCode.HTTP_SUCCESSFUL,
                 message: "Markup set has been updated",
             };
+        });
+    }
+
+    public async getAllFlightApi(req: Request) {
+        return await this.db.transaction(async (trx) => {
+            const flightApiModel = this.Model.FlightApiModel(trx);
+            const data = await flightApiModel.getFlightApi({});
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                data
+            }
         });
     }
 }

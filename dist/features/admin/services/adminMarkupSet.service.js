@@ -118,7 +118,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
             }));
         });
     }
-    getSingleMarkupSet(req) {
+    getSingleFlightMarkupSet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
@@ -149,7 +149,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
             }));
         });
     }
-    updateMarkupSet(req) {
+    updateFlightMarkupSet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { name, add, update } = req.body;
@@ -203,7 +203,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
             }));
         });
     }
-    deleteMarkupSet(req) {
+    deleteFlightMarkupSet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
@@ -349,6 +349,19 @@ class AdminMarkupSetService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: "Markup set has been updated",
+                };
+            }));
+        });
+    }
+    getAllFlightApi(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const flightApiModel = this.Model.FlightApiModel(trx);
+                const data = yield flightApiModel.getFlightApi({});
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    data
                 };
             }));
         });
