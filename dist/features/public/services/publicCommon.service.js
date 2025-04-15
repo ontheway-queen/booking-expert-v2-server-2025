@@ -17,6 +17,7 @@ const qs_1 = __importDefault(require("qs"));
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const config_1 = __importDefault(require("../../../config/config"));
 const sabreApiEndpoints_1 = __importDefault(require("../../../utils/miscellaneous/sabreApiEndpoints"));
+const flightConstent_1 = require("../../../utils/miscellaneous/flightConstent");
 class PublicCommonService extends abstract_service_1.default {
     constructor() {
         super();
@@ -44,10 +45,8 @@ class PublicCommonService extends abstract_service_1.default {
                     .request(axiosConfig)
                     .then((response) => __awaiter(this, void 0, void 0, function* () {
                     const data = response.data;
-                    // const authModel = this.Model.authModel();
-                    // await authModel.updateEnv(SABRE_TOKEN_ENV, {
-                    //   value: data.access_token,
-                    // });
+                    const authModel = this.Model.CommonModel();
+                    yield authModel.updateEnv(flightConstent_1.SABRE_TOKEN_ENV, data.access_token);
                 }))
                     .catch((error) => {
                     console.log(error);

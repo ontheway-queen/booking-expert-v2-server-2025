@@ -32,11 +32,15 @@ export default class AgencyUserModel extends Schema {
   }
 
   // update user
-  public async updateUser(payload: IUpdateAgencyUserPayload, id: number) {
+  public async updateUser(
+    payload: IUpdateAgencyUserPayload,
+    { agency_id, id }: { id: number; agency_id: number }
+  ) {
     return await this.db('agency_user')
       .withSchema(this.AGENT_SCHEMA)
       .update(payload)
-      .where('id', id);
+      .andWhere('id', id)
+      .andWhere('agency_id', agency_id);
   }
 
   public async updateUserByEmail(
@@ -110,7 +114,9 @@ export default class AgencyUserModel extends Schema {
     email,
     username,
     id,
+    agency_id,
   }: {
+    agency_id?: number;
     email?: string;
     username?: string;
     id?: number;
@@ -121,7 +127,7 @@ export default class AgencyUserModel extends Schema {
         'au.id',
         'au.agency_id',
         'au.email',
-        'au.mobile_number',
+        'au.phone_number',
         'au.photo',
         'au.name',
         'au.username',
@@ -132,7 +138,7 @@ export default class AgencyUserModel extends Schema {
         'au.socket_id',
         'au.is_main_user',
         'a.status AS agency_status',
-        'a.agency_no',
+        'a.agent_no',
         'a.email AS agency_email',
         'a.agency_name',
         'a.agency_logo',
@@ -150,6 +156,10 @@ export default class AgencyUserModel extends Schema {
 
         if (id) {
           qb.andWhere('au.id', id);
+        }
+
+        if (agency_id) {
+          qb.andWhere('au.agency_id', agency_id);
         }
       })
       .first();
@@ -182,12 +192,12 @@ export default class AgencyUserModel extends Schema {
   }
 
   public async getAllPermissions(): Promise<IGetAllAgencyPermissionsData[]> {
-    return await this.db('permissions')
+    return await this.db('permissions AS per')
       .withSchema(this.AGENT_SCHEMA)
-      .select('per.id', 'per.name', 'ua.name as created_by', 'per.created_at')
-      .leftJoin('user_admin as ua', 'ua.id', 'per.created_by')
+      .select('per.id', 'per.name')
       .orderBy('per.name', 'asc');
   }
+
   // update role
   public async updateRole(payload: IUpdateAgencyRolePayload, id: number) {
     return await this.db('roles')

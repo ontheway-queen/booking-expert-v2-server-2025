@@ -8,15 +8,17 @@ import {
 } from '../../../utils/miscellaneous/constants';
 import PublicEmailOTPService from '../../public/services/publicEmailOTP.service';
 import {
+  ICompleteRegisterParsedTokenData,
   ILogin2FAReqBody,
   ILoginReqBody,
   IRegisterAgentReqBody,
   IResetPassReqBody,
 } from '../utils/types/authTypes';
-import { ITokenParseAgency } from '../../public/utils/types/publicCommon.types';
+import { ITokenParseAgencyUser } from '../../public/utils/types/publicCommon.types';
 import CustomError from '../../../utils/lib/customError';
 import { IInsertAgencyRolePermissionPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
 import { registrationVerificationTemplate } from '../../../utils/templates/registrationVerificationTemplate';
+import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
 
 export default class AuthAgentService extends AbstractServices {
   constructor() {
@@ -59,17 +61,18 @@ export default class AuthAgentService extends AbstractServices {
       let national_id = '';
 
       files.forEach((file) => {
+        console.log(file.fieldname);
         switch (file.fieldname) {
-          case logo:
+          case 'logo':
             logo = file.filename;
             break;
-          case civil_aviation:
+          case 'civil_aviation':
             civil_aviation = file.filename;
             break;
-          case trade_license:
+          case 'trade_license':
             trade_license = file.filename;
             break;
-          case national_id:
+          case 'national_id':
             national_id = file.filename;
             break;
           default:
@@ -98,7 +101,7 @@ export default class AuthAgentService extends AbstractServices {
       const newRole = await AgencyUserModel.createRole({
         agency_id: newAgency[0].id,
         name: 'Super Admin',
-        id_main_role: true,
+        is_main_role: true,
       });
 
       const permissions = await AgencyUserModel.getAllPermissions();
@@ -155,10 +158,7 @@ export default class AuthAgentService extends AbstractServices {
         emailSub: `Booking Expert Agency Registration Verification`,
         emailBody: registrationVerificationTemplate(
           agency_name,
-          {
-            username,
-            pass: password,
-          },
+
           '/registration/verification?token=' + verificationToken
         ),
       });
@@ -166,7 +166,7 @@ export default class AuthAgentService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: this.ResMsg.HTTP_SUCCESSFUL,
+        message: `Your registration has been successfully placed. Agency ID: ${agent_no}. To complete your registration please check your email and complete registration with the link we have sent to your email.`,
         data: {
           email,
         },
@@ -174,7 +174,55 @@ export default class AuthAgentService extends AbstractServices {
     });
   }
 
-  public async registerComplete(req: Request) {}
+  public async registerComplete(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { token } = req.body as { token: string };
+      const AgentModel = this.Model.AgencyModel(trx);
+      const AgencyUserModel = this.Model.AgencyUserModel(trx);
+
+      const parsedToken = Lib.verifyToken(
+        token,
+        config.JWT_SECRET_AGENT + OTP_TYPES.register_agent
+      ) as ICompleteRegisterParsedTokenData | false;
+
+      if (!parsedToken) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_UNAUTHORIZED,
+          message: 'Invalid token or token expired. Please contact us.',
+        };
+      }
+
+      const { agency_id, email, user_id, agency_name } = parsedToken;
+
+      await AgentModel.updateAgency({ status: 'Pending' }, agency_id);
+
+      const password = Lib.generateRandomPassword(8);
+      const hashed_password = await Lib.hashValue(password);
+
+      await AgencyUserModel.updateUser(
+        {
+          hashed_password,
+        },
+        { agency_id, id: user_id }
+      );
+
+      await Lib.sendEmail({
+        email,
+        emailSub: `Booking Expert Agency Registration Verification`,
+        emailBody: registrationVerificationCompletedTemplate(agency_name, {
+          email,
+          password,
+        }),
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: `Registration successful. Please check you will receive login credentials at the email address ${email}.`,
+      };
+    });
+  }
 
   public async login(req: Request) {
     return this.db.transaction(async (trx) => {
@@ -205,10 +253,10 @@ export default class AuthAgentService extends AbstractServices {
         role_id,
         photo,
         agency_id,
-        agency_no,
+        agent_no,
         agency_status,
         hashed_password,
-        mobile_number,
+        phone_number,
         white_label,
         agency_email,
         agency_logo,
@@ -216,7 +264,11 @@ export default class AuthAgentService extends AbstractServices {
         is_main_user,
       } = checkUserAgency;
 
-      if (agency_status === 'Inactive' || agency_status === 'Incomplete') {
+      if (
+        agency_status === 'Inactive' ||
+        agency_status === 'Incomplete' ||
+        agency_status === 'Rejected'
+      ) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -284,7 +336,7 @@ export default class AuthAgentService extends AbstractServices {
         whiteLabelPermissions = rest;
       }
 
-      const tokenData: ITokenParseAgency = {
+      const tokenData: ITokenParseAgencyUser = {
         user_id: id,
         username,
         user_email: email,
@@ -293,6 +345,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_email,
         agency_name,
         is_main_user,
+        photo,
       };
 
       const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
@@ -317,11 +370,11 @@ export default class AuthAgentService extends AbstractServices {
           is_main_user,
           agency: {
             agency_id,
-            agency_no,
+            agent_no,
             agency_email,
             agency_name,
             agency_status,
-            mobile_number,
+            phone_number,
             agency_logo,
           },
           role,
@@ -362,9 +415,9 @@ export default class AuthAgentService extends AbstractServices {
         role_id,
         photo,
         agency_id,
-        agency_no,
+        agent_no,
         agency_status,
-        mobile_number,
+        phone_number,
         white_label,
         agency_email,
         agency_logo,
@@ -416,7 +469,7 @@ export default class AuthAgentService extends AbstractServices {
         whiteLabelPermissions = rest;
       }
 
-      const tokenData: ITokenParseAgency = {
+      const tokenData: ITokenParseAgencyUser = {
         user_id: id,
         username,
         user_email,
@@ -425,6 +478,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_email,
         agency_name,
         is_main_user,
+        photo,
       };
 
       const authToken = Lib.createToken(
@@ -453,11 +507,11 @@ export default class AuthAgentService extends AbstractServices {
           is_main_user,
           agency: {
             agency_id,
-            agency_no,
+            agent_no,
             agency_email,
             agency_name,
             agency_status,
-            mobile_number,
+            phone_number,
             agency_logo,
           },
           role,
@@ -498,7 +552,7 @@ export default class AuthAgentService extends AbstractServices {
 
     const hashed_password = await Lib.hashValue(password);
 
-    await AgencyUserModel.updateUser({ hashed_password }, email);
+    await AgencyUserModel.updateUserByEmail({ hashed_password }, email);
 
     return {
       success: true,

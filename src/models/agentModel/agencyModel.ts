@@ -62,7 +62,7 @@ export default class AgencyModel extends Schema {
       .where((qb) => {
         if (query.filter) {
           qb.where('ag.agency_name', 'like', `%${query.filter}%`)
-            .orWhere('ag.agency_no', query.filter)
+            .orWhere('ag.agent_no', query.filter)
             .orWhere('ag.email', 'like', `%${query.filter}%`);
         }
         if (query.status) {
@@ -82,7 +82,7 @@ export default class AgencyModel extends Schema {
         .where((qb) => {
           if (query.filter) {
             qb.where('ag.agency_name', 'like', `%${query.filter}%`)
-              .orWhere('ag.agency_no', query.filter)
+              .orWhere('ag.agent_no', query.filter)
               .orWhere('ag.email', 'like', `%${query.filter}%`);
           }
           if (query.status) {
@@ -98,7 +98,7 @@ export default class AgencyModel extends Schema {
     agency_id,
     email,
     name,
-    agency_no,
+    agent_no,
   }: ICheckAgencyQuery): Promise<ICheckAgencyData | undefined> {
     return await this.db('agency')
       .withSchema(this.AGENT_SCHEMA)
@@ -125,8 +125,8 @@ export default class AgencyModel extends Schema {
         if (name) {
           qb.where('agency_name', name);
         }
-        if (agency_no) {
-          qb.where('agent_no', agency_no);
+        if (agent_no) {
+          qb.where('agent_no', agent_no);
         }
       })
       .first();
@@ -168,7 +168,7 @@ export default class AgencyModel extends Schema {
       .where((qb) => {
         if (query.search_value) {
           qb.where('ag.agency_name', 'like', `%${query.search_value}%`)
-            .orWhere('ag.agency_no', query.search_value)
+            .orWhere('ag.agent_no', query.search_value)
             .orWhere('ag.email', 'like', `%${query.search_value}%`);
         }
         if (query.status) {
@@ -188,7 +188,7 @@ export default class AgencyModel extends Schema {
         .where((qb) => {
           if (query.search_value) {
             qb.where('ag.agency_name', 'like', `%${query.search_value}%`)
-              .orWhere('ag.agency_no', query.search_value)
+              .orWhere('ag.agent_no', query.search_value)
               .orWhere('ag.email', 'like', `%${query.search_value}%`);
           }
           if (query.status) {

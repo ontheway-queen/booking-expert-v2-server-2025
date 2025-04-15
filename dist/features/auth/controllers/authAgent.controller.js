@@ -37,6 +37,15 @@ class AuthAgentController extends abstract_controller_1.default {
         }));
         this.register = this.asyncWrapper.wrap({ bodySchema: this.validator.agencyRegisterValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.register(req), { code } = _a, data = __rest(_a, ["code"]);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
+        }));
+        this.registerComplete = this.asyncWrapper.wrap({ bodySchema: this.validator.agencyRegisterCompleteValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.registerComplete(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
         this.login2FA = this.asyncWrapper.wrap({ bodySchema: this.validator.login2FAValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {

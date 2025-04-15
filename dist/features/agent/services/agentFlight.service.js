@@ -17,15 +17,86 @@ const abstract_service_1 = __importDefault(require("../../../abstract/abstract.s
 const flightConstent_1 = require("../../../utils/miscellaneous/flightConstent");
 const uuid_1 = require("uuid");
 const redis_1 = require("../../../app/redis");
+const sabreFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service"));
+const commonFlightSupport_service_1 = require("../../../utils/supportServices/flightSupportServices/commonFlightSupport.service");
 class AgentFlightService extends abstract_service_1.default {
     constructor() {
         super();
     }
-    //flight search
-    flightSearch(req, res) {
+    flightSearch(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agent;
+                const { agency_id } = req.agencyUser;
+                const body = req.body;
+                //get flight markup set id
+                const agencyModel = this.Model.AgencyModel(trx);
+                const agency_details = yield agencyModel.checkAgency({ agency_id });
+                if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'No commission set has been found for the agency',
+                    };
+                }
+                const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
+                const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
+                    status: true,
+                    markup_set_id: agency_details.flight_markup_set
+                });
+                //extract API IDs
+                let sabre_set_flight_api_id = 0;
+                apiData.forEach((api) => {
+                    if (api.api_name === flightConstent_1.SABRE_API) {
+                        sabre_set_flight_api_id = api.id;
+                    }
+                });
+                let sabreData = [];
+                if (sabre_set_flight_api_id) {
+                    const sabreSubService = new sabreFlightSupport_service_1.default(trx);
+                    sabreData = yield sabreSubService.FlightSearch({
+                        booking_block: false,
+                        markup_set_id: agency_details.flight_markup_set,
+                        reqBody: body,
+                        set_flight_api_id: sabre_set_flight_api_id,
+                    });
+                }
+                //generate search ID
+                const search_id = (0, uuid_1.v4)();
+                const leg_descriptions = body.OriginDestinationInformation.map((OrDeInfo) => {
+                    return {
+                        departureDate: OrDeInfo.DepartureDateTime,
+                        departureLocation: OrDeInfo.OriginLocation.LocationCode,
+                        arrivalLocation: OrDeInfo.DestinationLocation.LocationCode,
+                    };
+                });
+                const results = [...sabreData];
+                results.sort((a, b) => a.fare.payable - b.fare.payable);
+                const responseData = {
+                    search_id,
+                    journey_type: body.JourneyType,
+                    leg_descriptions,
+                    total: results.length,
+                    results,
+                };
+                //save data to redis
+                const dataForStore = {
+                    reqBody: body,
+                    response: responseData,
+                };
+                yield (0, redis_1.setRedis)(search_id, dataForStore);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: responseData,
+                };
+            }));
+        });
+    }
+    flightSearchSSE(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
                 const JourneyType = req.query.JourneyType;
                 const OriginDestinationInformation = req.query.OriginDestinationInformation;
                 const PassengerTypeQuantity = req.query.PassengerTypeQuantity;
@@ -94,7 +165,7 @@ class AgentFlightService extends abstract_service_1.default {
                 });
                 // Sabre results
                 if (sabre_set_flight_api_id) {
-                    const sabreSubService = new SabreFlightService(trx);
+                    const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     yield sendResults('Sabre', () => __awaiter(this, void 0, void 0, function* () {
                         return sabreSubService.FlightSearch({
                             booking_block: false,
@@ -104,6 +175,76 @@ class AgentFlightService extends abstract_service_1.default {
                         });
                     }));
                 }
+            }));
+        });
+    }
+    getFlightFareRule(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { flight_id, search_id } = req.query;
+                //get data from redis using the search id
+                const retrievedData = yield (0, redis_1.getRedis)(search_id);
+                if (!retrievedData) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const retrieveResponse = retrievedData.response;
+                const foundItem = retrieveResponse.results.find((item) => item.flight_id === flight_id);
+                if (!foundItem) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                let res = false;
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: res ? res : flightConstent_1.FLIGHT_FARE_RESPONSE
+                };
+            }));
+        });
+    }
+    flightRevalidate(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const { flight_id, search_id } = req.query;
+                //get flight markup set id
+                const agencyModel = this.Model.AgencyModel(trx);
+                const agency_details = yield agencyModel.checkAgency({ agency_id });
+                if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'No commission set has been found for the agency',
+                    };
+                }
+                //revalidate using the flight support service
+                const flightSupportService = new commonFlightSupport_service_1.CommonFlightSupportService(trx);
+                const data = yield flightSupportService.FlightRevalidate({
+                    search_id,
+                    flight_id,
+                    markup_set_id: agency_details.flight_markup_set
+                });
+                if (data) {
+                    return {
+                        success: true,
+                        message: "Ticket has been revalidated successfully!",
+                        data,
+                        code: this.StatusCode.HTTP_OK,
+                    };
+                }
+                return {
+                    success: false,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                };
             }));
         });
     }

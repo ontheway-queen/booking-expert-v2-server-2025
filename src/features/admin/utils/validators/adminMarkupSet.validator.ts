@@ -30,6 +30,8 @@ export default class AdminMarkupSetValidator {
         name: Joi.string().optional(),
         status: Joi.boolean().optional(),
         type: Joi.string().valid('Flight', 'Hotel').required(),
+        limit: Joi.number().optional(),
+        skip: Joi.number().optional()
     });
 
     public updateCommissionSetSchema = Joi.object({

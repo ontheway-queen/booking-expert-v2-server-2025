@@ -43,7 +43,7 @@ export interface IGetSingleAdminData {
   email: string;
   gender: string;
   phone_number: string;
-  photo?: string;
+  photo: string | null;
   role_id: number;
   is_main_user: boolean;
   two_fa: boolean;

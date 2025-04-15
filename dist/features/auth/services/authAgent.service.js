@@ -30,6 +30,7 @@ const constants_1 = require("../../../utils/miscellaneous/constants");
 const publicEmailOTP_service_1 = __importDefault(require("../../public/services/publicEmailOTP.service"));
 const customError_1 = __importDefault(require("../../../utils/lib/customError"));
 const registrationVerificationTemplate_1 = require("../../../utils/templates/registrationVerificationTemplate");
+const registrationVerificationCompletedTemplate_1 = require("../../../utils/templates/registrationVerificationCompletedTemplate");
 class AuthAgentService extends abstract_service_1.default {
     constructor() {
         super();
@@ -64,17 +65,18 @@ class AuthAgentService extends abstract_service_1.default {
                 let trade_license = '';
                 let national_id = '';
                 files.forEach((file) => {
+                    console.log(file.fieldname);
                     switch (file.fieldname) {
-                        case logo:
+                        case 'logo':
                             logo = file.filename;
                             break;
-                        case civil_aviation:
+                        case 'civil_aviation':
                             civil_aviation = file.filename;
                             break;
-                        case trade_license:
+                        case 'trade_license':
                             trade_license = file.filename;
                             break;
-                        case national_id:
+                        case 'national_id':
                             national_id = file.filename;
                             break;
                         default:
@@ -97,7 +99,7 @@ class AuthAgentService extends abstract_service_1.default {
                 const newRole = yield AgencyUserModel.createRole({
                     agency_id: newAgency[0].id,
                     name: 'Super Admin',
-                    id_main_role: true,
+                    is_main_role: true,
                 });
                 const permissions = yield AgencyUserModel.getAllPermissions();
                 const permissionPayload = [];
@@ -137,15 +139,12 @@ class AuthAgentService extends abstract_service_1.default {
                 yield lib_1.default.sendEmail({
                     email,
                     emailSub: `Booking Expert Agency Registration Verification`,
-                    emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, {
-                        username,
-                        pass: password,
-                    }, '/registration/verification?token=' + verificationToken),
+                    emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, '/registration/verification?token=' + verificationToken),
                 });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                    message: `Your registration has been successfully placed. Agency ID: ${agent_no}. To complete your registration please check your email and complete registration with the link we have sent to your email.`,
                     data: {
                         email,
                     },
@@ -154,7 +153,41 @@ class AuthAgentService extends abstract_service_1.default {
         });
     }
     registerComplete(req) {
-        return __awaiter(this, void 0, void 0, function* () { });
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { token } = req.body;
+                const AgentModel = this.Model.AgencyModel(trx);
+                const AgencyUserModel = this.Model.AgencyUserModel(trx);
+                const parsedToken = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent);
+                if (!parsedToken) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_UNAUTHORIZED,
+                        message: 'Invalid token or token expired. Please contact us.',
+                    };
+                }
+                const { agency_id, email, user_id, agency_name } = parsedToken;
+                yield AgentModel.updateAgency({ status: 'Pending' }, agency_id);
+                const password = lib_1.default.generateRandomPassword(8);
+                const hashed_password = yield lib_1.default.hashValue(password);
+                yield AgencyUserModel.updateUser({
+                    hashed_password,
+                }, { agency_id, id: user_id });
+                yield lib_1.default.sendEmail({
+                    email,
+                    emailSub: `Booking Expert Agency Registration Verification`,
+                    emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(agency_name, {
+                        email,
+                        password,
+                    }),
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: `Registration successful. Please check you will receive login credentials at the email address ${email}.`,
+                };
+            }));
+        });
     }
     login(req) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -173,8 +206,10 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agency_no, agency_status, hashed_password, mobile_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkUserAgency;
-                if (agency_status === 'Inactive' || agency_status === 'Incomplete') {
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkUserAgency;
+                if (agency_status === 'Inactive' ||
+                    agency_status === 'Incomplete' ||
+                    agency_status === 'Rejected') {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -239,6 +274,7 @@ class AuthAgentService extends abstract_service_1.default {
                     agency_email,
                     agency_name,
                     is_main_user,
+                    photo,
                 };
                 const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
                 const role = yield AgentUserModel.getSingleRoleWithPermissions(role_id, agency_id);
@@ -257,11 +293,11 @@ class AuthAgentService extends abstract_service_1.default {
                         is_main_user,
                         agency: {
                             agency_id,
-                            agency_no,
+                            agent_no,
                             agency_email,
                             agency_name,
                             agency_status,
-                            mobile_number,
+                            phone_number,
                             agency_logo,
                         },
                         role,
@@ -289,7 +325,7 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agency_no, agency_status, mobile_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkAgencyUser;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, phone_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkAgencyUser;
                 if (!status) {
                     return {
                         success: false,
@@ -335,6 +371,7 @@ class AuthAgentService extends abstract_service_1.default {
                     agency_email,
                     agency_name,
                     is_main_user,
+                    photo,
                 };
                 const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_ADMIN, '24h');
                 const role = yield AgencyUserModel.getSingleRoleWithPermissions(role_id, agency_id);
@@ -353,11 +390,11 @@ class AuthAgentService extends abstract_service_1.default {
                         is_main_user,
                         agency: {
                             agency_id,
-                            agency_no,
+                            agent_no,
                             agency_email,
                             agency_name,
                             agency_status,
-                            mobile_number,
+                            phone_number,
                             agency_logo,
                         },
                         role,
@@ -390,7 +427,7 @@ class AuthAgentService extends abstract_service_1.default {
             }
             const AgencyUserModel = this.Model.AgencyUserModel();
             const hashed_password = yield lib_1.default.hashValue(password);
-            yield AgencyUserModel.updateUser({ hashed_password }, email);
+            yield AgencyUserModel.updateUserByEmail({ hashed_password }, email);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,

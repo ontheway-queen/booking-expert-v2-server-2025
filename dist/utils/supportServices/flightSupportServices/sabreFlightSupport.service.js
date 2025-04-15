@@ -8,58 +8,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const uuid_1 = require("uuid");
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const config_1 = __importDefault(require("../../../config/config"));
-const flightConstent_1 = require("../../miscellaneous/flightConstent");
+const customError_1 = __importDefault(require("../../lib/customError"));
+const flightUtils_1 = __importDefault(require("../../lib/flight/flightUtils"));
 const sabreRequest_1 = __importDefault(require("../../lib/flight/sabreRequest"));
+const lib_1 = __importDefault(require("../../lib/lib"));
+const constants_1 = require("../../miscellaneous/constants");
+const flightConstent_1 = require("../../miscellaneous/flightConstent");
 const sabreApiEndpoints_1 = __importDefault(require("../../miscellaneous/sabreApiEndpoints"));
 const staticData_1 = require("../../miscellaneous/staticData");
-const lib_1 = __importDefault(require("../../lib/lib"));
 class SabreFlightService extends abstract_service_1.default {
     constructor(trx) {
         super();
         this.request = new sabreRequest_1.default();
-        // Get layover time
-        this.getNewLayoverTime = (options) => {
-            const layoverTime = options.map((item, index) => {
-                var _a, _b;
-                let firstArrival = options[index].arrival.time;
-                let secondDeparture = (_b = (_a = options[index + 1]) === null || _a === void 0 ? void 0 : _a.departure) === null || _b === void 0 ? void 0 : _b.time;
-                let layoverTimeString = 0;
-                if (secondDeparture) {
-                    const startDate = new Date(`2020-01-01T${firstArrival}`);
-                    let endDate = new Date(`2020-01-01T${secondDeparture}`);
-                    if (endDate < startDate) {
-                        endDate = new Date(`2020-01-02T${secondDeparture}`);
-                        // Calculate the difference in milliseconds
-                        const differenceInMilliseconds = endDate.getTime() - startDate.getTime();
-                        // Convert the difference minutes
-                        layoverTimeString = Math.abs(differenceInMilliseconds / (1000 * 60));
-                    }
-                    else {
-                        const layoverTimeInMilliseconds = endDate.getTime() - startDate.getTime();
-                        layoverTimeString = Math.abs(layoverTimeInMilliseconds) / (1000 * 60);
-                    }
-                }
-                return layoverTimeString;
-            });
-            return layoverTime;
-        };
+        this.flightUtils = new flightUtils_1.default();
         this.trx = trx;
     }
     ////////////==================FLIGHT SEARCH (START)=========================///////////
@@ -159,7 +127,7 @@ class SabreFlightService extends abstract_service_1.default {
     }
     // Flight search service
     FlightSearch(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, commission_set_id, }) {
+        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, markup_set_id, }) {
             const flightRequestBody = yield this.FlightReqFormatterV5(reqBody, set_flight_api_id);
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_SEARCH_ENDPOINT_V5, flightRequestBody);
             // return [response];
@@ -174,18 +142,18 @@ class SabreFlightService extends abstract_service_1.default {
                 reqBody: reqBody,
                 set_flight_api_id,
                 booking_block,
-                commission_set_id,
+                markup_set_id,
             });
             return result;
         });
     }
     // Flight search Response formatter
     FlightSearchResFormatter(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, data, reqBody, commission_set_id, flight_id, }) {
+        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, data, reqBody, markup_set_id, flight_id, }) {
             var _b;
             const commonModel = this.Model.CommonModel(this.trx);
-            const commissionModel = this.Model.apiAirlinesCommissionModel(this.trx);
-            const routeConfigModel = this.Model.flightRouteConfigModel(this.trx);
+            const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
+            // const routeConfigModel = this.Model.flightRouteConfigModel(this.trx);
             const airports = [];
             const OriginDest = reqBody.OriginDestinationInformation;
             OriginDest.forEach((item) => {
@@ -288,8 +256,8 @@ class SabreFlightService extends abstract_service_1.default {
                             const segd = pfd.segments[j];
                             const segment = segd === null || segd === void 0 ? void 0 : segd.segment;
                             if (segment !== undefined) {
-                                const meal_type = lib_1.default.getMeal((segment === null || segment === void 0 ? void 0 : segment.mealCode) || '');
-                                const cabin_type = lib_1.default.getCabin((segment === null || segment === void 0 ? void 0 : segment.cabinCode) || '');
+                                const meal_type = this.flightUtils.getMeal((segment === null || segment === void 0 ? void 0 : segment.mealCode) || '');
+                                const cabin_type = this.flightUtils.getCabin((segment === null || segment === void 0 ? void 0 : segment.cabinCode) || '');
                                 segments.push({
                                     id: j + 1,
                                     name: `Segment-${j + 1}`,
@@ -361,50 +329,55 @@ class SabreFlightService extends abstract_service_1.default {
                     };
                     passenger_lists.push(new_passenger);
                 }
-                const legsDesc = this.newGetLegsDesc(itinerary.legs, legDesc, OriginDest);
+                const legsDesc = this.flightUtils.getLegsDesc(itinerary.legs, legDesc, OriginDest);
                 const validatingCarrier = yield commonModel.getAirlines(fare.validatingCarrierCode);
-                // Commission data
-                let finalCom = 0;
-                let finalComType = '';
-                let finalComMode = '';
-                const routeComCheck = yield routeConfigModel.getSetRoutesCommission({
-                    status: true,
-                    departure: airports[0],
-                    arrival: airports[1],
-                    commission_set_id,
-                }, false);
-                // Set commission if route commission is available
-                if (routeComCheck.data.length) {
-                    if (routeComCheck.data.length > 1) {
-                        const routeComFoundOfAirline = routeComCheck.data.find((item) => item.airline === fare.validatingCarrierCode);
-                        if (routeComFoundOfAirline) {
-                            const { commission, com_type, com_mode } = routeComFoundOfAirline;
-                            finalCom = commission;
-                            finalComMode = com_mode;
-                            finalComType = com_type;
-                        }
-                    }
-                    else {
-                        const { commission, com_type, com_mode, airline } = routeComCheck.data[0];
-                        if (!airline || airline === fare.validatingCarrierCode) {
-                            finalCom = commission;
-                            finalComMode = com_mode;
-                            finalComType = com_type;
-                        }
-                    }
-                }
-                // Set commission if route commission is not available and airlines commission is available
-                if (!finalCom && !finalComType && !finalComMode) {
-                    //airline commission
-                    const comCheck = yield commissionModel.getAPIAirlinesCommission({
+                // Markup data
+                let finalMarkup = 0;
+                let finalMarkupType = '';
+                let finalMarkupMode = '';
+                // const routeMarkupCheck = await routeConfigModel.getSetRoutesCommission(
+                //   {
+                //     status: true,
+                //     departure: airports[0],
+                //     arrival: airports[1],
+                //     markup_set_id,
+                //   },
+                //   false
+                // );
+                // // Set markup if route markup is available
+                // if (routeMarkupCheck.data.length) {
+                //   if (routeMarkupCheck.data.length > 1) {
+                //     const routeMarkupFoundOfAirline = routeMarkupCheck.data.find(
+                //       (item) => item.airline === fare.validatingCarrierCode
+                //     );
+                //     if (routeMarkupFoundOfAirline) {
+                //       const { markup, markup_type, markup_mode } = routeMarkupFoundOfAirline;
+                //       finalMarkup = markup;
+                //       finalMarkupMode = markup_mode;
+                //       finalMarkupType = markup_type;
+                //     }
+                //   } else {
+                //     const { markup, markup_type, markup_mode, airline } =
+                //       routeMarkupCheck.data[0];
+                //     if (!airline || airline === fare.validatingCarrierCode) {
+                //       finalMarkup = markup;
+                //       finalMarkupMode = markup_mode;
+                //       finalMarkupType = markup_type;
+                //     }
+                //   }
+                // }
+                // Set Markup if route Markup is not available and airlines Markup is available
+                if (!finalMarkup && !finalMarkupType && !finalMarkupMode) {
+                    //airline markup
+                    const markupCheck = yield flightMarkupsModel.getAllFlightMarkups({
                         airline: fare.validatingCarrierCode,
                         status: true,
-                        set_flight_api_id,
-                        limit: '1',
+                        markup_set_flight_api_id: set_flight_api_id,
+                        limit: 1,
                     }, false);
                     // Set Amount
-                    if (comCheck.data.length) {
-                        const { com_domestic, com_from_dac, com_to_dac, com_soto, com_type, com_mode, } = comCheck.data[0];
+                    if (markupCheck.data.length) {
+                        const { markup_domestic, markup_from_dac, markup_to_dac, markup_soto, markup_type, markup_mode, } = markupCheck.data[0];
                         let allBdAirport = true;
                         let existBdAirport = false;
                         for (const airport of airports) {
@@ -419,27 +392,27 @@ class SabreFlightService extends abstract_service_1.default {
                         }
                         if (allBdAirport) {
                             // Domestic
-                            finalCom = com_domestic;
-                            finalComMode = com_mode;
-                            finalComType = com_type;
+                            finalMarkup = markup_domestic;
+                            finalMarkupMode = markup_mode;
+                            finalMarkupType = markup_type;
                         }
                         else if (staticData_1.BD_AIRPORT.includes(airports[0])) {
                             // From Dhaka
-                            finalCom = com_from_dac;
-                            finalComMode = com_mode;
-                            finalComType = com_type;
+                            finalMarkup = markup_from_dac;
+                            finalMarkupMode = markup_mode;
+                            finalMarkupType = markup_type;
                         }
                         else if (existBdAirport) {
                             // To Dhaka
-                            finalCom = com_to_dac;
-                            finalComMode = com_mode;
-                            finalComType = com_type;
+                            finalMarkup = markup_to_dac;
+                            finalMarkupMode = markup_mode;
+                            finalMarkupType = markup_type;
                         }
                         else {
                             // Soto
-                            finalCom = com_soto;
-                            finalComMode = com_mode;
-                            finalComType = com_type;
+                            finalMarkup = markup_soto;
+                            finalMarkupMode = markup_mode;
+                            finalMarkupType = markup_type;
                         }
                     }
                 }
@@ -453,23 +426,23 @@ class SabreFlightService extends abstract_service_1.default {
                     total_price: Number(fare.totalFare.totalPrice) + ait,
                     payable: Number(fare.totalFare.totalPrice) + ait,
                 };
-                // Set Commission to fare
-                if (finalCom && finalComMode && finalComType) {
-                    if (finalComType === COM_TYPE_PER) {
-                        const comAmount = (Number(new_fare.base_fare) * Number(finalCom)) / 100;
-                        if (finalComMode === COM_MODE_INCREASE) {
-                            new_fare.convenience_fee += Number(comAmount);
+                // Set Markup to fare
+                if (finalMarkup && finalMarkupMode && finalMarkupType) {
+                    if (finalMarkupType === flightConstent_1.MARKUP_TYPE_PER) {
+                        const markupAmount = (Number(new_fare.base_fare) * Number(finalMarkup)) / 100;
+                        if (finalMarkupMode === flightConstent_1.MARKUP_MODE_INCREASE) {
+                            new_fare.convenience_fee += Number(markupAmount);
                         }
                         else {
-                            new_fare.discount += Number(comAmount);
+                            new_fare.discount += Number(markupAmount);
                         }
                     }
                     else {
-                        if (finalComMode === COM_MODE_INCREASE) {
-                            new_fare.convenience_fee += Number(finalCom);
+                        if (finalMarkupMode === flightConstent_1.MARKUP_MODE_INCREASE) {
+                            new_fare.convenience_fee += Number(finalMarkup);
                         }
                         else {
-                            new_fare.discount += Number(finalCom);
+                            new_fare.discount += Number(finalMarkup);
                         }
                     }
                 }
@@ -561,12 +534,12 @@ class SabreFlightService extends abstract_service_1.default {
                     });
                 });
                 const itinery = {
-                    flight_id: flight_id || uuidv4(),
+                    flight_id: flight_id || (0, uuid_1.v4)(),
                     api_search_id: '',
                     booking_block,
                     isDomesticFlight,
                     journey_type: reqBody.JourneyType,
-                    api: SABRE_API,
+                    api: flightConstent_1.SABRE_API,
                     fare: new_fare,
                     refundable,
                     carrier_code: fare.validatingCarrierCode,
@@ -587,7 +560,7 @@ class SabreFlightService extends abstract_service_1.default {
     ///==================FLIGHT SEARCH (END)=========================///
     //////==================FLIGHT REVALIDATE (START)=========================//////
     //sabre flight revalidate service
-    SabreFlightRevalidate(reqBody, retrieved_response, commission_set_id, set_flight_api_id, flight_id, booking_block) {
+    SabreFlightRevalidate(reqBody, retrieved_response, markup_set_id, set_flight_api_id, flight_id, booking_block) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const revalidate_req_body = yield this.RevalidateFlightReqFormatter(reqBody, retrieved_response);
@@ -595,19 +568,19 @@ class SabreFlightService extends abstract_service_1.default {
             if (!response) {
                 lib_1.default.writeJsonFile('sabre_revalidate_request', revalidate_req_body);
                 lib_1.default.writeJsonFile('sabre_revalidate_response', response);
-                throw new CustomError('External API Error', 500);
+                throw new customError_1.default('External API Error', 500);
             }
             if (((_a = response.groupedItineraryResponse) === null || _a === void 0 ? void 0 : _a.statistics.itineraryCount) === 0) {
                 lib_1.default.writeJsonFile('sabre_revalidate_request', revalidate_req_body);
                 lib_1.default.writeJsonFile('sabre_revalidate_response', response);
-                throw new CustomError(`Cannot revalidate flight with this flight id`, 400);
+                throw new customError_1.default(`Cannot revalidate flight with this flight id`, 400);
             }
             const data = yield this.FlightSearchResFormatter({
                 set_flight_api_id,
                 booking_block,
                 reqBody,
                 data: response.groupedItineraryResponse,
-                commission_set_id,
+                markup_set_id,
                 flight_id,
             });
             return data;
@@ -642,8 +615,8 @@ class SabreFlightService extends abstract_service_1.default {
                 const depart_air = flight.options[0].departure.airport_code;
                 if (req_depart_air === depart_air) {
                     for (const option of flight.options) {
-                        const DepartureDateTime = convertDateTime(option.departure.date, option.departure.time);
-                        const ArrivalDateTime = convertDateTime(option.arrival.date, option.arrival.time);
+                        const DepartureDateTime = this.flightUtils.convertDateTime(option.departure.date, option.departure.time);
+                        const ArrivalDateTime = this.flightUtils.convertDateTime(option.arrival.date, option.arrival.time);
                         const flight_data = {
                             Number: Number(option === null || option === void 0 ? void 0 : option.carrier.carrier_marketing_flight_number),
                             ClassOfService: 'V',
@@ -665,7 +638,7 @@ class SabreFlightService extends abstract_service_1.default {
                     }
                     const origin_destination_info = {
                         RPH: item.RPH,
-                        DepartureDateTime: convertDateTime(item.DepartureDateTime, depart_time),
+                        DepartureDateTime: this.flightUtils.convertDateTime(item.DepartureDateTime, depart_time),
                         OriginLocation: item['OriginLocation'],
                         DestinationLocation: item['DestinationLocation'],
                         TPA_Extensions: {
@@ -789,7 +762,7 @@ class SabreFlightService extends abstract_service_1.default {
             });
             Service.push({
                 SSR_Code: 'CTCE',
-                Text: PROJECT_EMAIL.replace('@', '//'),
+                Text: constants_1.PROJECT_EMAIL.replace('@', '//'),
                 PersonName: {
                     NameNumber: '1.1',
                 },
@@ -803,7 +776,7 @@ class SabreFlightService extends abstract_service_1.default {
             const Email = [];
             Email.push({
                 NameNumber: '1.1',
-                Address: PROJECT_EMAIL,
+                Address: constants_1.PROJECT_EMAIL,
                 Type: 'CC',
             });
             let inf_ind = 1;
@@ -855,12 +828,12 @@ class SabreFlightService extends abstract_service_1.default {
                 }
                 SecureFlight.push(secure_fl_data);
                 if (item.passport_number) {
-                    const issuing_country = yield this.Model.commonModel().getAllCountry({
+                    const issuing_country = yield this.Model.CommonModel().getAllCountry({
                         id: Number(item.issuing_country),
                     });
                     let nationality = issuing_country;
                     if (item.nationality !== item.issuing_country) {
-                        nationality = yield this.Model.commonModel().getAllCountry({
+                        nationality = yield this.Model.CommonModel().getAllCountry({
                             id: Number(item.nationality),
                         });
                     }
@@ -923,8 +896,8 @@ class SabreFlightService extends abstract_service_1.default {
                 for (const option of item.options) {
                     const mar_code = option.carrier.carrier_marketing_code;
                     const segment = {
-                        ArrivalDateTime: dateTimeFormatter(option.arrival.date, option.arrival.time),
-                        DepartureDateTime: dateTimeFormatter(option.departure.date, option.departure.time),
+                        ArrivalDateTime: this.flightUtils.convertDateTime(option.arrival.date, option.arrival.time),
+                        DepartureDateTime: this.flightUtils.convertDateTime(option.departure.date, option.departure.time),
                         FlightNumber: String(option.carrier.carrier_marketing_flight_number),
                         NumberInParty: String(passengerLength),
                         ResBookDesigCode: booking_code === null || booking_code === void 0 ? void 0 : booking_code[booking_code_index],
@@ -1051,61 +1024,47 @@ class SabreFlightService extends abstract_service_1.default {
     }
     //flight booking service
     FlightBookingService(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ body, user_info, revalidate_data, source, }) {
-            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                var _a, _b, _c, _d, _e;
-                const requestBody = yield this.pnrReqBody(body, revalidate_data, {
-                    email: user_info.email,
-                    phone: user_info.phone,
-                    name: user_info.name,
-                });
-                const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT, requestBody);
-                if (!response) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
-                        message: this.ResMsg.HTTP_INTERNAL_SERVER_ERROR,
-                    };
-                }
-                if (((_b = (_a = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _a === void 0 ? void 0 : _a.ApplicationResults) === null || _b === void 0 ? void 0 : _b.status) !==
-                    'Complete') {
-                    // throw new CustomError(
-                    //   "Error while booking the flight from Sabre",
-                    //   500,
-                    //   ERROR_LEVEL_WARNING,
-                    //   {
-                    //     api: SABRE_API,
-                    //     endpoint: SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
-                    //     payload: requestBody,
-                    //     response: response?.CreatePassengerNameRecordRS?.ApplicationResults
-                    //   }
-                    // );
-                    yield this.Model.errorLogsModel(trx).insert({
-                        level: ERROR_LEVEL_WARNING,
-                        message: 'Error from sabre while booking flight',
-                        url: sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT,
-                        http_method: 'POST',
-                        metadata: {
-                            api: SABRE_API,
-                            endpoint: sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT,
-                            payload: requestBody,
-                            response: (_c = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _c === void 0 ? void 0 : _c.ApplicationResults,
-                        },
-                        source,
-                    });
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: this.ResMsg.HTTP_BAD_REQUEST,
-                        error: response.CreatePassengerNameRecordRS.ApplicationResults,
-                    };
-                }
+        return __awaiter(this, arguments, void 0, function* ({ body, user_info, revalidate_data, }) {
+            var _b, _c, _d, _e;
+            const requestBody = yield this.pnrReqBody(body, revalidate_data, {
+                email: user_info.email,
+                phone: user_info.phone,
+                name: user_info.name,
+            });
+            const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT, requestBody);
+            if (!response) {
                 return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    pnr: (_e = (_d = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _d === void 0 ? void 0 : _d.ItineraryRef) === null || _e === void 0 ? void 0 : _e.ID,
+                    success: false,
+                    code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
+                    message: this.ResMsg.HTTP_INTERNAL_SERVER_ERROR,
                 };
-            }));
+            }
+            if (((_c = (_b = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _b === void 0 ? void 0 : _b.ApplicationResults) === null || _c === void 0 ? void 0 : _c.status) !==
+                'Complete') {
+                // await this.Model.errorLogsModel(trx).insert({
+                //   level: ERROR_LEVEL_WARNING,
+                //   message: 'Error from sabre while booking flight',
+                //   url: SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
+                //   http_method: 'POST',
+                //   metadata: {
+                //     api: SABRE_API,
+                //     endpoint: SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
+                //     payload: requestBody,
+                //     response: response?.CreatePassengerNameRecordRS?.ApplicationResults,
+                //   },
+                // });
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_BAD_REQUEST,
+                    message: this.ResMsg.HTTP_BAD_REQUEST,
+                    error: response.CreatePassengerNameRecordRS.ApplicationResults,
+                };
+            }
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                pnr: (_e = (_d = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _d === void 0 ? void 0 : _d.ItineraryRef) === null || _e === void 0 ? void 0 : _e.ID,
+            };
         });
     }
     ///==================FLIGHT BOOKING (END)=========================///
@@ -1178,69 +1137,67 @@ class SabreFlightService extends abstract_service_1.default {
     }
     //ticket issue service
     TicketIssueService(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ pnr, unique_traveler, source, }) {
-            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                var _a, _b;
-                const ticketReqBody = this.SabreTicketIssueReqFormatter(pnr, unique_traveler);
-                const response = yield this.request.postRequest(sabreApiEndpoints_1.default.TICKET_ISSUE_ENDPOINT, ticketReqBody);
-                if (((_b = (_a = response === null || response === void 0 ? void 0 : response.AirTicketRS) === null || _a === void 0 ? void 0 : _a.ApplicationResults) === null || _b === void 0 ? void 0 : _b.status) === 'Complete') {
-                    const retrieve_booking = yield this.request.postRequest(sabreApiEndpoints_1.default.GET_BOOKING_ENDPOINT, {
-                        confirmationId: pnr,
-                    });
-                    if (!retrieve_booking || !(retrieve_booking === null || retrieve_booking === void 0 ? void 0 : retrieve_booking.flightTickets)) {
-                        yield this.Model.errorLogsModel(trx).insert({
-                            level: ERROR_LEVEL_WARNING,
-                            message: 'Error from sabre while ticket issue',
-                            url: sabreApiEndpoints_1.default.GET_BOOKING_ENDPOINT,
-                            http_method: 'POST',
-                            metadata: {
-                                api: SABRE_API,
-                                endpoint: sabreApiEndpoints_1.default.GET_BOOKING_ENDPOINT,
-                                payload: { confirmationId: pnr },
-                                response: retrieve_booking,
-                            },
-                            source,
-                        });
-                        return {
-                            success: true,
-                            code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
-                            message: 'An error occurred while retrieving the ticket numbers',
-                            error: retrieve_booking === null || retrieve_booking === void 0 ? void 0 : retrieve_booking.errors,
-                        };
-                    }
-                    const ticket_number = [];
-                    for (let i = 0; i < retrieve_booking.flightTickets.length; i++) {
-                        ticket_number.push(retrieve_booking.flightTickets[i].number);
-                    }
+        return __awaiter(this, arguments, void 0, function* ({ pnr, unique_traveler, }) {
+            var _b, _c;
+            const ticketReqBody = this.SabreTicketIssueReqFormatter(pnr, unique_traveler);
+            const response = yield this.request.postRequest(sabreApiEndpoints_1.default.TICKET_ISSUE_ENDPOINT, ticketReqBody);
+            if (((_c = (_b = response === null || response === void 0 ? void 0 : response.AirTicketRS) === null || _b === void 0 ? void 0 : _b.ApplicationResults) === null || _c === void 0 ? void 0 : _c.status) === 'Complete') {
+                const retrieve_booking = yield this.request.postRequest(sabreApiEndpoints_1.default.GET_BOOKING_ENDPOINT, {
+                    confirmationId: pnr,
+                });
+                if (!retrieve_booking || !(retrieve_booking === null || retrieve_booking === void 0 ? void 0 : retrieve_booking.flightTickets)) {
+                    // await this.Model.errorLogsModel(trx).insert({
+                    //   level: ERROR_LEVEL_WARNING,
+                    //   message: 'Error from sabre while ticket issue',
+                    //   url: SabreAPIEndpoints.GET_BOOKING_ENDPOINT,
+                    //   http_method: 'POST',
+                    //   metadata: {
+                    //     api: SABRE_API,
+                    //     endpoint: SabreAPIEndpoints.GET_BOOKING_ENDPOINT,
+                    //     payload: { confirmationId: pnr },
+                    //     response: retrieve_booking,
+                    //   },
+                    //   source,
+                    // });
                     return {
                         success: true,
-                        code: this.StatusCode.HTTP_SUCCESSFUL,
-                        message: 'Ticket has been issued',
-                        data: ticket_number,
-                    };
-                }
-                else {
-                    yield this.Model.errorLogsModel(trx).insert({
-                        level: ERROR_LEVEL_WARNING,
-                        message: 'Error from sabre while ticket issue',
-                        url: sabreApiEndpoints_1.default.TICKET_ISSUE_ENDPOINT,
-                        http_method: 'POST',
-                        metadata: {
-                            api: SABRE_API,
-                            endpoint: sabreApiEndpoints_1.default.TICKET_ISSUE_ENDPOINT,
-                            payload: ticketReqBody,
-                            response: response,
-                        },
-                        source,
-                    });
-                    return {
-                        success: false,
                         code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
-                        message: 'An error occurred while issuing the ticket',
-                        error: response === null || response === void 0 ? void 0 : response.errors,
+                        message: 'An error occurred while retrieving the ticket numbers',
+                        error: retrieve_booking === null || retrieve_booking === void 0 ? void 0 : retrieve_booking.errors,
                     };
                 }
-            }));
+                const ticket_number = [];
+                for (let i = 0; i < retrieve_booking.flightTickets.length; i++) {
+                    ticket_number.push(retrieve_booking.flightTickets[i].number);
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: 'Ticket has been issued',
+                    data: ticket_number,
+                };
+            }
+            else {
+                // await this.Model.errorLogsModel(trx).insert({
+                //   level: ERROR_LEVEL_WARNING,
+                //   message: 'Error from sabre while ticket issue',
+                //   url: SabreAPIEndpoints.TICKET_ISSUE_ENDPOINT,
+                //   http_method: 'POST',
+                //   metadata: {
+                //     api: SABRE_API,
+                //     endpoint: SabreAPIEndpoints.TICKET_ISSUE_ENDPOINT,
+                //     payload: ticketReqBody,
+                //     response: response,
+                //   },
+                //   source,
+                // });
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
+                    message: 'An error occurred while issuing the ticket',
+                    error: response === null || response === void 0 ? void 0 : response.errors,
+                };
+            }
         });
     }
     ///==================TICKET ISSUE (END)=========================///
@@ -1256,64 +1213,48 @@ class SabreFlightService extends abstract_service_1.default {
     }
     //sabre booking cancel service
     SabreBookingCancelService(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ pnr, ticket_issue_last_time, source, }) {
-            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                // if (ticket_issue_last_time) {
-                //   // Convert the database timestamp string to a Date object in UTC
-                //   const databaseUTCTimestamp = Date.parse(ticket_issue_last_time);
-                //   // Get the current UTC timestamp
-                //   const currentUTCTimestamp = Date.now();
-                //   //check if cancellation time is expired
-                //   if (currentUTCTimestamp > databaseUTCTimestamp) {
-                //     return {
-                //       success: false,
-                //       code: this.StatusCode.HTTP_BAD_REQUEST,
-                //       message: 'Booking cancellation time has been expired',
-                //     };
-                //   }
-                // }
-                //cancel booking req formatter
-                const cancelBookingBody = this.SabreBookingCancelReqFormatter(pnr);
-                const response = yield this.request.postRequest(sabreApiEndpoints_1.default.CANCEL_BOOKING_ENDPOINT, cancelBookingBody);
-                //if there is error then return
-                if (!response || response.errors) {
-                    yield this.Model.errorLogsModel(trx).insert({
-                        level: ERROR_LEVEL_WARNING,
-                        message: 'Error from sabre while cancel booking',
-                        url: sabreApiEndpoints_1.default.CANCEL_BOOKING_ENDPOINT,
-                        http_method: 'POST',
-                        metadata: {
-                            api: SABRE_API,
-                            endpoint: sabreApiEndpoints_1.default.CANCEL_BOOKING_ENDPOINT,
-                            payload: cancelBookingBody,
-                            response: response,
-                        },
-                        source,
-                    });
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
-                        message: 'An error occurred while cancelling the booking',
-                        error: response === null || response === void 0 ? void 0 : response.errors,
-                    };
-                }
+        return __awaiter(this, arguments, void 0, function* ({ pnr }) {
+            //cancel booking req formatter
+            const cancelBookingBody = this.SabreBookingCancelReqFormatter(pnr);
+            const response = yield this.request.postRequest(sabreApiEndpoints_1.default.CANCEL_BOOKING_ENDPOINT, cancelBookingBody);
+            //if there is error then return
+            if (!response || response.errors) {
+                // await this.Model.errorLogsModel(trx).insert({
+                //   level: ERROR_LEVEL_WARNING,
+                //   message: 'Error from sabre while cancel booking',
+                //   url: SabreAPIEndpoints.CANCEL_BOOKING_ENDPOINT,
+                //   http_method: 'POST',
+                //   metadata: {
+                //     api: SABRE_API,
+                //     endpoint: SabreAPIEndpoints.CANCEL_BOOKING_ENDPOINT,
+                //     payload: cancelBookingBody,
+                //     response: response,
+                //   },
+                //   source,
+                // });
                 return {
-                    success: true,
-                    message: 'Booking successfully cancelled',
-                    code: this.StatusCode.HTTP_OK,
+                    success: false,
+                    code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
+                    message: 'An error occurred while cancelling the booking',
+                    error: response === null || response === void 0 ? void 0 : response.errors,
                 };
-            }));
+            }
+            return {
+                success: true,
+                message: 'Booking successfully cancelled',
+                code: this.StatusCode.HTTP_OK,
+            };
         });
     }
     ///==================BOOKING CANCEL (END)=========================///
-    /////==================GRN UPDATE(START)=========================//////////////
+    /////==================GET BOOKING(START)=========================//////////////
     GRNUpdate(_a) {
         return __awaiter(this, arguments, void 0, function* ({ pnr, booking_status, }) {
             var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.GET_BOOKING_ENDPOINT, {
                 confirmationId: pnr,
             });
-            let status = booking_status || FLIGHT_BOOKED;
+            let status = booking_status;
             let ticket_number = [];
             let last_time = null;
             let airline_pnr = null;
@@ -1321,15 +1262,15 @@ class SabreFlightService extends abstract_service_1.default {
             if (response) {
                 //pnr status
                 if (((_d = (_c = (_b = response === null || response === void 0 ? void 0 : response.flightTickets) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.ticketStatusName) === null || _d === void 0 ? void 0 : _d.toLowerCase()) ===
-                    FLIGHT_TICKET_VOIDED) {
-                    status = FLIGHT_TICKET_VOIDED;
+                    flightConstent_1.FLIGHT_BOOKING_VOID) {
+                    status = flightConstent_1.FLIGHT_BOOKING_VOID;
                 }
                 else if (((_g = (_f = (_e = response === null || response === void 0 ? void 0 : response.flightTickets) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.ticketStatusName) === null || _g === void 0 ? void 0 : _g.toLowerCase()) ===
-                    FLIGHT_TICKET_REFUNDED) {
-                    status = FLIGHT_TICKET_REFUNDED;
+                    flightConstent_1.FLIGHT_BOOKING_REFUNDED) {
+                    status = flightConstent_1.FLIGHT_BOOKING_REFUNDED;
                 }
                 else if (response === null || response === void 0 ? void 0 : response.isTicketed) {
-                    status = FLIGHT_TICKET_ISSUE;
+                    status = flightConstent_1.FLIGHT_TICKET_ISSUE;
                     //get ticket number
                     for (let i = 0; i < ((_h = response === null || response === void 0 ? void 0 : response.flightTickets) === null || _h === void 0 ? void 0 : _h.length); i++) {
                         ticket_number.push(response === null || response === void 0 ? void 0 : response.flightTickets[i].number);
@@ -1339,7 +1280,7 @@ class SabreFlightService extends abstract_service_1.default {
                     if ((response === null || response === void 0 ? void 0 : response.bookingId) &&
                         (response === null || response === void 0 ? void 0 : response.startDate) === undefined &&
                         (response === null || response === void 0 ? void 0 : response.endDate) === undefined) {
-                        status = FLIGHT_BOOKING_CANCEL;
+                        status = flightConstent_1.FLIGHT_BOOKING_CANCELLED;
                     }
                 }
                 //get last time of ticket issue
@@ -1365,49 +1306,6 @@ class SabreFlightService extends abstract_service_1.default {
                 refundable,
             };
         });
-    }
-    /////==================GRN UPDATE(END)=========================//////////////
-    /////////==================UTILS (START)=========================//////////
-    // Get legs desc
-    newGetLegsDesc(legItems, legDesc, OriginDest) {
-        const legsDesc = [];
-        for (const [index, leg_item] of legItems.entries()) {
-            const leg_id = leg_item.ref;
-            const legs = legDesc.find((legDecs) => legDecs.id === leg_id);
-            if (legs) {
-                const options = [];
-                const date = OriginDest[index].DepartureDateTime;
-                for (const option of legs.options) {
-                    const { departureDateAdjustment } = option, rest = __rest(option, ["departureDateAdjustment"]);
-                    let departure_date = new Date(date);
-                    if (departureDateAdjustment) {
-                        departure_date.setDate(departure_date.getDate() + Number(departureDateAdjustment));
-                    }
-                    let year = departure_date.getFullYear();
-                    let month = String(departure_date.getMonth() + 1).padStart(2, '0');
-                    let day = String(departure_date.getDate()).padStart(2, '0');
-                    const departureDate = `${year}-${month}-${day}`;
-                    const arrivalDate = new Date(departureDate);
-                    if (option.arrival.date_adjustment) {
-                        arrivalDate.setDate(arrivalDate.getDate() + option.arrival.date_adjustment);
-                    }
-                    const arrivalYear = arrivalDate.getFullYear();
-                    const arrivalMonth = String(arrivalDate.getMonth() + 1).padStart(2, '0');
-                    const arrivalDay = String(arrivalDate.getDate()).padStart(2, '0');
-                    const formattedArrivalDate = `${arrivalYear}-${arrivalMonth}-${arrivalDay}`;
-                    options.push(Object.assign(Object.assign({}, rest), { departure: Object.assign(Object.assign({}, option.departure), { date: departureDate }), arrival: Object.assign(Object.assign({}, option.arrival), { date: formattedArrivalDate }) }));
-                }
-                const layoverTime = this.getNewLayoverTime(options);
-                legsDesc.push({
-                    id: legs.id,
-                    stoppage: options.length - 1,
-                    elapsed_time: legs.elapsed_time,
-                    layover_time: layoverTime,
-                    options,
-                });
-            }
-        }
-        return legsDesc;
     }
 }
 exports.default = SabreFlightService;

@@ -59,12 +59,12 @@ export interface IInsertLastNoPayload {
     | 'User_Tour'
     | 'User_Umrah'
     | 'User_SupportTicket';
-  last_update: Date;
+  last_updated: Date;
 }
 
 export interface IUpdateLastNoPayload {
   last_id: number;
-  last_update: Date;
+  last_updated: Date;
 }
 
 export interface IGetLastIdParams {

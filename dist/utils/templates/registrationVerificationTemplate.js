@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registrationVerificationTemplate = void 0;
 const constants_1 = require("../miscellaneous/constants");
-const registrationVerificationTemplate = (agency_name, creds, verificationLink) => {
+const registrationVerificationTemplate = (agency_name, verificationLink) => {
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -46,33 +46,6 @@ const registrationVerificationTemplate = (agency_name, creds, verificationLink) 
                   style="display: block; width: 80px; margin-bottom: 10px;"
                 />
               </td>
-            </tr>
-              <tr>
-              <td align="center" style="padding: 0 20px 20px;">
-                <p
-                  style="
-                    font-size: 12px;
-                    color: #7c7b7b;
-                    margin: 0;
-                    line-height: 1.5;
-                  "
-                >
-                 <b>Agency Login:</b>
-                </p>
-                  <p
-                  style="
-                    font-size: 12px;
-                    color: #7c7b7b;
-                    margin: 0;
-                    line-height: 1.5;
-                  "
-                >
-                 <b>Username:</b> ${creds.username}
-                 <br/>
-                 <b>Password:</b> ${creds.pass}
-                </p>
-              </td>
-            </tr>
             <tr>
               <td align="center" style="padding: 0 20px;">
                 <!-- Heading -->
@@ -100,8 +73,7 @@ const registrationVerificationTemplate = (agency_name, creds, verificationLink) 
                 <!-- OTP -->
                 <div
                   style="
-                    font-size: 25px;
-                    font-weight: bold;
+                    font-size: 6px;
                     color: #0491e2;
                     margin: 20px 0;
                   "

@@ -1,4 +1,8 @@
-export const origin: string[] = ['http://localhost:3000','http://localhost:5000','http://10.10.220.47:5000'];
+export const origin: string[] = [
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://10.10.220.47:5000',
+];
 
 // OTP types constants
 export const OTP_TYPES = {
@@ -17,8 +21,11 @@ export const OTP_TYPES = {
 
 //Project Info
 export const PROJECT_NAME = 'Booking Expert V2';
-export const PROJECT_LOGO = 'https://ticket.trabill.biz/assets/logo.png';
-export const PROJECT_LINK = 'https://ticket.trabill.biz';
+export const PROJECT_LOGO =
+  'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_logo.png';
+export const PROJECT_ICON =
+  'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_icon.png';
+export const PROJECT_LINK = 'http://10.10.220.31:3000';
 export const PROJECT_EMAIL = 'sup.m360ict@gmail.com';
 export const PROJECT_NUMBER = '+8801958398339';
 export const PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';

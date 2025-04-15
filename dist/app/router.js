@@ -32,7 +32,7 @@ class RootRouter {
         // Auth Routes
         this.v2Router.use('/auth', this.authRootRouter.Router);
         // Agent Routes
-        this.v2Router.use('/agent', this.agentRootRouter.Router);
+        this.v2Router.use('/agent', this.authChecker.agencyUserAuthChecker, this.agentRootRouter.Router);
         // B2C Routes
         this.v2Router.use('/b2c', this.b2cRootRouter.Router);
         // Admin Routes

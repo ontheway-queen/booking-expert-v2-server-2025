@@ -8,6 +8,7 @@ import cron from 'node-cron';
 import CustomError from '../utils/lib/customError';
 import ErrorHandler from '../middleware/errorHandler/errorHandler';
 import RootRouter from './router';
+import PublicCommonService from '../features/public/services/publicCommon.service';
 
 class App {
   public app: Application = express();
@@ -36,7 +37,9 @@ class App {
   }
 
   //start server
-  public startServer() {
+  public async startServer() {
+    // const services = new PublicCommonService();
+    // await services.getSabreToken();
     this.server.listen(this.port, () => {
       console.log(
         `Booking Expert V2 OTA server has started successfully at port: ${this.port}...🚀`

@@ -27,10 +27,12 @@ export default class PublicEmailOTPService extends AbstractServices {
       const { email, type } = payload;
 
       let OTP_FOR = '';
+
       switch (type) {
         case OTP_TYPES.reset_admin:
           const userAdminModel = this.Model.AdminModel(trx);
           const check = await userAdminModel.checkUserAdmin({ email });
+
           if (!check) {
             return {
               success: false,
@@ -38,11 +40,14 @@ export default class PublicEmailOTPService extends AbstractServices {
               message: 'No user has been found with this email',
             };
           }
+
           OTP_FOR = 'reset password.';
+          break;
         case OTP_TYPES.reset_agent:
           const agencyUserModel = this.Model.AgencyUserModel(trx);
-          const checkAdmin = await agencyUserModel.checkUser({ email });
-          if (!checkAdmin) {
+          const checkAgent = await agencyUserModel.checkUser({ email });
+
+          if (!checkAgent) {
             return {
               success: false,
               code: this.StatusCode.HTTP_NOT_FOUND,
@@ -50,6 +55,8 @@ export default class PublicEmailOTPService extends AbstractServices {
             };
           }
           OTP_FOR = 'reset password.';
+          break;
+
         case OTP_TYPES.reset_b2c:
           const b2cUserModel = this.Model.B2CUserModel(trx);
           const checkUser = await b2cUserModel.checkUser({ email });
@@ -61,6 +68,8 @@ export default class PublicEmailOTPService extends AbstractServices {
             };
           }
           OTP_FOR = 'reset password.';
+          break;
+
         case OTP_TYPES.register_agent:
           const agencyUserModel2 = this.Model.AgencyUserModel(trx);
           const checkAdmin2 = await agencyUserModel2.checkUser({ email });
@@ -72,6 +81,8 @@ export default class PublicEmailOTPService extends AbstractServices {
             };
           }
           OTP_FOR = 'register as an agent.';
+          break;
+
         case OTP_TYPES.register_b2c:
           const b2cUserModel2 = this.Model.B2CUserModel(trx);
           const checkUser2 = await b2cUserModel2.checkUser({ email });
@@ -83,16 +94,25 @@ export default class PublicEmailOTPService extends AbstractServices {
             };
           }
           OTP_FOR = 'registration.';
+          break;
+
         case OTP_TYPES.verify_admin:
           OTP_FOR = 'admin login.';
+          break;
+
         case OTP_TYPES.verify_agent:
           OTP_FOR = 'agent login.';
+          break;
+
         case OTP_TYPES.verify_b2c:
           OTP_FOR = 'user login.';
+          break;
+
         default:
           break;
       }
 
+      console.log({ OTP_FOR });
       const commonModel = this.Model.CommonModel(trx);
       const checkOtp = await commonModel.getOTP({
         email: email,
@@ -203,22 +223,38 @@ export default class PublicEmailOTPService extends AbstractServices {
         switch (type) {
           case OTP_TYPES.reset_admin:
             secret = config.JWT_SECRET_ADMIN;
+            break;
+
           case OTP_TYPES.reset_agent:
             secret = config.JWT_SECRET_AGENT;
+            break;
+
           case OTP_TYPES.reset_b2c:
             secret = config.JWT_SECRET_USER;
+            break;
+
           case OTP_TYPES.register_agent:
             tokenValidity = '15m';
             secret = config.JWT_SECRET_AGENT;
+            break;
+
           case OTP_TYPES.register_b2c:
             tokenValidity = '15m';
             secret = config.JWT_SECRET_USER;
+            break;
+
           case OTP_TYPES.verify_admin:
             secret = config.JWT_SECRET_ADMIN;
+            break;
+
           case OTP_TYPES.verify_agent:
             secret = config.JWT_SECRET_AGENT;
+            break;
+
           case OTP_TYPES.verify_b2c:
             secret = config.JWT_SECRET_USER;
+            break;
+
           default:
             break;
         }

@@ -30,6 +30,8 @@ class AdminMarkupSetValidator {
             name: joi_1.default.string().optional(),
             status: joi_1.default.boolean().optional(),
             type: joi_1.default.string().valid('Flight', 'Hotel').required(),
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional()
         });
         this.updateCommissionSetSchema = joi_1.default.object({
             name: joi_1.default.string().optional(),

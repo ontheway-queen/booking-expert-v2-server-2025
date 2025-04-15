@@ -104,7 +104,7 @@ class CommonModel extends Schema {
   // Get airlines
   public async getAirlines(airlineCode: string) {
     const [airline] = await this.db('airlines')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .select('name', 'logo')
       .where((qb) => {
         if (airlineCode) {
@@ -126,7 +126,7 @@ class CommonModel extends Schema {
     const aircraft = await this.db
       .select('*')
       .from('aircraft')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .where('code', code);
 
     if (aircraft.length) {
@@ -141,7 +141,7 @@ class CommonModel extends Schema {
     const [airport] = await this.db
       .select('*')
       .from('airport')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .where('iata_code', airportCode);
 
     if (airport) {
@@ -156,7 +156,7 @@ class CommonModel extends Schema {
     const [city] = await this.db
       .select('name')
       .from('city_view')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .where('code', cityCode);
 
     return city?.name as string;
@@ -165,7 +165,7 @@ class CommonModel extends Schema {
   //get all country
   public async getAllCountry(payload: { id?: number; name?: string }) {
     return await this.db('country')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .select('id', 'name', 'iso', 'iso3', 'phone_code')
       .where((qb) => {
         if (payload.id) {
@@ -196,7 +196,7 @@ class CommonModel extends Schema {
   }) {
     // console.log({ city_id });
     return await this.db('city')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .select('id', 'name')
       .where((qb) => {
         if (country_id) {
@@ -222,14 +222,14 @@ class CommonModel extends Schema {
     code?: string;
   }) {
     return await this.db('city')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .insert(payload, 'id');
   }
 
   //insert airport
   public async insertAirport(payload: ICreateAirportPayload) {
     return await this.db('airport')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .insert(payload, 'id');
   }
 
@@ -245,7 +245,7 @@ class CommonModel extends Schema {
     total: boolean
   ) {
     const data = await this.db('airport as air')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .select(
         'air.id',
         'air.country_id',
@@ -284,7 +284,7 @@ class CommonModel extends Schema {
     let count: any[] = [];
     if (total) {
       count = await this.db('airport as air')
-        .withSchema(this.DBO_SCHEMA)
+        .withSchema(this.PUBLIC_SCHEMA)
         .count('air.id as total')
         .join('country as cou', 'cou.id', 'air.country_id')
         .where((qb) => {
@@ -304,7 +304,7 @@ class CommonModel extends Schema {
   //update airport
   public async updateAirport(payload: IUpdateAirportPayload, id: number) {
     return await this.db('airport')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .update(payload)
       .where({ id });
   }
@@ -312,7 +312,7 @@ class CommonModel extends Schema {
   //delete airport
   public async deleteAirport(id: number) {
     return await this.db('airport')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .delete()
       .where({ id });
   }
@@ -320,7 +320,7 @@ class CommonModel extends Schema {
   //insert airline
   public async insertAirline(payload: ICreateAirlinesPayload) {
     return await this.db('airlines')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .insert(payload, 'id');
   }
 
@@ -330,7 +330,7 @@ class CommonModel extends Schema {
     total: boolean
   ) {
     const data = await this.db('airlines as air')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .select('air.id', 'air.code', 'air.name', 'air.logo')
       .where((qb) => {
         if (params.code) {
@@ -351,7 +351,7 @@ class CommonModel extends Schema {
     let count: any[] = [];
     if (total) {
       count = await this.db('airlines as air')
-        .withSchema(this.DBO_SCHEMA)
+        .withSchema(this.PUBLIC_SCHEMA)
         .count('air.id as total')
         .where((qb) => {
           if (params.code) {
@@ -369,7 +369,7 @@ class CommonModel extends Schema {
   //update airlines
   public async updateAirlines(payload: IUpdateAirlinesPayload, id: number) {
     return await this.db('airlines')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .update(payload)
       .where({ id });
   }
@@ -377,7 +377,7 @@ class CommonModel extends Schema {
   //delete airlines
   public async deleteAirlines(id: number) {
     return await this.db('airlines')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .delete()
       .where({ id });
   }
@@ -386,7 +386,7 @@ class CommonModel extends Schema {
   public getAirlineDetails = async (airlineCode: string) => {
     const [airline] = await this.db
       .select('name as airline_name', 'logo as airline_logo')
-      .withSchema(this.DBO_SCHEMA)
+      .withSchema(this.PUBLIC_SCHEMA)
       .from('airlines')
       .where('code', airlineCode);
 

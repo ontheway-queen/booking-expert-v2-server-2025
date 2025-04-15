@@ -46,8 +46,12 @@ class App {
     }
     //start server
     startServer() {
-        this.server.listen(this.port, () => {
-            console.log(`Booking Expert V2 OTA server has started successfully at port: ${this.port}...🚀`);
+        return __awaiter(this, void 0, void 0, function* () {
+            // const services = new PublicCommonService();
+            // await services.getSabreToken();
+            this.server.listen(this.port, () => {
+                console.log(`Booking Expert V2 OTA server has started successfully at port: ${this.port}...🚀`);
+            });
         });
     }
     //init middleware

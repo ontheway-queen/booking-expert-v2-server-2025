@@ -13,8 +13,12 @@ class AuthAgentRouter extends abstract_router_1.default {
     }
     callRouter() {
         this.router.route('/login').post(this.controller.login);
-        this.router.route('/register').post(this.controller.register);
-        this.router.route('/register/complete');
+        this.router
+            .route('/register')
+            .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_USER), this.controller.register);
+        this.router
+            .route('/register/complete')
+            .post(this.controller.registerComplete);
         this.router.route('/login/2fa').post(this.controller.login2FA);
         this.router.route('/reset-password').post(this.controller.resetPassword);
     }

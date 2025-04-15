@@ -23,7 +23,7 @@ class CommonModel extends schema_1.default {
             const aircraft = yield this.db
                 .select('*')
                 .from('aircraft')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .where('code', code);
             if (aircraft.length) {
                 return aircraft[0];
@@ -36,7 +36,7 @@ class CommonModel extends schema_1.default {
         this.getAirlineDetails = (airlineCode) => __awaiter(this, void 0, void 0, function* () {
             const [airline] = yield this.db
                 .select('name as airline_name', 'logo as airline_logo')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .from('airlines')
                 .where('code', airlineCode);
             if (airline) {
@@ -134,7 +134,7 @@ class CommonModel extends schema_1.default {
     getAirlines(airlineCode) {
         return __awaiter(this, void 0, void 0, function* () {
             const [airline] = yield this.db('airlines')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .select('name', 'logo')
                 .where((qb) => {
                 if (airlineCode) {
@@ -158,7 +158,7 @@ class CommonModel extends schema_1.default {
             const [airport] = yield this.db
                 .select('*')
                 .from('airport')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .where('iata_code', airportCode);
             if (airport) {
                 return airport.name;
@@ -174,7 +174,7 @@ class CommonModel extends schema_1.default {
             const [city] = yield this.db
                 .select('name')
                 .from('city_view')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .where('code', cityCode);
             return city === null || city === void 0 ? void 0 : city.name;
         });
@@ -183,7 +183,7 @@ class CommonModel extends schema_1.default {
     getAllCountry(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('country')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .select('id', 'name', 'iso', 'iso3', 'phone_code')
                 .where((qb) => {
                 if (payload.id) {
@@ -201,7 +201,7 @@ class CommonModel extends schema_1.default {
         return __awaiter(this, arguments, void 0, function* ({ country_id, city_id, limit, skip, filter, name, }) {
             // console.log({ city_id });
             return yield this.db('city')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .select('id', 'name')
                 .where((qb) => {
                 if (country_id) {
@@ -223,7 +223,7 @@ class CommonModel extends schema_1.default {
     insertCity(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('city')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .insert(payload, 'id');
         });
     }
@@ -231,7 +231,7 @@ class CommonModel extends schema_1.default {
     insertAirport(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('airport')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .insert(payload, 'id');
         });
     }
@@ -240,7 +240,7 @@ class CommonModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const data = yield this.db('airport as air')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .select('air.id', 'air.country_id', 'cou.name as country', 'air.name', 'air.iata_code', 'ct.id as city_id', 'ct.name as city_name')
                 .join('country as cou', 'cou.id', 'air.country_id')
                 .leftJoin('city as ct', 'ct.id', 'air.city')
@@ -265,7 +265,7 @@ class CommonModel extends schema_1.default {
             let count = [];
             if (total) {
                 count = yield this.db('airport as air')
-                    .withSchema(this.DBO_SCHEMA)
+                    .withSchema(this.PUBLIC_SCHEMA)
                     .count('air.id as total')
                     .join('country as cou', 'cou.id', 'air.country_id')
                     .where((qb) => {
@@ -286,7 +286,7 @@ class CommonModel extends schema_1.default {
     updateAirport(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('airport')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .update(payload)
                 .where({ id });
         });
@@ -295,7 +295,7 @@ class CommonModel extends schema_1.default {
     deleteAirport(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('airport')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .delete()
                 .where({ id });
         });
@@ -304,7 +304,7 @@ class CommonModel extends schema_1.default {
     insertAirline(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('airlines')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .insert(payload, 'id');
         });
     }
@@ -313,7 +313,7 @@ class CommonModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const data = yield this.db('airlines as air')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .select('air.id', 'air.code', 'air.name', 'air.logo')
                 .where((qb) => {
                 if (params.code) {
@@ -334,7 +334,7 @@ class CommonModel extends schema_1.default {
             let count = [];
             if (total) {
                 count = yield this.db('airlines as air')
-                    .withSchema(this.DBO_SCHEMA)
+                    .withSchema(this.PUBLIC_SCHEMA)
                     .count('air.id as total')
                     .where((qb) => {
                     if (params.code) {
@@ -353,7 +353,7 @@ class CommonModel extends schema_1.default {
     updateAirlines(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('airlines')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .update(payload)
                 .where({ id });
         });
@@ -362,7 +362,7 @@ class CommonModel extends schema_1.default {
     deleteAirlines(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('airlines')
-                .withSchema(this.DBO_SCHEMA)
+                .withSchema(this.PUBLIC_SCHEMA)
                 .delete()
                 .where({ id });
         });

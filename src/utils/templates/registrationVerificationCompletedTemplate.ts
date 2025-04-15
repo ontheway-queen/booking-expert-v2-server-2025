@@ -1,15 +1,23 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendEmailOtpTemplate = void 0;
-const constants_1 = require("../miscellaneous/constants");
-const sendEmailOtpTemplate = (otp, otpFor) => {
-    return `
+import {
+  PROJECT_LINK,
+  PROJECT_LOGO,
+  PROJECT_NAME,
+} from '../miscellaneous/constants';
+
+export const registrationVerificationCompletedTemplate = (
+  agency_name: string,
+  creds: {
+    email: string;
+    password: string;
+  }
+) => {
+  return `
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Verification Code</title>
+    <title>Registration Completed - ${agency_name}</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: Arial, sans-serif;">
     <!-- Outer table to center the content -->
@@ -41,12 +49,11 @@ const sendEmailOtpTemplate = (otp, otpFor) => {
               <td align="center" style="padding: 20px;">
                 <!-- Logo -->
                 <img
-                  src="${constants_1.PROJECT_LOGO}"
-                  alt="${constants_1.PROJECT_NAME}"
+                  src="${PROJECT_LOGO}"
+                  alt="${PROJECT_NAME}"
                   style="display: block; width: 80px; margin-bottom: 10px;"
                 />
               </td>
-            </tr>
             <tr>
               <td align="center" style="padding: 0 20px;">
                 <!-- Heading -->
@@ -58,7 +65,33 @@ const sendEmailOtpTemplate = (otp, otpFor) => {
                     margin: 0 0 20px;
                   "
                 >
-                  Verification Code
+                              </tr>
+              <tr>
+              <td align="center" style="padding: 0 20px 20px;">
+                <p
+                  style="
+                    font-size: 12px;
+                    color: #7c7b7b;
+                    margin: 0;
+                    line-height: 1.5;
+                  "
+                >
+                 <b>Agency Login:</b>
+                </p>
+                  <p
+                  style="
+                    font-size: 12px;
+                    color: #7c7b7b;
+                    margin: 0;
+                    line-height: 1.5;
+                  "
+                >
+                 <b>Username:</b> ${creds.email}
+                 <br/>
+                 <b>Password:</b> ${creds.password}
+                </p>
+              </td>
+            </tr>
                 </h1>
                 <!-- Subtext -->
                 <p
@@ -69,18 +102,17 @@ const sendEmailOtpTemplate = (otp, otpFor) => {
                     line-height: 1.5;
                   "
                 >
-                  Use the following OTP to complete the procedure for ${otpFor}.
+                  Use the following link to login.
                 </p>
                 <!-- OTP -->
                 <div
                   style="
-                    font-size: 25px;
-                    font-weight: bold;
+                    font-size:11px;
                     color: #0491e2;
                     margin: 20px 0;
                   "
                 >
-                 ${otp}
+                 ${PROJECT_LINK}/login
                 </div>
               </td>
             </tr>
@@ -95,7 +127,7 @@ const sendEmailOtpTemplate = (otp, otpFor) => {
                     line-height: 1.5;
                   "
                 >
-                  Validity for this OTP is ${constants_1.OTP_DEFAULT_EXPIRY} minutes. Keep this code private.
+                  Validity for this link is 24 hour. Keep this link private.
                 </p>
               </td>
             </tr>
@@ -108,4 +140,3 @@ const sendEmailOtpTemplate = (otp, otpFor) => {
 </html>
     `;
 };
-exports.sendEmailOtpTemplate = sendEmailOtpTemplate;
