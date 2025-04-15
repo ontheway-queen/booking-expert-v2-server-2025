@@ -44,10 +44,6 @@ class PublicCommonService extends abstract_service_1.default {
                     .request(axiosConfig)
                     .then((response) => __awaiter(this, void 0, void 0, function* () {
                     const data = response.data;
-                    // const authModel = this.Model.authModel();
-                    // await authModel.updateEnv(SABRE_TOKEN_ENV, {
-                    //   value: data.access_token,
-                    // });
                 }))
                     .catch((error) => {
                     console.log(error);
@@ -56,6 +52,58 @@ class PublicCommonService extends abstract_service_1.default {
             catch (err) {
                 console.log(err);
             }
+        });
+    }
+    //get all country
+    getAllCountry(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { name } = req.query;
+            const model = this.Model.CommonModel();
+            const country_list = yield model.getCountry({ name });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: country_list,
+            };
+        });
+    }
+    //get all city
+    getAllCity(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.CommonModel();
+            const city_list = yield model.getCity(req.query);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: city_list,
+            };
+        });
+    }
+    //get all airport
+    getAllAirport(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.CommonModel();
+            const get_airport = yield model.getAirport(req.query);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: get_airport.data,
+            };
+        });
+    }
+    getAllAirlines(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.CommonModel();
+            const get_airlines = yield model.getAirlines(req.query, false);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: get_airlines.data,
+            };
         });
     }
 }
