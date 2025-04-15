@@ -8,10 +8,11 @@ export interface ITokenParseAgencyUser {
   agency_name: string;
   agency_email: string;
   user_id: number;
-  photo: string | undefined;
+  photo: string | null;
   user_email: string;
   username: string;
   name: string;
+  phone_number: string | null;
   is_main_user: boolean;
 }
 
@@ -21,6 +22,7 @@ export interface ITokenParseUser {
   name: string;
   photo: string | null;
   user_email: string;
+  phone_number: string | null;
 }
 
 export interface ITokenParseAdmin {
@@ -30,6 +32,7 @@ export interface ITokenParseAdmin {
   photo: string | null;
   user_email: string;
   is_main_user: boolean;
+  phone_number: string | null;
 }
 
 export interface ITokenParseAgencyB2CUser {
@@ -41,6 +44,7 @@ export interface ITokenParseAgencyB2CUser {
   user_email: string;
   username: string;
   name: string;
+  phone_number: string | null;
 }
 
 export interface IValidateAPIAgencyData {

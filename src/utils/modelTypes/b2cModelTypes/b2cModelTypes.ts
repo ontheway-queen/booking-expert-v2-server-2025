@@ -15,6 +15,7 @@ export interface IUpdateB2CUserPayload {
   password_hash?: string;
   phone_number?: string;
   photo?: string;
+  two_fa?: boolean;
 }
 
 export interface IGetB2CUserListQuery {
@@ -43,6 +44,7 @@ export interface IGetB2CSingleUser {
   status: boolean;
   photo?: string;
   created_at: string;
+  two_fa: boolean;
 }
 
 export interface ICheckB2CUserData {
@@ -55,4 +57,5 @@ export interface ICheckB2CUserData {
   gender: string;
   phone_number: string;
   photo: string;
+  two_fa: boolean;
 }

@@ -54,6 +54,7 @@ class AdminProfileService extends abstract_service_1.default {
                 user_email: user.email,
                 user_id: user.id,
                 username: user.username,
+                phone_number: user.phone_number,
             };
             const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
             let whiteLabelPermissions = {

@@ -345,6 +345,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_email,
         agency_name,
         is_main_user,
+        phone_number,
         photo,
       };
 
@@ -477,6 +478,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_id,
         agency_email,
         agency_name,
+        phone_number,
         is_main_user,
         photo,
       };

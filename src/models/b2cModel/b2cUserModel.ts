@@ -88,6 +88,7 @@ export default class B2CUserModel extends Schema {
         'status',
         'gender',
         'phone_number',
+        'two_fa',
         'created_at'
       )
       .where('id', id)
@@ -115,6 +116,7 @@ export default class B2CUserModel extends Schema {
         'username',
         'name',
         'email',
+        'two_fa',
         'status'
       )
       .where((qb) => {

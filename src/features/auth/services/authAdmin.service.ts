@@ -94,6 +94,7 @@ export default class AuthAdminService extends AbstractServices {
         user_email: email,
         name,
         is_main_user,
+        phone_number,
         photo,
       };
 
@@ -178,6 +179,7 @@ export default class AuthAdminService extends AbstractServices {
         user_email: email,
         name,
         is_main_user,
+        phone_number,
         photo,
       };
 

@@ -274,6 +274,7 @@ class AuthAgentService extends abstract_service_1.default {
                     agency_email,
                     agency_name,
                     is_main_user,
+                    phone_number,
                     photo,
                 };
                 const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
@@ -370,6 +371,7 @@ class AuthAgentService extends abstract_service_1.default {
                     agency_id,
                     agency_email,
                     agency_name,
+                    phone_number,
                     is_main_user,
                     photo,
                 };
