@@ -140,6 +140,7 @@ export default class AgencyUserModel extends Schema {
         'a.status AS agency_status',
         'a.agent_no',
         'a.email AS agency_email',
+        'a.phone AS agency_phone_number',
         'a.agency_name',
         'a.agency_logo',
         'a.allow_api',

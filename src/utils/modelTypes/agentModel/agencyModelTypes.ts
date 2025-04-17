@@ -85,6 +85,7 @@ export interface IGetSingleAgencyData {
   address: string;
   status: string;
   usable_loan: number;
+  balance: number;
   white_label: boolean;
   allow_api: boolean;
   flight_markup_set: string;

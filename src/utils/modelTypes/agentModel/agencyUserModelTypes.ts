@@ -51,6 +51,7 @@ export interface ICheckAgencyUserData {
   name: string;
   photo: string;
   phone_number: string;
+  agency_phone_number: string;
   username: string;
   hashed_password: string;
   agency_name: string;

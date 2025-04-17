@@ -171,7 +171,15 @@ class AgencyModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('agency AS ag')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.phone', 'ag.address', 'ag.status', 'ag.flight_markup_set', 'ag.hotel_markup_set', 'fm.name AS flight_markup_set_name', 'hm.name AS hotel_markup_set_name', 'ag.usable_loan', 'ag.white_label', 'ag.allow_api', 'ua.name AS created_by', 'uar.name AS referred_by')
+                .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.phone', 'ag.address', 'ag.status', 'ag.flight_markup_set', 'ag.hotel_markup_set', this.db.raw(`(
+  SELECT 
+    COALESCE(SUM(CASE WHEN al.type = 'Credit' THEN amount ELSE 0 END), 0) - 
+    COALESCE(SUM(CASE WHEN al.type = 'Debit' THEN amount ELSE 0 END), 0) 
+  AS balance 
+  FROM agent.agency_ledger as al
+  WHERE ag.id = al.agency_id
+) AS balance
+`), 'fm.name AS flight_markup_set_name', 'hm.name AS hotel_markup_set_name', 'ag.usable_loan', 'ag.white_label', 'ag.allow_api', 'ua.name AS created_by', 'uar.name AS referred_by')
                 .joinRaw('LEFT JOIN dbo.markup_set AS fm ON ag.flight_markup_set = fm.id')
                 .joinRaw('LEFT JOIN dbo.markup_set AS hm ON ag.hotel_markup_set = hm.id')
                 .joinRaw('LEFT JOIN admin.user_admin AS ua ON ag.created_by = ua.id')

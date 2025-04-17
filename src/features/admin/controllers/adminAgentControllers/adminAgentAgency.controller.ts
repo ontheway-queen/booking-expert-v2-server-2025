@@ -7,7 +7,7 @@ export default class AdminAgentAgencyController extends AbstractController {
     super();
   }
 
-  public insertDeposit = this.asyncWrapper.wrap(
+  public getAgency = this.asyncWrapper.wrap(
     null,
     async (req: Request, res: Response) => {
       res
