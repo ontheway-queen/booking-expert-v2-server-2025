@@ -50,6 +50,8 @@ export interface ICreateMarkupSetReqBody {
       markup_soto: number;
       markup_type: 'PER' | 'FLAT'; // PER, FLAT
       markup_mode: 'INCREASE' | 'DECREASE'; // INCREASE, DECREASE
+      booking_block?: boolean;
+      issue_block?: boolean;
     }[];
     update?: {
       id: 2;
@@ -61,6 +63,8 @@ export interface ICreateMarkupSetReqBody {
       markup_type?: 'PER' | 'FLAT'; // PER, FLAT
       markup_mode?: 'INCREASE' | 'DECREASE'; // INCREASE, DECREASE
       status?: false;
+      booking_block?: boolean;
+      issue_block?: boolean;
     }[];
     remove?: number[];
   }

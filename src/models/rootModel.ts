@@ -11,6 +11,11 @@ import FlightApiModel from './markupSetModel/flightApiModel';
 import MarkupSetFlightApiModel from './markupSetModel/markupSetFlightApiModel';
 import FlightMarkupsModel from './markupSetModel/flightMarkupsModel';
 import B2CMarkupConfigModel from './markupSetModel/b2cMarkupConfigModel';
+import FlightBookingModel from './flightModel/flightBookingModel';
+import FlightBookingPriceBreakdownModel from './flightModel/flightBookingPriceBreakdownModel';
+import FlightBookingSegmentModel from './flightModel/flightBookingSegmentModel';
+import FlightBookingTrackingModel from './flightModel/flightBookingTrackingModel';
+import FlightBookingTravelerModel from './flightModel/flightBookingTravelerModel';
 
 export default class Models {
   //Common model
@@ -66,5 +71,30 @@ export default class Models {
   //B2C Markup Config Model
   public B2CMarkupConfigModel(trx?: Knex.Transaction) {
     return new B2CMarkupConfigModel(trx || db);
+  }
+
+  //Flight booking Model
+  public FlightBookingModel(trx?: Knex.Transaction) {
+    return new FlightBookingModel(trx || db);
+  }
+
+  //Flight Booking Price Breakdown Model
+  public FlightBookingPriceBreakdownModel(trx?: Knex.Transaction) {
+    return new FlightBookingPriceBreakdownModel(trx || db);
+  }
+
+  //Flight booking segment Model
+  public FlightBookingSegmentModel(trx?: Knex.Transaction) {
+    return new FlightBookingSegmentModel(trx || db);
+  }
+
+  //Flight Booking Tracking Model
+  public FlightBookingTrackingModel(trx?: Knex.Transaction) {
+    return new FlightBookingTrackingModel(trx || db);
+  }
+
+  //Flight booking traveler Model
+  public FlightBookingTravelerModel(trx?: Knex.Transaction) {
+    return new FlightBookingTravelerModel(trx || db);
   }
 }

@@ -294,7 +294,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 if (add) {
                     const addPayload = [];
                     for (const addItem of add) {
-                        const { airlines, markup_domestic, markup_from_dac, markup_to_dac, markup_soto, markup_mode, markup_type } = addItem;
+                        const { airlines, markup_domestic, markup_from_dac, markup_to_dac, markup_soto, markup_mode, markup_type, booking_block, issue_block } = addItem;
                         for (const airline of airlines) {
                             //check if airline already exists
                             const existingRecord = yield flightMarkupsModel.getAllFlightMarkups({
@@ -310,7 +310,9 @@ class AdminMarkupSetService extends abstract_service_1.default {
                                     markup_to_dac,
                                     markup_type,
                                     updated_by: user_id,
-                                    updated_at: new Date()
+                                    updated_at: new Date(),
+                                    booking_block,
+                                    issue_block
                                 }, existingRecord.data[0].key);
                             }
                             else {
@@ -322,6 +324,8 @@ class AdminMarkupSetService extends abstract_service_1.default {
                                     markup_soto,
                                     markup_to_dac,
                                     markup_type,
+                                    booking_block,
+                                    issue_block,
                                     created_by: user_id,
                                     markup_set_flight_api_id: setFlightApiData[0].id
                                 });
@@ -342,7 +346,6 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 }
                 //remove existing markup of airlines
                 if (remove) {
-                    console.log({ remove });
                     yield flightMarkupsModel.deleteFlightMarkups(remove);
                 }
                 return {

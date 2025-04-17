@@ -1,0 +1,266 @@
+import { Knex } from 'knex';
+import { TDB } from '../../features/public/utils/types/publicCommon.types';
+import { BOOKING_SOURCE_AGENT, BOOKING_SOURCE_AGENT_B2C, BOOKING_SOURCE_B2C, BOOKING_SOURCE_EXTERNAL, BOOKING_SOURCE_SUB_AGENT } from '../../utils/miscellaneous/flightConstent';
+import Schema from '../../utils/miscellaneous/schema';
+import { IFlightBookingCheckPayload, IGetFlightBookingList, IGetFlightBookingListFilterQuery, IGetSingleFlightBookingData, IInsertFlightBookingPayload, IUpdateFlightBookingPayload } from '../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
+
+
+export default class FlightBookingModel extends Schema {
+    private db: TDB;
+
+    constructor(db: TDB) {
+        super();
+        this.db = db;
+    }
+
+    public async insertFlightBooking(payload: IInsertFlightBookingPayload): Promise<{ id: number }[]> {
+        return await this.db("flight_booking")
+            .withSchema(this.DBO_SCHEMA)
+            .insert(payload, 'id');
+    }
+
+    public async getFlightBookingList(
+        query: IGetFlightBookingListFilterQuery,
+        is_total: boolean = false
+    ): Promise<{ data: IGetFlightBookingList[]; total?: number }> {
+        const data = await this.db("flight_booking as fb")
+            .withSchema(this.DBO_SCHEMA)
+            .leftJoin("agent.agency as ag", function () {
+                this.on("fb.source_id", "=", "ag.id").andOnVal("fb.source_type", "in", [BOOKING_SOURCE_AGENT, BOOKING_SOURCE_SUB_AGENT, BOOKING_SOURCE_AGENT_B2C]);
+            })
+            .leftJoin("b2c.users as b2c", function () {
+                this.on("fb.created_by", "=", "b2c.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_B2C);
+            })
+            .leftJoin("external.external as ex", function () {
+                this.on("fb.source_id", "=", "ex.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_EXTERNAL);
+            })
+            .select(
+                "fb.id",
+                "fb.booking_ref",
+                "fb.source_type",
+                "fb.source_id",
+                this.db.raw(`
+      CASE 
+        WHEN fb.source_type IN (${BOOKING_SOURCE_AGENT}, ${BOOKING_SOURCE_SUB_AGENT}, ${BOOKING_SOURCE_AGENT_B2C}) THEN ag.agency_name
+        WHEN fb.source_type = ${BOOKING_SOURCE_B2C} THEN b2c.name
+        WHEN fb.source_type = ${BOOKING_SOURCE_EXTERNAL} THEN ex.name
+        ELSE NULL
+      END AS source_name
+    `),
+                "fb.api",
+                "fb.created_at",
+                "fb.travel_date",
+                "fb.gds_pnr",
+                "fb.journey_type",
+                "fb.total_passenger",
+                "fb.status",
+                "fb.payable_amount",
+                "fb.route"
+            )
+            .where((qb) => {
+                if (query.status) {
+                    qb.andWhere("fb.status", query.status);
+                }
+                if (query.from_date && query.to_date) {
+                    qb.andWhereBetween("fb.created_at", [query.from_date, query.to_date]);
+                }
+                if (query.filter) {
+                    qb.andWhere((qbc) => {
+                        qbc.whereILike("fb.booking_ref", `${query.filter}%`)
+                        qbc.orWhereILike("fb.gds_pnr", `${query.filter}`)
+                    });
+                }
+                if (query.source_id) {
+                    qb.andWhere("fb.source_id", query.source_id);
+                }
+            })
+            .orderBy("fb.id", "desc")
+            .limit(query.limit || 100)
+            .offset(query.skip || 0);
+
+        let total: any[] = [];
+        if (is_total) {
+            total = await this.db("flight_booking as fb")
+                .withSchema(this.DBO_SCHEMA)
+
+                .count(
+                    "fb.id as total"
+                )
+                .where((qb) => {
+                    if (query.status) {
+                        qb.andWhere("fb.status", query.status);
+                    }
+                    if (query.from_date && query.to_date) {
+                        qb.andWhereBetween("fb.created_at", [query.from_date, query.to_date]);
+                    }
+                    if (query.filter) {
+                        qb.andWhere((qbc) => {
+                            qbc.whereILike("fb.booking_ref", `${query.filter}%`)
+                            qbc.orWhereILike("fb.gds_pnr", `${query.filter}`)
+                        });
+                    }
+                    if (query.source_id) {
+                        qb.andWhere("fb.source_id", query.source_id);
+                    }
+                });
+        }
+
+        return {
+            data,
+            total: total[0]?.total
+        }
+    }
+
+    public async getSingleFlightBooking(id: number): Promise<IGetSingleFlightBookingData> {
+        return await this.db("flight_booking as fb")
+            .withSchema(this.DBO_SCHEMA)
+            .leftJoin("agent.agency as ag", function () {
+                this.on("fb.source_id", "=", "ag.id").andOnVal("fb.source_type", "in", [BOOKING_SOURCE_AGENT, BOOKING_SOURCE_SUB_AGENT, BOOKING_SOURCE_AGENT_B2C]);
+            })
+            .leftJoin("b2c.users as b2c", function () {
+                this.on("fb.created_by", "=", "b2c.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_B2C);
+            })
+            .leftJoin("external.external as ex", function () {
+                this.on("fb.source_id", "=", "ex.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_EXTERNAL);
+            })
+            .leftJoin("agent.agency_user as agu", function () {
+                this.on("fb.created_by_user_id", "=", "agu.id").andOnVal("fb.source_type", "in", [BOOKING_SOURCE_AGENT, BOOKING_SOURCE_SUB_AGENT]);
+            })
+            .leftJoin("agent_b2c.users as ab", function () {
+                this.on("fb.created_by_user_id", "=", "ab.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_AGENT_B2C);
+            })
+            .leftJoin("b2c.users as b2c2", function () {
+                this.on("fb.created_by_user_id", "=", "b2c2.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_B2C);
+            })
+            .leftJoin("external.external_user as eu", function () {
+                this.on("fb.created_by_user_id", "=", "eu.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_EXTERNAL);
+            })
+            .select(
+                "fb.id",
+                "fb.booking_ref",
+                "fb.source_type",
+                "fb.source_id",
+                this.db.raw(`
+      CASE 
+        WHEN fb.source_type IN (${BOOKING_SOURCE_AGENT}, ${BOOKING_SOURCE_SUB_AGENT}, ${BOOKING_SOURCE_AGENT_B2C}) THEN ag.agency_name
+        WHEN fb.source_type = ${BOOKING_SOURCE_B2C} THEN b2c.name
+        WHEN fb.source_type = ${BOOKING_SOURCE_EXTERNAL} THEN ex.name
+        ELSE NULL
+      END AS source_name
+    `),
+                this.db.raw(`
+        CASE 
+          WHEN fb.source_type IN (${BOOKING_SOURCE_AGENT}, ${BOOKING_SOURCE_SUB_AGENT}) THEN agu.name
+          WHEN fb.source_type = ${BOOKING_SOURCE_AGENT_B2C} THEN ab.name
+          WHEN fb.source_type = ${BOOKING_SOURCE_B2C} THEN b2c2.name
+          WHEN fb.source_type = ${BOOKING_SOURCE_EXTERNAL} THEN eu.name
+          ELSE NULL
+        END AS created_by
+      `),
+
+                "fb.api",
+                "fb.created_at",
+                "fb.travel_date",
+                "fb.gds_pnr",
+                "fb.journey_type",
+                "fb.total_passenger",
+                "fb.status",
+                "fb.payable_amount",
+                "fb.source_id",
+                "fb.base_fare",
+                "fb.tax",
+                "fb.ait",
+                "fb.ticket_price",
+                "fb.markup_price",
+                "fb.markup_type",
+                "fb.agent_markup",
+                "fb.refundable",
+                "fb.api_booking_ref",
+                "fb.route",
+                "fb.ticket_issue_last_time",
+                "fb.airline_pnr",
+                "fb.cancelled_at",
+                "fb.issued_at"
+            )
+            .where((qb) => {
+                qb.andWhere("fb.id", id);
+            })
+            .first();
+    }
+
+    public async updateFlightBooking(payload: IUpdateFlightBookingPayload, id: number) {
+        return await this.db("flight_booking")
+            .withSchema(this.DBO_SCHEMA)
+            .update(payload)
+            .where({ id });
+    }
+
+    public async checkFlightBooking(payload: IFlightBookingCheckPayload): Promise<number> {
+        // Start building the query
+        const db = this.db; // Store this.db in a variable
+        const query = db("flight_booking as fb")
+            .withSchema(this.DBO_SCHEMA)
+            .join("flight_segment as fs", "fs.flight_booking_id", "fb.id")
+            .join("flight_booking_traveler as fbt", "fbt.flight_booking_id", "fb.id")
+            .countDistinct("fb.id as total")
+            .where({
+                "fb.route": payload.route,
+                "fs.departure_date": payload.departure_date,
+                "fs.flight_number": payload.flight_number
+            });
+    
+        // Handle status filter (single or array)
+        if (Array.isArray(payload.status)) {
+            query.whereIn("fb.status", payload.status);
+        } else {
+            query.where("fb.status", payload.status);
+        }
+    
+        // Build passenger matching conditions
+        query.andWhere(function() {
+            const passengerConditions = this.where(false); // Start with false to use OR later
+            
+            payload.passengers.forEach(passenger => {
+                const passengerQuery = {
+                    "fbt.first_name": passenger.first_name,
+                    "fbt.last_name": passenger.last_name
+                };
+    
+                // Add optional identifier matches
+                const identifierConditions: Readonly<Partial<Knex.MaybeRawRecord<any>>> | any[] = [];
+                if (passenger.passport) {
+                    identifierConditions.push(
+                        db.raw("(fbt.passport_number IS NOT NULL AND fbt.passport_number = ?)", 
+                        [passenger.passport])
+                    );
+                }
+                if (passenger.email) {
+                    identifierConditions.push(
+                        db.raw("(fbt.email IS NOT NULL AND fbt.email = ?)", 
+                        [passenger.email])
+                    );
+                }
+                if (passenger.phone) {
+                    identifierConditions.push(
+                        db.raw("(fbt.phone IS NOT NULL AND fbt.phone = ?)", 
+                        [passenger.phone])
+                    );
+                }
+    
+                // Combine conditions for this passenger
+                passengerConditions.orWhere(function() {
+                    this.where(passengerQuery);
+                    if (identifierConditions.length > 0) {
+                        this.andWhere(function() {
+                            this.orWhere(identifierConditions);
+                        });
+                    }
+                });
+            });
+        });
+    
+        // Execute and return count
+        const result = await query.first();
+        return Number(result?.total ?? 0);
+    }
+}

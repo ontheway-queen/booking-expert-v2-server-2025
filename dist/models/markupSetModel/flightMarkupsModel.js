@@ -30,7 +30,7 @@ class FlightMarkupsModel extends schema_1.default {
             var _a;
             const data = yield this.db('flight_markups as fm')
                 .withSchema(this.DBO_SCHEMA)
-                .select('fm.id as key', 'fm.airline', 'airlines.name AS airline_name', 'airlines.logo AS airline_logo', 'fm.markup_domestic', 'fm.markup_from_dac', 'fm.markup_to_dac', 'fm.markup_soto', 'fm.markup_type', 'fm.markup_mode', 'fm.status', 'cad.name AS created_by', 'uad.name AS updated_by', 'fm.updated_at as last_updated_at', 'fa.api_name', 'fa.api_logo')
+                .select('fm.id as key', 'fm.airline', 'airlines.name AS airline_name', 'airlines.logo AS airline_logo', 'fm.markup_domestic', 'fm.markup_from_dac', 'fm.markup_to_dac', 'fm.markup_soto', 'fm.markup_type', 'fm.markup_mode', 'fm.status', 'fm.booking_block', 'fm.issue_block', 'cad.name AS created_by', 'uad.name AS updated_by', 'fm.updated_at as last_updated_at', 'fa.api_name', 'fa.api_logo')
                 .joinRaw('left join ?? on ?? = ??', [
                 `${this.ADMIN_SCHEMA}.user_admin AS cad`,
                 'fm.created_by',

@@ -61,6 +61,18 @@ class PublicCommonValidator {
             limit: joi_1.default.number(),
             skip: joi_1.default.number(),
         });
+        // get country
+        this.getCountry = joi_1.default.object({
+            name: joi_1.default.string().optional(),
+        });
+        // get city
+        this.getCity = joi_1.default.object({
+            name: joi_1.default.string().optional(),
+            country_id: joi_1.default.number().optional(),
+            city_id: joi_1.default.number().optional(),
+            limit: joi_1.default.number(),
+            skip: joi_1.default.number(),
+        });
     }
     // multiple params number validator
     multipleParamsNumValidator(fields) {

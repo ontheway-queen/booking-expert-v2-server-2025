@@ -31,4 +31,10 @@ ResMsg.USER_WITH_EXIST_WITH_EMAIL = 'User already exist with this email';
 // Login
 ResMsg.LOGIN_SUCCESSFUL = 'You are now logged in';
 ResMsg.UNABLE_FOR_STATUS = 'Unable to complete your request for application status reason';
+//booking
+ResMsg.BOOKING_PRICE_CHANGED = 'The booking price has been updated. Please confirm to proceed';
+ResMsg.DUPLICATE_BOOKING = "This flight is already booked with the same passenger information";
+ResMsg.BOOKING_CANCELLED_MORE_THAN_TWO_TIMES = "Booking has been cancelled 2 times with the same information";
+ResMsg.SET_FLIGHT_API_ID_NOT_FOUND = "Set flight api id not found";
+ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP = "Airline data not found for the markup set";
 exports.default = ResMsg;

@@ -18,37 +18,6 @@ const schema_1 = __importDefault(require("../../utils/miscellaneous/schema"));
 class CommonModel extends schema_1.default {
     constructor(db) {
         super();
-        // Aircraft details by code
-        this.getAircraft = (code) => __awaiter(this, void 0, void 0, function* () {
-            const aircraft = yield this.db
-                .select('*')
-                .from('aircraft')
-                .withSchema(this.PUBLIC_SCHEMA)
-                .where('code', code);
-            if (aircraft.length) {
-                return aircraft[0];
-            }
-            else {
-                return { code: code, name: 'Not available' };
-            }
-        });
-        // AIRLINE DETAILS BY AIRLINE CODE
-        this.getAirlineDetails = (airlineCode) => __awaiter(this, void 0, void 0, function* () {
-            const [airline] = yield this.db
-                .select('name as airline_name', 'logo as airline_logo')
-                .withSchema(this.PUBLIC_SCHEMA)
-                .from('airlines')
-                .where('code', airlineCode);
-            if (airline) {
-                return airline;
-            }
-            else {
-                return {
-                    airline_name: 'Not available',
-                    airline_logo: 'Not available',
-                };
-            }
-        });
         this.db = db;
     }
     // get otp
@@ -131,7 +100,7 @@ class CommonModel extends schema_1.default {
         });
     }
     // Get airlines
-    getAirlines(airlineCode) {
+    getAirlineByCode(airlineCode) {
         return __awaiter(this, void 0, void 0, function* () {
             const [airline] = yield this.db('airlines')
                 .withSchema(this.PUBLIC_SCHEMA)
@@ -152,35 +121,24 @@ class CommonModel extends schema_1.default {
             }
         });
     }
-    // get airport
-    getAirport(airportCode) {
+    // Aircraft details by code
+    getAircraft(code) {
         return __awaiter(this, void 0, void 0, function* () {
-            const [airport] = yield this.db
+            const aircraft = yield this.db
                 .select('*')
-                .from('airport')
+                .from('aircraft')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .where('iata_code', airportCode);
-            if (airport) {
-                return airport.name;
+                .where('code', code);
+            if (aircraft.length) {
+                return aircraft[0];
             }
             else {
-                return 'Not available';
+                return { code: code, name: 'Not available' };
             }
-        });
-    }
-    // get city
-    getCity(cityCode) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const [city] = yield this.db
-                .select('name')
-                .from('city_view')
-                .withSchema(this.PUBLIC_SCHEMA)
-                .where('code', cityCode);
-            return city === null || city === void 0 ? void 0 : city.name;
         });
     }
     //get all country
-    getAllCountry(payload) {
+    getCountry(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('country')
                 .withSchema(this.PUBLIC_SCHEMA)
@@ -197,24 +155,27 @@ class CommonModel extends schema_1.default {
         });
     }
     //get all city
-    getAllCity(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ country_id, city_id, limit, skip, filter, name, }) {
-            // console.log({ city_id });
-            return yield this.db('city')
+    getCity(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ country_id, city_id, limit, skip, name, code }) {
+            return yield this.db('city AS c')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .select('id', 'name')
+                .select('c.id', 'c.name', 'co.name AS country_name')
+                .leftJoin('country AS co', 'c.country_id', 'co.id')
                 .where((qb) => {
                 if (country_id) {
-                    qb.where({ country_id });
+                    qb.andWhere('c.country_id', country_id);
                 }
                 if (name) {
-                    qb.andWhere('name', 'ilike', `%${name}%`);
+                    qb.andWhere('c.name', 'ilike', `%${name}%`);
+                }
+                if (code) {
+                    qb.andWhere('c.code', code);
                 }
                 if (city_id) {
-                    qb.andWhere('id', city_id);
+                    qb.andWhere('c.id', city_id);
                 }
             })
-                .orderBy('id', 'asc')
+                .orderBy('c.name', 'asc')
                 .limit(limit || 100)
                 .offset(skip || 0);
         });
@@ -236,8 +197,8 @@ class CommonModel extends schema_1.default {
         });
     }
     //get all airport
-    getAllAirport(params, total) {
-        return __awaiter(this, void 0, void 0, function* () {
+    getAirport(params_1) {
+        return __awaiter(this, arguments, void 0, function* (params, total = false) {
             var _a;
             const data = yield this.db('airport as air')
                 .withSchema(this.PUBLIC_SCHEMA)
@@ -309,7 +270,7 @@ class CommonModel extends schema_1.default {
         });
     }
     //get all airlines
-    getAllAirline(params, total) {
+    getAirlines(params, total) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const data = yield this.db('airlines as air')

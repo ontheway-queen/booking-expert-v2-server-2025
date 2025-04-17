@@ -19,6 +19,8 @@ const uuid_1 = require("uuid");
 const redis_1 = require("../../../app/redis");
 const sabreFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service"));
 const commonFlightSupport_service_1 = require("../../../utils/supportServices/flightSupportServices/commonFlightSupport.service");
+const flightUtils_1 = __importDefault(require("../../../utils/lib/flight/flightUtils"));
+const commonFlightBookingSupport_service_1 = require("../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service");
 class AgentFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -233,6 +235,7 @@ class AgentFlightService extends abstract_service_1.default {
                     markup_set_id: agency_details.flight_markup_set
                 });
                 if (data) {
+                    yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
                     return {
                         success: true,
                         message: "Ticket has been revalidated successfully!",
@@ -245,6 +248,91 @@ class AgentFlightService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                     code: this.StatusCode.HTTP_NOT_FOUND,
                 };
+            }));
+        });
+    }
+    flightBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id, user_id, user_email, name } = req.agencyUser;
+                const body = req.body;
+                const booking_confirm = req.query.booking_confirm;
+                //get flight markup set id
+                const agencyModel = this.Model.AgencyModel(trx);
+                const agency_details = yield agencyModel.checkAgency({ agency_id });
+                if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'No commission set has been found for the agency',
+                    };
+                }
+                //revalidate
+                const flightSupportService = new commonFlightSupport_service_1.CommonFlightSupportService(trx);
+                const data = yield flightSupportService.FlightRevalidate({
+                    search_id: body.search_id,
+                    flight_id: body.flight_id,
+                    markup_set_id: agency_details.flight_markup_set
+                });
+                if (!data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                //if price has been changed and no confirmation of booking then return
+                if (!booking_confirm) {
+                    const price_changed = yield flightSupportService.checkBookingPriceChange({ flight_id: body.flight_id, booking_price: data.fare.total_price });
+                    if (price_changed) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_CONFLICT,
+                            message: this.ResMsg.BOOKING_PRICE_CHANGED
+                        };
+                    }
+                }
+                //check eligibility of the booking
+                const bookingSupportService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
+                const checkEligibilityOfBooking = yield bookingSupportService.checkEligibilityOfBooking({
+                    route: new flightUtils_1.default().getRouteOfFlight(data.leg_description),
+                    departure_date: data.flights[0].options[0].departure.date,
+                    flight_number: `${data.flights[0].options[0].carrier.carrier_marketing_flight_number}`,
+                    domestic_flight: data.domestic_flight,
+                    passenger: body.passengers
+                });
+                if (!checkEligibilityOfBooking.success) {
+                    return checkEligibilityOfBooking;
+                }
+                //check if the booking is block
+                const directBookingPermission = yield bookingSupportService.checkDirectFlightBookingPermission({
+                    markup_set_id: agency_details.flight_markup_set,
+                    api_name: data.api,
+                    airline: data.carrier_code
+                });
+                if (directBookingPermission.success === false) {
+                    return directBookingPermission;
+                }
+                //if booking is blocked
+                let airline_pnr = null;
+                let refundable = data.refundable;
+                let gds_pnr = null;
+                if (directBookingPermission.booking_block === false) {
+                    if (data.api === flightConstent_1.SABRE_API) {
+                        const sabreSubService = new sabreFlightSupport_service_1.default(trx);
+                        gds_pnr = yield sabreSubService.FlightBookingService({
+                            body,
+                            user_info: { id: user_id, name, email: user_email, phone: "" },
+                            revalidate_data: data
+                        });
+                        //get airline pnr, refundable status
+                        const grnData = yield sabreSubService.GRNUpdate({
+                            pnr: String(gds_pnr),
+                        });
+                        airline_pnr = grnData.airline_pnr;
+                        refundable = grnData.refundable;
+                    }
+                }
             }));
         });
     }

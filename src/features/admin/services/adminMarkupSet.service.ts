@@ -337,7 +337,9 @@ export class AdminMarkupSetService extends AbstractServices {
                         markup_to_dac,
                         markup_soto,
                         markup_mode,
-                        markup_type
+                        markup_type,
+                        booking_block,
+                        issue_block
                     } = addItem;
 
                     for (const airline of airlines) {
@@ -356,7 +358,9 @@ export class AdminMarkupSetService extends AbstractServices {
                                 markup_to_dac,
                                 markup_type,
                                 updated_by: user_id,
-                                updated_at: new Date()
+                                updated_at: new Date(),
+                                booking_block,
+                                issue_block
                             }, existingRecord.data[0].key,);
                         } else {
                             addPayload.push({
@@ -367,6 +371,8 @@ export class AdminMarkupSetService extends AbstractServices {
                                 markup_soto,
                                 markup_to_dac,
                                 markup_type,
+                                booking_block,
+                                issue_block,
                                 created_by: user_id,
                                 markup_set_flight_api_id: setFlightApiData[0].id
                             });
@@ -394,7 +400,6 @@ export class AdminMarkupSetService extends AbstractServices {
 
             //remove existing markup of airlines
             if (remove) {
-                console.log({ remove });
                 await flightMarkupsModel.deleteFlightMarkups(remove);
             }
 

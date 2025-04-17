@@ -15,6 +15,11 @@ const flightApiModel_1 = __importDefault(require("./markupSetModel/flightApiMode
 const markupSetFlightApiModel_1 = __importDefault(require("./markupSetModel/markupSetFlightApiModel"));
 const flightMarkupsModel_1 = __importDefault(require("./markupSetModel/flightMarkupsModel"));
 const b2cMarkupConfigModel_1 = __importDefault(require("./markupSetModel/b2cMarkupConfigModel"));
+const flightBookingModel_1 = __importDefault(require("./flightModel/flightBookingModel"));
+const flightBookingPriceBreakdownModel_1 = __importDefault(require("./flightModel/flightBookingPriceBreakdownModel"));
+const flightBookingSegmentModel_1 = __importDefault(require("./flightModel/flightBookingSegmentModel"));
+const flightBookingTrackingModel_1 = __importDefault(require("./flightModel/flightBookingTrackingModel"));
+const flightBookingTravelerModel_1 = __importDefault(require("./flightModel/flightBookingTravelerModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -59,6 +64,26 @@ class Models {
     //B2C Markup Config Model
     B2CMarkupConfigModel(trx) {
         return new b2cMarkupConfigModel_1.default(trx || database_1.db);
+    }
+    //Flight booking Model
+    FlightBookingModel(trx) {
+        return new flightBookingModel_1.default(trx || database_1.db);
+    }
+    //Flight Booking Price Breakdown Model
+    FlightBookingPriceBreakdownModel(trx) {
+        return new flightBookingPriceBreakdownModel_1.default(trx || database_1.db);
+    }
+    //Flight booking segment Model
+    FlightBookingSegmentModel(trx) {
+        return new flightBookingSegmentModel_1.default(trx || database_1.db);
+    }
+    //Flight Booking Tracking Model
+    FlightBookingTrackingModel(trx) {
+        return new flightBookingTrackingModel_1.default(trx || database_1.db);
+    }
+    //Flight booking traveler Model
+    FlightBookingTravelerModel(trx) {
+        return new flightBookingTravelerModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

@@ -102,7 +102,7 @@ class CommonModel extends Schema {
   }
 
   // Get airlines
-  public async getAirlines(airlineCode: string) {
+  public async getAirlineByCode(airlineCode: string) {
     const [airline] = await this.db('airlines')
       .withSchema(this.PUBLIC_SCHEMA)
       .select('name', 'logo')
@@ -122,7 +122,7 @@ class CommonModel extends Schema {
   }
 
   // Aircraft details by code
-  public getAircraft = async (code: string) => {
+  public async getAircraft(code: string) {
     const aircraft = await this.db
       .select('*')
       .from('aircraft')
@@ -134,36 +134,10 @@ class CommonModel extends Schema {
     } else {
       return { code: code, name: 'Not available' };
     }
-  };
-
-  // get airport
-  public async getAirport(airportCode: string) {
-    const [airport] = await this.db
-      .select('*')
-      .from('airport')
-      .withSchema(this.PUBLIC_SCHEMA)
-      .where('iata_code', airportCode);
-
-    if (airport) {
-      return airport.name;
-    } else {
-      return 'Not available';
-    }
-  }
-
-  // get city
-  public async getCity(cityCode: string) {
-    const [city] = await this.db
-      .select('name')
-      .from('city_view')
-      .withSchema(this.PUBLIC_SCHEMA)
-      .where('code', cityCode);
-
-    return city?.name as string;
   }
 
   //get all country
-  public async getAllCountry(payload: { id?: number; name?: string }) {
+  public async getCountry(payload: { id?: number; name?: string }) {
     return await this.db('country')
       .withSchema(this.PUBLIC_SCHEMA)
       .select('id', 'name', 'iso', 'iso3', 'phone_code')
@@ -179,38 +153,40 @@ class CommonModel extends Schema {
   }
 
   //get all city
-  public async getAllCity({
+  public async getCity({
     country_id,
     city_id,
     limit,
     skip,
-    filter,
     name,
+    code
   }: {
     country_id?: number;
     city_id?: number;
     limit?: number;
     skip?: number;
-    filter?: string;
     name?: string;
+    code?: string;
   }) {
-    // console.log({ city_id });
-    return await this.db('city')
+    return await this.db('city AS c')
       .withSchema(this.PUBLIC_SCHEMA)
-      .select('id', 'name')
+      .select('c.id', 'c.name', 'co.name AS country_name')
+      .leftJoin('country AS co', 'c.country_id', 'co.id')
       .where((qb) => {
         if (country_id) {
-          qb.where({ country_id });
+          qb.andWhere('c.country_id', country_id);
         }
         if (name) {
-          qb.andWhere('name', 'ilike', `%${name}%`);
+          qb.andWhere('c.name', 'ilike', `%${name}%`);
         }
-
+        if (code) {
+          qb.andWhere('c.code', code);
+        }
         if (city_id) {
-          qb.andWhere('id', city_id);
+          qb.andWhere('c.id', city_id);
         }
       })
-      .orderBy('id', 'asc')
+      .orderBy('c.name', 'asc')
       .limit(limit || 100)
       .offset(skip || 0);
   }
@@ -234,7 +210,7 @@ class CommonModel extends Schema {
   }
 
   //get all airport
-  public async getAllAirport(
+  public async getAirport(
     params: {
       country_id?: number;
       name?: string;
@@ -242,7 +218,7 @@ class CommonModel extends Schema {
       skip?: number;
       code?: string;
     },
-    total: boolean
+    total: boolean = false
   ) {
     const data = await this.db('airport as air')
       .withSchema(this.PUBLIC_SCHEMA)
@@ -325,7 +301,7 @@ class CommonModel extends Schema {
   }
 
   //get all airlines
-  public async getAllAirline(
+  public async getAirlines(
     params: { code?: string; name?: string; limit?: number; skip?: number },
     total: boolean
   ) {
@@ -381,23 +357,5 @@ class CommonModel extends Schema {
       .delete()
       .where({ id });
   }
-
-  // AIRLINE DETAILS BY AIRLINE CODE
-  public getAirlineDetails = async (airlineCode: string) => {
-    const [airline] = await this.db
-      .select('name as airline_name', 'logo as airline_logo')
-      .withSchema(this.PUBLIC_SCHEMA)
-      .from('airlines')
-      .where('code', airlineCode);
-
-    if (airline) {
-      return airline;
-    } else {
-      return {
-        airline_name: 'Not available',
-        airline_logo: 'Not available',
-      };
-    }
-  };
 }
 export default CommonModel;

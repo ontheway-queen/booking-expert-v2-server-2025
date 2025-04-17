@@ -109,5 +109,17 @@ class FlightUtils {
         }
         return legsDesc;
     }
+    //get route of flight
+    getRouteOfFlight(leg_description) {
+        let route;
+        route = leg_description.map((item) => {
+            return item.departureLocation;
+        });
+        route =
+            route.join('-') +
+                '-' +
+                leg_description[leg_description.length - 1].arrivalLocation;
+        return route;
+    }
 }
 exports.default = FlightUtils;

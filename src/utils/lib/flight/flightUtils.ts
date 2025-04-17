@@ -153,4 +153,17 @@ export default class FlightUtils {
     });
     return layoverTime;
   };
+
+  //get route of flight
+  public getRouteOfFlight(leg_description: { departureLocation: string, arrivalLocation: string }[]) {
+    let route;
+    route = leg_description.map((item: any) => {
+      return item.departureLocation;
+    });
+    route =
+      route.join('-') +
+      '-' +
+      leg_description[leg_description.length - 1].arrivalLocation;
+    return route;
+  }
 }

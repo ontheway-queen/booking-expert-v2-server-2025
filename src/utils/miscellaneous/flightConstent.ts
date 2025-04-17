@@ -16,13 +16,33 @@ export const MARKUP_MODE_DECREASE = 'DECREASE';
 export const FLIGHT_BOOKING_REQUEST = "PENDING";
 export const FLIGHT_BOOKING_CONFIRMED = "BOOKED";
 export const FLIGHT_BOOKING_VOID = "VOIDED";
-export const FLIGHT_BOOKING_IN_PROCESS = "IN PROCESS";
+export const FLIGHT_BOOKING_IN_PROCESS = "BOOKING IN PROCESS";
+export const FLIGHT_TICKET_IN_PROCESS = "TICKET IN PROCESS";
 export const FLIGHT_BOOKING_ON_HOLD = "ON HOLD";
 export const FLIGHT_TICKET_ISSUE = "ISSUED";
 export const FLIGHT_BOOKING_EXPIRED = "EXPIRED";
 export const FLIGHT_BOOKING_CANCELLED = "CANCELLED";
 export const FLIGHT_BOOKING_REFUNDED = "REFUNDED";
 export const FLIGHT_BOOKING_REISSUED = "REISSUED";
+
+//journey type
+export const JOURNEY_TYPE_ONE_WAY = "ONE WAY";
+export const JOURNEY_TYPE_ROUND_TRIP = "ROUND TRIP";
+export const JOURNEY_TYPE_MULTI_CITY = "MULTI CITY";
+
+//booking source
+export const BOOKING_SOURCE_AGENT = "AGENT";
+export const BOOKING_SOURCE_SUB_AGENT = "SUB AGENT";
+export const BOOKING_SOURCE_AGENT_B2C = "AGENT B2C";
+export const BOOKING_SOURCE_B2C = "B2C";
+export const BOOKING_SOURCE_EXTERNAL = "EXTERNAL";
+export const BOOKING_SOURCE_ADMIN = "ADMIN";
+
+//min days before departure for direct ticket issue
+export const MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET = 2;
+
+//redis key for flight revalidate data
+export const FLIGHT_REVALIDATE_REDIS_KEY = "FLIGHT ID - ";
 
 // Priority airport on search
 export const PRIORITY_AIRPORTS = [

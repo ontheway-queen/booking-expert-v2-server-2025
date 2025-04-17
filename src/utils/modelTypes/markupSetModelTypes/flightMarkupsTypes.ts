@@ -12,6 +12,8 @@ export interface ICreateFlightMarkupsPayload extends IMarkupTypes {
     markup_to_dac?: number;
     markup_soto?: number;
     created_by: number;
+    booking_block?: boolean;
+    issue_block?: boolean;
 }
 
 export interface IUpdateFlightMarkupsPayload {
@@ -25,6 +27,8 @@ export interface IUpdateFlightMarkupsPayload {
     updated_at: Date;
     markup_type?: 'PER' | 'FLAT';
     markup_mode?: 'INCREASE' | 'DECREASE';
+    booking_block?: boolean;
+    issue_block?: boolean;
 }
 
 export interface IGetFlightMarkupsData extends IMarkupTypes {
@@ -37,6 +41,8 @@ export interface IGetFlightMarkupsData extends IMarkupTypes {
     markup_to_dac: number;
     markup_soto: number;
     status: boolean;
+    booking_block: boolean;
+    issue_block: boolean;
     created_by: number;
     updated_by: number | null;
     last_updated_at: Date | null;
@@ -54,6 +60,6 @@ export interface IGetFlightMarkupsListFilterQuery {
     skip?: number;
 }
 
-export interface IGetApiActiveAirlinesData{
+export interface IGetApiActiveAirlinesData {
     Code: string;
 }

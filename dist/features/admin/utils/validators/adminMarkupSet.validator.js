@@ -55,6 +55,8 @@ class AdminMarkupSetValidator {
                 markup_soto: joi_1.default.number().required(),
                 markup_type: joi_1.default.string().valid('PER', 'FLAT').required(),
                 markup_mode: joi_1.default.string().valid('INCREASE', 'DECREASE').required(),
+                booking_block: joi_1.default.boolean().optional(),
+                issue_block: joi_1.default.boolean().optional()
             }))
                 .min(1)
                 .optional(),
@@ -69,6 +71,8 @@ class AdminMarkupSetValidator {
                 status: joi_1.default.boolean(),
                 markup_type: joi_1.default.string().valid('PER', 'FLAT'),
                 markup_mode: joi_1.default.string().valid('INCREASE', 'DECREASE'),
+                booking_block: joi_1.default.boolean().optional(),
+                issue_block: joi_1.default.boolean().optional()
             }))
                 .min(1)
                 .optional(),

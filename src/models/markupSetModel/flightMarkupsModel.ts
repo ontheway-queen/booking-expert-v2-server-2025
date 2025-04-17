@@ -34,6 +34,8 @@ export default class FlightMarkupsModel extends Schema {
                 'fm.markup_type',
                 'fm.markup_mode',
                 'fm.status',
+                'fm.booking_block',
+                'fm.issue_block',
                 'cad.name AS created_by',
                 'uad.name AS updated_by',
                 'fm.updated_at as last_updated_at',

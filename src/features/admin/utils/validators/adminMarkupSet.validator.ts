@@ -60,6 +60,8 @@ export default class AdminMarkupSetValidator {
                     markup_soto: Joi.number().required(),
                     markup_type: Joi.string().valid('PER', 'FLAT').required(),
                     markup_mode: Joi.string().valid('INCREASE', 'DECREASE').required(),
+                    booking_block: Joi.boolean().optional(),
+                    issue_block: Joi.boolean().optional()
                 })
             )
             .min(1)
@@ -76,6 +78,8 @@ export default class AdminMarkupSetValidator {
                     status: Joi.boolean(),
                     markup_type: Joi.string().valid('PER', 'FLAT'),
                     markup_mode: Joi.string().valid('INCREASE', 'DECREASE'),
+                    booking_block: Joi.boolean().optional(),
+                    issue_block: Joi.boolean().optional()
                 })
             )
             .min(1)

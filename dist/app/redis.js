@@ -15,7 +15,7 @@ const redis_url = 'redis://localhost';
 const client = (0, redis_1.createClient)({ url: redis_url });
 client.on('error', (err) => console.log('Redis Client Error', err));
 client.connect();
-const setRedis = (key_1, value_1, ...args_1) => __awaiter(void 0, [key_1, value_1, ...args_1], void 0, function* (key, value, ex = 1800) {
+const setRedis = (key_1, value_1, ...args_1) => __awaiter(void 0, [key_1, value_1, ...args_1], void 0, function* (key, value, ex = 900) {
     yield client.setEx(key, ex, JSON.stringify(value));
 });
 exports.setRedis = setRedis;

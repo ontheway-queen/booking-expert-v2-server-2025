@@ -8,7 +8,7 @@ client.on('error', (err) => console.log('Redis Client Error', err));
 
 client.connect();
 
-export const setRedis = async (key: string, value: any, ex = 1800) => {
+export const setRedis = async (key: string, value: any, ex = 900) => {
   await client.setEx(key, ex, JSON.stringify(value));
 };
 
