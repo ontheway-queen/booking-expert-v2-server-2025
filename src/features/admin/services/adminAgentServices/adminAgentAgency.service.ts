@@ -27,6 +27,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
       const { id } = req.params;
       const agency_id = Number(id);
       const AgencyModel = this.Model.AgencyModel(trx);
+      const AgencyPaymentModel = this.Model.AgencyPaymentModel(trx);
 
       const data = await AgencyModel.getSingleAgency(agency_id);
 
@@ -37,6 +38,8 @@ export default class AdminAgentAgencyService extends AbstractServices {
           message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
+
+      const ledger = await AgencyPaymentModel.getAgencyLedger({ agency_id });
     });
   }
 }

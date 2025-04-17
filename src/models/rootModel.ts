@@ -16,6 +16,7 @@ import FlightBookingPriceBreakdownModel from './flightModel/flightBookingPriceBr
 import FlightBookingSegmentModel from './flightModel/flightBookingSegmentModel';
 import FlightBookingTrackingModel from './flightModel/flightBookingTrackingModel';
 import FlightBookingTravelerModel from './flightModel/flightBookingTravelerModel';
+import AgencyPaymentModel from './agentModel/agencyPaymentModel';
 
 export default class Models {
   //Common model
@@ -96,5 +97,10 @@ export default class Models {
   //Flight booking traveler Model
   public FlightBookingTravelerModel(trx?: Knex.Transaction) {
     return new FlightBookingTravelerModel(trx || db);
+  }
+
+  //Agency Payment Model
+  public AgencyPaymentModel(trx?: Knex.Transaction) {
+    return new AgencyPaymentModel(trx || db);
   }
 }

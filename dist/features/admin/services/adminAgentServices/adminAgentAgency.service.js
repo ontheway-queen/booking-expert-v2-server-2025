@@ -37,6 +37,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const { id } = req.params;
                 const agency_id = Number(id);
                 const AgencyModel = this.Model.AgencyModel(trx);
+                const AgencyPaymentModel = this.Model.AgencyPaymentModel(trx);
                 const data = yield AgencyModel.getSingleAgency(agency_id);
                 if (!data) {
                     return {
@@ -45,6 +46,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
+                const ledger = yield AgencyPaymentModel.getAgencyLedger({ agency_id });
             }));
         });
     }
