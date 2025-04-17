@@ -1,12 +1,11 @@
 import {
-  OTP_DEFAULT_EXPIRY,
   PROJECT_LINK,
   PROJECT_LOGO,
   PROJECT_NAME,
 } from '../miscellaneous/constants';
 
 export const registrationVerificationTemplate = (
-  agency_name: string,
+  name: string,
   verificationLink: string
 ) => {
   return `
@@ -15,7 +14,7 @@ export const registrationVerificationTemplate = (
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Registration Confirmation - ${agency_name}</title>
+    <title>New Registration Confirmation - ${name}</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: Arial, sans-serif;">
     <!-- Outer table to center the content -->
@@ -63,7 +62,7 @@ export const registrationVerificationTemplate = (
                     margin: 0 0 20px;
                   "
                 >
-                  Registration Link of ${agency_name}
+                  Registration Link of ${name}
                 </h1>
                 <!-- Subtext -->
                 <p
@@ -74,7 +73,7 @@ export const registrationVerificationTemplate = (
                     line-height: 1.5;
                   "
                 >
-                  Use the following link to complete the registration process of ${agency_name}.
+                  Use the following link to complete the registration process of ${name}.
                 </p>
                 <!-- OTP -->
                 <div

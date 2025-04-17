@@ -19,6 +19,7 @@ const config_1 = __importDefault(require("../../config/config"));
 const adminModel_1 = __importDefault(require("../../models/adminModel/adminModel"));
 const database_1 = require("../../app/database");
 const agencyUserModel_1 = __importDefault(require("../../models/agentModel/agencyUserModel"));
+const b2cUserModel_1 = __importDefault(require("../../models/b2cModel/b2cUserModel"));
 class AuthChecker {
     constructor() {
         // admin auth checker
@@ -62,6 +63,7 @@ class AuthChecker {
                         user_email: checkAdmin.email,
                         user_id,
                         username: checkAdmin.username,
+                        phone_number: checkAdmin.phone_number,
                     };
                     next();
                 }
@@ -94,9 +96,30 @@ class AuthChecker {
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
             }
             else {
-                req.user = verify;
-                console.log({ user: req.user });
-                next();
+                const { user_id } = verify;
+                const userModel = new b2cUserModel_1.default(database_1.db);
+                const user = yield userModel.checkUser({ id: user_id });
+                if (user) {
+                    if (!user.status) {
+                        return res
+                            .status(statusCode_1.default.HTTP_UNAUTHORIZED)
+                            .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                    }
+                    req.user = {
+                        name: user === null || user === void 0 ? void 0 : user.name,
+                        phone_number: user === null || user === void 0 ? void 0 : user.phone_number,
+                        photo: user === null || user === void 0 ? void 0 : user.photo,
+                        user_email: user === null || user === void 0 ? void 0 : user.email,
+                        user_id,
+                        username: user === null || user === void 0 ? void 0 : user.username,
+                    };
+                    next();
+                }
+                else {
+                    return res
+                        .status(statusCode_1.default.HTTP_UNAUTHORIZED)
+                        .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                }
             }
         });
         // agency user auth checker
@@ -154,6 +177,7 @@ class AuthChecker {
                             user_email: checkAgencyUser.email,
                             user_id,
                             username: checkAgencyUser.username,
+                            phone_number: checkAgencyUser.phone_number,
                         };
                         next();
                     }
@@ -193,6 +217,8 @@ class AuthChecker {
                 next();
             }
         });
+        // Agency B2C White label Auth Checker
+        this.whiteLabelAuthChecker = () => __awaiter(this, void 0, void 0, function* () { });
         // Agency B2C API Authorizer
         this.agencyB2CAPIAccessChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             req.agentAPI = { agency_email: '', agency_id: 1, agency_name: '' };

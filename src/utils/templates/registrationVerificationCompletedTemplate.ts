@@ -5,7 +5,7 @@ import {
 } from '../miscellaneous/constants';
 
 export const registrationVerificationCompletedTemplate = (
-  agency_name: string,
+  name: string,
   creds: {
     email: string;
     password: string;
@@ -17,7 +17,7 @@ export const registrationVerificationCompletedTemplate = (
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registration Completed - ${agency_name}</title>
+    <title>Registration Completed - ${name}</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: Arial, sans-serif;">
     <!-- Outer table to center the content -->
@@ -76,7 +76,7 @@ export const registrationVerificationCompletedTemplate = (
                     line-height: 1.5;
                   "
                 >
-                 <b>Agency Login:</b>
+                 <b>Login:</b>
                 </p>
                   <p
                   style="

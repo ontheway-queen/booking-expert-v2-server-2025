@@ -37,6 +37,7 @@ export default class AdminProfileService extends AbstractServices {
       name: admin.name,
       is_main_user: admin.is_main_user,
       photo: admin.photo,
+      phone_number: admin.phone_number,
     };
 
     const token = Lib.createToken(tokenData, config.JWT_SECRET_ADMIN, '24h');

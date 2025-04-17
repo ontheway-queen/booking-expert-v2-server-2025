@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registrationVerificationCompletedTemplate = void 0;
 const constants_1 = require("../miscellaneous/constants");
-const registrationVerificationCompletedTemplate = (agency_name, creds) => {
+const registrationVerificationCompletedTemplate = (name, creds) => {
     return `
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registration Completed - ${agency_name}</title>
+    <title>Registration Completed - ${name}</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: Arial, sans-serif;">
     <!-- Outer table to center the content -->
@@ -68,7 +68,7 @@ const registrationVerificationCompletedTemplate = (agency_name, creds) => {
                     line-height: 1.5;
                   "
                 >
-                 <b>Agency Login:</b>
+                 <b>Login:</b>
                 </p>
                   <p
                   style="

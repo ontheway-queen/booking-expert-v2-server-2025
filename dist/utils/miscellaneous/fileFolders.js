@@ -4,11 +4,13 @@ class FileFolder {
 }
 FileFolder.PROMOTIONAL_FILES = 'promotional-files';
 FileFolder.ARTICLE_FILES = 'article-files';
-FileFolder.ADMIN_FILES = 'admin-files';
+FileFolder.ADMIN_FILES = 'admin/admin-files';
 FileFolder.COMMON_FILES = 'common-files';
-FileFolder.USER_FILES = 'user-files';
-FileFolder.TRAVELER_FILES = 'traveler-files';
-FileFolder.AGENCY_USER = 'agency-files';
+FileFolder.B2C_USER_FILES = 'b2c/user-files';
+FileFolder.AGENT_TRAVELER_FILES = 'agent/traveler-files';
+FileFolder.B2C_TRAVELER_FILES = 'b2c/traveler-files';
+FileFolder.AGENCY_USER = 'agent/agency-user';
+FileFolder.AGENCY_FILES = 'agent/agency-files';
 FileFolder.TOUR_PACKAGE = 'tour-package';
 FileFolder.PACKAGE_FILE = 'package-file';
 FileFolder.VISA_FILES = 'visa-files';

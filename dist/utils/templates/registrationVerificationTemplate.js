@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registrationVerificationTemplate = void 0;
 const constants_1 = require("../miscellaneous/constants");
-const registrationVerificationTemplate = (agency_name, verificationLink) => {
+const registrationVerificationTemplate = (name, verificationLink) => {
     return `
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Registration Confirmation - ${agency_name}</title>
+    <title>New Registration Confirmation - ${name}</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: Arial, sans-serif;">
     <!-- Outer table to center the content -->
@@ -57,7 +57,7 @@ const registrationVerificationTemplate = (agency_name, verificationLink) => {
                     margin: 0 0 20px;
                   "
                 >
-                  Registration Link of ${agency_name}
+                  Registration Link of ${name}
                 </h1>
                 <!-- Subtext -->
                 <p
@@ -68,7 +68,7 @@ const registrationVerificationTemplate = (agency_name, verificationLink) => {
                     line-height: 1.5;
                   "
                 >
-                  Use the following link to complete the registration process of ${agency_name}.
+                  Use the following link to complete the registration process of ${name}.
                 </p>
                 <!-- OTP -->
                 <div

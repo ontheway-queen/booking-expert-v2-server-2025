@@ -12,6 +12,7 @@ import {
   IGetAgencyListWithBalanceData,
   IGetAgencyListWithBalanceQuery,
   IGetAPICredsData,
+  IGetSingleAgencyData,
   IGetWhiteLabelPermissionData,
   IUpdateAgencyPayload,
   IUpdateAPICredsPayload,
@@ -221,7 +222,9 @@ export default class AgencyModel extends Schema {
   }
 
   // get single agency
-  public async getSingleAgency(id: number) {
+  public async getSingleAgency(
+    id: number
+  ): Promise<IGetSingleAgencyData | null> {
     return await this.db('agency AS ag')
       .withSchema(this.AGENT_SCHEMA)
       .select(
@@ -235,6 +238,15 @@ export default class AgencyModel extends Schema {
         'ag.status',
         'ag.flight_markup_set',
         'ag.hotel_markup_set',
+        this.db.raw(`(
+  SELECT 
+    COALESCE(SUM(CASE WHEN al.type = 'Credit' THEN amount ELSE 0 END), 0) - 
+    COALESCE(SUM(CASE WHEN al.type = 'Debit' THEN amount ELSE 0 END), 0) 
+  AS balance 
+  FROM agent.agency_ledger as al
+  WHERE ag.id = al.agency_id
+) AS balance
+`),
         'fm.name AS flight_markup_set_name',
         'hm.name AS hotel_markup_set_name',
         'ag.usable_loan',

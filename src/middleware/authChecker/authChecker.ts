@@ -12,6 +12,7 @@ import {
 import AdminModel from '../../models/adminModel/adminModel';
 import { db } from '../../app/database';
 import AgencyUserModel from '../../models/agentModel/agencyUserModel';
+import B2CUserModel from '../../models/b2cModel/b2cUserModel';
 
 export default class AuthChecker {
   // admin auth checker
@@ -70,7 +71,8 @@ export default class AuthChecker {
           user_email: checkAdmin.email,
           user_id,
           username: checkAdmin.username,
-        } as ITokenParseAdmin;
+          phone_number: checkAdmin.phone_number,
+        };
         next();
       } else {
         res
@@ -112,9 +114,32 @@ export default class AuthChecker {
         .status(StatusCode.HTTP_UNAUTHORIZED)
         .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
     } else {
-      req.user = verify as ITokenParseUser;
-      console.log({ user: req.user });
-      next();
+      const { user_id } = verify;
+      const userModel = new B2CUserModel(db);
+
+      const user = await userModel.checkUser({ id: user_id });
+
+      if (user) {
+        if (!user.status) {
+          return res
+            .status(StatusCode.HTTP_UNAUTHORIZED)
+            .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
+        }
+
+        req.user = {
+          name: user?.name,
+          phone_number: user?.phone_number,
+          photo: user?.photo,
+          user_email: user?.email,
+          user_id,
+          username: user?.username,
+        };
+        next();
+      } else {
+        return res
+          .status(StatusCode.HTTP_UNAUTHORIZED)
+          .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
+      }
     }
   };
 
@@ -190,7 +215,8 @@ export default class AuthChecker {
             user_email: checkAgencyUser.email,
             user_id,
             username: checkAgencyUser.username,
-          } as ITokenParseAgencyUser;
+            phone_number: checkAgencyUser.phone_number,
+          };
           next();
         }
       } else {
@@ -239,6 +265,9 @@ export default class AuthChecker {
       next();
     }
   };
+
+  // Agency B2C White label Auth Checker
+  public whiteLabelAuthChecker = async () => {};
 
   // Agency B2C API Authorizer
   public agencyB2CAPIAccessChecker = async (

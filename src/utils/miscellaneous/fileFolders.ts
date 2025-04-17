@@ -1,11 +1,13 @@
 class FileFolder {
   static readonly PROMOTIONAL_FILES = 'promotional-files';
   static readonly ARTICLE_FILES = 'article-files';
-  static readonly ADMIN_FILES = 'admin-files';
+  static readonly ADMIN_FILES = 'admin/admin-files';
   static readonly COMMON_FILES = 'common-files';
-  static readonly USER_FILES = 'user-files';
-  static readonly TRAVELER_FILES = 'traveler-files';
-  static readonly AGENCY_USER = 'agency-files';
+  static readonly B2C_USER_FILES = 'b2c/user-files';
+  static readonly AGENT_TRAVELER_FILES = 'agent/traveler-files';
+  static readonly B2C_TRAVELER_FILES = 'b2c/traveler-files';
+  static readonly AGENCY_USER = 'agent/agency-user';
+  static readonly AGENCY_FILES = 'agent/agency-files';
   static readonly TOUR_PACKAGE = 'tour-package';
   static readonly PACKAGE_FILE = 'package-file';
   static readonly VISA_FILES = 'visa-files';

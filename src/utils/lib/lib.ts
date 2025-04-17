@@ -61,7 +61,11 @@ class Lib {
     emailBody: string;
     attachments?: Attachment[];
   }) {
-    return await this.sendEmailDefault(payload);
+    return await this.sendEmailHostinger({
+      ...payload,
+      senderEmail: config.EMAIL_SEND_EMAIL_ID,
+      senderPassword: config.EMAIL_SEND_PASSWORD,
+    });
   }
 
   // send email by nodemailer

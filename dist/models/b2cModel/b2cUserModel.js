@@ -36,6 +36,15 @@ class B2CUserModel extends schema_1.default {
                 .where('id', id);
         });
     }
+    // update user by email
+    updateUserByEmail(payload, email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('users')
+                .withSchema(this.B2C_SCHEMA)
+                .update(payload)
+                .where('email', email);
+        });
+    }
     // get user list
     getUserList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, need_total = false) {
@@ -80,7 +89,7 @@ class B2CUserModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('users')
                 .withSchema(this.B2C_SCHEMA)
-                .select('id', 'username', 'name', 'email', 'photo', 'status', 'gender', 'phone_number', 'created_at')
+                .select('id', 'username', 'name', 'email', 'photo', 'status', 'gender', 'phone_number', 'two_fa', 'created_at')
                 .where('id', id)
                 .first();
         });
@@ -90,7 +99,7 @@ class B2CUserModel extends schema_1.default {
         return __awaiter(this, arguments, void 0, function* ({ email, username, id, }) {
             return yield this.db('users')
                 .withSchema(this.B2C_SCHEMA)
-                .select('id', 'password_hash', 'phone_number', 'gender', 'photo', 'username', 'name', 'email', 'status')
+                .select('id', 'password_hash', 'phone_number', 'gender', 'photo', 'username', 'name', 'email', 'two_fa', 'status')
                 .where((qb) => {
                 if (username) {
                     qb.orWhere('username', username);

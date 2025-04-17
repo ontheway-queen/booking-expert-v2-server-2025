@@ -58,7 +58,7 @@ class Lib {
     }
     static sendEmail(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.sendEmailDefault(payload);
+            return yield this.sendEmailHostinger(Object.assign(Object.assign({}, payload), { senderEmail: config_1.default.EMAIL_SEND_EMAIL_ID, senderPassword: config_1.default.EMAIL_SEND_PASSWORD }));
         });
     }
     // send email by nodemailer

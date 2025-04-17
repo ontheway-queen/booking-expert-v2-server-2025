@@ -8,7 +8,7 @@ import {
 } from '../../../utils/miscellaneous/constants';
 import PublicEmailOTPService from '../../public/services/publicEmailOTP.service';
 import {
-  ICompleteRegisterParsedTokenData,
+  ICompleteAgencyRegisterParsedTokenData,
   ILogin2FAReqBody,
   ILoginReqBody,
   IRegisterAgentReqBody,
@@ -183,7 +183,7 @@ export default class AuthAgentService extends AbstractServices {
       const parsedToken = Lib.verifyToken(
         token,
         config.JWT_SECRET_AGENT + OTP_TYPES.register_agent
-      ) as ICompleteRegisterParsedTokenData | false;
+      ) as ICompleteAgencyRegisterParsedTokenData | false;
 
       if (!parsedToken) {
         return {
@@ -259,6 +259,7 @@ export default class AuthAgentService extends AbstractServices {
         phone_number,
         white_label,
         agency_email,
+        agency_phone_number,
         agency_logo,
         agency_name,
         is_main_user,
@@ -345,6 +346,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_email,
         agency_name,
         is_main_user,
+        phone_number,
         photo,
       };
 
@@ -368,13 +370,14 @@ export default class AuthAgentService extends AbstractServices {
           status,
           photo,
           is_main_user,
+          phone_number,
           agency: {
             agency_id,
             agent_no,
             agency_email,
             agency_name,
             agency_status,
-            phone_number,
+            phone_number: agency_phone_number,
             agency_logo,
           },
           role,
@@ -419,6 +422,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_status,
         phone_number,
         white_label,
+        agency_phone_number,
         agency_email,
         agency_logo,
         agency_name,
@@ -477,6 +481,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_id,
         agency_email,
         agency_name,
+        phone_number,
         is_main_user,
         photo,
       };
@@ -505,13 +510,14 @@ export default class AuthAgentService extends AbstractServices {
           status,
           photo,
           is_main_user,
+          phone_number,
           agency: {
             agency_id,
             agent_no,
             agency_email,
             agency_name,
             agency_status,
-            phone_number,
+            phone_number: agency_phone_number,
             agency_logo,
           },
           role,

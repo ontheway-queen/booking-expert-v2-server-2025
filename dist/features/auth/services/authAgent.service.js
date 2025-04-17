@@ -206,7 +206,7 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkUserAgency;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, white_label, agency_email, agency_phone_number, agency_logo, agency_name, is_main_user, } = checkUserAgency;
                 if (agency_status === 'Inactive' ||
                     agency_status === 'Incomplete' ||
                     agency_status === 'Rejected') {
@@ -274,6 +274,7 @@ class AuthAgentService extends abstract_service_1.default {
                     agency_email,
                     agency_name,
                     is_main_user,
+                    phone_number,
                     photo,
                 };
                 const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
@@ -291,13 +292,14 @@ class AuthAgentService extends abstract_service_1.default {
                         status,
                         photo,
                         is_main_user,
+                        phone_number,
                         agency: {
                             agency_id,
                             agent_no,
                             agency_email,
                             agency_name,
                             agency_status,
-                            phone_number,
+                            phone_number: agency_phone_number,
                             agency_logo,
                         },
                         role,
@@ -325,7 +327,7 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, phone_number, white_label, agency_email, agency_logo, agency_name, is_main_user, } = checkAgencyUser;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, phone_number, white_label, agency_phone_number, agency_email, agency_logo, agency_name, is_main_user, } = checkAgencyUser;
                 if (!status) {
                     return {
                         success: false,
@@ -370,6 +372,7 @@ class AuthAgentService extends abstract_service_1.default {
                     agency_id,
                     agency_email,
                     agency_name,
+                    phone_number,
                     is_main_user,
                     photo,
                 };
@@ -388,13 +391,14 @@ class AuthAgentService extends abstract_service_1.default {
                         status,
                         photo,
                         is_main_user,
+                        phone_number,
                         agency: {
                             agency_id,
                             agent_no,
                             agency_email,
                             agency_name,
                             agency_status,
-                            phone_number,
+                            phone_number: agency_phone_number,
                             agency_logo,
                         },
                         role,

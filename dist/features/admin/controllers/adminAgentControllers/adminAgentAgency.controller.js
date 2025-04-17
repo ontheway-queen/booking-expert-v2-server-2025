@@ -16,7 +16,7 @@ const abstract_controller_1 = __importDefault(require("../../../../abstract/abst
 class AdminAgentAgencyController extends abstract_controller_1.default {
     constructor() {
         super();
-        this.insertDeposit = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.getAgency = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
             res
                 .status(200)
                 .json({ success: true, message: 'Deposit inserted successfully' });

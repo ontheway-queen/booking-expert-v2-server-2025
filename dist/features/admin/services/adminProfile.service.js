@@ -39,6 +39,7 @@ class AdminProfileService extends abstract_service_1.default {
                 name: admin.name,
                 is_main_user: admin.is_main_user,
                 photo: admin.photo,
+                phone_number: admin.phone_number,
             };
             const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_ADMIN, '24h');
             return {
