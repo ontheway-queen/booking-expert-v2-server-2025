@@ -19,6 +19,7 @@ const constants_1 = require("../../../utils/miscellaneous/constants");
 const config_1 = __importDefault(require("../../../config/config"));
 const registrationVerificationTemplate_1 = require("../../../utils/templates/registrationVerificationTemplate");
 const registrationVerificationCompletedTemplate_1 = require("../../../utils/templates/registrationVerificationCompletedTemplate");
+const emailSendLib_1 = __importDefault(require("../../../utils/lib/emailSendLib"));
 class AuthB2CService extends abstract_service_1.default {
     constructor() {
         super();
@@ -221,7 +222,7 @@ class AuthB2CService extends abstract_service_1.default {
                     gender,
                 });
                 const verificationToken = lib_1.default.createToken({ email, user_id: newUser[0].id, username, name }, config_1.default.JWT_SECRET_USER + constants_1.OTP_TYPES.register_b2c, '24h');
-                yield lib_1.default.sendEmail({
+                yield emailSendLib_1.default.sendEmail({
                     email,
                     emailSub: `Booking Expert User Registration Verification`,
                     emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(name, '/registration/verification?token=' + verificationToken),
@@ -271,7 +272,7 @@ class AuthB2CService extends abstract_service_1.default {
                     phone_number: user.phone_number,
                 };
                 const AuthToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_USER, '24h');
-                yield lib_1.default.sendEmail({
+                yield emailSendLib_1.default.sendEmail({
                     email,
                     emailSub: `Booking Expert User Registration Completed`,
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(name, {

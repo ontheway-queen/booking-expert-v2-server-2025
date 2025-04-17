@@ -1,6 +1,5 @@
 import AbstractServices from '../../../abstract/abstract.service';
 import {
-  OTP_DEFAULT_EXPIRY,
   OTP_EMAIL_SUBJECT,
   OTP_TYPES,
 } from '../../../utils/miscellaneous/constants';
@@ -13,6 +12,7 @@ import {
 } from '../utils/types/publicOTP.types';
 import { TDB } from '../utils/types/publicCommon.types';
 import { SignOptions } from 'jsonwebtoken';
+import EmailSendLib from '../../../utils/lib/emailSendLib';
 
 export default class PublicEmailOTPService extends AbstractServices {
   private DBCon: TDB;
@@ -133,7 +133,7 @@ export default class PublicEmailOTPService extends AbstractServices {
       try {
         const [send_email] = await Promise.all([
           email
-            ? Lib.sendEmail({
+            ? EmailSendLib.sendEmail({
                 email,
                 emailSub: OTP_EMAIL_SUBJECT,
                 emailBody: sendEmailOtpTemplate(otp, OTP_FOR),
