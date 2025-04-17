@@ -8,7 +8,7 @@ import {
 } from '../../../utils/miscellaneous/constants';
 import PublicEmailOTPService from '../../public/services/publicEmailOTP.service';
 import {
-  ICompleteRegisterParsedTokenData,
+  ICompleteAgencyRegisterParsedTokenData,
   ILogin2FAReqBody,
   ILoginReqBody,
   IRegisterAgentReqBody,
@@ -183,7 +183,7 @@ export default class AuthAgentService extends AbstractServices {
       const parsedToken = Lib.verifyToken(
         token,
         config.JWT_SECRET_AGENT + OTP_TYPES.register_agent
-      ) as ICompleteRegisterParsedTokenData | false;
+      ) as ICompleteAgencyRegisterParsedTokenData | false;
 
       if (!parsedToken) {
         return {

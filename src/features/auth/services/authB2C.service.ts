@@ -1,11 +1,19 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
-import { ILogin2FAReqBody, ILoginReqBody } from '../utils/types/authTypes';
+import {
+  ICompleteUserRegisterParsedTokenData,
+  ILogin2FAReqBody,
+  ILoginReqBody,
+  IRegisterB2CReqBody,
+  IResetPassReqBody,
+} from '../utils/types/authTypes';
 import Lib from '../../../utils/lib/lib';
 import PublicEmailOTPService from '../../public/services/publicEmailOTP.service';
 import { OTP_TYPES } from '../../../utils/miscellaneous/constants';
 import { ITokenParseUser } from '../../public/utils/types/publicCommon.types';
 import config from '../../../config/config';
+import { registrationVerificationTemplate } from '../../../utils/templates/registrationVerificationTemplate';
+import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
 
 export default class AuthB2CService extends AbstractServices {
   constructor() {
@@ -186,6 +194,186 @@ export default class AuthB2CService extends AbstractServices {
           gender,
         },
         token,
+      };
+    });
+  }
+
+  public async resetPassword(req: Request) {
+    const { password, token } = req.body as IResetPassReqBody;
+
+    const data: any = Lib.verifyToken(
+      token,
+      config.JWT_SECRET_USER + OTP_TYPES.reset_b2c
+    );
+
+    if (!data) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_UNAUTHORIZED,
+        message: this.ResMsg.HTTP_UNAUTHORIZED,
+      };
+    }
+    const { email, type } = data;
+
+    if (type !== OTP_TYPES.reset_b2c) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_FORBIDDEN,
+        message: this.StatusCode.HTTP_FORBIDDEN,
+      };
+    }
+
+    const B2CUserModel = this.Model.B2CUserModel();
+
+    const password_hash = await Lib.hashValue(password);
+
+    await B2CUserModel.updateUserByEmail({ password_hash }, email);
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.PASSWORD_CHANGED,
+    };
+  }
+
+  public async register(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { email, name, phone_number, gender } =
+        req.body as IRegisterB2CReqBody;
+      const UserModel = this.Model.B2CUserModel(trx);
+
+      const checkAgentUser = await UserModel.checkUser({ email });
+
+      if (checkAgentUser) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_CONFLICT,
+          message: 'Email already exist. Please use another email.',
+        };
+      }
+
+      let username = Lib.generateUsername(name);
+
+      let suffix = 1;
+
+      while (await UserModel.checkUser({ username })) {
+        username = `${username}${suffix}`;
+        suffix += 1;
+      }
+
+      const password = Lib.generateRandomPassword(8);
+
+      const password_hash = await Lib.hashValue(password);
+
+      const newUser = await UserModel.createUser({
+        email,
+        password_hash,
+        name,
+        phone_number,
+        username,
+        gender,
+      });
+
+      const verificationToken = Lib.createToken(
+        { email, user_id: newUser[0].id, username, name },
+        config.JWT_SECRET_USER + OTP_TYPES.register_b2c,
+        '24h'
+      );
+
+      await Lib.sendEmail({
+        email,
+        emailSub: `Booking Expert User Registration Verification`,
+        emailBody: registrationVerificationTemplate(
+          name,
+          '/registration/verification?token=' + verificationToken
+        ),
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: `Your registration has been successfully placed. To complete your registration please check your email and complete registration with the link we have sent to your email.`,
+        data: {
+          email,
+        },
+      };
+    });
+  }
+
+  public async registerComplete(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { token } = req.body as { token: string };
+      const B2CUserModel = this.Model.B2CUserModel(trx);
+
+      const parsedToken = Lib.verifyToken(
+        token,
+        config.JWT_SECRET_AGENT + OTP_TYPES.register_agent
+      ) as ICompleteUserRegisterParsedTokenData | false;
+
+      if (!parsedToken) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_UNAUTHORIZED,
+          message: 'Invalid token or token expired. Please contact us.',
+        };
+      }
+
+      const { email, username, user_id, name } = parsedToken;
+
+      const user = await B2CUserModel.checkUser({ id: user_id });
+
+      if (!user) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_UNAUTHORIZED,
+          message: this.ResMsg.HTTP_UNAUTHORIZED,
+        };
+      }
+
+      const password = Lib.generateRandomPassword(8);
+      const password_hash = await Lib.hashValue(password);
+
+      await B2CUserModel.updateUser({ password_hash }, user_id);
+
+      const tokenData: ITokenParseUser = {
+        user_id,
+        username,
+        user_email: email,
+        name,
+        photo: user.photo,
+        phone_number: user.phone_number,
+      };
+
+      const AuthToken = Lib.createToken(
+        tokenData,
+        config.JWT_SECRET_USER,
+        '24h'
+      );
+
+      await Lib.sendEmail({
+        email,
+        emailSub: `Booking Expert User Registration Completed`,
+        emailBody: registrationVerificationCompletedTemplate(name, {
+          email,
+          password,
+        }),
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: `Registration successful. Please check your email address ${email} for login credentials.`,
+        data: {
+          id: user_id,
+          username,
+          name,
+          email,
+          two_fa: user.two_fa,
+          status: user.status,
+          photo: user.photo,
+          gender: user.gender,
+        },
+        token: AuthToken,
       };
     });
   }

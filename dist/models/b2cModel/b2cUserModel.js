@@ -36,6 +36,15 @@ class B2CUserModel extends schema_1.default {
                 .where('id', id);
         });
     }
+    // update user by email
+    updateUserByEmail(payload, email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('users')
+                .withSchema(this.B2C_SCHEMA)
+                .update(payload)
+                .where('email', email);
+        });
+    }
     // get user list
     getUserList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, need_total = false) {

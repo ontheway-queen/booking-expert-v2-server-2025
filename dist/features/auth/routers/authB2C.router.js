@@ -4,11 +4,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_router_1 = __importDefault(require("../../../abstract/abstract.router"));
+const authB2C_controller_1 = __importDefault(require("../controllers/authB2C.controller"));
 class AuthB2CRouter extends abstract_router_1.default {
     constructor() {
         super();
+        this.controller = new authB2C_controller_1.default();
         this.callRouter();
     }
-    callRouter() { }
+    callRouter() {
+        this.router.route('/login').post(this.controller.login);
+        this.router
+            .route('/register')
+            .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_USER), this.controller.register);
+        this.router
+            .route('/register/complete')
+            .post(this.controller.registerComplete);
+        this.router.route('/login/2fa').post(this.controller.login2FA);
+        this.router.route('/reset-password').post(this.controller.resetPassword);
+    }
 }
 exports.default = AuthB2CRouter;

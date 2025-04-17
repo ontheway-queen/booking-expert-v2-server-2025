@@ -19,7 +19,7 @@ export default class B2CUserModel extends Schema {
   }
 
   //create user
-  public async createUser(payload: ICreateB2CUserPayload): Promise<number[]> {
+  public async createUser(payload: ICreateB2CUserPayload) {
     return await this.db('users')
       .withSchema(this.B2C_SCHEMA)
       .insert(payload, 'id');
@@ -31,6 +31,17 @@ export default class B2CUserModel extends Schema {
       .withSchema(this.B2C_SCHEMA)
       .update(payload)
       .where('id', id);
+  }
+
+  // update user by email
+  public async updateUserByEmail(
+    payload: IUpdateB2CUserPayload,
+    email: string
+  ) {
+    return await this.db('users')
+      .withSchema(this.B2C_SCHEMA)
+      .update(payload)
+      .where('email', email);
   }
 
   // get user list

@@ -23,9 +23,23 @@ export interface IRegisterAgentReqBody {
   email: string;
 }
 
-export interface ICompleteRegisterParsedTokenData extends jwt.JwtPayload {
+export interface IRegisterB2CReqBody {
+  name: string;
+  phone_number: string;
+  email: string;
+  gender: string;
+}
+
+export interface ICompleteAgencyRegisterParsedTokenData extends jwt.JwtPayload {
   email: string;
   agency_name: string;
   agency_id: number;
   user_id: number;
+}
+
+export interface ICompleteUserRegisterParsedTokenData extends jwt.JwtPayload {
+  email: string;
+  username: string;
+  user_id: number;
+  name: string;
 }
