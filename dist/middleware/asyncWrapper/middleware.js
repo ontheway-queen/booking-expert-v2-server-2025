@@ -45,7 +45,7 @@ class Wrapper {
                     });
                 }
                 else {
-                    next(new customError_1.default(err.message, err.status));
+                    next(new customError_1.default(err.message, err.status, err.level, err.metadata));
                 }
             }
         });

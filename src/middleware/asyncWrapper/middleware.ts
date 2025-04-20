@@ -44,7 +44,7 @@ export default class Wrapper {
             message: err.message,
           });
         } else {
-          next(new CustomError(err.message, err.status));
+          next(new CustomError(err.message, err.status, err.level, err.metadata));
         }
       }
     };

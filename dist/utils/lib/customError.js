@@ -7,6 +7,7 @@ class CustomError extends Error {
         this.message = message;
         this.level = level;
         this.metadata = metadata;
+        console.log({ metadata });
     }
 }
 exports.default = CustomError;

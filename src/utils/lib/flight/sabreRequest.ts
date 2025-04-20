@@ -1,7 +1,8 @@
 import axios from 'axios';
 import Models from '../../../models/rootModel';
-import { SABRE_TOKEN_ENV } from '../../miscellaneous/flightConstent';
+import { SABRE_API, SABRE_TOKEN_ENV } from '../../miscellaneous/flightConstent';
 import config from '../../../config/config';
+import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
 const BASE_URL = config.SABRE_URL;
 
 export default class SabreRequests {
@@ -50,21 +51,21 @@ export default class SabreRequests {
         data: requestData,
         validateStatus: () => true,
       });
-    //   if (response.status !== 200) {
-    //     await new Models().errorLogsModel().insert({
-    //       level: ERROR_LEVEL_WARNING,
-    //       message: `Error from Sabre`,
-    //       url: apiUrl,
-    //       http_method: 'POST',
-    //       metadata: {
-    //         api: SABRE_API,
-    //         endpoint: apiUrl,
-    //         payload: requestData,
-    //         response: response.data,
-    //       }
-    //     });
-    //     return false;
-    //   }
+      if (response.status !== 200) {
+        await new Models().ErrorLogsModel().insertErrorLogs({
+          level: ERROR_LEVEL_WARNING,
+          message: `Error from Sabre`,
+          url: apiUrl,
+          http_method: 'POST',
+          metadata: {
+            api: SABRE_API,
+            endpoint: apiUrl,
+            payload: requestData,
+            response: response.data,
+          }
+        });
+        return false;
+      }
       // console.log("response again", response);
       return response.data;
 

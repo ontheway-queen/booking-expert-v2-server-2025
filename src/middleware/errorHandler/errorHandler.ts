@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import ManageFile from '../../utils/lib/manageFile';
 import CustomError from '../../utils/lib/customError';
+import { SOURCE_ADMIN, SOURCE_AGENT, SOURCE_AGENT_B2C, SOURCE_B2C, SOURCE_EXTERNAL } from '../../utils/miscellaneous/constants';
+import Models from '../../models/rootModel';
 
 interface ICustomError {
   success: boolean;
@@ -27,6 +29,28 @@ export default class ErrorHandler {
 
     if (files.length) {
       await this.manageFile.deleteFromCloud(files);
+    }
+
+    //insert error logs
+    const errorDetails = {
+      message: err.message,
+      route: req.originalUrl,
+      method: req.method,
+      stack: err.stack,
+      user_id: req.user?.user_id || req.agencyUser?.user_id || req.admin?.user_id || req.agencyB2CUser?.user_id || req.external?.external_id,
+      source: req.agencyUser ? SOURCE_AGENT : req.admin ? SOURCE_ADMIN : req.external ? SOURCE_EXTERNAL : req.agencyB2CUser ? SOURCE_AGENT_B2C : SOURCE_B2C as 
+      | typeof SOURCE_AGENT
+      | typeof SOURCE_AGENT_B2C
+      | typeof SOURCE_B2C
+      | typeof SOURCE_EXTERNAL
+      | typeof SOURCE_ADMIN
+    };
+    try {
+      if (err.status == 500 || !err.status) {
+        await new Models().ErrorLogsModel().insertErrorLogs({ level: err.level || "ERROR", message: errorDetails.message || "Internal Server Error", stack_trace: errorDetails.stack, source: errorDetails.source, user_id: errorDetails.user_id, url: errorDetails.route, http_method: errorDetails.method, metadata: err.metadata });
+      }
+    } catch (err: any) {
+      console.log({ err });
     }
 
     res

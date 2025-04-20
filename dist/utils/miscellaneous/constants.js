@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WHITE_LABEL_PERMISSIONS_MODULES = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.MARKUP_SET_TYPE_HOTEL = exports.MARKUP_SET_TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL = exports.PROJECT_LINK = exports.PROJECT_ICON = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
+exports.WHITE_LABEL_PERMISSIONS_MODULES = exports.SOURCE_ADMIN = exports.SOURCE_EXTERNAL = exports.SOURCE_B2C = exports.SOURCE_AGENT_B2C = exports.SOURCE_SUB_AGENT = exports.SOURCE_AGENT = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.MARKUP_SET_TYPE_HOTEL = exports.MARKUP_SET_TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL = exports.PROJECT_LINK = exports.PROJECT_ICON = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
 exports.origin = [
     'http://localhost:3000',
     'http://localhost:5000',
@@ -42,5 +42,12 @@ exports.ERROR_LEVEL_INFO = 'INFO';
 exports.ERROR_LEVEL_WARNING = 'WARNING';
 exports.ERROR_LEVEL_ERROR = 'ERROR';
 exports.ERROR_LEVEL_CRITICAL = 'CRITICAL';
+//panel source
+exports.SOURCE_AGENT = "AGENT";
+exports.SOURCE_SUB_AGENT = "SUB AGENT";
+exports.SOURCE_AGENT_B2C = "AGENT B2C";
+exports.SOURCE_B2C = "B2C";
+exports.SOURCE_EXTERNAL = "EXTERNAL";
+exports.SOURCE_ADMIN = "ADMIN";
 // White label permissions modules
 exports.WHITE_LABEL_PERMISSIONS_MODULES = [];

@@ -48,5 +48,14 @@ export const ERROR_LEVEL_WARNING = 'WARNING';
 export const ERROR_LEVEL_ERROR = 'ERROR';
 export const ERROR_LEVEL_CRITICAL = 'CRITICAL';
 
+
+//panel source
+export const SOURCE_AGENT = "AGENT";
+export const SOURCE_SUB_AGENT = "SUB AGENT";
+export const SOURCE_AGENT_B2C = "AGENT B2C";
+export const SOURCE_B2C = "B2C";
+export const SOURCE_EXTERNAL = "EXTERNAL";
+export const SOURCE_ADMIN = "ADMIN";
+
 // White label permissions modules
 export const WHITE_LABEL_PERMISSIONS_MODULES: string[] = [];

@@ -20,6 +20,7 @@ const flightBookingPriceBreakdownModel_1 = __importDefault(require("./flightMode
 const flightBookingSegmentModel_1 = __importDefault(require("./flightModel/flightBookingSegmentModel"));
 const flightBookingTrackingModel_1 = __importDefault(require("./flightModel/flightBookingTrackingModel"));
 const flightBookingTravelerModel_1 = __importDefault(require("./flightModel/flightBookingTravelerModel"));
+const errorLogsModel_1 = __importDefault(require("./errorLogsModel/errorLogsModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -84,6 +85,10 @@ class Models {
     //Flight booking traveler Model
     FlightBookingTravelerModel(trx) {
         return new flightBookingTravelerModel_1.default(trx || database_1.db);
+    }
+    //Error logs Model
+    ErrorLogsModel(trx) {
+        return new errorLogsModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

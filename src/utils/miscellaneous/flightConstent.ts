@@ -30,14 +30,6 @@ export const JOURNEY_TYPE_ONE_WAY = "ONE WAY";
 export const JOURNEY_TYPE_ROUND_TRIP = "ROUND TRIP";
 export const JOURNEY_TYPE_MULTI_CITY = "MULTI CITY";
 
-//booking source
-export const BOOKING_SOURCE_AGENT = "AGENT";
-export const BOOKING_SOURCE_SUB_AGENT = "SUB AGENT";
-export const BOOKING_SOURCE_AGENT_B2C = "AGENT B2C";
-export const BOOKING_SOURCE_B2C = "B2C";
-export const BOOKING_SOURCE_EXTERNAL = "EXTERNAL";
-export const BOOKING_SOURCE_ADMIN = "ADMIN";
-
 //booking traveler files
 export const TRAVELER_FILE_TYPE_PASSPORT = "passport";
 export const TRAVELER_FILE_TYPE_VISA = "visa";

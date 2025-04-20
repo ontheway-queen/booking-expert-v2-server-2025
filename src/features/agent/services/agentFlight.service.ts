@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import AbstractServices from "../../../abstract/abstract.service";
 import { IAirlineCodePayload, IFormattedFlightItinerary, IMultiAPIFlightSearchReqBody, IMultipleApiFlightBookingRequestBody, IOriginDestinationInformationPayload, IPassengerTypeQuantityPayload } from "../../../utils/supportTypes/flightTypes/commonFlightTypes";
-import { BOOKING_SOURCE_AGENT, FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_FARE_RESPONSE, FLIGHT_REVALIDATE_REDIS_KEY, SABRE_API } from "../../../utils/miscellaneous/flightConstent";
+import { FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_FARE_RESPONSE, FLIGHT_REVALIDATE_REDIS_KEY, SABRE_API } from "../../../utils/miscellaneous/flightConstent";
 import { v4 as uuidv4 } from "uuid";
 import { getRedis, setRedis } from "../../../app/redis";
 import SabreFlightService from "../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service";
 import { CommonFlightSupportService } from "../../../utils/supportServices/flightSupportServices/commonFlightSupport.service";
 import FlightUtils from "../../../utils/lib/flight/flightUtils";
 import { CommonFlightBookingSupportService } from "../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service";
+import { SOURCE_AGENT } from "../../../utils/miscellaneous/constants";
 
 export class AgentFlightService extends AbstractServices {
   constructor() {
@@ -399,7 +400,7 @@ export class AgentFlightService extends AbstractServices {
         flight_data: data,
         traveler_data: body.passengers,
         type: "Agent_Flight",
-        source_type: BOOKING_SOURCE_AGENT,
+        source_type: SOURCE_AGENT,
         source_id: agency_id,
       });
 

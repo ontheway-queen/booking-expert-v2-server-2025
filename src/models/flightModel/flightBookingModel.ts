@@ -1,8 +1,8 @@
 import { Knex } from 'knex';
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { BOOKING_SOURCE_AGENT, BOOKING_SOURCE_AGENT_B2C, BOOKING_SOURCE_B2C, BOOKING_SOURCE_EXTERNAL, BOOKING_SOURCE_SUB_AGENT } from '../../utils/miscellaneous/flightConstent';
 import Schema from '../../utils/miscellaneous/schema';
 import { IFlightBookingCheckPayload, IGetFlightBookingList, IGetFlightBookingListFilterQuery, IGetSingleFlightBookingData, IInsertFlightBookingPayload, IUpdateFlightBookingPayload } from '../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
+import { SOURCE_AGENT, SOURCE_AGENT_B2C, SOURCE_B2C, SOURCE_EXTERNAL, SOURCE_SUB_AGENT } from '../../utils/miscellaneous/constants';
 
 
 export default class FlightBookingModel extends Schema {
@@ -26,13 +26,13 @@ export default class FlightBookingModel extends Schema {
         const data = await this.db("flight_booking as fb")
             .withSchema(this.DBO_SCHEMA)
             .leftJoin("agent.agency as ag", function () {
-                this.on("fb.source_id", "=", "ag.id").andOnVal("fb.source_type", "in", [BOOKING_SOURCE_AGENT, BOOKING_SOURCE_SUB_AGENT, BOOKING_SOURCE_AGENT_B2C]);
+                this.on("fb.source_id", "=", "ag.id").andOnVal("fb.source_type", "in", [SOURCE_AGENT, SOURCE_SUB_AGENT, SOURCE_AGENT_B2C]);
             })
             .leftJoin("b2c.users as b2c", function () {
-                this.on("fb.created_by", "=", "b2c.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_B2C);
+                this.on("fb.created_by", "=", "b2c.id").andOnVal("fb.source_type", "=", SOURCE_B2C);
             })
             .leftJoin("external.external as ex", function () {
-                this.on("fb.source_id", "=", "ex.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_EXTERNAL);
+                this.on("fb.source_id", "=", "ex.id").andOnVal("fb.source_type", "=", SOURCE_EXTERNAL);
             })
             .select(
                 "fb.id",
@@ -41,9 +41,9 @@ export default class FlightBookingModel extends Schema {
                 "fb.source_id",
                 this.db.raw(`
       CASE 
-        WHEN fb.source_type IN (${BOOKING_SOURCE_AGENT}, ${BOOKING_SOURCE_SUB_AGENT}, ${BOOKING_SOURCE_AGENT_B2C}) THEN ag.agency_name
-        WHEN fb.source_type = ${BOOKING_SOURCE_B2C} THEN b2c.name
-        WHEN fb.source_type = ${BOOKING_SOURCE_EXTERNAL} THEN ex.name
+        WHEN fb.source_type IN (${SOURCE_AGENT}, ${SOURCE_SUB_AGENT}, ${SOURCE_AGENT_B2C}) THEN ag.agency_name
+        WHEN fb.source_type = ${SOURCE_B2C} THEN b2c.name
+        WHEN fb.source_type = ${SOURCE_EXTERNAL} THEN ex.name
         ELSE NULL
       END AS source_name
     `),
@@ -115,25 +115,25 @@ export default class FlightBookingModel extends Schema {
         return await this.db("flight_booking as fb")
             .withSchema(this.DBO_SCHEMA)
             .leftJoin("agent.agency as ag", function () {
-                this.on("fb.source_id", "=", "ag.id").andOnVal("fb.source_type", "in", [BOOKING_SOURCE_AGENT, BOOKING_SOURCE_SUB_AGENT, BOOKING_SOURCE_AGENT_B2C]);
+                this.on("fb.source_id", "=", "ag.id").andOnVal("fb.source_type", "in", [SOURCE_AGENT, SOURCE_SUB_AGENT, SOURCE_AGENT_B2C]);
             })
             .leftJoin("b2c.users as b2c", function () {
-                this.on("fb.created_by", "=", "b2c.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_B2C);
+                this.on("fb.created_by", "=", "b2c.id").andOnVal("fb.source_type", "=", SOURCE_B2C);
             })
             .leftJoin("external.external as ex", function () {
-                this.on("fb.source_id", "=", "ex.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_EXTERNAL);
+                this.on("fb.source_id", "=", "ex.id").andOnVal("fb.source_type", "=", SOURCE_EXTERNAL);
             })
             .leftJoin("agent.agency_user as agu", function () {
-                this.on("fb.created_by_user_id", "=", "agu.id").andOnVal("fb.source_type", "in", [BOOKING_SOURCE_AGENT, BOOKING_SOURCE_SUB_AGENT]);
+                this.on("fb.created_by_user_id", "=", "agu.id").andOnVal("fb.source_type", "in", [SOURCE_AGENT,SOURCE_SUB_AGENT]);
             })
             .leftJoin("agent_b2c.users as ab", function () {
-                this.on("fb.created_by_user_id", "=", "ab.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_AGENT_B2C);
+                this.on("fb.created_by_user_id", "=", "ab.id").andOnVal("fb.source_type", "=", SOURCE_AGENT_B2C);
             })
             .leftJoin("b2c.users as b2c2", function () {
-                this.on("fb.created_by_user_id", "=", "b2c2.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_B2C);
+                this.on("fb.created_by_user_id", "=", "b2c2.id").andOnVal("fb.source_type", "=", SOURCE_B2C);
             })
             .leftJoin("external.external_user as eu", function () {
-                this.on("fb.created_by_user_id", "=", "eu.id").andOnVal("fb.source_type", "=", BOOKING_SOURCE_EXTERNAL);
+                this.on("fb.created_by_user_id", "=", "eu.id").andOnVal("fb.source_type", "=", SOURCE_EXTERNAL);
             })
             .select(
                 "fb.id",
@@ -142,18 +142,18 @@ export default class FlightBookingModel extends Schema {
                 "fb.source_id",
                 this.db.raw(`
       CASE 
-        WHEN fb.source_type IN (${BOOKING_SOURCE_AGENT}, ${BOOKING_SOURCE_SUB_AGENT}, ${BOOKING_SOURCE_AGENT_B2C}) THEN ag.agency_name
-        WHEN fb.source_type = ${BOOKING_SOURCE_B2C} THEN b2c.name
-        WHEN fb.source_type = ${BOOKING_SOURCE_EXTERNAL} THEN ex.name
+        WHEN fb.source_type IN (${SOURCE_AGENT}, ${SOURCE_SUB_AGENT}, ${SOURCE_AGENT_B2C}) THEN ag.agency_name
+        WHEN fb.source_type = ${SOURCE_B2C} THEN b2c.name
+        WHEN fb.source_type = ${SOURCE_EXTERNAL} THEN ex.name
         ELSE NULL
       END AS source_name
     `),
                 this.db.raw(`
         CASE 
-          WHEN fb.source_type IN (${BOOKING_SOURCE_AGENT}, ${BOOKING_SOURCE_SUB_AGENT}) THEN agu.name
-          WHEN fb.source_type = ${BOOKING_SOURCE_AGENT_B2C} THEN ab.name
-          WHEN fb.source_type = ${BOOKING_SOURCE_B2C} THEN b2c2.name
-          WHEN fb.source_type = ${BOOKING_SOURCE_EXTERNAL} THEN eu.name
+          WHEN fb.source_type IN (${SOURCE_AGENT}, ${SOURCE_SUB_AGENT}) THEN agu.name
+          WHEN fb.source_type = ${SOURCE_AGENT_B2C} THEN ab.name
+          WHEN fb.source_type = ${SOURCE_B2C} THEN b2c2.name
+          WHEN fb.source_type = ${SOURCE_EXTERNAL} THEN eu.name
           ELSE NULL
         END AS created_by
       `),
@@ -196,11 +196,11 @@ export default class FlightBookingModel extends Schema {
     }
 
     public async checkFlightBooking(payload: IFlightBookingCheckPayload): Promise<number> {
-        // Start building the query
-        const db = this.db; // Store this.db in a variable
+        const db = this.db;
+    
         const query = db("flight_booking as fb")
             .withSchema(this.DBO_SCHEMA)
-            .join("flight_segment as fs", "fs.flight_booking_id", "fb.id")
+            .join("flight_booking_segment as fs", "fs.flight_booking_id", "fb.id")
             .join("flight_booking_traveler as fbt", "fbt.flight_booking_id", "fb.id")
             .countDistinct("fb.id as total")
             .where({
@@ -217,49 +217,48 @@ export default class FlightBookingModel extends Schema {
         }
     
         // Build passenger matching conditions
-        query.andWhere(function() {
-            const passengerConditions = this.where(false); // Start with false to use OR later
-            
+        query.andWhere(function () {
+            const passengerConditions = this.where(false); // Start with false for OR chaining
+    
             payload.passengers.forEach(passenger => {
                 const passengerQuery = {
                     "fbt.first_name": passenger.first_name,
                     "fbt.last_name": passenger.last_name
                 };
     
-                // Add optional identifier matches
-                const identifierConditions: Readonly<Partial<Knex.MaybeRawRecord<any>>> | any[] = [];
+                const identifierConditions: any[] = [];
+    
                 if (passenger.passport) {
                     identifierConditions.push(
-                        db.raw("(fbt.passport_number IS NOT NULL AND fbt.passport_number = ?)", 
-                        [passenger.passport])
+                        db.raw("(fbt.passport_number IS NOT NULL AND fbt.passport_number = ?)", [passenger.passport])
                     );
                 }
                 if (passenger.email) {
                     identifierConditions.push(
-                        db.raw("(fbt.email IS NOT NULL AND fbt.email = ?)", 
-                        [passenger.email])
+                        db.raw("(fbt.email IS NOT NULL AND fbt.email = ?)", [passenger.email])
                     );
                 }
                 if (passenger.phone) {
                     identifierConditions.push(
-                        db.raw("(fbt.phone IS NOT NULL AND fbt.phone = ?)", 
-                        [passenger.phone])
+                        db.raw("(fbt.phone IS NOT NULL AND fbt.phone = ?)", [passenger.phone])
                     );
                 }
     
-                // Combine conditions for this passenger
-                passengerConditions.orWhere(function() {
+                // Combine passenger name + any identifier
+                passengerConditions.orWhere(function () {
                     this.where(passengerQuery);
+    
                     if (identifierConditions.length > 0) {
-                        this.andWhere(function() {
-                            this.orWhere(identifierConditions);
+                        this.andWhere(function () {
+                            for (const condition of identifierConditions) {
+                                this.orWhere(condition);
+                            }
                         });
                     }
                 });
             });
         });
     
-        // Execute and return count
         const result = await query.first();
         return Number(result?.total ?? 0);
     }

@@ -21,6 +21,7 @@ const sabreFlightSupport_service_1 = __importDefault(require("../../../utils/sup
 const commonFlightSupport_service_1 = require("../../../utils/supportServices/flightSupportServices/commonFlightSupport.service");
 const flightUtils_1 = __importDefault(require("../../../utils/lib/flight/flightUtils"));
 const commonFlightBookingSupport_service_1 = require("../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service");
+const constants_1 = require("../../../utils/miscellaneous/constants");
 class AgentFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -349,7 +350,7 @@ class AgentFlightService extends abstract_service_1.default {
                     flight_data: data,
                     traveler_data: body.passengers,
                     type: "Agent_Flight",
-                    source_type: flightConstent_1.BOOKING_SOURCE_AGENT,
+                    source_type: constants_1.SOURCE_AGENT,
                     source_id: agency_id,
                 });
                 return {

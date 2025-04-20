@@ -20,6 +20,8 @@ class AgentFlightRouter extends abstract_router_1.default {
             .get(this.controller.getFlightFareRule);
         this.router.route('/revalidate')
             .get(this.controller.flightRevalidate);
+        this.router.route('/booking')
+            .post(this.uploader.cloudUploadRaw(this.fileFolders.FLIGHT_BOOKING_FILES), this.controller.flightBooking);
     }
 }
 exports.default = AgentFlightRouter;

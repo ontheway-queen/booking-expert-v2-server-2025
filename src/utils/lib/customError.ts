@@ -37,5 +37,6 @@ export default class CustomError extends Error implements IError {
     this.message = message;
     this.level = level;
     this.metadata = metadata;
+    console.log({metadata});
   }
 }

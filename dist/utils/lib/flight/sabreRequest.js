@@ -16,6 +16,7 @@ const axios_1 = __importDefault(require("axios"));
 const rootModel_1 = __importDefault(require("../../../models/rootModel"));
 const flightConstent_1 = require("../../miscellaneous/flightConstent");
 const config_1 = __importDefault(require("../../../config/config"));
+const constants_1 = require("../../miscellaneous/constants");
 const BASE_URL = config_1.default.SABRE_URL;
 class SabreRequests {
     // get request
@@ -59,21 +60,21 @@ class SabreRequests {
                     data: requestData,
                     validateStatus: () => true,
                 });
-                //   if (response.status !== 200) {
-                //     await new Models().errorLogsModel().insert({
-                //       level: ERROR_LEVEL_WARNING,
-                //       message: `Error from Sabre`,
-                //       url: apiUrl,
-                //       http_method: 'POST',
-                //       metadata: {
-                //         api: SABRE_API,
-                //         endpoint: apiUrl,
-                //         payload: requestData,
-                //         response: response.data,
-                //       }
-                //     });
-                //     return false;
-                //   }
+                if (response.status !== 200) {
+                    yield new rootModel_1.default().ErrorLogsModel().insertErrorLogs({
+                        level: constants_1.ERROR_LEVEL_WARNING,
+                        message: `Error from Sabre`,
+                        url: apiUrl,
+                        http_method: 'POST',
+                        metadata: {
+                            api: flightConstent_1.SABRE_API,
+                            endpoint: apiUrl,
+                            payload: requestData,
+                            response: response.data,
+                        }
+                    });
+                    return false;
+                }
                 // console.log("response again", response);
                 return response.data;
             }
