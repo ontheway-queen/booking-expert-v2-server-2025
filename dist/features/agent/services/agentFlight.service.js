@@ -254,7 +254,7 @@ class AgentFlightService extends abstract_service_1.default {
     flightBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id, user_email, name } = req.agencyUser;
+                const { agency_id, user_id, user_email, name, phone_number } = req.agencyUser;
                 const body = req.body;
                 const booking_confirm = req.query.booking_confirm;
                 //get flight markup set id
@@ -313,16 +313,17 @@ class AgentFlightService extends abstract_service_1.default {
                 if (directBookingPermission.success === false) {
                     return directBookingPermission;
                 }
-                //if booking is blocked
+                //if booking is not blocked then book the flight using API
                 let airline_pnr = null;
                 let refundable = data.refundable;
                 let gds_pnr = null;
+                let api_booking_ref = null;
                 if (directBookingPermission.booking_block === false) {
                     if (data.api === flightConstent_1.SABRE_API) {
                         const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                         gds_pnr = yield sabreSubService.FlightBookingService({
                             body,
-                            user_info: { id: user_id, name, email: user_email, phone: "" },
+                            user_info: { id: user_id, name, email: user_email, phone: phone_number || "" },
                             revalidate_data: data
                         });
                         //get airline pnr, refundable status
@@ -333,6 +334,35 @@ class AgentFlightService extends abstract_service_1.default {
                         refundable = grnData.refundable;
                     }
                 }
+                //insert booking data
+                const { booking_id, booking_ref } = yield bookingSupportService.insertFlightBookingData({
+                    gds_pnr,
+                    airline_pnr,
+                    status: directBookingPermission.booking_block ? flightConstent_1.FLIGHT_BOOKING_IN_PROCESS : flightConstent_1.FLIGHT_BOOKING_CONFIRMED,
+                    api_booking_ref,
+                    user_id,
+                    user_name: name,
+                    user_email,
+                    files: req.files || [],
+                    refundable,
+                    last_time: data.ticket_last_time,
+                    flight_data: data,
+                    traveler_data: body.passengers,
+                    type: "Agent_Flight",
+                    source_type: flightConstent_1.BOOKING_SOURCE_AGENT,
+                    source_id: agency_id,
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: "The flight has been booked successfully!",
+                    data: {
+                        booking_id,
+                        booking_ref,
+                        gds_pnr,
+                        status: directBookingPermission.booking_block ? flightConstent_1.FLIGHT_BOOKING_IN_PROCESS : flightConstent_1.FLIGHT_BOOKING_CONFIRMED
+                    }
+                };
             }));
         });
     }

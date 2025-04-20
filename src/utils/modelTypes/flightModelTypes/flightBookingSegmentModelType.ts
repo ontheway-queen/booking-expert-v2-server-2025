@@ -8,14 +8,14 @@ export interface IInsertFlightBookingSegmentPayload {
     destination: string;
     class: string;
     baggage: string;
-    departure_date: Date;
+    departure_date: Date|string;
     departure_time: string;
-    arrival_date: Date;
+    arrival_date: Date|string;
     arrival_time: string;
     aircraft: string | null;
     duration: string;
-    departure_terminal: string | null;
-    arrival_terminal: string | null;
+    departure_terminal?: string | null;
+    arrival_terminal?: string | null;
 }
 
 export interface IGetFlightBookingSegmentData {

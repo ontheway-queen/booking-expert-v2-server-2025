@@ -898,13 +898,13 @@ export default class SabreFlightService extends AbstractServices {
     foundItem: IFormattedFlightItinerary,
     user_info: { email: string; phone: string; name: string }
   ) {
-    const formattedDate = (dateString: string) =>
+    const formattedDate = (dateString: string|Date) =>
       `${String(new Date(dateString).getDate()).padStart(2, '0')}${new Date(
         dateString
       )
         .toLocaleString('default', { month: 'short' })
         .toUpperCase()}${String(new Date(dateString).getFullYear()).slice(-2)}`;
-    const monthDiff = (date: string): string => {
+    const monthDiff = (date: string|Date): string => {
       const diff = Math.ceil(
         (new Date().getTime() - new Date(date).getTime()) /
         (1000 * 60 * 60 * 24 * 30)

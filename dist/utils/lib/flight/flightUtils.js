@@ -11,6 +11,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const flightConstent_1 = require("../../miscellaneous/flightConstent");
 const staticData_1 = require("../../miscellaneous/staticData");
 class FlightUtils {
     constructor() {
@@ -120,6 +121,43 @@ class FlightUtils {
                 '-' +
                 leg_description[leg_description.length - 1].arrivalLocation;
         return route;
+    }
+    //get journey type
+    getJourneyType(journey_type) {
+        if (journey_type === "1") {
+            return flightConstent_1.JOURNEY_TYPE_ONE_WAY;
+        }
+        else if (journey_type === "2") {
+            return flightConstent_1.JOURNEY_TYPE_ROUND_TRIP;
+        }
+        else {
+            return flightConstent_1.JOURNEY_TYPE_MULTI_CITY;
+        }
+    }
+    //map flight availability
+    mapFlightAvailability(availability) {
+        const baggage_info = [];
+        const cabin_info = [];
+        availability.map((item) => {
+            item.segments.map((segment) => {
+                baggage_info.push(`${segment.passenger[0].baggage_count} ${segment.passenger[0].baggage_unit}`);
+                cabin_info.push(`${segment.passenger[0].cabin_type} ${segment.passenger[0].booking_code}`);
+            });
+        });
+        return {
+            baggage_info,
+            cabin_info,
+        };
+    }
+    //segment place info
+    segmentPlaceInfo(airport, city, city_code) {
+        return `${airport} (${city},${city_code})`;
+    }
+    //flight duration
+    getDuration(minutes) {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${hours > 0 ? hours + ' hour' + (hours > 1 ? 's' : '') : ''} ${mins > 0 ? mins + ' minute' + (mins > 1 ? 's' : '') : ''}`.trim();
     }
 }
 exports.default = FlightUtils;

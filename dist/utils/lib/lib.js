@@ -245,11 +245,6 @@ class Lib {
             return phone_number; // Return the whole phone number if none of the conditions are met
         }
     }
-    static formatDuration(minutes) {
-        const hours = Math.floor(minutes / 60);
-        const mins = minutes % 60;
-        return `${hours > 0 ? hours + ' hour' + (hours > 1 ? 's' : '') : ''} ${mins > 0 ? mins + ' minute' + (mins > 1 ? 's' : '') : ''}`.trim();
-    }
     static generateUsername(full_name) {
         const newName = full_name.split(' ').join('');
         return newName.toLowerCase();

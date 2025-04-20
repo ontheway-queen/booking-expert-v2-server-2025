@@ -322,13 +322,6 @@ class Lib {
     }
   }
 
-  public static formatDuration(minutes: number): string {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours > 0 ? hours + ' hour' + (hours > 1 ? 's' : '') : ''} ${
-      mins > 0 ? mins + ' minute' + (mins > 1 ? 's' : '') : ''
-    }`.trim();
-  }
 
   public static generateUsername(full_name: string) {
     const newName = full_name.split(' ').join('');

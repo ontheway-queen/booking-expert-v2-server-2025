@@ -38,6 +38,10 @@ export const BOOKING_SOURCE_B2C = "B2C";
 export const BOOKING_SOURCE_EXTERNAL = "EXTERNAL";
 export const BOOKING_SOURCE_ADMIN = "ADMIN";
 
+//booking traveler files
+export const TRAVELER_FILE_TYPE_PASSPORT = "passport";
+export const TRAVELER_FILE_TYPE_VISA = "visa";
+
 //min days before departure for direct ticket issue
 export const MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET = 2;
 

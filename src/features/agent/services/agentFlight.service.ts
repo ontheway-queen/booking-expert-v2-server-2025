@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import AbstractServices from "../../../abstract/abstract.service";
 import { IAirlineCodePayload, IFormattedFlightItinerary, IMultiAPIFlightSearchReqBody, IMultipleApiFlightBookingRequestBody, IOriginDestinationInformationPayload, IPassengerTypeQuantityPayload } from "../../../utils/supportTypes/flightTypes/commonFlightTypes";
-import { FLIGHT_FARE_RESPONSE, FLIGHT_REVALIDATE_REDIS_KEY, SABRE_API } from "../../../utils/miscellaneous/flightConstent";
+import { BOOKING_SOURCE_AGENT, FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_FARE_RESPONSE, FLIGHT_REVALIDATE_REDIS_KEY, SABRE_API } from "../../../utils/miscellaneous/flightConstent";
 import { v4 as uuidv4 } from "uuid";
 import { getRedis, setRedis } from "../../../app/redis";
 import SabreFlightService from "../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service";
@@ -295,7 +295,7 @@ export class AgentFlightService extends AbstractServices {
 
   public async flightBooking(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id, user_id, user_email, name } = req.agencyUser;
+      const { agency_id, user_id, user_email, name, phone_number } = req.agencyUser;
       const body = req.body as IMultipleApiFlightBookingRequestBody;
       const booking_confirm = req.query.booking_confirm;
       //get flight markup set id
@@ -362,16 +362,17 @@ export class AgentFlightService extends AbstractServices {
         return directBookingPermission;
       }
 
-      //if booking is blocked
+      //if booking is not blocked then book the flight using API
       let airline_pnr: string | null = null;
       let refundable = data.refundable;
       let gds_pnr: string | null = null;
+      let api_booking_ref: string | null = null;
       if (directBookingPermission.booking_block === false) {
         if (data.api === SABRE_API) {
           const sabreSubService = new SabreFlightService(trx);
           gds_pnr = await sabreSubService.FlightBookingService({
             body,
-            user_info: { id: user_id, name, email: user_email, phone: "" },
+            user_info: { id: user_id, name, email: user_email, phone: phone_number || "" },
             revalidate_data: data
           });
           //get airline pnr, refundable status
@@ -380,6 +381,37 @@ export class AgentFlightService extends AbstractServices {
           });
           airline_pnr = grnData.airline_pnr;
           refundable = grnData.refundable;
+        }
+      }
+
+      //insert booking data
+      const { booking_id, booking_ref } = await bookingSupportService.insertFlightBookingData({
+        gds_pnr,
+        airline_pnr,
+        status: directBookingPermission.booking_block ? FLIGHT_BOOKING_IN_PROCESS : FLIGHT_BOOKING_CONFIRMED,
+        api_booking_ref,
+        user_id,
+        user_name: name,
+        user_email,
+        files: (req.files as Express.Multer.File[]) || [],
+        refundable,
+        last_time: data.ticket_last_time,
+        flight_data: data,
+        traveler_data: body.passengers,
+        type: "Agent_Flight",
+        source_type: BOOKING_SOURCE_AGENT,
+        source_id: agency_id,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: "The flight has been booked successfully!",
+        data: {
+          booking_id,
+          booking_ref,
+          gds_pnr,
+          status: directBookingPermission.booking_block ? FLIGHT_BOOKING_IN_PROCESS : FLIGHT_BOOKING_CONFIRMED
         }
       }
 

@@ -1,4 +1,4 @@
-type travelerType = "ADT" | "C02" | "C03" | "C04" | "C05" | "C06" | "C07" | "C08" | "C09" | "C10" | "C11";
+type travelerType = "ADT" | "C02" | "C03" | "C04" | "C05" | "C06" | "C07" | "C08" | "C09" | "C10" | "C11" | "INF";
 type travelerReference = "Mr" | "Ms" | "Mrs" | "MSTR" | "Miss";
 type travelerGender = "Male" | "Female";
 
@@ -8,12 +8,12 @@ export interface IInsertFlightBookingTravelerPayload {
     reference: travelerReference;
     first_name: string;
     last_name: string;
-    phone?: number;
-    date_of_birth: Date;
+    phone?: string;
+    date_of_birth: Date | string;
     gender: travelerGender;
     email?: string;
     passport_number?: string;
-    passport_expiry_date?: Date;
+    passport_expiry_date?: Date | string;
     ticket_number?: string;
     issuing_country?: number;
     nationality?: number;

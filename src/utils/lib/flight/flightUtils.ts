@@ -1,8 +1,9 @@
+import { JOURNEY_TYPE_MULTI_CITY, JOURNEY_TYPE_ONE_WAY, JOURNEY_TYPE_ROUND_TRIP } from '../../miscellaneous/flightConstent';
 import {
   SABRE_CABIN_CODE,
   SABRE_MEAL_CODE,
 } from '../../miscellaneous/staticData';
-import { IFormattedFlight, IFormattedFlightOption } from '../../supportTypes/flightTypes/commonFlightTypes';
+import { IFormattedFlight, IFormattedFlightOption, IMultiFlightAvailability } from '../../supportTypes/flightTypes/commonFlightTypes';
 import { IFormattedLegDesc, OriginDestinationInformation } from '../../supportTypes/flightTypes/sabreFlightTypes';
 
 export default class FlightUtils {
@@ -165,5 +166,47 @@ export default class FlightUtils {
       '-' +
       leg_description[leg_description.length - 1].arrivalLocation;
     return route;
+  }
+
+  //get journey type
+  public getJourneyType(journey_type: "1" | "2" | "3") {
+    if (journey_type === "1") {
+      return JOURNEY_TYPE_ONE_WAY;
+    } else if (journey_type === "2") {
+      return JOURNEY_TYPE_ROUND_TRIP;
+    } else {
+      return JOURNEY_TYPE_MULTI_CITY;
+    }
+  }
+
+  //map flight availability
+  public mapFlightAvailability(availability: IMultiFlightAvailability[]) {
+    const baggage_info: string[] = [];
+    const cabin_info: string[] = [];
+    availability.map((item) => {
+      item.segments.map((segment) => {
+        baggage_info.push(`${segment.passenger[0].baggage_count} ${segment.passenger[0].baggage_unit}`);
+        cabin_info.push(`${segment.passenger[0].cabin_type} ${segment.passenger[0].booking_code}`);
+      });
+    });
+
+    return {
+      baggage_info,
+      cabin_info,
+    }
+  }
+
+  //segment place info
+  public segmentPlaceInfo(airport: string, city: string, city_code: string) {
+    return `${airport} (${city},${city_code})`;
+  }
+
+  //flight duration
+  public getDuration(minutes: number): string {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours > 0 ? hours + ' hour' + (hours > 1 ? 's' : '') : ''} ${
+      mins > 0 ? mins + ' minute' + (mins > 1 ? 's' : '') : ''
+    }`.trim();
   }
 }

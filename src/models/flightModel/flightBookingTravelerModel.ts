@@ -11,7 +11,7 @@ export default class FlightBookingTravelerModel extends Schema {
         this.db = db;
     }
 
-    public async insertFlightBookingTraveler(payload: IInsertFlightBookingTravelerPayload): Promise<{ id: number }[]> {
+    public async insertFlightBookingTraveler(payload: IInsertFlightBookingTravelerPayload | IInsertFlightBookingTravelerPayload[]): Promise<{ id: number }[]> {
         return await this.db("flight_booking_traveler")
             .withSchema(this.DBO_SCHEMA)
             .insert(payload, 'id');

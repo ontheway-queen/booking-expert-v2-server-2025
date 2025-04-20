@@ -1,5 +1,5 @@
 export type SourceType = "AGENT" | "SUB AGENT" | "AGENT B2C" | "B2C" | "EXTERNAL";
-export type BookingStatus = "PENDING" | "BOOKED" | "VOIDED" | "IN PROCESS" | "ON HOLD" | "ISSUED" | "EXPIRED" | "CANCELLED" | "REFUNDED" | "REISSUED";
+export type BookingStatus = "PENDING" | "BOOKED" | "VOIDED" | "ON HOLD" | "ISSUED" | "EXPIRED" | "CANCELLED" | "REFUNDED" | "REISSUED" | "BOOKING IN PROCESS" | "TICKET IN PROCESS";
 export type MarkupType = "INCREASE" | "DECREASE";
 export type JourneyType = "ONE WAY" | "ROUND TRIP" | "MULTI CITY";
 export type ActionUserType = SourceType | "ADMIN";
@@ -8,7 +8,7 @@ export interface IInsertFlightBookingPayload {
     booking_ref: string;
     source_type: SourceType;
     source_id?: number;
-    gds_pnr?: string;
+    gds_pnr?: string | null;
     total_passenger: number;
     status?: BookingStatus;
     base_fare: number;
@@ -16,17 +16,17 @@ export interface IInsertFlightBookingPayload {
     ait?: number;
     ticket_price: number;
     markup_price?: number;
-    markup_type?: MarkupType;
+    markup_type?: MarkupType | null;
     payable_amount: number;
     agent_markup?: number;
     journey_type: JourneyType;
     refundable: boolean;
     api: string;
-    api_booking_ref?: string;
+    api_booking_ref?: string | null;
     route: string;
-    travel_date: Date;
-    ticket_issue_last_time?: string;
-    airline_pnr?: string;
+    travel_date: Date | string;
+    ticket_issue_last_time?: string | null;
+    airline_pnr?: string | null;
     created_by: number;
 }
 

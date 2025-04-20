@@ -34,15 +34,15 @@ export interface IMultiAPIFlightSearchReqBody {
 export interface IMultipleAPIFlightBookingPassengerReqBody {
   key: string;
   type: "ADT" | "C02" | "C03" | "C04" | "C05" | "C06" | "C07" | "C08" | "C09" | "C10" | "C11" | "INF";
-  reference: "Mr" | "Mrs" | "Ms" | "Master" | "Miss" | "MSTR";
+  reference: "Mr" | "Mrs" | "Ms" | "Miss" | "MSTR";
   first_name: string;
   last_name: string;
   contact_number?: string;
   contact_email?: string;
-  date_of_birth: string;
+  date_of_birth: string | Date;
   gender: "Male" | "Female";
   passport_number?: string;
-  passport_expiry_date?: string;
+  passport_expiry_date?: string | Date;
   nationality: number;
   issuing_country: number;
   frequent_flyer_airline?: string;
@@ -93,7 +93,7 @@ export interface ILegDescription {
   arrivalLocation: string;
 }
 export interface IFormattedFlightItinerary {
-  journey_type?: string;
+  journey_type: "1" | "2" | "3";
   leg_description: ILegDescription[];
   domestic_flight: boolean;
   price_changed: boolean;
