@@ -27,7 +27,6 @@ export default class AdminAgentAgencyService extends AbstractServices {
       const { id } = req.params;
       const agency_id = Number(id);
       const AgencyModel = this.Model.AgencyModel(trx);
-      const AgencyPaymentModel = this.Model.AgencyPaymentModel(trx);
 
       const data = await AgencyModel.getSingleAgency(agency_id);
 
@@ -39,7 +38,30 @@ export default class AdminAgentAgencyService extends AbstractServices {
         };
       }
 
-      const ledger = await AgencyPaymentModel.getAgencyLedger({ agency_id });
+      let whiteLabelPermissions = {
+        flight: false,
+        hotel: false,
+        visa: false,
+        holiday: false,
+        umrah: false,
+        group_fare: false,
+        blog: false,
+      };
+
+      if (data.white_label) {
+        const wPermissions = await AgencyModel.getWhiteLabelPermission(
+          agency_id
+        );
+        const { token, ...rest } = wPermissions;
+        whiteLabelPermissions = rest;
+      }
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: { ...data, whiteLabelPermissions },
+      };
     });
   }
 }

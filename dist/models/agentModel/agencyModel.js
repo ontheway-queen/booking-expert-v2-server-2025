@@ -179,11 +179,11 @@ class AgencyModel extends schema_1.default {
   FROM agent.agency_ledger as al
   WHERE ag.id = al.agency_id
 ) AS balance
-`), 'fm.name AS flight_markup_set_name', 'hm.name AS hotel_markup_set_name', 'ag.usable_loan', 'ag.white_label', 'ag.allow_api', 'ua.name AS created_by', 'uar.name AS referred_by')
+`), 'fm.name AS flight_markup_set_name', 'hm.name AS hotel_markup_set_name', 'ag.usable_loan', 'ag.white_label', 'ag.allow_api', 'ag.civil_aviation', 'ag.trade_license', 'ag.national_id', 'ua.name AS created_by', 'ua.ref_id', 'ar.name AS referred_by')
                 .joinRaw('LEFT JOIN dbo.markup_set AS fm ON ag.flight_markup_set = fm.id')
                 .joinRaw('LEFT JOIN dbo.markup_set AS hm ON ag.hotel_markup_set = hm.id')
                 .joinRaw('LEFT JOIN admin.user_admin AS ua ON ag.created_by = ua.id')
-                .joinRaw('LEFT JOIN admin.user_admin AS uar ON ag.ref_id = uar.id')
+                .joinRaw('LEFT JOIN agent.agency AS ar ON ag.ref_id = ar.id')
                 .where('ag.id', id)
                 .first();
         });
