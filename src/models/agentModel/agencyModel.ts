@@ -55,7 +55,6 @@ export default class AgencyModel extends Schema {
         'ag.agency_name',
         'ag.email',
         'ag.phone',
-        'ag.address',
         'ag.status',
         'ag.white_label',
         'ag.allow_api'
@@ -256,8 +255,8 @@ export default class AgencyModel extends Schema {
         'ag.trade_license',
         'ag.national_id',
         'ua.name AS created_by',
-        'ua.ref_id',
-        'ar.name AS referred_by'
+        'ag.ref_id',
+        'ar.agency_name AS referred_by'
       )
       .joinRaw('LEFT JOIN dbo.markup_set AS fm ON ag.flight_markup_set = fm.id')
       .joinRaw('LEFT JOIN dbo.markup_set AS hm ON ag.hotel_markup_set = hm.id')

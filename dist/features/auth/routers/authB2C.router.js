@@ -13,9 +13,7 @@ class AuthB2CRouter extends abstract_router_1.default {
     }
     callRouter() {
         this.router.route('/login').post(this.controller.login);
-        this.router
-            .route('/register')
-            .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_USER), this.controller.register);
+        this.router.route('/register').post(this.controller.register);
         this.router
             .route('/register/complete')
             .post(this.controller.registerComplete);

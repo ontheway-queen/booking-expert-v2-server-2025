@@ -13,7 +13,7 @@ export default class AgentProfileRouter extends AbstractRouter {
       .route('/')
       .get(this.controller.getProfile)
       .patch(
-        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_USER),
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_USER, ['photo']),
         this.controller.updateProfile
       );
 

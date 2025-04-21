@@ -15,7 +15,9 @@ class B2CProfileRouter extends abstract_router_1.default {
         this.router
             .route('/')
             .get(this.controller.getProfile)
-            .patch(this.uploader.cloudUploadRaw(this.fileFolders.B2C_USER_FILES), this.controller.updateProfile);
+            .patch(this.uploader.cloudUploadRaw(this.fileFolders.B2C_USER_FILES, [
+            'photo',
+        ]), this.controller.updateProfile);
         this.router.route('/change-password').post(this.controller.changePassword);
     }
 }

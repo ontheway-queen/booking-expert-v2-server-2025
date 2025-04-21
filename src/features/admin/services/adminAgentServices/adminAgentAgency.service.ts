@@ -46,14 +46,14 @@ export default class AdminAgentAgencyService extends AbstractServices {
         umrah: false,
         group_fare: false,
         blog: false,
+        token: '',
       };
 
       if (data.white_label) {
         const wPermissions = await AgencyModel.getWhiteLabelPermission(
           agency_id
         );
-        const { token, ...rest } = wPermissions;
-        whiteLabelPermissions = rest;
+        whiteLabelPermissions = wPermissions;
       }
 
       return {
