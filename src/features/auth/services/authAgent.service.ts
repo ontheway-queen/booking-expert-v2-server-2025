@@ -99,6 +99,18 @@ export default class AuthAgentService extends AbstractServices {
         national_id,
       });
 
+      await AgentModel.createWhiteLabelPermission({
+        agency_id: newAgency[0].id,
+        blog: false,
+        flight: false,
+        group_fare: false,
+        holiday: false,
+        hotel: false,
+        token: '',
+        umrah: false,
+        visa: false,
+      });
+
       const newRole = await AgencyUserModel.createRole({
         agency_id: newAgency[0].id,
         name: 'Super Admin',

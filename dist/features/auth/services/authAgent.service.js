@@ -97,6 +97,17 @@ class AuthAgentService extends abstract_service_1.default {
                     trade_license,
                     national_id,
                 });
+                yield AgentModel.createWhiteLabelPermission({
+                    agency_id: newAgency[0].id,
+                    blog: false,
+                    flight: false,
+                    group_fare: false,
+                    holiday: false,
+                    hotel: false,
+                    token: '',
+                    umrah: false,
+                    visa: false,
+                });
                 const newRole = yield AgencyUserModel.createRole({
                     agency_id: newAgency[0].id,
                     name: 'Super Admin',

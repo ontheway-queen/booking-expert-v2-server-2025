@@ -121,7 +121,7 @@ class Lib {
             let NoCode = '';
             const lastId = yield commonModel.getLastId({ type });
             if (lastId) {
-                newId = lastId.last_id + 1;
+                newId = Number(lastId.last_id) + 1;
                 yield commonModel.updateLastNo({ last_id: newId, last_updated: new Date() }, lastId === null || lastId === void 0 ? void 0 : lastId.id);
             }
             else {

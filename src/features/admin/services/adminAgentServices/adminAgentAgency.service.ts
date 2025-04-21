@@ -64,4 +64,6 @@ export default class AdminAgentAgencyService extends AbstractServices {
       };
     });
   }
+
+  public async updateAgency(req: Request) {}
 }

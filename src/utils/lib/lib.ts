@@ -140,7 +140,7 @@ class Lib {
     const lastId = await commonModel.getLastId({ type });
 
     if (lastId) {
-      newId = lastId.last_id + 1;
+      newId = Number(lastId.last_id) + 1;
       await commonModel.updateLastNo(
         { last_id: newId, last_updated: new Date() },
         lastId?.id

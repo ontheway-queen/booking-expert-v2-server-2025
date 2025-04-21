@@ -68,5 +68,8 @@ class AdminAgentAgencyService extends abstract_service_1.default {
             }));
         });
     }
+    updateAgency(req) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
 }
 exports.default = AdminAgentAgencyService;
