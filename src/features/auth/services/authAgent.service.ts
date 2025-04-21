@@ -62,7 +62,6 @@ export default class AuthAgentService extends AbstractServices {
       let national_id = '';
 
       files.forEach((file) => {
-        console.log(file.fieldname);
         switch (file.fieldname) {
           case 'logo':
             logo = file.filename;
@@ -97,18 +96,6 @@ export default class AuthAgentService extends AbstractServices {
         civil_aviation,
         trade_license,
         national_id,
-      });
-
-      await AgentModel.createWhiteLabelPermission({
-        agency_id: newAgency[0].id,
-        blog: false,
-        flight: false,
-        group_fare: false,
-        holiday: false,
-        hotel: false,
-        token: '',
-        umrah: false,
-        visa: false,
       });
 
       const newRole = await AgencyUserModel.createRole({

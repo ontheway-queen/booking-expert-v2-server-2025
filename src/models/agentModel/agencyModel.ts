@@ -16,6 +16,7 @@ import {
   IGetWhiteLabelPermissionData,
   IUpdateAgencyPayload,
   IUpdateAPICredsPayload,
+  IUpdateWhiteLabelPermissionPayload,
 } from '../../utils/modelTypes/agentModel/agencyModelTypes';
 
 export default class AgencyModel extends Schema {
@@ -275,10 +276,20 @@ export default class AgencyModel extends Schema {
       .insert(payload, 'id');
   }
 
+  public async updateWhiteLabelPermission(
+    payload: IUpdateWhiteLabelPermissionPayload,
+    agency_id: number
+  ) {
+    return await this.db('agency_white_label_permission')
+      .withSchema(this.AGENT_SCHEMA)
+      .update(payload)
+      .where('agency_id', agency_id);
+  }
+
   // get white label permission
   public async getWhiteLabelPermission(
     agency_id: number
-  ): Promise<IGetWhiteLabelPermissionData> {
+  ): Promise<IGetWhiteLabelPermissionData | null> {
     return await this.db('agency_white_label_permission')
       .withSchema(this.AGENT_SCHEMA)
       .select(

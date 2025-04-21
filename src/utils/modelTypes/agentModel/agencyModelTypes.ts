@@ -19,6 +19,9 @@ export interface ICreateAgencyPayload {
 
 export interface IUpdateAgencyPayload {
   agency_logo?: string;
+  civil_aviation?: string;
+  trade_license?: string;
+  national_id?: string;
   agency_name?: string;
   email?: string;
   phone?: string;
@@ -128,6 +131,17 @@ export interface ICreateWhiteLabelPermissionPayload {
   group_fare: boolean;
   umrah: boolean;
   blog: boolean;
+}
+
+export interface IUpdateWhiteLabelPermissionPayload {
+  flight?: boolean;
+  hotel?: boolean;
+  visa?: boolean;
+  holiday?: boolean;
+  umrah?: boolean;
+  group_fare?: boolean;
+  blog?: boolean;
+  token?: string;
 }
 
 export interface IGetWhiteLabelPermissionData {

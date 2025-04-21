@@ -25,4 +25,12 @@ export default class AdminAgentAgencyController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public updateAgency = this.asyncWrapper.wrap(
+    { paramSchema: this.validator.updateAgency },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.updateAgency(req);
+      res.status(code).json(rest);
+    }
+  );
 }
