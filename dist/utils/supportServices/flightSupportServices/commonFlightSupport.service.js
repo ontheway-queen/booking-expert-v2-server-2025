@@ -51,7 +51,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
                 return null;
             }
             revalidate_data.leg_description = retrievedData.response.leg_descriptions;
-            revalidate_data.price_changed = this.checkRevalidatePriceChange({ flight_search_price: Number(foundItem === null || foundItem === void 0 ? void 0 : foundItem.fare.total_price), flight_revalidate_price: Number(revalidate_data.fare.total_price) });
+            revalidate_data.price_changed = this.checkRevalidatePriceChange({ flight_search_price: Number(foundItem === null || foundItem === void 0 ? void 0 : foundItem.fare.total_price), flight_revalidate_price: Number(revalidate_data === null || revalidate_data === void 0 ? void 0 : revalidate_data.fare.total_price) });
             return revalidate_data;
         });
     }
@@ -66,6 +66,9 @@ class CommonFlightSupportService extends abstract_service_1.default {
     checkBookingPriceChange(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             const retrievedData = yield (0, redis_1.getRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${payload.flight_id}`);
+            if (!retrievedData) {
+                return null;
+            }
             if (retrievedData.fare.total_price === payload.booking_price) {
                 return false;
             }

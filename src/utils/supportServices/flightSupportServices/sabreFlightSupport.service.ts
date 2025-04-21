@@ -1277,7 +1277,7 @@ export default class SabreFlightService extends AbstractServices {
       requestBody
     );
     if (!response) {
-      throw new Error("Something went wrong. Please try again later");
+      throw new CustomError('Something went wrong. Please try again later', 500);
     }
     if (
       response?.CreatePassengerNameRecordRS?.ApplicationResults?.status !==

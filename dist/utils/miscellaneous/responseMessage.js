@@ -37,4 +37,5 @@ ResMsg.DUPLICATE_BOOKING = "This flight is already booked with the same passenge
 ResMsg.BOOKING_CANCELLED_MORE_THAN_TWO_TIMES = "Booking has been cancelled 2 times with the same information";
 ResMsg.SET_FLIGHT_API_ID_NOT_FOUND = "Set flight api id not found";
 ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP = "Airline data not found for the markup set";
+ResMsg.REVALIDATE_BEFORE_BOOKING = "Revalidate the flight before booking";
 exports.default = ResMsg;

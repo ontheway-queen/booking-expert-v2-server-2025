@@ -285,11 +285,18 @@ class AgentFlightService extends abstract_service_1.default {
                 //if price has been changed and no confirmation of booking then return
                 if (!booking_confirm) {
                     const price_changed = yield flightSupportService.checkBookingPriceChange({ flight_id: body.flight_id, booking_price: data.fare.total_price });
-                    if (price_changed) {
+                    if (price_changed === true) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_CONFLICT,
                             message: this.ResMsg.BOOKING_PRICE_CHANGED
+                        };
+                    }
+                    else if (price_changed === null) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_NOT_FOUND,
+                            message: this.ResMsg.REVALIDATE_BEFORE_BOOKING,
                         };
                     }
                 }

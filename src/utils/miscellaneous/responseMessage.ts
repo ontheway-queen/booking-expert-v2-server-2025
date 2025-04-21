@@ -51,6 +51,7 @@ class ResMsg {
   static readonly BOOKING_CANCELLED_MORE_THAN_TWO_TIMES = "Booking has been cancelled 2 times with the same information";
   static readonly SET_FLIGHT_API_ID_NOT_FOUND = "Set flight api id not found";
   static readonly AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP = "Airline data not found for the markup set";
+  static readonly REVALIDATE_BEFORE_BOOKING = "Revalidate the flight before booking";
 }
 
 export default ResMsg;

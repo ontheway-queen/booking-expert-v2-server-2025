@@ -61,7 +61,7 @@ export class CommonFlightSupportService extends AbstractServices {
             return null;
         }
         revalidate_data.leg_description = retrievedData.response.leg_descriptions;
-        revalidate_data.price_changed = this.checkRevalidatePriceChange({ flight_search_price: Number(foundItem?.fare.total_price), flight_revalidate_price: Number(revalidate_data.fare.total_price) });
+        revalidate_data.price_changed = this.checkRevalidatePriceChange({ flight_search_price: Number(foundItem?.fare.total_price), flight_revalidate_price: Number(revalidate_data?.fare.total_price) });
         return revalidate_data;
     }
 
@@ -82,6 +82,9 @@ export class CommonFlightSupportService extends AbstractServices {
         booking_price: number;
     }) {
         const retrievedData = await getRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${payload.flight_id}`) as IFormattedFlightItinerary;
+        if (!retrievedData) {
+            return null;
+        }
         if (retrievedData.fare.total_price === payload.booking_price) {
             return false;
         } else {

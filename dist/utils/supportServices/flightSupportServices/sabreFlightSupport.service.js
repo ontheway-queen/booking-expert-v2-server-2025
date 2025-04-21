@@ -1036,7 +1036,7 @@ class SabreFlightService extends abstract_service_1.default {
             });
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT, requestBody);
             if (!response) {
-                throw new Error("Something went wrong. Please try again later");
+                throw new customError_1.default('Something went wrong. Please try again later', 500);
             }
             if (((_c = (_b = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _b === void 0 ? void 0 : _b.ApplicationResults) === null || _c === void 0 ? void 0 : _c.status) !==
                 'Complete') {
