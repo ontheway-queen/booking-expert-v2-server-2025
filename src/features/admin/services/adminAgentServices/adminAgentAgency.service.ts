@@ -1,11 +1,13 @@
 import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
 import {
-  AdminAgentGetAgencyReqQuery,
-  AdminAgentUpdateAgencyReqBody,
+  IAdminAgentGetAgencyReqQuery,
+  IAdminAgentUpdateAgencyReqBody,
+  IAdminAgentUpdateAgencyApplicationReqBody,
 } from '../../utils/types/adminAgentAgency.types';
 import CustomError from '../../../../utils/lib/customError';
 import { IUpdateAgencyPayload } from '../../../../utils/modelTypes/agentModel/agencyModelTypes';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class AdminAgentAgencyService extends AbstractServices {
   constructor() {
@@ -13,7 +15,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
   }
 
   public async getAgency(req: Request) {
-    const query = req.query as unknown as AdminAgentGetAgencyReqQuery;
+    const query = req.query as unknown as IAdminAgentGetAgencyReqQuery;
     const AgencyModel = this.Model.AgencyModel();
 
     const data = await AgencyModel.getAgencyList(query, true);
@@ -58,7 +60,10 @@ export default class AdminAgentAgencyService extends AbstractServices {
         const wPermissions = await AgencyModel.getWhiteLabelPermission(
           agency_id
         );
-        whiteLabelPermissions = wPermissions;
+
+        if (wPermissions) {
+          whiteLabelPermissions = wPermissions;
+        }
       }
 
       return {
@@ -85,9 +90,20 @@ export default class AdminAgentAgencyService extends AbstractServices {
           this.StatusCode.HTTP_NOT_FOUND
         );
       }
+
+      if (
+        checkAgency.status === 'Incomplete' ||
+        checkAgency.status === 'Pending' ||
+        checkAgency.status === 'Rejected'
+      ) {
+        throw new CustomError(
+          this.ResMsg.HTTP_NOT_FOUND,
+          this.StatusCode.HTTP_NOT_FOUND
+        );
+      }
       const { user_id } = req.admin;
       const { status, white_label_permissions, white_label, ...restBody } =
-        req.body as AdminAgentUpdateAgencyReqBody;
+        req.body as IAdminAgentUpdateAgencyReqBody;
 
       const files = (req.files as Express.Multer.File[]) || [];
 
@@ -95,7 +111,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       files.forEach((file) => {
         switch (file.fieldname) {
-          case 'logo':
+          case 'agency_logo':
             payload.agency_logo = file.filename;
             break;
           case 'civil_aviation':
@@ -124,7 +140,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         }
       }
 
-      if (white_label_permissions || white_label) {
+      if (white_label_permissions) {
         const checkPermission = await AgentModel.getWhiteLabelPermission(
           agency_id
         );
@@ -135,8 +151,96 @@ export default class AdminAgentAgencyService extends AbstractServices {
             agency_id
           );
         } else {
-          // await AgentModel.createWhiteLabelPermission()
+          const uuid = uuidv4();
+          await AgentModel.createWhiteLabelPermission({
+            agency_id,
+            token: uuid,
+            ...white_label_permissions,
+          });
         }
+      }
+
+      await AgentModel.updateAgency(payload, agency_id);
+
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        type: 'UPDATE',
+        details: `Agency Updated. Data: ${JSON.stringify(payload)}`,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
+    });
+  }
+
+  public async updateAgencyApplication(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { id } = req.params;
+      const agency_id = Number(id);
+      const AgentModel = this.Model.AgencyModel(trx);
+      const MarkupSetModel = this.Model.MarkupSetModel(trx);
+      const checkAgency = await AgentModel.checkAgency({
+        agency_id,
+      });
+
+      if (!checkAgency) {
+        throw new CustomError(
+          this.ResMsg.HTTP_NOT_FOUND,
+          this.StatusCode.HTTP_NOT_FOUND
+        );
+      }
+
+      if (
+        checkAgency.status === 'Incomplete' ||
+        checkAgency.status === 'Pending' ||
+        checkAgency.status === 'Rejected'
+      ) {
+        throw new CustomError(
+          this.ResMsg.HTTP_NOT_FOUND,
+          this.StatusCode.HTTP_NOT_FOUND
+        );
+      }
+
+      const body = req.body as IAdminAgentUpdateAgencyApplicationReqBody;
+
+      let payload: IUpdateAgencyPayload = {};
+
+      if (body.status === 'Active') {
+        const checkFlightMarkupSet = await MarkupSetModel.getSingleMarkupSet(
+          body.flight_markup_set,
+          true,
+          'Flight'
+        );
+
+        if (!checkFlightMarkupSet) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
+            message: 'Invalid flight markup set.',
+          };
+        }
+        const checkHotelMarkupSet = await MarkupSetModel.getSingleMarkupSet(
+          body.flight_markup_set,
+          true,
+          'Hotel'
+        );
+
+        if (!checkHotelMarkupSet) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
+            message: 'Invalid hotel markup set.',
+          };
+        }
+
+        payload.status = body.status;
+        payload.flight_markup_set = body.flight_markup_set;
+        payload.hotel_markup_set = body.hotel_markup_set;
+      } else {
+        payload.status = body.status;
       }
 
       await AgentModel.updateAgency(payload, agency_id);

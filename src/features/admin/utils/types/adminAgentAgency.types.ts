@@ -1,11 +1,11 @@
-export interface AdminAgentGetAgencyReqQuery {
+export interface IAdminAgentGetAgencyReqQuery {
   filter?: string;
   limit?: string;
   skip?: string;
   status: string;
 }
 
-export interface AdminAgentUpdateAgencyReqBody {
+export interface IAdminAgentUpdateAgencyReqBody {
   agency_name?: string;
   email?: string;
   phone?: string;
@@ -24,4 +24,10 @@ export interface AdminAgentUpdateAgencyReqBody {
     group_fare: boolean;
     blog: boolean;
   };
+}
+
+export interface IAdminAgentUpdateAgencyApplicationReqBody {
+  status: 'Active' | 'Rejected';
+  hotel_markup_set: number;
+  flight_markup_set: number;
 }

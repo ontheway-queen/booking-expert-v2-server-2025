@@ -1,67 +1,79 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import Schema from '../../utils/miscellaneous/schema';
-import { ICreateMarkupSetPayload, IGetMarkupListFilterQuery, IGetMarkupSetData, IUpdateMarkupSetPayload } from '../../utils/modelTypes/markupSetModelTypes/markupSetModelTypes';
+import {
+  ICreateMarkupSetPayload,
+  IGetMarkupListFilterQuery,
+  IGetMarkupSetData,
+  IUpdateMarkupSetPayload,
+} from '../../utils/modelTypes/markupSetModelTypes/markupSetModelTypes';
 
 export default class MarkupSetModel extends Schema {
-    private db: TDB;
+  private db: TDB;
 
-    constructor(db: TDB) {
-        super();
-        this.db = db;
-    }
+  constructor(db: TDB) {
+    super();
+    this.db = db;
+  }
 
-    public async createMarkupSet(payload: ICreateMarkupSetPayload): Promise<{ id: number }[]> {
-        return await this.db('markup_set')
-            .withSchema(this.DBO_SCHEMA)
-            .insert(payload, 'id');
-    }
+  public async createMarkupSet(
+    payload: ICreateMarkupSetPayload
+  ): Promise<{ id: number }[]> {
+    return await this.db('markup_set')
+      .withSchema(this.DBO_SCHEMA)
+      .insert(payload, 'id');
+  }
 
+  public async getAllMarkupSet(
+    query: IGetMarkupListFilterQuery
+  ): Promise<IGetMarkupSetData[]> {
+    const data = await this.db('markup_set')
+      .withSchema(this.DBO_SCHEMA)
+      .select('*')
+      .where((qb) => {
+        if (query.name) {
+          qb.andWhereILike('name', `%${query.name}%`);
+        }
+        if (query.check_name) {
+          qb.andWhere('name', query.check_name);
+        }
+        if (query.status !== undefined) {
+          qb.andWhere('status', query.status);
+        }
+        if (query.type) {
+          qb.andWhere('type', query.type);
+        }
+      })
+      .andWhere('is_deleted', false);
 
-    public async getAllMarkupSet(
-        query: IGetMarkupListFilterQuery
-    ): Promise<IGetMarkupSetData[]> {
-        const data = await this.db('markup_set')
-            .withSchema(this.DBO_SCHEMA)
-            .select('*')
-            .where((qb) => {
-                if (query.name) {
-                    qb.andWhereILike('name', `%${query.name}%`);
-                }
-                if (query.check_name) {
-                    qb.andWhere('name', query.check_name);
-                }
-                if (query.status !== undefined) {
-                    qb.andWhere('status', query.status);
-                }
-                if(query.type) {
-                    qb.andWhere('type', query.type);
-                }
-            })
-            .andWhere("is_deleted", false);
+    return data;
+  }
 
-        return data;
-    }
+  public async getSingleMarkupSet(
+    id: number,
+    status?: boolean,
+    type?: 'Flight' | 'Hotel'
+  ): Promise<IGetMarkupSetData | null> {
+    return await this.db('markup_set')
+      .withSchema(this.DBO_SCHEMA)
+      .select('*')
+      .where((qb) => {
+        if (type) {
+          qb.andWhere('type', type);
+        }
+        qb.andWhere({ id });
 
-    public async getSingleMarkupSet(id: number, status?: boolean): Promise<IGetMarkupSetData> {
-        return await this.db('markup_set')
-            .withSchema(this.DBO_SCHEMA)
-            .select('*')
-            .where((qb) => {
-                qb.andWhere({ id });
+        if (status !== undefined) {
+          qb.andWhere('status', status);
+        }
+      })
+      .andWhere('is_deleted', false)
+      .first();
+  }
 
-                if (status !== undefined) {
-                    qb.andWhere('status', status);
-                }
-            })
-            .andWhere("is_deleted", false)
-            .first();
-    }
-
-    public async updateMarkupSet(payload: IUpdateMarkupSetPayload, id: number) {
-        return await this.db('markup_set')
-            .withSchema(this.DBO_SCHEMA)
-            .update(payload)
-            .where({ id });
-    }
-
+  public async updateMarkupSet(payload: IUpdateMarkupSetPayload, id: number) {
+    return await this.db('markup_set')
+      .withSchema(this.DBO_SCHEMA)
+      .update(payload)
+      .where({ id });
+  }
 }

@@ -68,8 +68,10 @@ class AdminProfileService extends abstract_service_1.default {
             };
             if (user.white_label) {
                 const wPermissions = yield AgentModel.getWhiteLabelPermission(agency_id);
-                const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
-                whiteLabelPermissions = rest;
+                if (wPermissions) {
+                    const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
+                    whiteLabelPermissions = rest;
+                }
             }
             return {
                 success: true,

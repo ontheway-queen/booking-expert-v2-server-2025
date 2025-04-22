@@ -3,7 +3,9 @@ import Schema from '../../utils/miscellaneous/schema';
 import {
   IAdminCreatePayload,
   ICheckUserAdmin,
+  ICreateAdminAuditTrailPayload,
   ICreateRolePayload,
+  IGetAdminAuditTrailQuery,
   IGetAdminData,
   IGetAdminListFilterQuery,
   IGetAllPermissionsData,
@@ -303,5 +305,64 @@ export default class AdminModel extends Schema {
       .update(payload)
       .andWhere('role_id', role_id)
       .andWhere('permission_id', permission_id);
+  }
+
+  //create audit
+  public async createAudit(payload: ICreateAdminAuditTrailPayload) {
+    return await this.db('audit_trail')
+      .withSchema(this.ADMIN_SCHEMA)
+      .insert(payload);
+  }
+
+  //get audit
+  public async getAudit(payload: IGetAdminAuditTrailQuery) {
+    const data = await this.db('admin_audit_trail as at')
+      .select(
+        'at.id',
+        'ad.name as created_by',
+        'at.type',
+        'at.details',
+        'at.created_at'
+      )
+      .leftJoin('admin as ad', 'ad.id', 'at.created_by')
+      .andWhere((qb) => {
+        if (payload.created_by) {
+          qb.andWhere('at.created_by', payload.created_by);
+        }
+        if (payload.type) {
+          qb.andWhere('at.type', payload.type);
+        }
+        if (payload.from_date && payload.to_date) {
+          qb.andWhereBetween('at.created_at', [
+            payload.from_date,
+            payload.to_date,
+          ]);
+        }
+      })
+      .limit(payload.limit || 100)
+      .offset(payload.skip || 0)
+      .orderBy('at.id', 'desc');
+
+    const total = await this.db('admin_audit_trail as at')
+      .count('at.id as total')
+      .andWhere((qb) => {
+        if (payload.created_by) {
+          qb.andWhere('at.created_by', payload.created_by);
+        }
+        if (payload.type) {
+          qb.andWhere('at.type', payload.type);
+        }
+        if (payload.from_date && payload.to_date) {
+          qb.andWhereBetween('at.created_at', [
+            payload.from_date,
+            payload.to_date,
+          ]);
+        }
+      });
+
+    return {
+      data,
+      total: total[0]?.total,
+    };
   }
 }

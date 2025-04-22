@@ -29,7 +29,6 @@ class CommonModel extends schema_1.default {
                 .andWhere('email', payload.email)
                 .andWhere('type', payload.type)
                 .andWhere('matched', 0)
-                .andWhere('tried', '<', 3)
                 .andWhereRaw(`"create_date" + interval '${constants_1.OTP_DEFAULT_EXPIRY} minutes' > NOW()`);
             return check;
         });
@@ -156,7 +155,7 @@ class CommonModel extends schema_1.default {
     }
     //get all city
     getCity(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ country_id, city_id, limit, skip, name, code }) {
+        return __awaiter(this, arguments, void 0, function* ({ country_id, city_id, limit, skip, name, code, }) {
             return yield this.db('city AS c')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .select('c.id', 'c.name', 'co.name AS country_name')

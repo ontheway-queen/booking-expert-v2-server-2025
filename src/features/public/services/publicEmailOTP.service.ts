@@ -112,7 +112,6 @@ export default class PublicEmailOTPService extends AbstractServices {
           break;
       }
 
-      console.log({ OTP_FOR });
       const commonModel = this.Model.CommonModel(trx);
       const checkOtp = await commonModel.getOTP({
         email: email,

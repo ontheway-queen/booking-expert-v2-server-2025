@@ -23,18 +23,44 @@ class AdminAgentAgencyValidator {
             hotel_markup_set: joi_1.default.number().optional(),
             white_label: joi_1.default.boolean().optional(),
             allow_api: joi_1.default.boolean().optional(),
-            status: joi_1.default.string()
-                .valid('Pending', 'Active', 'Inactive', 'Rejected', 'Incomplete')
-                .optional(),
-            white_label_permissions: joi_1.default.object({
-                flight: joi_1.default.boolean().required(),
-                hotel: joi_1.default.boolean().required(),
-                visa: joi_1.default.boolean().required(),
-                holiday: joi_1.default.boolean().required(),
-                umrah: joi_1.default.boolean().required(),
-                group_fare: joi_1.default.boolean().required(),
-                blog: joi_1.default.boolean().required(),
-            }).optional(),
+            status: joi_1.default.string().valid('Active', 'Inactive').optional(),
+            white_label_permissions: joi_1.default.string()
+                .optional()
+                .custom((value, helpers) => {
+                try {
+                    const innerSchema = joi_1.default.object({
+                        flight: joi_1.default.boolean().required(),
+                        hotel: joi_1.default.boolean().required(),
+                        visa: joi_1.default.boolean().required(),
+                        holiday: joi_1.default.boolean().required(),
+                        umrah: joi_1.default.boolean().required(),
+                        group_fare: joi_1.default.boolean().required(),
+                        blog: joi_1.default.boolean().required(),
+                    });
+                    const parsedValue = JSON.parse(value);
+                    const { error } = innerSchema.validate(parsedValue);
+                    if (error) {
+                        return helpers.error('any.invalid');
+                    }
+                    else {
+                        return parsedValue;
+                    }
+                }
+                catch (err) {
+                    return helpers.error('any.invalid');
+                }
+            }),
+        });
+        this.updateAgencyApplication = joi_1.default.object({
+            status: joi_1.default.string().valid('Active', 'Rejected').required(),
+            flight_markup_set: joi_1.default.alternatives().conditional('status', {
+                is: 'Active',
+                then: joi_1.default.number().required(),
+            }),
+            hotel_markup_set: joi_1.default.alternatives().conditional('status', {
+                is: 'Active',
+                then: joi_1.default.number().required(),
+            }),
         });
     }
 }

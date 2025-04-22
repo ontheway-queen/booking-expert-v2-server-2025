@@ -19,17 +19,44 @@ export default class AdminAgentAgencyValidator {
     hotel_markup_set: Joi.number().optional(),
     white_label: Joi.boolean().optional(),
     allow_api: Joi.boolean().optional(),
-    status: Joi.string()
-      .valid('Pending', 'Active', 'Inactive', 'Rejected', 'Incomplete')
-      .optional(),
-    white_label_permissions: Joi.object({
-      flight: Joi.boolean().required(),
-      hotel: Joi.boolean().required(),
-      visa: Joi.boolean().required(),
-      holiday: Joi.boolean().required(),
-      umrah: Joi.boolean().required(),
-      group_fare: Joi.boolean().required(),
-      blog: Joi.boolean().required(),
-    }).optional(),
+    status: Joi.string().valid('Active', 'Inactive').optional(),
+    white_label_permissions: Joi.string()
+      .optional()
+      .custom((value, helpers) => {
+        try {
+          const innerSchema = Joi.object({
+            flight: Joi.boolean().required(),
+            hotel: Joi.boolean().required(),
+            visa: Joi.boolean().required(),
+            holiday: Joi.boolean().required(),
+            umrah: Joi.boolean().required(),
+            group_fare: Joi.boolean().required(),
+            blog: Joi.boolean().required(),
+          });
+          const parsedValue = JSON.parse(value);
+
+          const { error } = innerSchema.validate(parsedValue);
+
+          if (error) {
+            return helpers.error('any.invalid');
+          } else {
+            return parsedValue;
+          }
+        } catch (err) {
+          return helpers.error('any.invalid');
+        }
+      }),
+  });
+
+  public updateAgencyApplication = Joi.object({
+    status: Joi.string().valid('Active', 'Rejected').required(),
+    flight_markup_set: Joi.alternatives().conditional('status', {
+      is: 'Active',
+      then: Joi.number().required(),
+    }),
+    hotel_markup_set: Joi.alternatives().conditional('status', {
+      is: 'Active',
+      then: Joi.number().required(),
+    }),
   });
 }

@@ -56,15 +56,15 @@ export default class AuthAgentService extends AbstractServices {
         };
       }
 
-      let logo = '';
+      let agency_logo = '';
       let civil_aviation = '';
       let trade_license = '';
       let national_id = '';
 
       files.forEach((file) => {
         switch (file.fieldname) {
-          case 'logo':
-            logo = file.filename;
+          case 'agency_logo':
+            agency_logo = file.filename;
             break;
           case 'civil_aviation':
             civil_aviation = file.filename;
@@ -92,7 +92,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_name,
         email,
         phone,
-        agency_logo: logo,
+        agency_logo,
         civil_aviation,
         trade_license,
         national_id,
@@ -333,8 +333,11 @@ export default class AuthAgentService extends AbstractServices {
         const wPermissions = await AgentModel.getWhiteLabelPermission(
           agency_id
         );
-        const { token, ...rest } = wPermissions;
-        whiteLabelPermissions = rest;
+
+        if (wPermissions) {
+          const { token, ...rest } = wPermissions;
+          whiteLabelPermissions = rest;
+        }
       }
 
       const tokenData: ITokenParseAgencyUser = {
@@ -469,8 +472,11 @@ export default class AuthAgentService extends AbstractServices {
         const wPermissions = await AgencyModel.getWhiteLabelPermission(
           agency_id
         );
-        const { token, ...rest } = wPermissions;
-        whiteLabelPermissions = rest;
+
+        if (wPermissions) {
+          const { token, ...rest } = wPermissions;
+          whiteLabelPermissions = rest;
+        }
       }
 
       const tokenData: ITokenParseAgencyUser = {

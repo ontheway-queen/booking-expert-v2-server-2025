@@ -25,6 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
 const customError_1 = __importDefault(require("../../../../utils/lib/customError"));
+const uuid_1 = require("uuid");
 class AdminAgentAgencyService extends abstract_service_1.default {
     constructor() {
         super();
@@ -69,7 +70,9 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 };
                 if (data.white_label) {
                     const wPermissions = yield AgencyModel.getWhiteLabelPermission(agency_id);
-                    whiteLabelPermissions = wPermissions;
+                    if (wPermissions) {
+                        whiteLabelPermissions = wPermissions;
+                    }
                 }
                 return {
                     success: true,
@@ -92,13 +95,18 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 if (!checkAgency) {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
                 }
+                if (checkAgency.status === 'Incomplete' ||
+                    checkAgency.status === 'Pending' ||
+                    checkAgency.status === 'Rejected') {
+                    throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
+                }
                 const { user_id } = req.admin;
                 const _a = req.body, { status, white_label_permissions, white_label } = _a, restBody = __rest(_a, ["status", "white_label_permissions", "white_label"]);
                 const files = req.files || [];
                 const payload = Object.assign({}, restBody);
                 files.forEach((file) => {
                     switch (file.fieldname) {
-                        case 'logo':
+                        case 'agency_logo':
                             payload.agency_logo = file.filename;
                             break;
                         case 'civil_aviation':
@@ -121,14 +129,73 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     if (white_label === true) {
                     }
                 }
-                if (white_label_permissions || white_label) {
+                if (white_label_permissions) {
                     const checkPermission = yield AgentModel.getWhiteLabelPermission(agency_id);
                     if (checkPermission && white_label_permissions) {
                         yield AgentModel.updateWhiteLabelPermission(white_label_permissions, agency_id);
                     }
                     else {
-                        // await AgentModel.createWhiteLabelPermission()
+                        const uuid = (0, uuid_1.v4)();
+                        yield AgentModel.createWhiteLabelPermission(Object.assign({ agency_id, token: uuid }, white_label_permissions));
                     }
+                }
+                yield AgentModel.updateAgency(payload, agency_id);
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    type: 'UPDATE',
+                    details: `Agency Updated. Data: ${JSON.stringify(payload)}`,
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }));
+        });
+    }
+    updateAgencyApplication(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { id } = req.params;
+                const agency_id = Number(id);
+                const AgentModel = this.Model.AgencyModel(trx);
+                const MarkupSetModel = this.Model.MarkupSetModel(trx);
+                const checkAgency = yield AgentModel.checkAgency({
+                    agency_id,
+                });
+                if (!checkAgency) {
+                    throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
+                }
+                if (checkAgency.status === 'Incomplete' ||
+                    checkAgency.status === 'Pending' ||
+                    checkAgency.status === 'Rejected') {
+                    throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
+                }
+                const body = req.body;
+                let payload = {};
+                if (body.status === 'Active') {
+                    const checkFlightMarkupSet = yield MarkupSetModel.getSingleMarkupSet(body.flight_markup_set, true, 'Flight');
+                    if (!checkFlightMarkupSet) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
+                            message: 'Invalid flight markup set.',
+                        };
+                    }
+                    const checkHotelMarkupSet = yield MarkupSetModel.getSingleMarkupSet(body.flight_markup_set, true, 'Hotel');
+                    if (!checkHotelMarkupSet) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
+                            message: 'Invalid hotel markup set.',
+                        };
+                    }
+                    payload.status = body.status;
+                    payload.flight_markup_set = body.flight_markup_set;
+                    payload.hotel_markup_set = body.hotel_markup_set;
+                }
+                else {
+                    payload.status = body.status;
                 }
                 yield AgentModel.updateAgency(payload, agency_id);
                 return {
