@@ -271,7 +271,7 @@ export default class AgencyModel extends Schema {
   public async createWhiteLabelPermission(
     payload: ICreateWhiteLabelPermissionPayload
   ) {
-    return await this.db('agency_white_label_permission')
+    return await this.db('white_label_permissions')
       .withSchema(this.AGENT_SCHEMA)
       .insert(payload, 'id');
   }
@@ -280,7 +280,7 @@ export default class AgencyModel extends Schema {
     payload: IUpdateWhiteLabelPermissionPayload,
     agency_id: number
   ) {
-    return await this.db('agency_white_label_permission')
+    return await this.db('white_label_permissions')
       .withSchema(this.AGENT_SCHEMA)
       .update(payload)
       .where('agency_id', agency_id);
@@ -290,7 +290,7 @@ export default class AgencyModel extends Schema {
   public async getWhiteLabelPermission(
     agency_id: number
   ): Promise<IGetWhiteLabelPermissionData | null> {
-    return await this.db('agency_white_label_permission')
+    return await this.db('white_label_permissions')
       .withSchema(this.AGENT_SCHEMA)
       .select(
         'agency_id',

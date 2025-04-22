@@ -101,7 +101,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
                 }
                 const { user_id } = req.admin;
-                const _a = req.body, { status, white_label_permissions, white_label } = _a, restBody = __rest(_a, ["status", "white_label_permissions", "white_label"]);
+                const _a = req.body, { white_label_permissions } = _a, restBody = __rest(_a, ["white_label_permissions"]);
                 const files = req.files || [];
                 const payload = Object.assign({}, restBody);
                 files.forEach((file) => {
@@ -122,11 +122,21 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                             throw new customError_1.default('Invalid files. Please provide valid trade license, civil aviation, NID, logo.', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                 });
-                if (status) {
-                    payload.status = status;
-                }
-                if (white_label !== undefined) {
-                    if (white_label === true) {
+                if (restBody.white_label && !white_label_permissions) {
+                    const checkPermission = yield AgentModel.getWhiteLabelPermission(agency_id);
+                    if (!checkPermission) {
+                        const uuid = (0, uuid_1.v4)();
+                        yield AgentModel.createWhiteLabelPermission({
+                            agency_id,
+                            token: uuid,
+                            blog: false,
+                            flight: false,
+                            group_fare: false,
+                            holiday: false,
+                            hotel: false,
+                            umrah: false,
+                            visa: false,
+                        });
                     }
                 }
                 if (white_label_permissions) {

@@ -102,7 +102,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         );
       }
       const { user_id } = req.admin;
-      const { status, white_label_permissions, white_label, ...restBody } =
+      const { white_label_permissions, ...restBody } =
         req.body as IAdminAgentUpdateAgencyReqBody;
 
       const files = (req.files as Express.Multer.File[]) || [];
@@ -131,12 +131,24 @@ export default class AdminAgentAgencyService extends AbstractServices {
         }
       });
 
-      if (status) {
-        payload.status = status;
-      }
+      if (restBody.white_label && !white_label_permissions) {
+        const checkPermission = await AgentModel.getWhiteLabelPermission(
+          agency_id
+        );
 
-      if (white_label !== undefined) {
-        if (white_label === true) {
+        if (!checkPermission) {
+          const uuid = uuidv4();
+          await AgentModel.createWhiteLabelPermission({
+            agency_id,
+            token: uuid,
+            blog: false,
+            flight: false,
+            group_fare: false,
+            holiday: false,
+            hotel: false,
+            umrah: false,
+            visa: false,
+          });
         }
       }
 
