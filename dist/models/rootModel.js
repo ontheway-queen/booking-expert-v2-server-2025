@@ -27,6 +27,7 @@ const holidayPackagePricingModel_1 = __importDefault(require("./holidayPackageMo
 const holidayPackageItineraryModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageItineraryModel"));
 const holidayPackageServiceModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageServiceModel"));
 const holidayPackageImagesModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageImagesModel"));
+const hotelMarkupsModel_1 = __importDefault(require("./markupSetModel/hotelMarkupsModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -67,6 +68,10 @@ class Models {
     //Flight Markups Model
     FlightMarkupsModel(trx) {
         return new flightMarkupsModel_1.default(trx || database_1.db);
+    }
+    //Hotel Markups Model
+    HotelMarkupsModel(trx) {
+        return new hotelMarkupsModel_1.default(trx || database_1.db);
     }
     //B2C Markup Config Model
     B2CMarkupConfigModel(trx) {

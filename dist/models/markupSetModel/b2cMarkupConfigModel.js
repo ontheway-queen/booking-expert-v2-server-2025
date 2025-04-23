@@ -23,7 +23,7 @@ class B2CMarkupConfigModel extends schema_1.default {
             return yield this.db('b2c_markup_config')
                 .withSchema(this.DBO_SCHEMA)
                 .select('b2c_markup_config.id', 'b2c_markup_config.markup_set_id', 'markup_set.name')
-                .join("markup_set", "markup_set.id", "b2c_markup_config.markup_set_id");
+                .join('markup_set', 'markup_set.id', 'b2c_markup_config.markup_set_id');
         });
     }
     upsertB2CMarkupConfig(payload) {
@@ -32,7 +32,7 @@ class B2CMarkupConfigModel extends schema_1.default {
             const res = yield this.db('b2c_markup_config')
                 .withSchema(this.DBO_SCHEMA)
                 .update(payload.markup_set_id)
-                .where("name", payload.name);
+                .where('name', payload.name);
             //if update is not successful then insert
             if (!res) {
                 yield this.db('b2c_markup_config')

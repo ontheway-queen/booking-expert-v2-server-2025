@@ -23,6 +23,7 @@ import HolidayPackagePricingModel from './holidayPackageModel/holidayPackagePric
 import HolidayPackageItineraryModel from './holidayPackageModel/holidayPackageItineraryModel';
 import HolidayPackageServiceModel from './holidayPackageModel/holidayPackageServiceModel';
 import HolidayPackageImagesModel from './holidayPackageModel/holidayPackageImagesModel';
+import HotelMarkupsModel from './markupSetModel/hotelMarkupsModel';
 
 export default class Models {
   //Common model
@@ -73,6 +74,11 @@ export default class Models {
   //Flight Markups Model
   public FlightMarkupsModel(trx?: Knex.Transaction) {
     return new FlightMarkupsModel(trx || db);
+  }
+
+  //Hotel Markups Model
+  public HotelMarkupsModel(trx?: Knex.Transaction) {
+    return new HotelMarkupsModel(trx || db);
   }
 
   //B2C Markup Config Model
