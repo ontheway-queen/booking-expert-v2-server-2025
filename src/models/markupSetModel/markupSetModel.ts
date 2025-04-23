@@ -24,8 +24,8 @@ export default class MarkupSetModel extends Schema {
             .withSchema(this.DBO_SCHEMA)
             .select('*')
             .where((qb) => {
-                if (query.name) {
-                    qb.andWhereILike('name', `%${query.name}%`);
+                if (query.filter) {
+                    qb.andWhereILike('name', `%${query.filter}%`);
                 }
                 if (query.check_name) {
                     qb.andWhere('name', query.check_name);

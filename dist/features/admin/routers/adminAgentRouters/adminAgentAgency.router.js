@@ -13,6 +13,7 @@ class AdminAgentAgencyRouter extends abstract_router_1.default {
     }
     callRouter() {
         this.router.get('/', this.controller.getAgency);
+        this.router.get('/:id', this.controller.getSingleAgency);
     }
 }
 exports.default = AdminAgentAgencyRouter;

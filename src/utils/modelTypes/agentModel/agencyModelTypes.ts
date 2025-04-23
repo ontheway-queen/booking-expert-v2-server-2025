@@ -90,6 +90,11 @@ export interface IGetSingleAgencyData {
   allow_api: boolean;
   flight_markup_set: string;
   hotel_markup_set: string;
+  ref_id: number;
+  civil_aviation: string;
+  referred_by: string;
+  trade_license: string;
+  national_id: string;
 }
 
 export interface ICheckAgencyQuery {

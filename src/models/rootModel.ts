@@ -16,7 +16,13 @@ import FlightBookingPriceBreakdownModel from './flightModel/flightBookingPriceBr
 import FlightBookingSegmentModel from './flightModel/flightBookingSegmentModel';
 import FlightBookingTrackingModel from './flightModel/flightBookingTrackingModel';
 import FlightBookingTravelerModel from './flightModel/flightBookingTravelerModel';
+import AgencyPaymentModel from './agentModel/agencyPaymentModel';
 import ErrorLogsModel from './errorLogsModel/errorLogsModel';
+import HolidayPackageModel from './holidayPackageModel/holidayPackageModel';
+import HolidayPackagePricingModel from './holidayPackageModel/holidayPackagePricingModel';
+import HolidayPackageItineraryModel from './holidayPackageModel/holidayPackageItineraryModel';
+import HolidayPackageServiceModel from './holidayPackageModel/holidayPackageServiceModel';
+import HolidayPackageImagesModel from './holidayPackageModel/holidayPackageImagesModel';
 
 export default class Models {
   //Common model
@@ -99,8 +105,38 @@ export default class Models {
     return new FlightBookingTravelerModel(trx || db);
   }
 
+  //Agency Payment Model
+  public AgencyPaymentModel(trx?: Knex.Transaction) {
+    return new AgencyPaymentModel(trx || db);
+  }
+
   //Error logs Model
   public ErrorLogsModel(trx?: Knex.Transaction) {
     return new ErrorLogsModel(trx || db);
+  }
+
+  //Holiday Package Model
+  public HolidayPackageModel(trx?: Knex.Transaction) {
+    return new HolidayPackageModel(trx || db);
+  }
+
+  //Holiday package pricing model
+  public HolidayPackagePricingModel(trx?: Knex.Transaction) {
+    return new HolidayPackagePricingModel(trx || db);
+  }
+
+  //Holiday package itinerary model
+  public HolidayPackageItineraryModel(trx?: Knex.Transaction) {
+    return new HolidayPackageItineraryModel(trx || db);
+  }
+
+  //Holiday package services model
+  public HolidayPackageServiceModel(trx?: Knex.Transaction) {
+    return new HolidayPackageServiceModel(trx || db);
+  }
+
+  //Holiday package images model
+  public HolidayPackageImagesModel(trx?: Knex.Transaction) {
+    return new HolidayPackageImagesModel(trx || db);
   }
 }

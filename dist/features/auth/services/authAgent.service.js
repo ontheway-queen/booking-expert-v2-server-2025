@@ -31,6 +31,7 @@ const publicEmailOTP_service_1 = __importDefault(require("../../public/services/
 const customError_1 = __importDefault(require("../../../utils/lib/customError"));
 const registrationVerificationTemplate_1 = require("../../../utils/templates/registrationVerificationTemplate");
 const registrationVerificationCompletedTemplate_1 = require("../../../utils/templates/registrationVerificationCompletedTemplate");
+const emailSendLib_1 = __importDefault(require("../../../utils/lib/emailSendLib"));
 class AuthAgentService extends abstract_service_1.default {
     constructor() {
         super();
@@ -96,6 +97,17 @@ class AuthAgentService extends abstract_service_1.default {
                     trade_license,
                     national_id,
                 });
+                yield AgentModel.createWhiteLabelPermission({
+                    agency_id: newAgency[0].id,
+                    blog: false,
+                    flight: false,
+                    group_fare: false,
+                    holiday: false,
+                    hotel: false,
+                    token: '',
+                    umrah: false,
+                    visa: false,
+                });
                 const newRole = yield AgencyUserModel.createRole({
                     agency_id: newAgency[0].id,
                     name: 'Super Admin',
@@ -136,7 +148,7 @@ class AuthAgentService extends abstract_service_1.default {
                     username,
                 });
                 const verificationToken = lib_1.default.createToken({ agency_id: newAgency[0].id, email, user_id: newUser[0].id }, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent, '24h');
-                yield lib_1.default.sendEmail({
+                yield emailSendLib_1.default.sendEmail({
                     email,
                     emailSub: `Booking Expert Agency Registration Verification`,
                     emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, '/registration/verification?token=' + verificationToken),
@@ -173,7 +185,7 @@ class AuthAgentService extends abstract_service_1.default {
                 yield AgencyUserModel.updateUser({
                     hashed_password,
                 }, { agency_id, id: user_id });
-                yield lib_1.default.sendEmail({
+                yield emailSendLib_1.default.sendEmail({
                     email,
                     emailSub: `Booking Expert Agency Registration Verification`,
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(agency_name, {

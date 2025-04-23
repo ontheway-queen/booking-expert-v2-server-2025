@@ -45,8 +45,31 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
+                let whiteLabelPermissions = {
+                    flight: false,
+                    hotel: false,
+                    visa: false,
+                    holiday: false,
+                    umrah: false,
+                    group_fare: false,
+                    blog: false,
+                    token: '',
+                };
+                if (data.white_label) {
+                    const wPermissions = yield AgencyModel.getWhiteLabelPermission(agency_id);
+                    whiteLabelPermissions = wPermissions;
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: Object.assign(Object.assign({}, data), { whiteLabelPermissions }),
+                };
             }));
         });
+    }
+    updateAgency(req) {
+        return __awaiter(this, void 0, void 0, function* () { });
     }
 }
 exports.default = AdminAgentAgencyService;

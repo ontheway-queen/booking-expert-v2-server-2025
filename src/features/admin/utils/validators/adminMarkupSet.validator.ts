@@ -27,7 +27,7 @@ export default class AdminMarkupSetValidator {
 
 
     public getMarkupSetSchema = Joi.object({
-        name: Joi.string().optional(),
+        filter: Joi.string().optional(),
         status: Joi.boolean().optional(),
         type: Joi.string().valid('Flight', 'Hotel').required(),
         limit: Joi.number().optional(),

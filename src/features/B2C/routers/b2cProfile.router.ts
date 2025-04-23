@@ -13,7 +13,9 @@ export default class B2CProfileRouter extends AbstractRouter {
       .route('/')
       .get(this.controller.getProfile)
       .patch(
-        this.uploader.cloudUploadRaw(this.fileFolders.B2C_USER_FILES),
+        this.uploader.cloudUploadRaw(this.fileFolders.B2C_USER_FILES, [
+          'photo',
+        ]),
         this.controller.updateProfile
       );
 

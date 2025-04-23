@@ -27,7 +27,7 @@ class AdminMarkupSetValidator {
                 .optional(),
         });
         this.getMarkupSetSchema = joi_1.default.object({
-            name: joi_1.default.string().optional(),
+            filter: joi_1.default.string().optional(),
             status: joi_1.default.boolean().optional(),
             type: joi_1.default.string().valid('Flight', 'Hotel').required(),
             limit: joi_1.default.number().optional(),

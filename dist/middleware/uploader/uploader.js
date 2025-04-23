@@ -15,7 +15,7 @@ class Uploader extends abstract_storatge_1.default {
         super();
     }
     // cloud upload raw
-    cloudUploadRaw(folder, types = uploaderConstants_1.allowAllFileTypes) {
+    cloudUploadRaw(folder, fields, types = uploaderConstants_1.allowAllFileTypes) {
         return (req, res, next) => {
             req.upFiles = [];
             const upload = (0, multer_1.default)({
@@ -41,7 +41,12 @@ class Uploader extends abstract_storatge_1.default {
                 fileFilter: function (_req, file, cb) {
                     // Check allowed extensions
                     if (types.includes(file.mimetype)) {
-                        cb(null, true); // no errors
+                        if (fields.includes(file.fieldname)) {
+                            cb(null, true); // no errors
+                        }
+                        else {
+                            cb(new Error(`File fieldname '${file.fieldname}' is not allowed`));
+                        }
                     }
                     else {
                         cb(new Error('File mimetype is not allowed' + ' for ' + file.fieldname));

@@ -12,10 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const config_1 = __importDefault(require("../../config/config"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const nodemailer_1 = __importDefault(require("nodemailer"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const commonModel_1 = __importDefault(require("../../models/commonModel/commonModel"));
@@ -56,121 +54,9 @@ class Lib {
         }
         return otp;
     }
-    static sendEmail(payload) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.sendEmailHostinger(Object.assign(Object.assign({}, payload), { senderEmail: config_1.default.EMAIL_SEND_EMAIL_ID, senderPassword: config_1.default.EMAIL_SEND_PASSWORD }));
-        });
-    }
-    // send email by nodemailer
-    static sendEmailDefault(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ email, emailBody, emailSub, attachments, }) {
-            try {
-                const transporter = nodemailer_1.default.createTransport({
-                    service: 'gmail',
-                    host: 'smtp.gmail.com',
-                    port: 465,
-                    auth: {
-                        user: config_1.default.EMAIL_SEND_EMAIL_ID,
-                        pass: config_1.default.EMAIL_SEND_PASSWORD,
-                    },
-                });
-                const info = yield transporter.sendMail({
-                    from: config_1.default.EMAIL_SEND_EMAIL_ID,
-                    to: email,
-                    subject: emailSub,
-                    html: emailBody,
-                    attachments: attachments || undefined,
-                });
-                console.log('Message send: %s', info);
-                return true;
-            }
-            catch (err) {
-                console.log({ err });
-                return false;
-            }
-        });
-    }
-    // send email google
-    static sendEmailGoogle(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ email, emailBody, emailSub, attachments, senderEmail, senderPassword, }) {
-            try {
-                const transporter = nodemailer_1.default.createTransport({
-                    service: 'gmail',
-                    host: 'smtp.gmail.com',
-                    port: 465,
-                    auth: {
-                        user: senderEmail,
-                        pass: senderPassword,
-                    },
-                });
-                const info = yield transporter.sendMail({
-                    from: senderEmail,
-                    to: email,
-                    subject: emailSub,
-                    html: emailBody,
-                    attachments: attachments || undefined,
-                });
-                console.log('Message send: %s', info);
-                return true;
-            }
-            catch (err) {
-                console.log({ err });
-                return false;
-            }
-        });
-    }
-    // send email hostinger
-    static sendEmailHostinger(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ email, emailBody, emailSub, attachments, senderEmail, senderPassword, }) {
-            try {
-                const transporter = nodemailer_1.default.createTransport({
-                    host: 'smtp.hostinger.com',
-                    port: 465,
-                    auth: {
-                        user: senderEmail,
-                        pass: senderPassword,
-                    },
-                });
-                const info = yield transporter.sendMail({
-                    from: senderEmail,
-                    to: email,
-                    subject: emailSub,
-                    html: emailBody,
-                    attachments: attachments || undefined,
-                });
-                console.log('Message send: %s', info);
-                return true;
-            }
-            catch (err) {
-                console.log({ err });
-                return false;
-            }
-        });
-    }
     // compare object
     static compareObj(a, b) {
         return JSON.stringify(a) == JSON.stringify(b);
-    }
-    // get time value
-    static getTimeValue(timeString) {
-        // Extract hours, minutes, and seconds
-        let [time, timeZone] = timeString.split('+');
-        if (!timeZone) {
-            [time, timeZone] = timeString.split('-');
-        }
-        let [hours, minutes, seconds] = time.split(':');
-        // Convert to milliseconds since midnight
-        let timeValue = (parseInt(hours, 10) * 60 * 60 +
-            parseInt(minutes, 10) * 60 +
-            parseInt(seconds, 10)) *
-            1000;
-        // Adjust for time zone
-        if (timeZone) {
-            let [tzHours, tzMinutes] = timeZone.split(':');
-            let timeZoneOffset = (parseInt(tzHours, 10) * 60 + parseInt(tzMinutes, 10)) * 60 * 1000;
-            timeValue -= timeZoneOffset;
-        }
-        return timeValue;
     }
     //get total amount after adding percentage
     static getPaymentAmount(storeAmount, percentage) {
@@ -188,28 +74,6 @@ class Lib {
             }
         });
         // Write response in json data file======================
-    }
-    //convert time to locale string
-    static convertToLocaleString(time) {
-        const completeTimeString = `1970-01-01T${time}`;
-        // Parse the date and format it
-        const date = new Date(completeTimeString);
-        if (isNaN(date)) {
-            return 'Invalid Date';
-        }
-        return date.toLocaleString('en-US', {
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric',
-            hour12: true,
-        });
-    }
-    //get formatted date
-    static getFormattedDate(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-        const day = String(date.getDate()).padStart(2, '0');
-        return { year, month, day };
     }
     // generate Random pass
     static generateRandomPassword(length, options = {}) {
@@ -257,7 +121,7 @@ class Lib {
             let NoCode = '';
             const lastId = yield commonModel.getLastId({ type });
             if (lastId) {
-                newId = lastId.last_id + 1;
+                newId = Number(lastId.last_id) + 1;
                 yield commonModel.updateLastNo({ last_id: newId, last_updated: new Date() }, lastId === null || lastId === void 0 ? void 0 : lastId.id);
             }
             else {

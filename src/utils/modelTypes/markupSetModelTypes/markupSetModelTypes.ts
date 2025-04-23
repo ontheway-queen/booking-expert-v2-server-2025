@@ -24,7 +24,7 @@ export interface IGetMarkupSetData extends markupType {
 }
 
 export interface IGetMarkupListFilterQuery{
-    name?: string;
+    filter?: string;
     status?: boolean;
     type?: 'Flight' | 'Hotel';
     check_name?: string;

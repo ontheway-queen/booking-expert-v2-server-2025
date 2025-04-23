@@ -37,6 +37,33 @@ export default class AdminAgentAgencyService extends AbstractServices {
           message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
+
+      let whiteLabelPermissions = {
+        flight: false,
+        hotel: false,
+        visa: false,
+        holiday: false,
+        umrah: false,
+        group_fare: false,
+        blog: false,
+        token: '',
+      };
+
+      if (data.white_label) {
+        const wPermissions = await AgencyModel.getWhiteLabelPermission(
+          agency_id
+        );
+        whiteLabelPermissions = wPermissions;
+      }
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: { ...data, whiteLabelPermissions },
+      };
     });
   }
+
+  public async updateAgency(req: Request) {}
 }

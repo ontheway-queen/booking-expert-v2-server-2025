@@ -17,6 +17,7 @@ const constants_1 = require("../../../utils/miscellaneous/constants");
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 const config_1 = __importDefault(require("../../../config/config"));
 const sendEmailOtpTemplate_1 = require("../../../utils/templates/sendEmailOtpTemplate");
+const emailSendLib_1 = __importDefault(require("../../../utils/lib/emailSendLib"));
 class PublicEmailOTPService extends abstract_service_1.default {
     constructor(DBCon) {
         super();
@@ -119,7 +120,7 @@ class PublicEmailOTPService extends abstract_service_1.default {
                 try {
                     const [send_email] = yield Promise.all([
                         email
-                            ? lib_1.default.sendEmail({
+                            ? emailSendLib_1.default.sendEmail({
                                 email,
                                 emailSub: constants_1.OTP_EMAIL_SUBJECT,
                                 emailBody: (0, sendEmailOtpTemplate_1.sendEmailOtpTemplate)(otp, OTP_FOR),

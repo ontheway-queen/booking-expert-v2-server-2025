@@ -20,7 +20,13 @@ const flightBookingPriceBreakdownModel_1 = __importDefault(require("./flightMode
 const flightBookingSegmentModel_1 = __importDefault(require("./flightModel/flightBookingSegmentModel"));
 const flightBookingTrackingModel_1 = __importDefault(require("./flightModel/flightBookingTrackingModel"));
 const flightBookingTravelerModel_1 = __importDefault(require("./flightModel/flightBookingTravelerModel"));
+const agencyPaymentModel_1 = __importDefault(require("./agentModel/agencyPaymentModel"));
 const errorLogsModel_1 = __importDefault(require("./errorLogsModel/errorLogsModel"));
+const holidayPackageModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageModel"));
+const holidayPackagePricingModel_1 = __importDefault(require("./holidayPackageModel/holidayPackagePricingModel"));
+const holidayPackageItineraryModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageItineraryModel"));
+const holidayPackageServiceModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageServiceModel"));
+const holidayPackageImagesModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageImagesModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -86,9 +92,33 @@ class Models {
     FlightBookingTravelerModel(trx) {
         return new flightBookingTravelerModel_1.default(trx || database_1.db);
     }
+    //Agency Payment Model
+    AgencyPaymentModel(trx) {
+        return new agencyPaymentModel_1.default(trx || database_1.db);
+    }
     //Error logs Model
     ErrorLogsModel(trx) {
         return new errorLogsModel_1.default(trx || database_1.db);
+    }
+    //Holiday Package Model
+    HolidayPackageModel(trx) {
+        return new holidayPackageModel_1.default(trx || database_1.db);
+    }
+    //Holiday package pricing model
+    HolidayPackagePricingModel(trx) {
+        return new holidayPackagePricingModel_1.default(trx || database_1.db);
+    }
+    //Holiday package itinerary model
+    HolidayPackageItineraryModel(trx) {
+        return new holidayPackageItineraryModel_1.default(trx || database_1.db);
+    }
+    //Holiday package services model
+    HolidayPackageServiceModel(trx) {
+        return new holidayPackageServiceModel_1.default(trx || database_1.db);
+    }
+    //Holiday package images model
+    HolidayPackageImagesModel(trx) {
+        return new holidayPackageImagesModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

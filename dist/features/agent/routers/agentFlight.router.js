@@ -21,7 +21,7 @@ class AgentFlightRouter extends abstract_router_1.default {
         this.router.route('/revalidate')
             .get(this.controller.flightRevalidate);
         this.router.route('/booking')
-            .post(this.uploader.cloudUploadRaw(this.fileFolders.FLIGHT_BOOKING_FILES), this.controller.flightBooking);
+            .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENT_FLIGHT_BOOKING_FILES, ['visa', 'passport']), this.controller.flightBooking);
     }
 }
 exports.default = AgentFlightRouter;

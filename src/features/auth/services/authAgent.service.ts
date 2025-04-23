@@ -19,6 +19,7 @@ import CustomError from '../../../utils/lib/customError';
 import { IInsertAgencyRolePermissionPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
 import { registrationVerificationTemplate } from '../../../utils/templates/registrationVerificationTemplate';
 import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
+import EmailSendLib from '../../../utils/lib/emailSendLib';
 
 export default class AuthAgentService extends AbstractServices {
   constructor() {
@@ -98,6 +99,18 @@ export default class AuthAgentService extends AbstractServices {
         national_id,
       });
 
+      await AgentModel.createWhiteLabelPermission({
+        agency_id: newAgency[0].id,
+        blog: false,
+        flight: false,
+        group_fare: false,
+        holiday: false,
+        hotel: false,
+        token: '',
+        umrah: false,
+        visa: false,
+      });
+
       const newRole = await AgencyUserModel.createRole({
         agency_id: newAgency[0].id,
         name: 'Super Admin',
@@ -153,7 +166,7 @@ export default class AuthAgentService extends AbstractServices {
         '24h'
       );
 
-      await Lib.sendEmail({
+      await EmailSendLib.sendEmail({
         email,
         emailSub: `Booking Expert Agency Registration Verification`,
         emailBody: registrationVerificationTemplate(
@@ -207,7 +220,7 @@ export default class AuthAgentService extends AbstractServices {
         { agency_id, id: user_id }
       );
 
-      await Lib.sendEmail({
+      await EmailSendLib.sendEmail({
         email,
         emailSub: `Booking Expert Agency Registration Verification`,
         emailBody: registrationVerificationCompletedTemplate(agency_name, {

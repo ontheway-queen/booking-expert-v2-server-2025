@@ -8,12 +8,12 @@ class FileFolder {
   static readonly B2C_TRAVELER_FILES = 'b2c/traveler-files';
   static readonly AGENCY_USER = 'agent/agency-user';
   static readonly AGENCY_FILES = 'agent/agency-files';
-  static readonly TOUR_PACKAGE = 'tour-package';
+  static readonly HOLIDAY_PACKAGE = 'holiday-package';
   static readonly PACKAGE_FILE = 'package-file';
   static readonly VISA_FILES = 'visa-files';
   static readonly SPECIAL_OFFER = 'special-offer';
   static readonly BANK_INVOICE_FILES = 'bank-invoice-files';
-  static readonly FLIGHT_BOOKING_FILES = 'flight-booking-files';
+  static readonly AGENT_FLIGHT_BOOKING_FILES = 'agent/flight-booking-files';
   static readonly AGENCY_REGISTRATION_REQUEST = 'agency-registration-request';
 }
 export default FileFolder;

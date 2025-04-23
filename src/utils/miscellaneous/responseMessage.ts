@@ -52,6 +52,8 @@ class ResMsg {
   static readonly SET_FLIGHT_API_ID_NOT_FOUND = "Set flight api id not found";
   static readonly AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP = "Airline data not found for the markup set";
   static readonly REVALIDATE_BEFORE_BOOKING = "Revalidate the flight before booking";
+
+  static readonly SLUG_ALREADY_EXISTS = 'Slug already exists. Please change the slug to continue.';
 }
 
 export default ResMsg;

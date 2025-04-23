@@ -13,7 +13,7 @@ export default class AdminProfileRouter extends AbstractRouter {
       .route('/')
       .get(this.controller.getProfile)
       .patch(
-        this.uploader.cloudUploadRaw(this.fileFolders.ADMIN_FILES),
+        this.uploader.cloudUploadRaw(this.fileFolders.ADMIN_FILES, ['photo']),
         this.controller.updateProfile
       );
 

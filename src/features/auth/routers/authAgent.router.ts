@@ -13,7 +13,12 @@ export default class AuthAgentRouter extends AbstractRouter {
     this.router
       .route('/register')
       .post(
-        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_FILES),
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_FILES, [
+          'logo',
+          'civil_aviation',
+          'trade_license',
+          'national_id',
+        ]),
         this.controller.register
       );
     this.router

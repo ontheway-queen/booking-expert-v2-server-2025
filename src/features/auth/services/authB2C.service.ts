@@ -14,6 +14,7 @@ import { ITokenParseUser } from '../../public/utils/types/publicCommon.types';
 import config from '../../../config/config';
 import { registrationVerificationTemplate } from '../../../utils/templates/registrationVerificationTemplate';
 import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
+import EmailSendLib from '../../../utils/lib/emailSendLib';
 
 export default class AuthB2CService extends AbstractServices {
   constructor() {
@@ -280,7 +281,7 @@ export default class AuthB2CService extends AbstractServices {
         '24h'
       );
 
-      await Lib.sendEmail({
+      await EmailSendLib.sendEmail({
         email,
         emailSub: `Booking Expert User Registration Verification`,
         emailBody: registrationVerificationTemplate(
@@ -350,7 +351,7 @@ export default class AuthB2CService extends AbstractServices {
         '24h'
       );
 
-      await Lib.sendEmail({
+      await EmailSendLib.sendEmail({
         email,
         emailSub: `Booking Expert User Registration Completed`,
         emailBody: registrationVerificationCompletedTemplate(name, {
