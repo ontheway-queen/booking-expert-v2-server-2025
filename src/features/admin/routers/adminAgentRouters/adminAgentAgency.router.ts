@@ -9,7 +9,25 @@ export default class AdminAgentAgencyRouter extends AbstractRouter {
   }
 
   private callRouter() {
-    this.router.get('/', this.controller.getAgency);
-    this.router.get('/:id', this.controller.getSingleAgency);
+    this.router.route('/').get(this.controller.getAgency);
+
+    this.router
+      .route('/:id')
+      .get(this.controller.getSingleAgency)
+      .patch(
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_FILES, [
+          'agency_logo',
+          'civil_aviation',
+          'trade_license',
+          'national_id',
+        ]),
+        this.controller.updateAgency
+      );
+
+    this.router
+      .route('/:id/application')
+      .patch(this.controller.updateAgencyApplication);
+
+    this.router.route('/:id/login').get(this.controller.agencyLogin);
   }
 }

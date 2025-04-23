@@ -191,15 +191,23 @@ class AgencyModel extends schema_1.default {
     // create white label permission
     createWhiteLabelPermission(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('agency_white_label_permission')
+            return yield this.db('white_label_permissions')
                 .withSchema(this.AGENT_SCHEMA)
                 .insert(payload, 'id');
+        });
+    }
+    updateWhiteLabelPermission(payload, agency_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('white_label_permissions')
+                .withSchema(this.AGENT_SCHEMA)
+                .update(payload)
+                .where('agency_id', agency_id);
         });
     }
     // get white label permission
     getWhiteLabelPermission(agency_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('agency_white_label_permission')
+            return yield this.db('white_label_permissions')
                 .withSchema(this.AGENT_SCHEMA)
                 .select('agency_id', 'token', 'flight', 'hotel', 'visa', 'holiday', 'group_fare', 'umrah', 'blog')
                 .where('agency_id', agency_id)

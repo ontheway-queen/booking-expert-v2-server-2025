@@ -1,4 +1,4 @@
-class Schema {
+export default class Schema {
   protected readonly PUBLIC_SCHEMA = 'public';
   protected readonly ADMIN_SCHEMA = 'admin';
   protected readonly DBO_SCHEMA = 'dbo';
@@ -8,4 +8,3 @@ class Schema {
   protected readonly AGENT_B2C_SCHEMA = 'agent_btoc';
   protected readonly EXTERNAL_SCHEMA = 'external';
 }
-export default Schema;

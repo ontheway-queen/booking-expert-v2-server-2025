@@ -19,9 +19,46 @@ export default class AdminAgentAgencyController extends AbstractController {
   );
 
   public getSingleAgency = this.asyncWrapper.wrap(
-    { paramSchema: this.commonValidator.singleParamNumValidator('id') },
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.getSingleAgency(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public updateAgencyApplication = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator('id'),
+      bodySchema: this.validator.updateAgencyApplication,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.updateAgencyApplication(
+        req
+      );
+      res.status(code).json(rest);
+    }
+  );
+
+  public updateAgency = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator('id'),
+      bodySchema: this.validator.updateAgency,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.updateAgency(req);
+
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
+    }
+  );
+
+  public agencyLogin = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.agencyLogin(req);
       res.status(code).json(rest);
     }
   );

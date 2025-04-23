@@ -50,6 +50,11 @@ export default class AuthAdminService extends AbstractServices {
       } = checkUserAdmin;
 
       if (!status) {
+        await this.insertAdminAudit(trx, {
+          created_by: id,
+          type: 'GET',
+          details: 'Tried to login with inactive account.',
+        });
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -60,6 +65,11 @@ export default class AuthAdminService extends AbstractServices {
       const checkPassword = await Lib.compareHashValue(password, password_hash);
 
       if (!checkPassword) {
+        await this.insertAdminAudit(trx, {
+          created_by: id,
+          type: 'GET',
+          details: 'Tried to login with wrong password.',
+        });
         return {
           success: false,
           code: this.StatusCode.HTTP_UNAUTHORIZED,
@@ -71,6 +81,12 @@ export default class AuthAdminService extends AbstractServices {
         const data = await new PublicEmailOTPService(trx).sendEmailOtp({
           email,
           type: OTP_TYPES.verify_admin,
+        });
+
+        await this.insertAdminAudit(trx, {
+          created_by: id,
+          type: 'GET',
+          details: 'OTP Send for login with 2fa.',
         });
 
         if (data.success) {
@@ -101,6 +117,12 @@ export default class AuthAdminService extends AbstractServices {
       const token = Lib.createToken(tokenData, config.JWT_SECRET_ADMIN, '24h');
 
       const role = await AdminModel.getSingleRoleWithPermissions(role_id);
+
+      await this.insertAdminAudit(trx, {
+        created_by: id,
+        type: 'GET',
+        details: 'User logged in.',
+      });
 
       return {
         success: true,
@@ -190,6 +212,12 @@ export default class AuthAdminService extends AbstractServices {
       );
 
       const role = await AdminModel.getSingleRoleWithPermissions(role_id);
+
+      await this.insertAdminAudit(trx, {
+        created_by: id,
+        type: 'GET',
+        details: 'User logged in with 2fa.',
+      });
 
       return {
         success: true,

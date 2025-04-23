@@ -115,11 +115,13 @@ export default class AgencyUserModel extends Schema {
     username,
     id,
     agency_id,
+    is_main_user,
   }: {
     agency_id?: number;
     email?: string;
     username?: string;
     id?: number;
+    is_main_user?: boolean;
   }): Promise<ICheckAgencyUserData | null> {
     return await this.db('agency_user AS au')
       .withSchema(this.AGENT_SCHEMA)
@@ -153,6 +155,10 @@ export default class AgencyUserModel extends Schema {
         }
         if (username) {
           qb.orWhere('au.username', username);
+        }
+
+        if (is_main_user !== undefined) {
+          qb.andWhere('is_main_user', is_main_user);
         }
 
         if (id) {

@@ -1,9 +1,10 @@
+import { Knex } from 'knex';
 import { db } from '../app/database';
 import Models from '../models/rootModel';
 import ManageFile from '../utils/lib/manageFile';
 import ResMsg from '../utils/miscellaneous/responseMessage';
-import Schema from '../utils/miscellaneous/schema';
 import StatusCode from '../utils/miscellaneous/statusCode';
+import { ICreateAdminAuditTrailPayload } from '../utils/modelTypes/adminModelTypes/adminModel.types';
 
 abstract class AbstractServices {
   protected db = db;
@@ -11,7 +12,15 @@ abstract class AbstractServices {
   protected ResMsg = ResMsg;
   protected StatusCode = StatusCode;
   protected Model = new Models();
-  protected schema = new Schema();
+
+  protected async insertAdminAudit(
+    trx: Knex.Transaction,
+    payload: ICreateAdminAuditTrailPayload
+  ) {
+    const adminModel = this.Model.AdminModel(trx);
+
+    await adminModel.createAudit(payload);
+  }
 }
 
 export default AbstractServices;

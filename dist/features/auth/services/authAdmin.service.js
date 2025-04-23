@@ -39,6 +39,11 @@ class AuthAdminService extends abstract_service_1.default {
                 }
                 const { password_hash, two_fa, status, email, id, username, name, role_id, photo, phone_number, gender, is_main_user, } = checkUserAdmin;
                 if (!status) {
+                    yield this.insertAdminAudit(trx, {
+                        created_by: id,
+                        type: 'GET',
+                        details: 'Tried to login with inactive account.',
+                    });
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -47,6 +52,11 @@ class AuthAdminService extends abstract_service_1.default {
                 }
                 const checkPassword = yield lib_1.default.compareHashValue(password, password_hash);
                 if (!checkPassword) {
+                    yield this.insertAdminAudit(trx, {
+                        created_by: id,
+                        type: 'GET',
+                        details: 'Tried to login with wrong password.',
+                    });
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_UNAUTHORIZED,
@@ -57,6 +67,11 @@ class AuthAdminService extends abstract_service_1.default {
                     const data = yield new publicEmailOTP_service_1.default(trx).sendEmailOtp({
                         email,
                         type: constants_1.OTP_TYPES.verify_admin,
+                    });
+                    yield this.insertAdminAudit(trx, {
+                        created_by: id,
+                        type: 'GET',
+                        details: 'OTP Send for login with 2fa.',
                     });
                     if (data.success) {
                         return {
@@ -84,6 +99,11 @@ class AuthAdminService extends abstract_service_1.default {
                 };
                 const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_ADMIN, '24h');
                 const role = yield AdminModel.getSingleRoleWithPermissions(role_id);
+                yield this.insertAdminAudit(trx, {
+                    created_by: id,
+                    type: 'GET',
+                    details: 'User logged in.',
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -148,6 +168,11 @@ class AuthAdminService extends abstract_service_1.default {
                 };
                 const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_ADMIN, '24h');
                 const role = yield AdminModel.getSingleRoleWithPermissions(role_id);
+                yield this.insertAdminAudit(trx, {
+                    created_by: id,
+                    type: 'GET',
+                    details: 'User logged in with 2fa.',
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,

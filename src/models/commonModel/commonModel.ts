@@ -31,7 +31,6 @@ class CommonModel extends Schema {
       .andWhere('email', payload.email)
       .andWhere('type', payload.type)
       .andWhere('matched', 0)
-      .andWhere('tried', '<', 3)
       .andWhereRaw(
         `"create_date" + interval '${OTP_DEFAULT_EXPIRY} minutes' > NOW()`
       );
@@ -159,7 +158,7 @@ class CommonModel extends Schema {
     limit,
     skip,
     name,
-    code
+    code,
   }: {
     country_id?: number;
     city_id?: number;

@@ -61,15 +61,14 @@ class AuthAgentService extends abstract_service_1.default {
                         message: 'Duplicate agency name! Already exist an agency with this name.',
                     };
                 }
-                let logo = '';
+                let agency_logo = '';
                 let civil_aviation = '';
                 let trade_license = '';
                 let national_id = '';
                 files.forEach((file) => {
-                    console.log(file.fieldname);
                     switch (file.fieldname) {
-                        case 'logo':
-                            logo = file.filename;
+                        case 'agency_logo':
+                            agency_logo = file.filename;
                             break;
                         case 'civil_aviation':
                             civil_aviation = file.filename;
@@ -92,21 +91,10 @@ class AuthAgentService extends abstract_service_1.default {
                     agency_name,
                     email,
                     phone,
-                    agency_logo: logo,
+                    agency_logo,
                     civil_aviation,
                     trade_license,
                     national_id,
-                });
-                yield AgentModel.createWhiteLabelPermission({
-                    agency_id: newAgency[0].id,
-                    blog: false,
-                    flight: false,
-                    group_fare: false,
-                    holiday: false,
-                    hotel: false,
-                    token: '',
-                    umrah: false,
-                    visa: false,
                 });
                 const newRole = yield AgencyUserModel.createRole({
                     agency_id: newAgency[0].id,
@@ -274,8 +262,10 @@ class AuthAgentService extends abstract_service_1.default {
                 };
                 if (white_label) {
                     const wPermissions = yield AgentModel.getWhiteLabelPermission(agency_id);
-                    const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
-                    whiteLabelPermissions = rest;
+                    if (wPermissions) {
+                        const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
+                        whiteLabelPermissions = rest;
+                    }
                 }
                 const tokenData = {
                     user_id: id,
@@ -373,8 +363,10 @@ class AuthAgentService extends abstract_service_1.default {
                 };
                 if (white_label) {
                     const wPermissions = yield AgencyModel.getWhiteLabelPermission(agency_id);
-                    const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
-                    whiteLabelPermissions = rest;
+                    if (wPermissions) {
+                        const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
+                        whiteLabelPermissions = rest;
+                    }
                 }
                 const tokenData = {
                     user_id: id,

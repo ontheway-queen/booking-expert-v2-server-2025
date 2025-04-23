@@ -14,7 +14,7 @@ export default class AuthAgentRouter extends AbstractRouter {
       .route('/register')
       .post(
         this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_FILES, [
-          'logo',
+          'agency_logo',
           'civil_aviation',
           'trade_license',
           'national_id',

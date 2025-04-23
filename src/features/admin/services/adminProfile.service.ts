@@ -1,8 +1,6 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
-import { ITokenParseAdmin } from '../../public/utils/types/publicCommon.types';
 import Lib from '../../../utils/lib/lib';
-import config from '../../../config/config';
 import {
   IAdminChangePassReqBody,
   IUpdateAdminProfileReqBody,
@@ -30,18 +28,6 @@ export default class AdminProfileService extends AbstractServices {
 
     const role = await adminModel.getSingleRoleWithPermissions(admin.role_id);
 
-    const tokenData: ITokenParseAdmin = {
-      user_id: admin.id,
-      username: admin.username,
-      user_email: admin.email,
-      name: admin.name,
-      is_main_user: admin.is_main_user,
-      photo: admin.photo,
-      phone_number: admin.phone_number,
-    };
-
-    const token = Lib.createToken(tokenData, config.JWT_SECRET_ADMIN, '24h');
-
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
@@ -59,7 +45,6 @@ export default class AdminProfileService extends AbstractServices {
         is_main_user: admin.is_main_user,
         role,
       },
-      token,
     };
   }
 

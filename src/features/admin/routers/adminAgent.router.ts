@@ -34,7 +34,7 @@ export default class AdminAgentRouter extends AbstractRouter {
     this.router.use('/group-fare', this.groupFareRouter.router);
     this.router.use('/holiday', this.holidayRouter.router);
     this.router.use('/hotel', this.hotelRouter.router);
-    this.router.use('/payment', this.paymentRouter.router);
+    this.router.use('/payments', this.paymentRouter.router);
     this.router.use('/promotions', this.promotionsRouter.router);
     this.router.use('/support-ticket', this.supportTicketRouter.router);
     this.router.use('/umrah', this.umrahRouter.router);

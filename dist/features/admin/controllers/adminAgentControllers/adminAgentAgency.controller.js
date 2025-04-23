@@ -35,8 +35,31 @@ class AdminAgentAgencyController extends abstract_controller_1.default {
             const _a = yield this.services.getAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
-        this.getSingleAgency = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator('id') }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.getSingleAgency = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.services.getSingleAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.updateAgencyApplication = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator('id'),
+            bodySchema: this.validator.updateAgencyApplication,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.updateAgencyApplication(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.updateAgency = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator('id'),
+            bodySchema: this.validator.updateAgency,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.updateAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
+        }));
+        this.agencyLogin = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.agencyLogin(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
     }

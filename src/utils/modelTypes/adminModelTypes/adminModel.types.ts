@@ -134,3 +134,18 @@ export interface IInsertRolePermissionPayload {
   update?: boolean;
   delete?: boolean;
 }
+
+export interface ICreateAdminAuditTrailPayload {
+  created_by: number;
+  type: 'CREATE' | 'GET' | 'UPDATE' | 'DELETE';
+  details: string;
+}
+
+export interface IGetAdminAuditTrailQuery {
+  type?: 'CREATE' | 'GET' | 'UPDATE' | 'DELETE';
+  created_by?: number;
+  limit?: number;
+  skip?: number;
+  from_date?: string;
+  to_date?: string;
+}

@@ -48,18 +48,21 @@ class MarkupSetModel extends schema_1.default {
             return data;
         });
     }
-    getSingleMarkupSet(id, status) {
+    getSingleMarkupSet(id, status, type) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('markup_set')
                 .withSchema(this.DBO_SCHEMA)
                 .select('*')
                 .where((qb) => {
+                if (type) {
+                    qb.andWhere('type', type);
+                }
                 qb.andWhere({ id });
                 if (status !== undefined) {
                     qb.andWhere('status', status);
                 }
             })
-                .andWhere("is_deleted", false)
+                .andWhere('is_deleted', false)
                 .first();
         });
     }
