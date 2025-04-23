@@ -8,6 +8,9 @@ import {
 import CustomError from '../../../../utils/lib/customError';
 import { IUpdateAgencyPayload } from '../../../../utils/modelTypes/agentModel/agencyModelTypes';
 import { v4 as uuidv4 } from 'uuid';
+import { ITokenParseAgencyUser } from '../../../public/utils/types/publicCommon.types';
+import Lib from '../../../../utils/lib/lib';
+import config from '../../../../config/config';
 
 export default class AdminAgentAgencyService extends AbstractServices {
   constructor() {
@@ -206,9 +209,8 @@ export default class AdminAgentAgencyService extends AbstractServices {
       }
 
       if (
-        checkAgency.status === 'Incomplete' ||
-        checkAgency.status === 'Pending' ||
-        checkAgency.status === 'Rejected'
+        checkAgency.status === 'Active' ||
+        checkAgency.status === 'Inactive'
       ) {
         throw new CustomError(
           this.ResMsg.HTTP_NOT_FOUND,
@@ -261,6 +263,92 @@ export default class AdminAgentAgencyService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
+      };
+    });
+  }
+
+  public async agencyLogin(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { user_id } = req.admin;
+      const { id: a_id } = req.params;
+      const agency_id = Number(a_id);
+      const AgentUserModel = this.Model.AgencyUserModel(trx);
+
+      const checkUserAgency = await AgentUserModel.checkUser({
+        agency_id,
+        is_main_user: true,
+      });
+
+      if (!checkUserAgency) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      const {
+        status,
+        email,
+        id,
+        username,
+        name,
+        photo,
+        agency_status,
+        phone_number,
+        agency_email,
+        agency_name,
+        is_main_user,
+      } = checkUserAgency;
+
+      if (
+        agency_status === 'Inactive' ||
+        agency_status === 'Incomplete' ||
+        agency_status === 'Rejected'
+      ) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Unauthorized agency! Please contact with us.',
+        };
+      }
+
+      if (!status) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: this.ResMsg.HTTP_ACCOUNT_INACTIVE,
+        };
+      }
+
+      const tokenData: ITokenParseAgencyUser = {
+        user_id: id,
+        username,
+        user_email: email,
+        name,
+        agency_id,
+        agency_email,
+        agency_name,
+        is_main_user,
+        phone_number,
+        photo,
+      };
+
+      const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
+
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        details: `Direct login to agent panel - ${checkUserAgency.agency_name}(${checkUserAgency.agent_no}) with ${checkUserAgency.username}`,
+        type: 'GET',
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.LOGIN_SUCCESSFUL,
+        data: {
+          token,
+        },
       };
     });
   }

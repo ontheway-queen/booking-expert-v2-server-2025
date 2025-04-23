@@ -10,6 +10,7 @@ export default class AdminAgentAgencyRouter extends AbstractRouter {
 
   private callRouter() {
     this.router.route('/').get(this.controller.getAgency);
+
     this.router
       .route('/:id')
       .get(this.controller.getSingleAgency)
@@ -22,8 +23,11 @@ export default class AdminAgentAgencyRouter extends AbstractRouter {
         ]),
         this.controller.updateAgency
       );
+
     this.router
       .route('/:id/application')
       .patch(this.controller.updateAgencyApplication);
+
+    this.router.route('/:id/login').get(this.controller.agencyLogin);
   }
 }

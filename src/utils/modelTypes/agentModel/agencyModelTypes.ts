@@ -105,6 +105,7 @@ export interface ICheckAgencyQuery {
   email?: string;
   name?: string;
   agent_no?: string;
+  status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
 }
 
 export interface ICheckAgencyData {

@@ -19,7 +19,7 @@ export default class AdminAgentAgencyController extends AbstractController {
   );
 
   public getSingleAgency = this.asyncWrapper.wrap(
-    { paramSchema: this.commonValidator.singleParamNumValidator('id') },
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.getSingleAgency(req);
       res.status(code).json(rest);
@@ -52,6 +52,14 @@ export default class AdminAgentAgencyController extends AbstractController {
       } else {
         this.error(rest.message, code);
       }
+    }
+  );
+
+  public agencyLogin = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.agencyLogin(req);
+      res.status(code).json(rest);
     }
   );
 }

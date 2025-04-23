@@ -104,16 +104,17 @@ class AgencyPaymentModel extends schema_1.default {
                     qb.andWhere('type', type);
                 }
                 if (from_date && to_date) {
-                    qb.andWhereBetween('ledger_date', [from_date, to_date]);
+                    qb.andWhereBetween('created_at', [from_date, to_date]);
                 }
             })
-                .orderBy('ledger_date', 'asc')
+                .orderBy('created_at', 'asc')
                 .orderBy('id', 'asc')
                 .limit(Number(limit) || constants_1.DATA_LIMIT)
                 .offset(Number(skip) || 0);
             let total = [];
             if (need_total) {
-                total = yield this.db('agency_ledger')
+                total = yield this.db('loan_history')
+                    .withSchema(this.AGENT_SCHEMA)
                     .count('id AS total')
                     .where((qb) => {
                     if (agency_id) {
@@ -123,7 +124,7 @@ class AgencyPaymentModel extends schema_1.default {
                         qb.andWhere('type', type);
                     }
                     if (from_date && to_date) {
-                        qb.andWhereBetween('ledger_date', [from_date, to_date]);
+                        qb.andWhereBetween('created_at', [from_date, to_date]);
                     }
                 });
             }
@@ -133,12 +134,12 @@ class AgencyPaymentModel extends schema_1.default {
             };
         });
     }
-    deleteLoanHistory(voucher_no) {
+    deleteLoanHistory(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.db('agency_ledger')
+            yield this.db('loan_history')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('*')
-                .where('voucher_no', voucher_no);
+                .delete()
+                .where('id', id);
         });
     }
 }

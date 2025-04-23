@@ -122,10 +122,10 @@ export default class AgencyPaymentModel extends Schema {
         }
 
         if (from_date && to_date) {
-          qb.andWhereBetween('ledger_date', [from_date, to_date]);
+          qb.andWhereBetween('created_at', [from_date, to_date]);
         }
       })
-      .orderBy('ledger_date', 'asc')
+      .orderBy('created_at', 'asc')
       .orderBy('id', 'asc')
       .limit(Number(limit) || DATA_LIMIT)
       .offset(Number(skip) || 0);
@@ -133,7 +133,8 @@ export default class AgencyPaymentModel extends Schema {
     let total: any[] = [];
 
     if (need_total) {
-      total = await this.db('agency_ledger')
+      total = await this.db('loan_history')
+        .withSchema(this.AGENT_SCHEMA)
         .count('id AS total')
         .where((qb) => {
           if (agency_id) {
@@ -144,7 +145,7 @@ export default class AgencyPaymentModel extends Schema {
           }
 
           if (from_date && to_date) {
-            qb.andWhereBetween('ledger_date', [from_date, to_date]);
+            qb.andWhereBetween('created_at', [from_date, to_date]);
           }
         });
     }
@@ -155,10 +156,10 @@ export default class AgencyPaymentModel extends Schema {
     };
   }
 
-  public async deleteLoanHistory(voucher_no: string) {
-    await this.db('agency_ledger')
+  public async deleteLoanHistory(id: number) {
+    await this.db('loan_history')
       .withSchema(this.AGENT_SCHEMA)
-      .select('*')
-      .where('voucher_no', voucher_no);
+      .delete()
+      .where('id', id);
   }
 }

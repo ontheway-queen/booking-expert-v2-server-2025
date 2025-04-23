@@ -25,7 +25,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
-const config_1 = __importDefault(require("../../../config/config"));
 class AdminProfileService extends abstract_service_1.default {
     constructor() {
         super();
@@ -44,19 +43,6 @@ class AdminProfileService extends abstract_service_1.default {
                 };
             }
             const role = yield agencyUserModel.getSingleRoleWithPermissions(user.role_id, agency_id);
-            const tokenData = {
-                agency_email: user.agency_email,
-                agency_id: user.agency_id,
-                agency_name: user.agency_name,
-                is_main_user: user.is_main_user,
-                name: user.name,
-                photo: user.photo,
-                user_email: user.email,
-                user_id: user.id,
-                username: user.username,
-                phone_number: user.phone_number,
-            };
-            const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
             let whiteLabelPermissions = {
                 flight: false,
                 hotel: false,
@@ -99,7 +85,6 @@ class AdminProfileService extends abstract_service_1.default {
                     white_label: user.white_label,
                     whiteLabelPermissions,
                 },
-                token,
             };
         });
     }

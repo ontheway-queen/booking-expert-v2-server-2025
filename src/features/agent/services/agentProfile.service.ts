@@ -1,8 +1,6 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
-import { ITokenParseAgencyUser } from '../../public/utils/types/publicCommon.types';
 import Lib from '../../../utils/lib/lib';
-import config from '../../../config/config';
 import {
   IAgencyUserChangePassReqBody,
   IUpdateAgentProfileReqBody,
@@ -33,21 +31,6 @@ export default class AdminProfileService extends AbstractServices {
       user.role_id,
       agency_id
     );
-
-    const tokenData: ITokenParseAgencyUser = {
-      agency_email: user.agency_email,
-      agency_id: user.agency_id,
-      agency_name: user.agency_name,
-      is_main_user: user.is_main_user,
-      name: user.name,
-      photo: user.photo,
-      user_email: user.email,
-      user_id: user.id,
-      username: user.username,
-      phone_number: user.phone_number,
-    };
-
-    const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
 
     let whiteLabelPermissions = {
       flight: false,
@@ -94,7 +77,6 @@ export default class AdminProfileService extends AbstractServices {
         white_label: user.white_label,
         whiteLabelPermissions,
       },
-      token,
     };
   }
 

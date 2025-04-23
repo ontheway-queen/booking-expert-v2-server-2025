@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
-const config_1 = __importDefault(require("../../../config/config"));
 class AdminProfileService extends abstract_service_1.default {
     constructor() {
         super();
@@ -32,16 +31,6 @@ class AdminProfileService extends abstract_service_1.default {
                 };
             }
             const role = yield adminModel.getSingleRoleWithPermissions(admin.role_id);
-            const tokenData = {
-                user_id: admin.id,
-                username: admin.username,
-                user_email: admin.email,
-                name: admin.name,
-                is_main_user: admin.is_main_user,
-                photo: admin.photo,
-                phone_number: admin.phone_number,
-            };
-            const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_ADMIN, '24h');
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -59,7 +48,6 @@ class AdminProfileService extends abstract_service_1.default {
                     is_main_user: admin.is_main_user,
                     role,
                 },
-                token,
             };
         });
     }

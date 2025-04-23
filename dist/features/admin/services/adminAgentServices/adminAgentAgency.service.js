@@ -26,6 +26,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
 const customError_1 = __importDefault(require("../../../../utils/lib/customError"));
 const uuid_1 = require("uuid");
+const lib_1 = __importDefault(require("../../../../utils/lib/lib"));
+const config_1 = __importDefault(require("../../../../config/config"));
 class AdminAgentAgencyService extends abstract_service_1.default {
     constructor() {
         super();
@@ -176,9 +178,8 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 if (!checkAgency) {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
                 }
-                if (checkAgency.status === 'Incomplete' ||
-                    checkAgency.status === 'Pending' ||
-                    checkAgency.status === 'Rejected') {
+                if (checkAgency.status === 'Active' ||
+                    checkAgency.status === 'Inactive') {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
                 }
                 const body = req.body;
@@ -212,6 +213,70 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
+                };
+            }));
+        });
+    }
+    agencyLogin(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { user_id } = req.admin;
+                const { id: a_id } = req.params;
+                const agency_id = Number(a_id);
+                const AgentUserModel = this.Model.AgencyUserModel(trx);
+                const checkUserAgency = yield AgentUserModel.checkUser({
+                    agency_id,
+                    is_main_user: true,
+                });
+                if (!checkUserAgency) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const { status, email, id, username, name, photo, agency_status, phone_number, agency_email, agency_name, is_main_user, } = checkUserAgency;
+                if (agency_status === 'Inactive' ||
+                    agency_status === 'Incomplete' ||
+                    agency_status === 'Rejected') {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'Unauthorized agency! Please contact with us.',
+                    };
+                }
+                if (!status) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: this.ResMsg.HTTP_ACCOUNT_INACTIVE,
+                    };
+                }
+                const tokenData = {
+                    user_id: id,
+                    username,
+                    user_email: email,
+                    name,
+                    agency_id,
+                    agency_email,
+                    agency_name,
+                    is_main_user,
+                    phone_number,
+                    photo,
+                };
+                const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    details: `Direct login to agent panel - ${checkUserAgency.agency_name}(${checkUserAgency.agent_no}) with ${checkUserAgency.username}`,
+                    type: 'GET',
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.LOGIN_SUCCESSFUL,
+                    data: {
+                        token,
+                    },
                 };
             }));
         });
