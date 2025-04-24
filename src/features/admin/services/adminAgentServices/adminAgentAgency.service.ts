@@ -11,6 +11,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { ITokenParseAgencyUser } from '../../../public/utils/types/publicCommon.types';
 import Lib from '../../../../utils/lib/lib';
 import config from '../../../../config/config';
+import {
+  MARKUP_SET_TYPE_FLIGHT,
+  MARKUP_SET_TYPE_HOTEL,
+} from '../../../../utils/miscellaneous/constants';
 
 export default class AdminAgentAgencyService extends AbstractServices {
   constructor() {
@@ -224,11 +228,11 @@ export default class AdminAgentAgencyService extends AbstractServices {
       let payload: IUpdateAgencyPayload = {};
 
       if (body.status === 'Active') {
-        const checkFlightMarkupSet = await MarkupSetModel.getSingleMarkupSet(
-          body.flight_markup_set,
-          true,
-          'Flight'
-        );
+        const checkFlightMarkupSet = await MarkupSetModel.getSingleMarkupSet({
+          id: body.flight_markup_set,
+          status: true,
+          type: MARKUP_SET_TYPE_FLIGHT,
+        });
 
         if (!checkFlightMarkupSet) {
           return {
@@ -237,11 +241,11 @@ export default class AdminAgentAgencyService extends AbstractServices {
             message: 'Invalid flight markup set.',
           };
         }
-        const checkHotelMarkupSet = await MarkupSetModel.getSingleMarkupSet(
-          body.flight_markup_set,
-          true,
-          'Hotel'
-        );
+        const checkHotelMarkupSet = await MarkupSetModel.getSingleMarkupSet({
+          id: body.flight_markup_set,
+          status: true,
+          type: MARKUP_SET_TYPE_HOTEL,
+        });
 
         if (!checkHotelMarkupSet) {
           return {

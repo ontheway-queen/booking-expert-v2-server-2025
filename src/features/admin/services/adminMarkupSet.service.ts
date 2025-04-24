@@ -10,17 +10,20 @@ import {
   IUpdateHotelMarkupsReqBody,
   IUpdateMarkupSetReqBody,
 } from '../utils/types/adminMarkupSetTypes';
-import { MARKUP_SET_TYPE_FLIGHT } from '../../../utils/miscellaneous/constants';
+import {
+  MARKUP_SET_TYPE_FLIGHT,
+  MARKUP_SET_TYPE_HOTEL,
+} from '../../../utils/miscellaneous/constants';
 import CustomError from '../../../utils/lib/customError';
 import { ICreateFlightMarkupsPayload } from '../../../utils/modelTypes/markupSetModelTypes/flightMarkupsTypes';
 import { IGetMarkupListFilterQuery } from '../../../utils/modelTypes/markupSetModelTypes/markupSetModelTypes';
 import { IInsertHotelMarkupPayload } from '../../../utils/modelTypes/markupSetModelTypes/hotelMarkupsTypes';
 
 export class AdminMarkupSetService extends AbstractServices {
-  public async createMarkupSet(req: Request) {
+  public async createFlightMarkupSet(req: Request) {
     return this.db.transaction(async (trx) => {
       const { user_id } = req.admin;
-      const { api, name, type } = req.body as ICreateMarkupSetReqBody;
+      const { api, name } = req.body as ICreateMarkupSetReqBody;
       const markupSetModel = this.Model.MarkupSetModel(trx);
       const flightApiModel = this.Model.FlightApiModel(trx);
       const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
@@ -29,7 +32,7 @@ export class AdminMarkupSetService extends AbstractServices {
       //check if markup set name already exists
       const checkName = await markupSetModel.getAllMarkupSet({
         check_name: name,
-        type,
+        type: MARKUP_SET_TYPE_FLIGHT,
       });
 
       if (checkName.length) {
@@ -44,7 +47,7 @@ export class AdminMarkupSetService extends AbstractServices {
       const newMarkupSet = await markupSetModel.createMarkupSet({
         name,
         created_by: user_id,
-        type,
+        type: MARKUP_SET_TYPE_FLIGHT,
       });
 
       const prePayload: IPrePayloadSetMarkup[] = [];
@@ -109,6 +112,13 @@ export class AdminMarkupSetService extends AbstractServices {
         await flightMarkupsModel.createFlightMarkups(airlinesMarkupPayload);
       }
 
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        type: 'CREATE',
+        details: `Create flight markup set ${name}.`,
+        payload: JSON.stringify(req.body),
+      });
+
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -124,7 +134,6 @@ export class AdminMarkupSetService extends AbstractServices {
 
       const data = await markupSetModel.getAllMarkupSet({
         ...query,
-        type: MARKUP_SET_TYPE_FLIGHT,
       });
 
       return {
@@ -141,7 +150,10 @@ export class AdminMarkupSetService extends AbstractServices {
 
       const markupSetModel = this.Model.MarkupSetModel(trx);
       const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
-      const markupSetData = await markupSetModel.getSingleMarkupSet(Number(id));
+      const markupSetData = await markupSetModel.getSingleMarkupSet({
+        id: Number(id),
+        type: 'Flight',
+      });
 
       if (!markupSetData) {
         return {
@@ -174,11 +186,15 @@ export class AdminMarkupSetService extends AbstractServices {
     return this.db.transaction(async (trx) => {
       const { name, add, update } = req.body as IUpdateMarkupSetReqBody;
       const { id } = req.params;
+      const { user_id } = req.admin;
       const markupSetModel = this.Model.MarkupSetModel(trx);
       const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
       const flightApiModel = this.Model.FlightApiModel(trx);
 
-      const checkComSet = await markupSetModel.getSingleMarkupSet(Number(id));
+      const checkComSet = await markupSetModel.getSingleMarkupSet({
+        id: Number(id),
+        type: MARKUP_SET_TYPE_FLIGHT,
+      });
 
       if (!checkComSet) {
         return {
@@ -235,6 +251,13 @@ export class AdminMarkupSetService extends AbstractServices {
         }
       }
 
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        type: 'UPDATE',
+        details: `Update flight markup set ${name}.`,
+        payload: JSON.stringify(req.body),
+      });
+
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
@@ -248,7 +271,9 @@ export class AdminMarkupSetService extends AbstractServices {
       const { id } = req.params;
       const { user_id } = req.admin;
       const markupSetModel = this.Model.MarkupSetModel(trx);
-      const getMarkupSet = await markupSetModel.getSingleMarkupSet(Number(id));
+      const getMarkupSet = await markupSetModel.getSingleMarkupSet({
+        id: Number(id),
+      });
       if (!getMarkupSet) {
         return {
           success: false,
@@ -330,6 +355,7 @@ export class AdminMarkupSetService extends AbstractServices {
           markup_set_id: Number(set_id),
           flight_api_id: Number(set_api_id),
         });
+
       if (!setFlightApiData.length) {
         return {
           success: false,
@@ -434,6 +460,13 @@ export class AdminMarkupSetService extends AbstractServices {
         await flightMarkupsModel.deleteFlightMarkups(remove);
       }
 
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        type: 'UPDATE',
+        details: `Update flight markup set ${set_id}. API - ${setFlightApiData[0].api_name} Airlines Markups.`,
+        payload: JSON.stringify(req.body),
+      });
+
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -454,31 +487,45 @@ export class AdminMarkupSetService extends AbstractServices {
     });
   }
 
-  public async createFlightMarkupSet(req: Request) {
+  public async createHotelMarkupSet(req: Request) {
     return this.db.transaction(async (trx) => {
       const { user_id } = req.admin;
       const { name, book, cancel } = req.body as ICreateHotelMarkupSetReqBody;
       const MarkupSetModel = this.Model.MarkupSetModel(trx);
       const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
 
+      //check if markup set name already exists
+      const checkName = await MarkupSetModel.getAllMarkupSet({
+        check_name: name,
+        type: MARKUP_SET_TYPE_HOTEL,
+      });
+
+      if (checkName.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_CONFLICT,
+          message: 'Markup Set name already exists',
+        };
+      }
+
       const markupSet = await MarkupSetModel.createMarkupSet({
         created_by: user_id,
         name,
-        type: 'Hotel',
+        type: MARKUP_SET_TYPE_HOTEL,
       });
 
       const hotelMarkupPayload: IInsertHotelMarkupPayload[] = [
         {
           markup: book.markup,
           mode: book.mode,
-          set_for: 'Book',
+          markup_for: 'Book',
           type: book.type,
           set_id: markupSet[0].id,
         },
         {
           markup: cancel.markup,
           mode: cancel.mode,
-          set_for: 'Cancel',
+          markup_for: 'Cancel',
           type: cancel.type,
           set_id: markupSet[0].id,
         },
@@ -497,6 +544,9 @@ export class AdminMarkupSetService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: this.ResMsg.HTTP_SUCCESSFUL,
+        data: {
+          id: markupSet[0].id,
+        },
       };
     });
   }
@@ -508,7 +558,10 @@ export class AdminMarkupSetService extends AbstractServices {
       const markupSetModel = this.Model.MarkupSetModel(trx);
       const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
 
-      const getMarkupSet = await markupSetModel.getSingleMarkupSet(set_id);
+      const getMarkupSet = await markupSetModel.getSingleMarkupSet({
+        id: set_id,
+        type: MARKUP_SET_TYPE_HOTEL,
+      });
 
       if (!getMarkupSet) {
         return {
@@ -519,7 +572,7 @@ export class AdminMarkupSetService extends AbstractServices {
       }
 
       const markups = await HotelMarkupsModel.getHotelMarkup({
-        set_for: 'Both',
+        markup_for: 'Both',
         set_id,
       });
 
@@ -544,7 +597,7 @@ export class AdminMarkupSetService extends AbstractServices {
         | {} = {};
 
       markups.forEach((markup) => {
-        if (markup.set_for === 'Book') {
+        if (markup.markup_for === 'Book') {
           book = {
             id: markup.id,
             markup: markup.markup,
@@ -554,7 +607,7 @@ export class AdminMarkupSetService extends AbstractServices {
           };
         }
 
-        if (markup.set_for === 'Cancel') {
+        if (markup.markup_for === 'Cancel') {
           cancel = {
             id: markup.id,
             markup: markup.markup,
@@ -594,7 +647,10 @@ export class AdminMarkupSetService extends AbstractServices {
       const markupSetModel = this.Model.MarkupSetModel(trx);
       const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
 
-      const getMarkupSet = await markupSetModel.getSingleMarkupSet(set_id);
+      const getMarkupSet = await markupSetModel.getSingleMarkupSet({
+        id: set_id,
+        type: MARKUP_SET_TYPE_HOTEL,
+      });
 
       if (!getMarkupSet) {
         return {
@@ -610,14 +666,14 @@ export class AdminMarkupSetService extends AbstractServices {
       if (book) {
         await HotelMarkupsModel.updateHotelMarkup(book, {
           set_id,
-          set_for: 'Book',
+          markup_for: 'Book',
         });
       }
 
       if (cancel) {
         await HotelMarkupsModel.updateHotelMarkup(cancel, {
           set_id,
-          set_for: 'Cancel',
+          markup_for: 'Cancel',
         });
       }
 

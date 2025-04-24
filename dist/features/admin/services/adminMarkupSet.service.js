@@ -28,11 +28,11 @@ const abstract_service_1 = __importDefault(require("../../../abstract/abstract.s
 const constants_1 = require("../../../utils/miscellaneous/constants");
 const customError_1 = __importDefault(require("../../../utils/lib/customError"));
 class AdminMarkupSetService extends abstract_service_1.default {
-    createMarkupSet(req) {
+    createFlightMarkupSet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id } = req.admin;
-                const { api, name, type } = req.body;
+                const { api, name } = req.body;
                 const markupSetModel = this.Model.MarkupSetModel(trx);
                 const flightApiModel = this.Model.FlightApiModel(trx);
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
@@ -40,7 +40,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 //check if markup set name already exists
                 const checkName = yield markupSetModel.getAllMarkupSet({
                     check_name: name,
-                    type,
+                    type: constants_1.MARKUP_SET_TYPE_FLIGHT,
                 });
                 if (checkName.length) {
                     return {
@@ -53,7 +53,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 const newMarkupSet = yield markupSetModel.createMarkupSet({
                     name,
                     created_by: user_id,
-                    type,
+                    type: constants_1.MARKUP_SET_TYPE_FLIGHT,
                 });
                 const prePayload = [];
                 for (const item of api) {
@@ -92,6 +92,12 @@ class AdminMarkupSetService extends abstract_service_1.default {
                     const airlinesMarkupPayload = markups.map((markup) => (Object.assign(Object.assign({}, markup), { markup_set_flight_api_id: newSetFlightApi[0].id, created_by: user_id })));
                     yield flightMarkupsModel.createFlightMarkups(airlinesMarkupPayload);
                 }
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    type: 'CREATE',
+                    details: `Create flight markup set ${name}.`,
+                    payload: JSON.stringify(req.body),
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -105,7 +111,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const query = req.query;
                 const markupSetModel = this.Model.MarkupSetModel(trx);
-                const data = yield markupSetModel.getAllMarkupSet(Object.assign(Object.assign({}, query), { type: constants_1.MARKUP_SET_TYPE_FLIGHT }));
+                const data = yield markupSetModel.getAllMarkupSet(Object.assign({}, query));
                 return {
                     success: true,
                     data,
@@ -120,7 +126,10 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 const { id } = req.params;
                 const markupSetModel = this.Model.MarkupSetModel(trx);
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
-                const markupSetData = yield markupSetModel.getSingleMarkupSet(Number(id));
+                const markupSetData = yield markupSetModel.getSingleMarkupSet({
+                    id: Number(id),
+                    type: 'Flight',
+                });
                 if (!markupSetData) {
                     return {
                         success: false,
@@ -150,10 +159,14 @@ class AdminMarkupSetService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { name, add, update } = req.body;
                 const { id } = req.params;
+                const { user_id } = req.admin;
                 const markupSetModel = this.Model.MarkupSetModel(trx);
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
                 const flightApiModel = this.Model.FlightApiModel(trx);
-                const checkComSet = yield markupSetModel.getSingleMarkupSet(Number(id));
+                const checkComSet = yield markupSetModel.getSingleMarkupSet({
+                    id: Number(id),
+                    type: constants_1.MARKUP_SET_TYPE_FLIGHT,
+                });
                 if (!checkComSet) {
                     return {
                         success: false,
@@ -191,6 +204,12 @@ class AdminMarkupSetService extends abstract_service_1.default {
                         yield markupSetFlightApiModel.updateMarkupSetFlightApi({ status }, id);
                     }
                 }
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    type: 'UPDATE',
+                    details: `Update flight markup set ${name}.`,
+                    payload: JSON.stringify(req.body),
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -205,7 +224,9 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 const { id } = req.params;
                 const { user_id } = req.admin;
                 const markupSetModel = this.Model.MarkupSetModel(trx);
-                const getMarkupSet = yield markupSetModel.getSingleMarkupSet(Number(id));
+                const getMarkupSet = yield markupSetModel.getSingleMarkupSet({
+                    id: Number(id),
+                });
                 if (!getMarkupSet) {
                     return {
                         success: false,
@@ -350,6 +371,12 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 if (remove) {
                     yield flightMarkupsModel.deleteFlightMarkups(remove);
                 }
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    type: 'UPDATE',
+                    details: `Update flight markup set ${set_id}. API - ${setFlightApiData[0].api_name} Airlines Markups.`,
+                    payload: JSON.stringify(req.body),
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -371,30 +398,42 @@ class AdminMarkupSetService extends abstract_service_1.default {
             }));
         });
     }
-    createFlightMarkupSet(req) {
+    createHotelMarkupSet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id } = req.admin;
                 const { name, book, cancel } = req.body;
                 const MarkupSetModel = this.Model.MarkupSetModel(trx);
                 const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
+                //check if markup set name already exists
+                const checkName = yield MarkupSetModel.getAllMarkupSet({
+                    check_name: name,
+                    type: constants_1.MARKUP_SET_TYPE_HOTEL,
+                });
+                if (checkName.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_CONFLICT,
+                        message: 'Markup Set name already exists',
+                    };
+                }
                 const markupSet = yield MarkupSetModel.createMarkupSet({
                     created_by: user_id,
                     name,
-                    type: 'Hotel',
+                    type: constants_1.MARKUP_SET_TYPE_HOTEL,
                 });
                 const hotelMarkupPayload = [
                     {
                         markup: book.markup,
                         mode: book.mode,
-                        set_for: 'Book',
+                        markup_for: 'Book',
                         type: book.type,
                         set_id: markupSet[0].id,
                     },
                     {
                         markup: cancel.markup,
                         mode: cancel.mode,
-                        set_for: 'Cancel',
+                        markup_for: 'Cancel',
                         type: cancel.type,
                         set_id: markupSet[0].id,
                     },
@@ -410,6 +449,9 @@ class AdminMarkupSetService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: this.ResMsg.HTTP_SUCCESSFUL,
+                    data: {
+                        id: markupSet[0].id,
+                    },
                 };
             }));
         });
@@ -421,7 +463,10 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 const set_id = Number(id);
                 const markupSetModel = this.Model.MarkupSetModel(trx);
                 const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
-                const getMarkupSet = yield markupSetModel.getSingleMarkupSet(set_id);
+                const getMarkupSet = yield markupSetModel.getSingleMarkupSet({
+                    id: set_id,
+                    type: constants_1.MARKUP_SET_TYPE_HOTEL,
+                });
                 if (!getMarkupSet) {
                     return {
                         success: false,
@@ -430,13 +475,13 @@ class AdminMarkupSetService extends abstract_service_1.default {
                     };
                 }
                 const markups = yield HotelMarkupsModel.getHotelMarkup({
-                    set_for: 'Both',
+                    markup_for: 'Both',
                     set_id,
                 });
                 let book = {};
                 let cancel = {};
                 markups.forEach((markup) => {
-                    if (markup.set_for === 'Book') {
+                    if (markup.markup_for === 'Book') {
                         book = {
                             id: markup.id,
                             markup: markup.markup,
@@ -445,7 +490,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                             type: markup.type,
                         };
                     }
-                    if (markup.set_for === 'Cancel') {
+                    if (markup.markup_for === 'Cancel') {
                         cancel = {
                             id: markup.id,
                             markup: markup.markup,
@@ -484,7 +529,10 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 const set_id = Number(id);
                 const markupSetModel = this.Model.MarkupSetModel(trx);
                 const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
-                const getMarkupSet = yield markupSetModel.getSingleMarkupSet(set_id);
+                const getMarkupSet = yield markupSetModel.getSingleMarkupSet({
+                    id: set_id,
+                    type: constants_1.MARKUP_SET_TYPE_HOTEL,
+                });
                 if (!getMarkupSet) {
                     return {
                         success: false,
@@ -496,13 +544,13 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 if (book) {
                     yield HotelMarkupsModel.updateHotelMarkup(book, {
                         set_id,
-                        set_for: 'Book',
+                        markup_for: 'Book',
                     });
                 }
                 if (cancel) {
                     yield HotelMarkupsModel.updateHotelMarkup(cancel, {
                         set_id,
-                        set_for: 'Cancel',
+                        markup_for: 'Cancel',
                     });
                 }
                 yield markupSetModel.updateMarkupSet(Object.assign(Object.assign({}, restBody), { updated_by: user_id, last_updated: new Date() }), set_id);

@@ -28,6 +28,7 @@ const customError_1 = __importDefault(require("../../../../utils/lib/customError
 const uuid_1 = require("uuid");
 const lib_1 = __importDefault(require("../../../../utils/lib/lib"));
 const config_1 = __importDefault(require("../../../../config/config"));
+const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AdminAgentAgencyService extends abstract_service_1.default {
     constructor() {
         super();
@@ -186,7 +187,11 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const body = req.body;
                 let payload = {};
                 if (body.status === 'Active') {
-                    const checkFlightMarkupSet = yield MarkupSetModel.getSingleMarkupSet(body.flight_markup_set, true, 'Flight');
+                    const checkFlightMarkupSet = yield MarkupSetModel.getSingleMarkupSet({
+                        id: body.flight_markup_set,
+                        status: true,
+                        type: constants_1.MARKUP_SET_TYPE_FLIGHT,
+                    });
                     if (!checkFlightMarkupSet) {
                         return {
                             success: false,
@@ -194,7 +199,11 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                             message: 'Invalid flight markup set.',
                         };
                     }
-                    const checkHotelMarkupSet = yield MarkupSetModel.getSingleMarkupSet(body.flight_markup_set, true, 'Hotel');
+                    const checkHotelMarkupSet = yield MarkupSetModel.getSingleMarkupSet({
+                        id: body.flight_markup_set,
+                        status: true,
+                        type: constants_1.MARKUP_SET_TYPE_HOTEL,
+                    });
                     if (!checkHotelMarkupSet) {
                         return {
                             success: false,

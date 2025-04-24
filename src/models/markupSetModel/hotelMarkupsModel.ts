@@ -26,7 +26,7 @@ export default class HotelMarkupsModel extends Schema {
 
   // Get set Hotel Commission
   public async getHotelMarkup({
-    set_for,
+    markup_for,
     set_id,
     status,
   }: IGetHotelMarkupQuery): Promise<IGetHotelMarkupData[]> {
@@ -36,8 +36,8 @@ export default class HotelMarkupsModel extends Schema {
       .where((qb) => {
         qb.andWhere('set_id', set_id);
 
-        if (set_for !== 'Both') {
-          qb.andWhere('set_for', set_for);
+        if (markup_for !== 'Both') {
+          qb.andWhere('markup_for', markup_for);
         }
 
         if (status !== undefined) {
@@ -48,13 +48,13 @@ export default class HotelMarkupsModel extends Schema {
 
   public async updateHotelMarkup(
     payload: IUpdateHotelMarkupPayload,
-    conditions: { set_id: number; set_for: 'Book' | 'Cancel' }
+    conditions: { set_id: number; markup_for: 'Book' | 'Cancel' }
   ) {
     return await this.db('hotel_markups')
       .withSchema(this.DBO_SCHEMA)
       .update(payload)
       .andWhere('set_id', conditions.set_id)
-      .andWhere('set_for', conditions.set_for);
+      .andWhere('markup_for', conditions.markup_for);
   }
 
   public async deleteHotelMarkup(id: number) {

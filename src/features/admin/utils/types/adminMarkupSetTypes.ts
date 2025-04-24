@@ -1,6 +1,5 @@
 export interface ICreateMarkupSetReqBody {
   name: string;
-  type: 'Flight' | 'Hotel';
   api: {
     api_id: number;
     airlines: string[];

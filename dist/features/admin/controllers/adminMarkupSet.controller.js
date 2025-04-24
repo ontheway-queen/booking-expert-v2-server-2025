@@ -31,12 +31,16 @@ class AdminMarkupSetController extends abstract_controller_1.default {
         super();
         this.validator = new adminMarkupSet_validator_1.default();
         this.service = new adminMarkupSet_service_1.AdminMarkupSetService();
-        this.createCommissionSet = this.asyncWrapper.wrap({ bodySchema: this.validator.createMarkupSetSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.createMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
-            res.status(code).json(data);
-        }));
         this.getMarkupSet = this.asyncWrapper.wrap({ querySchema: this.validator.getMarkupSetSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.deleteMarkupSet = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.deleteMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.createFlightMarkupSet = this.asyncWrapper.wrap({ bodySchema: this.validator.createMarkupSetSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.createFlightMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
         this.getSingleFlightMarkupSet = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -48,10 +52,6 @@ class AdminMarkupSetController extends abstract_controller_1.default {
             bodySchema: this.validator.updateCommissionSetSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.updateFlightMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
-            res.status(code).json(data);
-        }));
-        this.deleteFlightMarkupSet = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.deleteMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
         this.getMarkupSetFlightApiDetails = this.asyncWrapper.wrap({
@@ -75,6 +75,23 @@ class AdminMarkupSetController extends abstract_controller_1.default {
         }));
         this.getAllFlightApi = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getAllFlightApi(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.createHotelMarkupSet = this.asyncWrapper.wrap({ bodySchema: this.validator.createHotelMarkup }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.createHotelMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.updateHotelMarkupSet = this.asyncWrapper.wrap({
+            bodySchema: this.validator.updateHotelMarkup,
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.updateHotelMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.getSingleHotelMarkup = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getSingleHotelMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
     }

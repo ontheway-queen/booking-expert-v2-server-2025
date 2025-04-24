@@ -3,12 +3,12 @@ export interface IInsertHotelMarkupPayload {
   markup: number;
   type: 'PER' | 'FLAT';
   mode: 'INCREASE' | 'DECREASE';
-  set_for: 'Book' | 'Cancel';
+  markup_for: 'Book' | 'Cancel';
 }
 
 export interface IGetHotelMarkupQuery {
   set_id: number;
-  set_for: 'Book' | 'Cancel' | 'Both';
+  markup_for: 'Book' | 'Cancel' | 'Both';
   status?: boolean;
 }
 
@@ -21,7 +21,7 @@ export interface IGetHotelMarkupData {
   type: 'PER' | 'FLAT';
   mode: 'INCREASE' | 'DECREASE';
   status: boolean;
-  set_for: 'Book' | 'Cancel';
+  markup_for: 'Book' | 'Cancel';
 }
 
 export interface IUpdateHotelMarkupPayload {

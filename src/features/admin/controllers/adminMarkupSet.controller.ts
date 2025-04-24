@@ -9,19 +9,26 @@ export default class AdminMarkupSetController extends AbstractController {
   constructor() {
     super();
   }
-
-  public createCommissionSet = this.asyncWrapper.wrap(
-    { bodySchema: this.validator.createMarkupSetSchema },
-    async (req: Request, res: Response) => {
-      const { code, ...data } = await this.service.createMarkupSet(req);
-      res.status(code).json(data);
-    }
-  );
-
   public getMarkupSet = this.asyncWrapper.wrap(
     { querySchema: this.validator.getMarkupSetSchema },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.getMarkupSet(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public deleteMarkupSet = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.deleteMarkupSet(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public createFlightMarkupSet = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.createMarkupSetSchema },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.createFlightMarkupSet(req);
       res.status(code).json(data);
     }
   );
@@ -43,14 +50,6 @@ export default class AdminMarkupSetController extends AbstractController {
     },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.updateFlightMarkupSet(req);
-      res.status(code).json(data);
-    }
-  );
-
-  public deleteFlightMarkupSet = this.asyncWrapper.wrap(
-    { paramSchema: this.commonValidator.singleParamNumValidator() },
-    async (req: Request, res: Response) => {
-      const { code, ...data } = await this.service.deleteMarkupSet(req);
       res.status(code).json(data);
     }
   );
@@ -90,6 +89,35 @@ export default class AdminMarkupSetController extends AbstractController {
     null,
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.getAllFlightApi(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public createHotelMarkupSet = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.createHotelMarkup },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.createHotelMarkupSet(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public updateHotelMarkupSet = this.asyncWrapper.wrap(
+    {
+      bodySchema: this.validator.updateHotelMarkup,
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.updateHotelMarkupSet(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public getSingleHotelMarkup = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getSingleHotelMarkupSet(req);
       res.status(code).json(data);
     }
   );

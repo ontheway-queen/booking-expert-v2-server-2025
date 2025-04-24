@@ -28,14 +28,14 @@ class HotelMarkupsModel extends schema_1.default {
     }
     // Get set Hotel Commission
     getHotelMarkup(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ set_for, set_id, status, }) {
+        return __awaiter(this, arguments, void 0, function* ({ markup_for, set_id, status, }) {
             return yield this.db('hotel_markup_set_view')
                 .withSchema(this.DBO_SCHEMA)
                 .select('*')
                 .where((qb) => {
                 qb.andWhere('set_id', set_id);
-                if (set_for !== 'Both') {
-                    qb.andWhere('set_for', set_for);
+                if (markup_for !== 'Both') {
+                    qb.andWhere('markup_for', markup_for);
                 }
                 if (status !== undefined) {
                     qb.andWhere('status', status);
@@ -49,7 +49,7 @@ class HotelMarkupsModel extends schema_1.default {
                 .withSchema(this.DBO_SCHEMA)
                 .update(payload)
                 .andWhere('set_id', conditions.set_id)
-                .andWhere('set_for', conditions.set_for);
+                .andWhere('markup_for', conditions.markup_for);
         });
     }
     deleteHotelMarkup(id) {

@@ -48,27 +48,35 @@ export default class MarkupSetModel extends Schema {
     return data;
   }
 
-  public async getSingleMarkupSet(
-    id: number,
-    status?: boolean,
-    type?: 'Flight' | 'Hotel'
-  ): Promise<IGetMarkupSetData | null> {
+  public async getSingleMarkupSet({
+    id,
+    status,
+    type,
+  }: {
+    id: number;
+    status?: boolean;
+    type?: 'Flight' | 'Hotel';
+  }): Promise<IGetMarkupSetData | null> {
     return await this.db('markup_set AS ms')
       .withSchema(this.DBO_SCHEMA)
-      .select('ms.*', 'cua.name AS created_by_name', 'uua.updated_by_name')
+      .select(
+        'ms.*',
+        'cua.name AS created_by_name',
+        'uua.name AS updated_by_name'
+      )
       .joinRaw(`left join admin.user_admin AS cua on ms.created_by = cua.id`)
       .joinRaw(`left join admin.user_admin AS uua on ms.updated_by = uua.id`)
       .where((qb) => {
         if (type) {
-          qb.andWhere('type', type);
+          qb.andWhere('ms.type', type);
         }
-        qb.andWhere({ id });
+        qb.andWhere('ms.id', id);
 
         if (status !== undefined) {
-          qb.andWhere('status', status);
+          qb.andWhere('ms.status', status);
         }
       })
-      .andWhere('is_deleted', false)
+      .andWhere('ms.is_deleted', false)
       .first();
   }
 
