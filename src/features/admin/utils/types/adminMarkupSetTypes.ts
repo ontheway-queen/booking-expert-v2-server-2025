@@ -83,3 +83,17 @@ export interface IUpdateHotelMarkupsReqBody {
     markup: number;
   };
 }
+
+export interface ICreateHotelMarkupSetReqBody {
+  name: string;
+  book: {
+    type: 'PER' | 'FLAT';
+    mode: 'INCREASE' | 'DECREASE';
+    markup: number;
+  };
+  cancel: {
+    type: 'PER' | 'FLAT';
+    mode: 'INCREASE' | 'DECREASE';
+    markup: number;
+  };
+}

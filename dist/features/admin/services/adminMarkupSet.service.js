@@ -199,10 +199,11 @@ class AdminMarkupSetService extends abstract_service_1.default {
             }));
         });
     }
-    deleteFlightMarkupSet(req) {
+    deleteMarkupSet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
+                const { user_id } = req.admin;
                 const markupSetModel = this.Model.MarkupSetModel(trx);
                 const getMarkupSet = yield markupSetModel.getSingleMarkupSet(Number(id));
                 if (!getMarkupSet) {
@@ -213,6 +214,11 @@ class AdminMarkupSetService extends abstract_service_1.default {
                     };
                 }
                 const update = yield markupSetModel.updateMarkupSet({ is_deleted: true }, Number(id));
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    type: 'DELETE',
+                    details: `${getMarkupSet.type} markup set ${getMarkupSet.name} is deleted.`,
+                });
                 if (update) {
                     return {
                         success: true,
@@ -352,7 +358,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
             }));
         });
     }
-    getAllFlightApi(req) {
+    getAllFlightApi(_req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const flightApiModel = this.Model.FlightApiModel(trx);
@@ -361,6 +367,49 @@ class AdminMarkupSetService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     data,
+                };
+            }));
+        });
+    }
+    createFlightMarkupSet(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { user_id } = req.admin;
+                const { name, book, cancel } = req.body;
+                const MarkupSetModel = this.Model.MarkupSetModel(trx);
+                const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
+                const markupSet = yield MarkupSetModel.createMarkupSet({
+                    created_by: user_id,
+                    name,
+                    type: 'Hotel',
+                });
+                const hotelMarkupPayload = [
+                    {
+                        markup: book.markup,
+                        mode: book.mode,
+                        set_for: 'Book',
+                        type: book.type,
+                        set_id: markupSet[0].id,
+                    },
+                    {
+                        markup: cancel.markup,
+                        mode: cancel.mode,
+                        set_for: 'Cancel',
+                        type: cancel.type,
+                        set_id: markupSet[0].id,
+                    },
+                ];
+                yield HotelMarkupsModel.insertHotelMarkup(hotelMarkupPayload);
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    type: 'CREATE',
+                    details: `Create hotel markup set ${name}.`,
+                    payload: JSON.stringify(req.body),
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
                 };
             }));
         });
@@ -457,6 +506,12 @@ class AdminMarkupSetService extends abstract_service_1.default {
                     });
                 }
                 yield markupSetModel.updateMarkupSet(Object.assign(Object.assign({}, restBody), { updated_by: user_id, last_updated: new Date() }), set_id);
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    type: 'UPDATE',
+                    details: `Update hotel markup set ${getMarkupSet.name}`,
+                    payload: JSON.stringify(req.body),
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,

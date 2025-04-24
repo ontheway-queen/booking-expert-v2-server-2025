@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 import {
+  ICreateHotelMarkupSetReqBody,
   ICreateMarkupSetReqBody,
   IGetMarkupSetFlightApiFilter,
   IPrePayloadSetMarkup,
@@ -13,6 +14,7 @@ import { MARKUP_SET_TYPE_FLIGHT } from '../../../utils/miscellaneous/constants';
 import CustomError from '../../../utils/lib/customError';
 import { ICreateFlightMarkupsPayload } from '../../../utils/modelTypes/markupSetModelTypes/flightMarkupsTypes';
 import { IGetMarkupListFilterQuery } from '../../../utils/modelTypes/markupSetModelTypes/markupSetModelTypes';
+import { IInsertHotelMarkupPayload } from '../../../utils/modelTypes/markupSetModelTypes/hotelMarkupsTypes';
 
 export class AdminMarkupSetService extends AbstractServices {
   public async createMarkupSet(req: Request) {
@@ -241,9 +243,10 @@ export class AdminMarkupSetService extends AbstractServices {
     });
   }
 
-  public async deleteFlightMarkupSet(req: Request) {
+  public async deleteMarkupSet(req: Request) {
     return this.db.transaction(async (trx) => {
       const { id } = req.params;
+      const { user_id } = req.admin;
       const markupSetModel = this.Model.MarkupSetModel(trx);
       const getMarkupSet = await markupSetModel.getSingleMarkupSet(Number(id));
       if (!getMarkupSet) {
@@ -253,10 +256,17 @@ export class AdminMarkupSetService extends AbstractServices {
           message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
+
       const update = await markupSetModel.updateMarkupSet(
         { is_deleted: true },
         Number(id)
       );
+
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        type: 'DELETE',
+        details: `${getMarkupSet.type} markup set ${getMarkupSet.name} is deleted.`,
+      });
 
       if (update) {
         return {
@@ -432,7 +442,7 @@ export class AdminMarkupSetService extends AbstractServices {
     });
   }
 
-  public async getAllFlightApi(req: Request) {
+  public async getAllFlightApi(_req: Request) {
     return await this.db.transaction(async (trx) => {
       const flightApiModel = this.Model.FlightApiModel(trx);
       const data = await flightApiModel.getFlightApi({});
@@ -440,6 +450,53 @@ export class AdminMarkupSetService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_OK,
         data,
+      };
+    });
+  }
+
+  public async createFlightMarkupSet(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { user_id } = req.admin;
+      const { name, book, cancel } = req.body as ICreateHotelMarkupSetReqBody;
+      const MarkupSetModel = this.Model.MarkupSetModel(trx);
+      const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
+
+      const markupSet = await MarkupSetModel.createMarkupSet({
+        created_by: user_id,
+        name,
+        type: 'Hotel',
+      });
+
+      const hotelMarkupPayload: IInsertHotelMarkupPayload[] = [
+        {
+          markup: book.markup,
+          mode: book.mode,
+          set_for: 'Book',
+          type: book.type,
+          set_id: markupSet[0].id,
+        },
+        {
+          markup: cancel.markup,
+          mode: cancel.mode,
+          set_for: 'Cancel',
+          type: cancel.type,
+          set_id: markupSet[0].id,
+        },
+      ];
+
+      await HotelMarkupsModel.insertHotelMarkup(hotelMarkupPayload);
+
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        type: 'CREATE',
+        details: `Create hotel markup set ${name}.`,
+        payload: JSON.stringify(req.body),
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
       };
     });
   }
@@ -572,6 +629,13 @@ export class AdminMarkupSetService extends AbstractServices {
         },
         set_id
       );
+
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        type: 'UPDATE',
+        details: `Update hotel markup set ${getMarkupSet.name}`,
+        payload: JSON.stringify(req.body),
+      });
 
       return {
         success: true,

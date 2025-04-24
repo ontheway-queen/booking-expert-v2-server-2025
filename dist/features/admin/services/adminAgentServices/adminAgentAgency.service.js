@@ -156,6 +156,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     created_by: user_id,
                     type: 'UPDATE',
                     details: `Agency Updated. Data: ${JSON.stringify(payload)}`,
+                    payload,
                 });
                 return {
                     success: true,

@@ -181,6 +181,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         created_by: user_id,
         type: 'UPDATE',
         details: `Agency Updated. Data: ${JSON.stringify(payload)}`,
+        payload,
       });
 
       return {

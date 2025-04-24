@@ -45,22 +45,30 @@ class AdminMarkupSetController extends abstract_controller_1.default {
         }));
         this.updateFlightMarkupSet = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),
-            bodySchema: this.validator.updateCommissionSetSchema
+            bodySchema: this.validator.updateCommissionSetSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.updateFlightMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
         this.deleteFlightMarkupSet = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.deleteFlightMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
+            const _a = yield this.service.deleteMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
-        this.getMarkupSetFlightApiDetails = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.multipleParamsNumValidator(["set_id", "set_api_id"]) }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.getMarkupSetFlightApiDetails = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.multipleParamsNumValidator([
+                'set_id',
+                'set_api_id',
+            ]),
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getMarkupSetFlightApiDetails(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
         this.updateMarkupSetFlightApi = this.asyncWrapper.wrap({
-            paramSchema: this.commonValidator.multipleParamsNumValidator(["set_id", "set_api_id"]),
-            bodySchema: this.validator.updateFlightMarkupsSchema
+            paramSchema: this.commonValidator.multipleParamsNumValidator([
+                'set_id',
+                'set_api_id',
+            ]),
+            bodySchema: this.validator.updateFlightMarkupsSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.updateMarkupSetFlightApi(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);

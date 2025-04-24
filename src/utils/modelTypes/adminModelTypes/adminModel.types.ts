@@ -139,6 +139,7 @@ export interface ICreateAdminAuditTrailPayload {
   created_by: number;
   type: 'CREATE' | 'GET' | 'UPDATE' | 'DELETE';
   details: string;
+  payload?: object | string;
 }
 
 export interface IGetAdminAuditTrailQuery {
