@@ -11,10 +11,10 @@ export default class AdminAgentAgencyValidator {
   });
 
   public updateAgency = Joi.object({
-    agency_name: Joi.string().optional(),
-    email: Joi.string().optional(),
-    phone: Joi.string().optional(),
-    address: Joi.string().optional(),
+    agency_name: Joi.string().trim().optional(),
+    email: Joi.string().trim().optional(),
+    phone: Joi.string().trim().optional(),
+    address: Joi.string().trim().optional(),
     flight_markup_set: Joi.number().optional(),
     hotel_markup_set: Joi.number().optional(),
     white_label: Joi.boolean().optional(),

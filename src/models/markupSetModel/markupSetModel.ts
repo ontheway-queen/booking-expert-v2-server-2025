@@ -23,27 +23,27 @@ export default class MarkupSetModel extends Schema {
       .insert(payload, 'id');
   }
 
-    public async getAllMarkupSet(
-        query: IGetMarkupListFilterQuery
-    ): Promise<IGetMarkupSetData[]> {
-        const data = await this.db('markup_set')
-            .withSchema(this.DBO_SCHEMA)
-            .select('*')
-            .where((qb) => {
-                if (query.filter) {
-                    qb.andWhereILike('name', `%${query.filter}%`);
-                }
-                if (query.check_name) {
-                    qb.andWhere('name', query.check_name);
-                }
-                if (query.status !== undefined) {
-                    qb.andWhere('status', query.status);
-                }
-                if(query.type) {
-                    qb.andWhere('type', query.type);
-                }
-            })
-            .andWhere("is_deleted", false);
+  public async getAllMarkupSet(
+    query: IGetMarkupListFilterQuery
+  ): Promise<IGetMarkupSetData[]> {
+    const data = await this.db('markup_set')
+      .withSchema(this.DBO_SCHEMA)
+      .select('*')
+      .where((qb) => {
+        if (query.filter) {
+          qb.andWhereILike('name', `%${query.filter}%`);
+        }
+        if (query.check_name) {
+          qb.andWhere('name', query.check_name);
+        }
+        if (query.status !== undefined) {
+          qb.andWhere('status', query.status);
+        }
+        if (query.type) {
+          qb.andWhere('type', query.type);
+        }
+      })
+      .andWhere('is_deleted', false);
 
     return data;
   }
@@ -53,9 +53,11 @@ export default class MarkupSetModel extends Schema {
     status?: boolean,
     type?: 'Flight' | 'Hotel'
   ): Promise<IGetMarkupSetData | null> {
-    return await this.db('markup_set')
+    return await this.db('markup_set AS ms')
       .withSchema(this.DBO_SCHEMA)
-      .select('*')
+      .select('ms.*', 'cua.name AS created_by_name', 'uua.updated_by_name')
+      .joinRaw(`left join admin.user_admin AS cua on ms.created_by = cua.id`)
+      .joinRaw(`left join admin.user_admin AS uua on ms.updated_by = uua.id`)
       .where((qb) => {
         if (type) {
           qb.andWhere('type', type);

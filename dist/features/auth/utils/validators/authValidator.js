@@ -29,14 +29,14 @@ class AuthValidator {
         });
         //Complete Registration Validator
         this.agencyRegisterCompleteValidator = joi_1.default.object({
-            token: joi_1.default.string().required(),
+            token: joi_1.default.string().required().trim(),
         });
         //login with google validator
         this.loginWithGoogleValidator = joi_1.default.object({
             accessToken: joi_1.default.string().required(),
             image: joi_1.default.string().optional(),
-            name: joi_1.default.string().min(1).max(255).required(),
-            email: joi_1.default.string().email().lowercase().min(1).max(255).required(),
+            name: joi_1.default.string().min(1).max(255).required().trim(),
+            email: joi_1.default.string().email().lowercase().trim().min(1).max(255).required(),
         });
         // reset password validator
         this.resetPasswordValidator = joi_1.default.object({

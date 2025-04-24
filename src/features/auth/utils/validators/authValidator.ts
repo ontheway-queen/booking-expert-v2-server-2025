@@ -27,15 +27,15 @@ export default class AuthValidator {
 
   //Complete Registration Validator
   public agencyRegisterCompleteValidator = Joi.object({
-    token: Joi.string().required(),
+    token: Joi.string().required().trim(),
   });
 
   //login with google validator
   public loginWithGoogleValidator = Joi.object({
     accessToken: Joi.string().required(),
     image: Joi.string().optional(),
-    name: Joi.string().min(1).max(255).required(),
-    email: Joi.string().email().lowercase().min(1).max(255).required(),
+    name: Joi.string().min(1).max(255).required().trim(),
+    email: Joi.string().email().lowercase().trim().min(1).max(255).required(),
   });
 
   // reset password validator

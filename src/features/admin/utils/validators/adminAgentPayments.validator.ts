@@ -3,7 +3,7 @@ import Joi from 'joi';
 export default class AdminAgentPaymentsValidator {
   public createLoan = Joi.object({
     agency_id: Joi.number().required(),
-    details: Joi.string().required(),
+    details: Joi.string().trim().required(),
     type: Joi.string().valid('Given', 'Taken').required(),
     amount: Joi.number().required(),
   });
@@ -23,6 +23,6 @@ export default class AdminAgentPaymentsValidator {
     skip: Joi.number().optional(),
     from_date: Joi.string().optional(),
     to_date: Joi.string().optional(),
-    voucher_no: Joi.string().optional(),
+    voucher_no: Joi.string().trim().optional(),
   });
 }

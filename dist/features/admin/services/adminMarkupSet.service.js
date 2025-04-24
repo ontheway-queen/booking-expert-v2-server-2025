@@ -40,20 +40,20 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 //check if markup set name already exists
                 const checkName = yield markupSetModel.getAllMarkupSet({
                     check_name: name,
-                    type
+                    type,
                 });
                 if (checkName.length) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: "Markup Set name already exists"
+                        message: 'Markup Set name already exists',
                     };
                 }
                 //create a markup set
                 const newMarkupSet = yield markupSetModel.createMarkupSet({
                     name,
                     created_by: user_id,
-                    type
+                    type,
                 });
                 const prePayload = [];
                 for (const item of api) {
@@ -64,10 +64,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                         airlines.forEach((airline) => {
                             markups.push(Object.assign({ airline }, rest));
                         });
-                        checkExisting.markups = [
-                            ...checkExisting.markups,
-                            ...markups
-                        ];
+                        checkExisting.markups = [...checkExisting.markups, ...markups];
                     }
                     else {
                         airlines.forEach((airline) => {
@@ -76,30 +73,29 @@ class AdminMarkupSetService extends abstract_service_1.default {
                         prePayload.push({
                             api_id,
                             markups,
-                            set_id: newMarkupSet[0].id
+                            set_id: newMarkupSet[0].id,
                         });
                     }
                 }
                 for (const item of prePayload) {
                     const { api_id, set_id, markups } = item;
                     const checkApi = yield flightApiModel.getFlightApi({
-                        id: api_id
+                        id: api_id,
                     });
                     if (!checkApi.length) {
                         throw new customError_1.default(`Invalid api id: ${api_id}`, this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                     const newSetFlightApi = yield markupSetFlightApiModel.createMarkupSetFlightApi({
                         markup_set_id: set_id,
-                        flight_api_id: api_id
+                        flight_api_id: api_id,
                     });
                     const airlinesMarkupPayload = markups.map((markup) => (Object.assign(Object.assign({}, markup), { markup_set_flight_api_id: newSetFlightApi[0].id, created_by: user_id })));
                     yield flightMarkupsModel.createFlightMarkups(airlinesMarkupPayload);
                 }
-                ;
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "Markup Set has been created successfully",
+                    message: 'Markup Set has been created successfully',
                 };
             }));
         });
@@ -113,7 +109,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 return {
                     success: true,
                     data,
-                    code: this.StatusCode.HTTP_OK
+                    code: this.StatusCode.HTTP_OK,
                 };
             }));
         });
@@ -133,7 +129,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                     };
                 }
                 const setFlightAPIData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
-                    markup_set_id: Number(id)
+                    markup_set_id: Number(id),
                 });
                 return {
                     success: true,
@@ -221,14 +217,14 @@ class AdminMarkupSetService extends abstract_service_1.default {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        message: "Markup Set has been deleted",
+                        message: 'Markup Set has been deleted',
                     };
                 }
                 else {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
-                        message: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR
+                        message: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
                     };
                 }
             }));
@@ -242,20 +238,20 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
                 const setFlightApiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
                     markup_set_id: Number(set_id),
-                    flight_api_id: Number(set_api_id)
+                    flight_api_id: Number(set_api_id),
                 });
                 if (!setFlightApiData.length) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 const { airline, status } = req.query;
                 const { data, total } = yield flightMarkupsModel.getAllFlightMarkups({
                     markup_set_flight_api_id: setFlightApiData[0].id,
                     airline,
-                    status
+                    status,
                 });
                 return {
                     success: true,
@@ -276,13 +272,13 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
                 const setFlightApiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
                     markup_set_id: Number(set_id),
-                    flight_api_id: Number(set_api_id)
+                    flight_api_id: Number(set_api_id),
                 });
                 if (!setFlightApiData.length) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 const { api_status, add, remove, update } = req.body;
@@ -294,12 +290,12 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 if (add) {
                     const addPayload = [];
                     for (const addItem of add) {
-                        const { airlines, markup_domestic, markup_from_dac, markup_to_dac, markup_soto, markup_mode, markup_type, booking_block, issue_block } = addItem;
+                        const { airlines, markup_domestic, markup_from_dac, markup_to_dac, markup_soto, markup_mode, markup_type, booking_block, issue_block, } = addItem;
                         for (const airline of airlines) {
                             //check if airline already exists
                             const existingRecord = yield flightMarkupsModel.getAllFlightMarkups({
                                 airline,
-                                markup_set_flight_api_id: setFlightApiData[0].id
+                                markup_set_flight_api_id: setFlightApiData[0].id,
                             });
                             if (existingRecord.data.length) {
                                 yield flightMarkupsModel.updateFlightMarkups({
@@ -312,7 +308,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                                     updated_by: user_id,
                                     updated_at: new Date(),
                                     booking_block,
-                                    issue_block
+                                    issue_block,
                                 }, existingRecord.data[0].key);
                             }
                             else {
@@ -327,7 +323,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                                     booking_block,
                                     issue_block,
                                     created_by: user_id,
-                                    markup_set_flight_api_id: setFlightApiData[0].id
+                                    markup_set_flight_api_id: setFlightApiData[0].id,
                                 });
                             }
                         }
@@ -351,7 +347,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "Markup set has been updated",
+                    message: 'Markup set has been updated',
                 };
             }));
         });
@@ -364,7 +360,107 @@ class AdminMarkupSetService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    data
+                    data,
+                };
+            }));
+        });
+    }
+    getSingleHotelMarkupSet(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { id } = req.params;
+                const set_id = Number(id);
+                const markupSetModel = this.Model.MarkupSetModel(trx);
+                const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
+                const getMarkupSet = yield markupSetModel.getSingleMarkupSet(set_id);
+                if (!getMarkupSet) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const markups = yield HotelMarkupsModel.getHotelMarkup({
+                    set_for: 'Both',
+                    set_id,
+                });
+                let book = {};
+                let cancel = {};
+                markups.forEach((markup) => {
+                    if (markup.set_for === 'Book') {
+                        book = {
+                            id: markup.id,
+                            markup: markup.markup,
+                            mode: markup.mode,
+                            status: markup.status,
+                            type: markup.type,
+                        };
+                    }
+                    if (markup.set_for === 'Cancel') {
+                        cancel = {
+                            id: markup.id,
+                            markup: markup.markup,
+                            mode: markup.mode,
+                            status: markup.status,
+                            type: markup.type,
+                        };
+                    }
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: {
+                        id: set_id,
+                        name: getMarkupSet.name,
+                        status: getMarkupSet.status,
+                        created_by: getMarkupSet.created_by,
+                        created_by_name: getMarkupSet.created_by_name,
+                        updated_by: getMarkupSet.updated_by,
+                        updated_by_name: getMarkupSet.updated_by_name,
+                        created_at: getMarkupSet.created_at,
+                        last_updated: getMarkupSet.last_updated,
+                        book,
+                        cancel,
+                    },
+                };
+            }));
+        });
+    }
+    updateHotelMarkupSet(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { id } = req.params;
+                const { user_id } = req.admin;
+                const set_id = Number(id);
+                const markupSetModel = this.Model.MarkupSetModel(trx);
+                const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
+                const getMarkupSet = yield markupSetModel.getSingleMarkupSet(set_id);
+                if (!getMarkupSet) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const _a = req.body, { book, cancel } = _a, restBody = __rest(_a, ["book", "cancel"]);
+                if (book) {
+                    yield HotelMarkupsModel.updateHotelMarkup(book, {
+                        set_id,
+                        set_for: 'Book',
+                    });
+                }
+                if (cancel) {
+                    yield HotelMarkupsModel.updateHotelMarkup(cancel, {
+                        set_id,
+                        set_for: 'Cancel',
+                    });
+                }
+                yield markupSetModel.updateMarkupSet(Object.assign(Object.assign({}, restBody), { updated_by: user_id, last_updated: new Date() }), set_id);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
                 };
             }));
         });

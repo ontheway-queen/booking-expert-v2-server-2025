@@ -15,10 +15,10 @@ class AdminAgentAgencyValidator {
                 .required(),
         });
         this.updateAgency = joi_1.default.object({
-            agency_name: joi_1.default.string().optional(),
-            email: joi_1.default.string().optional(),
-            phone: joi_1.default.string().optional(),
-            address: joi_1.default.string().optional(),
+            agency_name: joi_1.default.string().trim().optional(),
+            email: joi_1.default.string().trim().optional(),
+            phone: joi_1.default.string().trim().optional(),
+            address: joi_1.default.string().trim().optional(),
             flight_markup_set: joi_1.default.number().optional(),
             hotel_markup_set: joi_1.default.number().optional(),
             white_label: joi_1.default.boolean().optional(),

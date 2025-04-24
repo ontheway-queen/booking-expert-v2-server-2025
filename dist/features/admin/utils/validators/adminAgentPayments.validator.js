@@ -8,7 +8,7 @@ class AdminAgentPaymentsValidator {
     constructor() {
         this.createLoan = joi_1.default.object({
             agency_id: joi_1.default.number().required(),
-            details: joi_1.default.string().required(),
+            details: joi_1.default.string().trim().required(),
             type: joi_1.default.string().valid('Given', 'Taken').required(),
             amount: joi_1.default.number().required(),
         });
@@ -26,7 +26,7 @@ class AdminAgentPaymentsValidator {
             skip: joi_1.default.number().optional(),
             from_date: joi_1.default.string().optional(),
             to_date: joi_1.default.string().optional(),
-            voucher_no: joi_1.default.string().optional(),
+            voucher_no: joi_1.default.string().trim().optional(),
         });
     }
 }
