@@ -179,7 +179,26 @@ export default class AdminAgentAgencyService extends AbstractServices {
         }
       }
 
+      const deleteFiles: string[] = [];
+
+      if (payload.agency_logo && checkAgency.agency_logo) {
+        deleteFiles.push(checkAgency.agency_logo);
+      }
+      if (payload.civil_aviation && checkAgency.civil_aviation) {
+        deleteFiles.push(checkAgency.civil_aviation);
+      }
+      if (payload.national_id && checkAgency.national_id) {
+        deleteFiles.push(checkAgency.national_id);
+      }
+      if (payload.trade_license && checkAgency.trade_license) {
+        deleteFiles.push(checkAgency.trade_license);
+      }
+
       await AgentModel.updateAgency(payload, agency_id);
+
+      if (deleteFiles.length) {
+        await this.manageFile.deleteFromCloud(deleteFiles);
+      }
 
       await this.insertAdminAudit(trx, {
         created_by: user_id,

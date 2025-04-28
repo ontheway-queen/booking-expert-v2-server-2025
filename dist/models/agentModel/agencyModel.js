@@ -80,7 +80,7 @@ class AgencyModel extends schema_1.default {
         return __awaiter(this, arguments, void 0, function* ({ agency_id, email, name, agent_no, }) {
             return yield this.db('agency')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('id', 'email', 'phone', 'agency_name', 'agent_no', 'status', 'white_label', 'allow_api', 'usable_loan', 'flight_markup_set', 'hotel_markup_set')
+                .select('id', 'email', 'phone', 'agency_logo', 'agency_name', 'agent_no', 'status', 'white_label', 'allow_api', 'civil_aviation', 'trade_license', 'national_id', 'usable_loan', 'flight_markup_set', 'hotel_markup_set')
                 .where((qb) => {
                 if (agency_id) {
                     qb.where('id', agency_id);
