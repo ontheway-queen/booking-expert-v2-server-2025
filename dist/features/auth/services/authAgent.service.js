@@ -139,7 +139,7 @@ class AuthAgentService extends abstract_service_1.default {
                 yield emailSendLib_1.default.sendEmail({
                     email,
                     emailSub: `Booking Expert Agency Registration Verification`,
-                    emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, '/registration/verification?token=' + verificationToken),
+                    emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, '/sign-up/verification?token=' + verificationToken),
                 });
                 return {
                     success: true,
@@ -380,7 +380,7 @@ class AuthAgentService extends abstract_service_1.default {
                     is_main_user,
                     photo,
                 };
-                const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_ADMIN, '24h');
+                const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
                 const role = yield AgencyUserModel.getSingleRoleWithPermissions(role_id, agency_id);
                 return {
                     success: true,
