@@ -16,6 +16,7 @@ exports.AdminAgentHolidayService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
 const constants_1 = require("../../../../utils/miscellaneous/constants");
 const customError_1 = __importDefault(require("../../../../utils/lib/customError"));
+const holidayConstants_1 = require("../../../../utils/miscellaneous/holidayConstants");
 class AdminAgentHolidayService extends abstract_service_1.default {
     getHolidayPackageBookingList(req) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -74,6 +75,13 @@ class AdminAgentHolidayService extends abstract_service_1.default {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
                         message: this.ResMsg.HTTP_NOT_FOUND
+                    };
+                }
+                if ([holidayConstants_1.HOLIDAY_BOOKING_STATUS.CONFIRMED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.CANCELLED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.REJECTED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.COMPLETED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.REFUNDED].includes(get_booking.status)) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: this.ResMsg.BOOKING_CANCELLATION_NOT_ALLOWED
                     };
                 }
                 const update_res = yield holidayPackageBookingModel.updateHolidayBooking({ status: req.body.status, updated_by: user_id, updated_at: new Date() }, id);
