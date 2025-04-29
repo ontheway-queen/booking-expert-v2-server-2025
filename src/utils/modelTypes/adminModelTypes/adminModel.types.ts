@@ -65,6 +65,7 @@ export interface IUpdateAdminPayload {
   role_id?: number;
   status?: boolean;
   two_fa?: boolean;
+  is_online?: boolean;
 }
 
 export interface ICheckUserAdmin {
