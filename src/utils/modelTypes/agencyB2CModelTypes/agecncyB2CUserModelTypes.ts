@@ -16,6 +16,9 @@ export interface IUpdateAgencyB2CUserPayload {
   password_hash?: string;
   phone_number?: string;
   photo?: string;
+  socket_id?: string;
+  status?: boolean;
+  is_online?: boolean;
 }
 
 export interface IGetAgencyB2CUserListQuery {

@@ -20,6 +20,7 @@ export interface IUpdateAgencyUserPayload {
   is_main_user?: boolean;
   status?: boolean;
   two_fa?: boolean;
+  is_online?: boolean;
   socket_id?: string;
 }
 

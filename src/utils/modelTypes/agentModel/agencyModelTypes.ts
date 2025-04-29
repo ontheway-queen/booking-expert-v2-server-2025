@@ -115,6 +115,10 @@ export interface ICheckAgencyData {
   email: string;
   phone: string;
   status: string;
+  agency_logo?: string;
+  civil_aviation?: string;
+  trade_license?: string;
+  national_id?: string;
   white_label: boolean;
   allow_api: boolean;
   flight_markup_set: number;

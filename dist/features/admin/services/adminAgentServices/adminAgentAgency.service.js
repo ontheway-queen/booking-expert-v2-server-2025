@@ -152,7 +152,23 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         yield AgentModel.createWhiteLabelPermission(Object.assign({ agency_id, token: uuid }, white_label_permissions));
                     }
                 }
+                const deleteFiles = [];
+                if (payload.agency_logo && checkAgency.agency_logo) {
+                    deleteFiles.push(checkAgency.agency_logo);
+                }
+                if (payload.civil_aviation && checkAgency.civil_aviation) {
+                    deleteFiles.push(checkAgency.civil_aviation);
+                }
+                if (payload.national_id && checkAgency.national_id) {
+                    deleteFiles.push(checkAgency.national_id);
+                }
+                if (payload.trade_license && checkAgency.trade_license) {
+                    deleteFiles.push(checkAgency.trade_license);
+                }
                 yield AgentModel.updateAgency(payload, agency_id);
+                if (deleteFiles.length) {
+                    yield this.manageFile.deleteFromCloud(deleteFiles);
+                }
                 yield this.insertAdminAudit(trx, {
                     created_by: user_id,
                     type: 'UPDATE',

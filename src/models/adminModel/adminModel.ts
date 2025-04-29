@@ -26,6 +26,7 @@ export default class AdminModel extends Schema {
     super();
     this.db = db;
   }
+
   //create admin
   public async createAdmin(payload: IAdminCreatePayload): Promise<number[]> {
     return await this.db('user_admin')

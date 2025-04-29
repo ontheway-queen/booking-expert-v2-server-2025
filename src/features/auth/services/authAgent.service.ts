@@ -159,7 +159,7 @@ export default class AuthAgentService extends AbstractServices {
         emailBody: registrationVerificationTemplate(
           agency_name,
 
-          '/registration/verification?token=' + verificationToken
+          '/sign-up/verification?token=' + verificationToken
         ),
       });
 
@@ -494,7 +494,7 @@ export default class AuthAgentService extends AbstractServices {
 
       const authToken = Lib.createToken(
         tokenData,
-        config.JWT_SECRET_ADMIN,
+        config.JWT_SECRET_AGENT,
         '24h'
       );
 

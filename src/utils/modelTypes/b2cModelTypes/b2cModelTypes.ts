@@ -15,7 +15,9 @@ export interface IUpdateB2CUserPayload {
   password_hash?: string;
   phone_number?: string;
   photo?: string;
+  socket_id?: string;
   two_fa?: boolean;
+  is_online?: boolean;
 }
 
 export interface IGetB2CUserListQuery {
