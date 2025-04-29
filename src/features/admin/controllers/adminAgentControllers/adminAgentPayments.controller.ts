@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import AbstractController from '../../../../abstract/abstract.controller';
 import AdminAgentPaymentsService from '../../services/adminAgentServices/adminAgentPayments.service';
-import AdminAgentPaymentsValidator from '../../utils/validators/adminAgentPayments.validator';
+import AdminAgentPaymentsValidator from '../../utils/validators/adminAgentValidators/adminAgentPayments.validator';
 
 export default class AdminAgentPaymentsController extends AbstractController {
   private services = new AdminAgentPaymentsService();

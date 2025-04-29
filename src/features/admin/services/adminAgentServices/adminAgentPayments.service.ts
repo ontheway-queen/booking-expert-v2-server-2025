@@ -3,7 +3,7 @@ import AbstractServices from '../../../../abstract/abstract.service';
 import {
   ICreateLoanReqBody,
   IGetLoanHistoryQuery,
-} from '../../utils/types/adminAgentPayments.types';
+} from '../../utils/types/adminAgentTypes/adminAgentPayments.types';
 import { IUpdateAgencyPayload } from '../../../../utils/modelTypes/agentModel/agencyModelTypes';
 
 export default class AdminAgentPaymentsService extends AbstractServices {

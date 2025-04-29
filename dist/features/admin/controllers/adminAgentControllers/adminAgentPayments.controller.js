@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_controller_1 = __importDefault(require("../../../../abstract/abstract.controller"));
 const adminAgentPayments_service_1 = __importDefault(require("../../services/adminAgentServices/adminAgentPayments.service"));
-const adminAgentPayments_validator_1 = __importDefault(require("../../utils/validators/adminAgentPayments.validator"));
+const adminAgentPayments_validator_1 = __importDefault(require("../../utils/validators/adminAgentValidators/adminAgentPayments.validator"));
 class AdminAgentPaymentsController extends abstract_controller_1.default {
     constructor() {
         super();

@@ -4,7 +4,7 @@ import {
   IAdminAgentGetAgencyReqQuery,
   IAdminAgentUpdateAgencyReqBody,
   IAdminAgentUpdateAgencyApplicationReqBody,
-} from '../../utils/types/adminAgentAgency.types';
+} from '../../utils/types/adminAgentTypes/adminAgentAgency.types';
 import CustomError from '../../../../utils/lib/customError';
 import { IUpdateAgencyPayload } from '../../../../utils/modelTypes/agentModel/agencyModelTypes';
 import { v4 as uuidv4 } from 'uuid';
