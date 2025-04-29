@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("joi"));
+const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AdminConfigValidator {
     constructor() {
         //Create airport schema
@@ -29,6 +30,11 @@ class AdminConfigValidator {
         this.updateAirlines = joi_1.default.object({
             code: joi_1.default.string().max(12).trim().optional().uppercase(),
             name: joi_1.default.string().max(500).trim().optional(),
+        });
+        //check slug
+        this.checkSlugSchema = joi_1.default.object({
+            slug: joi_1.default.string().required().trim().lowercase(),
+            type: joi_1.default.string().valid(constants_1.SLUG_TYPE_HOLIDAY, constants_1.SLUG_TYPE_UMRAH, constants_1.SLUG_TYPE_BLOG).valid().required()
         });
     }
 }

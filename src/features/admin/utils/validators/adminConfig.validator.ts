@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { SLUG_TYPE_BLOG, SLUG_TYPE_HOLIDAY, SLUG_TYPE_UMRAH } from '../../../../utils/miscellaneous/constants';
 
 export default class AdminConfigValidator {
   //Create airport schema
@@ -27,5 +28,11 @@ export default class AdminConfigValidator {
   public updateAirlines = Joi.object({
     code: Joi.string().max(12).trim().optional().uppercase(),
     name: Joi.string().max(500).trim().optional(),
+  });
+
+  //check slug
+  public checkSlugSchema = Joi.object({
+    slug: Joi.string().required().trim().lowercase(),
+    type: Joi.string().valid(SLUG_TYPE_HOLIDAY, SLUG_TYPE_UMRAH, SLUG_TYPE_BLOG).valid().required()
   });
 }

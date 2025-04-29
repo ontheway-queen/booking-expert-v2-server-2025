@@ -18,5 +18,6 @@ export default class AdminHolidayRouter extends AbstractRouter {
       .get(this.controller.getSingleHolidayPackage)
       .patch(this.uploader.cloudUploadRaw(this.fileFolders.HOLIDAY_PACKAGE,
         ['images']), this.controller.updateHolidayPackage)
+      .delete(this.controller.deleteHolidayPackage);
   }
 }

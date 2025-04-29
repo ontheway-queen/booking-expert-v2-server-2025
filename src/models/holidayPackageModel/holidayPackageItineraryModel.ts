@@ -1,6 +1,6 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import Schema from '../../utils/miscellaneous/schema';
-import { IInsertHolidayPackageItineraryPayload, IUpdateHolidayPackageItineraryPayload } from '../../utils/modelTypes/holidayPackageModelTypes/holidayPackageItineraryModelTypes';
+import { IGetHolidayPackageItinerary, IInsertHolidayPackageItineraryPayload, IUpdateHolidayPackageItineraryPayload } from '../../utils/modelTypes/holidayPackageModelTypes/holidayPackageItineraryModelTypes';
 
 
 export default class HolidayPackageItineraryModel extends Schema {
@@ -11,7 +11,7 @@ export default class HolidayPackageItineraryModel extends Schema {
         this.db = db;
     }
 
-    public async insertHolidayPackageItinerary(payload: IInsertHolidayPackageItineraryPayload|IInsertHolidayPackageItineraryPayload[]): Promise<{ id: number }[]> {
+    public async insertHolidayPackageItinerary(payload: IInsertHolidayPackageItineraryPayload | IInsertHolidayPackageItineraryPayload[]): Promise<{ id: number }[]> {
         return await this.db("holiday_package_itinerary")
             .withSchema(this.SERVICE_SCHEMA)
             .insert(payload, 'id');
@@ -24,7 +24,7 @@ export default class HolidayPackageItineraryModel extends Schema {
             .where({ id });
     }
 
-    public async deleteHolidayPackageItinerary(id: number|number[]) {
+    public async deleteHolidayPackageItinerary(id: number | number[]) {
         return await this.db("holiday_package_itinerary")
             .withSchema(this.SERVICE_SCHEMA)
             .delete()

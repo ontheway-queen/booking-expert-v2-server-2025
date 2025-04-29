@@ -1,3 +1,4 @@
+import { HOLIDAY_CREATED_BY_ADMIN, HOLIDAY_CREATED_BY_AGENT } from "../../miscellaneous/holidayConstants";
 import { IGetHolidayPackageImage, IUpdateHolidayPackageImagePayload } from "./holidayPackageImagesModelTypes";
 import { IGetHolidayPackageItinerary, IUpdateHolidayPackageItineraryPayload } from "./holidayPackageItineraryModelTypes";
 import { IGetHolidayPackagePricingList, IUpdateHolidayPackagePricingPayload } from "./holidayPackagePricingModelTypes";
@@ -8,7 +9,6 @@ export type HolidayForType = "AGENT" | "B2C" | "BOTH";
 
 export interface IInsertHolidayPackagePayload {
     slug: string;
-    city_id: number;
     title: string;
     details?: string;
     holiday_type: HolidayType;
@@ -19,7 +19,8 @@ export interface IInsertHolidayPackagePayload {
     tax_details?: string;
     general_condition?: string;
     holiday_for: HolidayForType;
-    created_by: number;
+    created_by: typeof HOLIDAY_CREATED_BY_ADMIN | typeof HOLIDAY_CREATED_BY_AGENT;
+    created_by_id: number;
 }
 
 export interface IGetHolidayPackageListFilterQuery {
@@ -30,14 +31,18 @@ export interface IGetHolidayPackageListFilterQuery {
     status?: boolean;
     limit?: number;
     skip?: number;
+    created_by: typeof HOLIDAY_CREATED_BY_ADMIN | typeof HOLIDAY_CREATED_BY_AGENT;
 }
 
 export interface IGetHolidayPackageList {
     id: number;
     slug: string;
     title: string;
-    city: string;
-    country: string;
+    cities: {
+        city_id: number;
+        city_name: string;
+        country: string;
+    }[];
     holiday_type: HolidayType;
     holiday_for: HolidayForType;
     duration: number;
@@ -50,9 +55,11 @@ export interface IGetHolidayPackageList {
 export interface IGetSingleHolidayPackageData {
     id: number;
     slug: string;
-    city_id: number;
-    city: string;
-    country: string;
+    cities: {
+        city_id: number;
+        city_name: string;
+        country: string;
+    }[];
     title: string;
     details: string;
     holiday_type: HolidayType;
@@ -75,6 +82,8 @@ export interface IGetSingleHolidayPackageParams {
     id?: number;
     slug?: string;
     status?: boolean;
+    created_by: typeof HOLIDAY_CREATED_BY_ADMIN | typeof HOLIDAY_CREATED_BY_AGENT;
+    holiday_for?: HolidayForType;
 }
 
 export interface IUpdateHolidayPackagePayload {
@@ -95,8 +104,5 @@ export interface IUpdateHolidayPackagePayload {
     itinerary?: IUpdateHolidayPackageItineraryPayload[];
     services?: IUpdateHolidayPackageServicePayload[];
     images?: IUpdateHolidayPackageImagePayload[];
-}
-
-export interface IDeleteHolidayPackagePayload {
-    is_deleted: true;
+    is_deleted?: true;
 }

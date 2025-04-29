@@ -1,5 +1,5 @@
-import Joi from "joi";
-import { HOLIDAY_FOR_AGENT, HOLIDAY_FOR_B2C, HOLIDAY_FOR_BOTH, HOLIDAY_PRICE_DISCOUNT_FLAT, HOLIDAY_PRICE_DISCOUNT_PER, HOLIDAY_SERVICE_TYPE_EXCLUDE, HOLIDAY_SERVICE_TYPE_INCLUDE, HOLIDAY_TYPE_DOMESTIC, HOLIDAY_TYPE_INTERNATIONAL } from "../../../../utils/miscellaneous/holidayConstants";
+import Joi, { number } from "joi";
+import { HOLIDAY_FOR_AGENT, HOLIDAY_FOR_B2C, HOLIDAY_FOR_BOTH, HOLIDAY_PRICE_MARKUP_FLAT, HOLIDAY_PRICE_MARKUP_PER, HOLIDAY_SERVICE_TYPE_EXCLUDE, HOLIDAY_SERVICE_TYPE_INCLUDE, HOLIDAY_TYPE_DOMESTIC, HOLIDAY_TYPE_INTERNATIONAL } from "../../../../utils/miscellaneous/holidayConstants";
 
 export class AdminHolidayValidator {
 
@@ -7,8 +7,8 @@ export class AdminHolidayValidator {
         price_for: Joi.string().valid(HOLIDAY_FOR_AGENT, HOLIDAY_FOR_B2C).required(),
         adult_price: Joi.number().required(),
         child_price: Joi.number().required(),
-        discount_price: Joi.number().optional(),
-        discount_type: Joi.string().valid(HOLIDAY_PRICE_DISCOUNT_FLAT, HOLIDAY_PRICE_DISCOUNT_PER).optional()
+        markup_price: Joi.number().optional(),
+        markup_type: Joi.string().valid(HOLIDAY_PRICE_MARKUP_FLAT, HOLIDAY_PRICE_MARKUP_PER).optional()
     });
 
     private createItinerarySchema = Joi.object({
@@ -24,7 +24,18 @@ export class AdminHolidayValidator {
 
     public createHolidaySchema = Joi.object({
         slug: Joi.string().required().max(1000),
-        city_id: Joi.number().required(),
+        city_id: Joi.alternatives()
+            .try(
+                Joi.array().items(Joi.number()).min(1).required(),
+                Joi.string().custom((value, helpers) => {
+                    try {
+                        const parsed = JSON.parse(value);
+                        return parsed;
+                    } catch (error) {
+                        return helpers.error("any.invalid");
+                    }
+                })
+            ).required(),
         title: Joi.string().required().max(1000),
         details: Joi.string().required(),
         holiday_type: Joi.string().valid(HOLIDAY_TYPE_DOMESTIC, HOLIDAY_TYPE_INTERNATIONAL).required(),
@@ -128,7 +139,21 @@ export class AdminHolidayValidator {
 
     public updateHolidaySchema = Joi.object({
         slug: Joi.string().optional().max(1000),
-        city_id: Joi.number().optional(),
+        city: Joi.alternatives()
+            .try(
+                Joi.object({
+                    add: Joi.array().items(Joi.number()).optional(),
+                    delete: Joi.array().items(Joi.number()).optional(),
+                }).optional(),
+                Joi.string().custom((value, helpers) => {
+                    try {
+                        const parsed = JSON.parse(value);
+                        return parsed;
+                    } catch (error) {
+                        return helpers.error("any.invalid");
+                    }
+                })
+            ).optional(),
         title: Joi.string().optional().max(1000),
         details: Joi.string().optional(),
         holiday_type: Joi.string()
@@ -144,7 +169,7 @@ export class AdminHolidayValidator {
             .valid(HOLIDAY_FOR_AGENT, HOLIDAY_FOR_B2C, HOLIDAY_FOR_BOTH)
             .optional(),
         status: Joi.boolean().optional(),
-    
+
         pricing: Joi.alternatives().try(
             Joi.object({
                 add: Joi.array().items(this.createPricingSchema).optional(),
@@ -155,9 +180,9 @@ export class AdminHolidayValidator {
                         price_for: Joi.string().valid(HOLIDAY_FOR_AGENT, HOLIDAY_FOR_B2C).optional(),
                         adult_price: Joi.number().optional(),
                         child_price: Joi.number().optional(),
-                        discount_price: Joi.number().optional(),
-                        discount_type: Joi.string()
-                            .valid(HOLIDAY_PRICE_DISCOUNT_FLAT, HOLIDAY_PRICE_DISCOUNT_PER)
+                        markup_price: Joi.number().optional(),
+                        markup_type: Joi.string()
+                            .valid(HOLIDAY_PRICE_MARKUP_FLAT, HOLIDAY_PRICE_MARKUP_PER)
                             .optional(),
                     })
                 ).optional(),
@@ -170,7 +195,7 @@ export class AdminHolidayValidator {
                 }
             })
         ).optional(),
-    
+
         itinerary: Joi.alternatives().try(
             Joi.object({
                 add: Joi.array().items(this.createItinerarySchema).optional(),
@@ -192,7 +217,7 @@ export class AdminHolidayValidator {
                 }
             })
         ).optional(),
-    
+
         services: Joi.alternatives().try(
             Joi.object({
                 add: Joi.array().items(this.createServiceSchema).optional(),
@@ -213,7 +238,7 @@ export class AdminHolidayValidator {
                 }
             })
         ).optional(),
-    
+
         delete_images: Joi.alternatives().try(
             Joi.array().items(Joi.number()),
             Joi.string().custom((value, helpers) => {
@@ -225,7 +250,7 @@ export class AdminHolidayValidator {
             })
         ).optional(),
     });
-    
+
 
 
 }

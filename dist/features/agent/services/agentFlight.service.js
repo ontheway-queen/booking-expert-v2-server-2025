@@ -342,6 +342,24 @@ class AgentFlightService extends abstract_service_1.default {
                         refundable = grnData.refundable;
                     }
                 }
+                //insert the revalidate data as info log
+                yield this.Model.ErrorLogsModel().insertErrorLogs({
+                    http_method: "POST",
+                    level: constants_1.ERROR_LEVEL_INFO,
+                    message: "Flight booking revalidate data",
+                    url: "/flight/booking",
+                    user_id: user_id,
+                    source: "AGENT",
+                    metadata: {
+                        api: data.api,
+                        request_body: {
+                            flight_id: body.flight_id,
+                            search_id: body.search_id,
+                            api_search_id: data.api_search_id
+                        },
+                        response: data
+                    }
+                });
                 //insert booking data
                 const { booking_id, booking_ref } = yield bookingSupportService.insertFlightBookingData({
                     gds_pnr,

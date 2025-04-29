@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const holidayConstants_1 = require("../../utils/miscellaneous/holidayConstants");
 const schema_1 = __importDefault(require("../../utils/miscellaneous/schema"));
 class HolidayPackageModel extends schema_1.default {
     constructor(db) {
@@ -25,66 +26,208 @@ class HolidayPackageModel extends schema_1.default {
                 .insert(payload, 'id');
         });
     }
+    // public async getHolidayPackageList(
+    //     query: IGetHolidayPackageListFilterQuery,
+    //     is_total: boolean = false
+    // ): Promise<{ data: IGetHolidayPackageList[]; total?: number }> {
+    //     const priceFor =
+    //         query.holiday_for === HOLIDAY_FOR_AGENT || query.holiday_for === HOLIDAY_FOR_B2C
+    //             ? query.holiday_for
+    //             : null;
+    //     const data = await this.db("holiday_package as tp")
+    //         .withSchema(this.SERVICE_SCHEMA)
+    //         .select(
+    //             "tp.id",
+    //             "tp.slug",
+    //             "tp.title",
+    //             this.db.raw(`
+    //                 (SELECT json_agg(json_build_object(
+    //                     'city_id', c.id,
+    //                     'city_name', c.name,
+    //                     'country', cn.name
+    //                 )) 
+    //                 FROM ${this.SERVICE_SCHEMA}.holiday_package_city hpc
+    //                 JOIN ${this.PUBLIC_SCHEMA}.city c ON c.id = hpc.city_id
+    //                 JOIN ${this.PUBLIC_SCHEMA}.country cn ON cn.id = c.country_id
+    //                 WHERE hpc.holiday_package_id = tp.id
+    //                 ) as cities
+    //             `),
+    //             "tp.holiday_type",
+    //             "tp.holiday_for",
+    //             "tp.duration",
+    //             "tp.status",
+    //             "tp.created_at",
+    //             this.db.raw(`
+    //                 (SELECT image FROM ${this.SERVICE_SCHEMA}.holiday_package_images 
+    //                 WHERE holiday_package_id = tp.id 
+    //                 ORDER BY id ASC 
+    //                 LIMIT 1) as image
+    //             `),
+    //             this.db.raw(`
+    //                 (SELECT adult_price FROM ${this.SERVICE_SCHEMA}.holiday_package_pricing 
+    //                 WHERE holiday_package_id = tp.id
+    //                 ${priceFor ? "AND price_for = ?" : ""}
+    //                 ORDER BY id ASC 
+    //                 LIMIT 1) as price
+    //             `, priceFor ? [priceFor] : [])
+    //         )
+    //         .where((qb) => {
+    //             if (query.city_id) {
+    //                 qb.whereIn("tp.id", function() {
+    //                     this.select("hpc.holiday_package_id")
+    //                        .from(`services.holiday_package_city as hpc`)
+    //                        .where("hpc.city_id", query.city_id);
+    //                 });
+    //             }
+    //             if (query.status !== undefined) {
+    //                 qb.andWhere("tp.status", query.status);
+    //             }
+    //             if (query.holiday_for) {
+    //                 if (query.holiday_for === HOLIDAY_FOR_AGENT || query.holiday_for === HOLIDAY_FOR_B2C) {
+    //                     qb.andWhere(function () {
+    //                         this.where("tp.holiday_for", query.holiday_for)
+    //                             .orWhere("tp.holiday_for", HOLIDAY_FOR_BOTH);
+    //                     });
+    //                 } else if (query.holiday_for === HOLIDAY_FOR_BOTH) {
+    //                     qb.andWhere("tp.holiday_for", HOLIDAY_FOR_BOTH);
+    //                 }
+    //             }
+    //             if (query.slug) {
+    //                 qb.andWhere("tp.slug", query.slug);
+    //             }
+    //             if(query.created_by){
+    //                 qb.andWhere("tp.created_by", query.created_by);
+    //             }
+    //         })
+    //         .andWhere("tp.is_deleted", false)
+    //         .groupBy("tp.id")
+    //         .orderBy("tp.id", "desc")
+    //         .limit(query.limit || 100)
+    //         .offset(query.skip || 0);
+    //     let total: any[] = [];
+    //     if (is_total) {
+    //         total = await this.db("holiday_package as tp")
+    //             .withSchema(this.SERVICE_SCHEMA)
+    //             .countDistinct("tp.id as total")
+    //             .modify((qb) => {
+    //                 if (query.city_id) {
+    //                     qb.whereIn("tp.id", function() {
+    //                         this.select("hpc.holiday_package_id")
+    //                            .from(`services.holiday_package_city as hpc`)
+    //                            .where("hpc.city_id", query.city_id);
+    //                     });
+    //                 }
+    //                 if (query.status !== undefined) {
+    //                     qb.andWhere("tp.status", query.status);
+    //                 }
+    //                 if (query.holiday_for) {
+    //                     if (query.holiday_for === HOLIDAY_FOR_AGENT || query.holiday_for === HOLIDAY_FOR_B2C) {
+    //                         qb.andWhere(function () {
+    //                             this.where("tp.holiday_for", query.holiday_for)
+    //                                 .orWhere("tp.holiday_for", HOLIDAY_FOR_BOTH);
+    //                         });
+    //                     } else if (query.holiday_for === HOLIDAY_FOR_BOTH) {
+    //                         qb.andWhere("tp.holiday_for", HOLIDAY_FOR_BOTH);
+    //                     }
+    //                 }
+    //                 if (query.slug) {
+    //                     qb.andWhere("tp.slug", query.slug);
+    //                 }
+    //                 if(query.created_by){
+    //                     qb.andWhere("tp.created_by", query.created_by);
+    //                 }
+    //             })
+    //             .andWhere("tp.is_deleted", false);
+    //     }
+    //     return {
+    //         data,
+    //         total: total[0]?.total
+    //     };
+    // }
     getHolidayPackageList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, is_total = false) {
             var _a;
-            const data = yield this.db("holiday_package as tp")
+            const price_for = query.holiday_for === holidayConstants_1.HOLIDAY_FOR_AGENT || query.holiday_for === holidayConstants_1.HOLIDAY_FOR_B2C
+                ? query.holiday_for
+                : null;
+            const view_name = query.created_by === holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN ? holidayConstants_1.VIEW_HOLIDAY_PACKAGE_CREATED_BY_ADMIN : holidayConstants_1.VIEW_HOLIDAY_PACKAGE_CREATED_BY_AGENT;
+            const schema = this.SERVICE_SCHEMA;
+            const data = yield this.db(`${view_name} as tp`)
                 .withSchema(this.SERVICE_SCHEMA)
-                .select("tp.id", "tp.slug", "tp.title", "c.name as city", "cn.name as country", "tp.holiday_type", "tp.holiday_for", "tp.duration", "tp.status", "tp.created_at", this.db.raw(`(
-                  SELECT image FROM ?? 
-                  WHERE holiday_package_id = tp.id 
-                  ORDER BY id ASC 
-                  LIMIT 1
-                ) as image`, [`${this.SERVICE_SCHEMA}.holiday_package_images`]), this.db.raw(`(
-                  SELECT adult_price FROM ?? 
-                  WHERE holiday_package_id = tp.id
-                  ${query.holiday_for ? "AND price_for = ?" : ""}
-                  ORDER BY id ASC 
-                  LIMIT 1
-                ) as price`, [
-                `${this.SERVICE_SCHEMA}.holiday_package_pricing`,
-                ...(query.holiday_for ? [query.holiday_for] : [])
-            ]))
-                .joinRaw(`left join ${this.PUBLIC_SCHEMA}.city as c on c.id = tp.city_id`)
-                .joinRaw(`left join ${this.PUBLIC_SCHEMA}.country as cn on cn.id = c.country_id`)
+                .select("tp.id", "tp.slug", "tp.title", "tp.duration", "tp.status", "tp.created_at", "tp.cities", "tp.holiday_type", "tp.holiday_for", this.db.raw(`
+            (
+                SELECT adult_price
+                FROM ${this.SERVICE_SCHEMA}.holiday_package_pricing 
+                WHERE holiday_package_id = tp.id
+                ${price_for ? "AND price_for = ?" : ""}
+                ORDER BY id ASC
+                LIMIT 1
+            ) as price
+        `, price_for ? [price_for] : []), this.db.raw(`
+            (
+                SELECT (tp.images->0->>'image')
+            ) as image
+        `))
                 .where((qb) => {
                 if (query.city_id) {
-                    qb.andWhere("tp.city_id", query.city_id);
+                    qb.whereIn("tp.id", function () {
+                        this.select("hpc.holiday_package_id")
+                            .from(`${schema}.holiday_package_city as hpc`)
+                            .where("hpc.city_id", query.city_id);
+                    });
                 }
                 if (query.status !== undefined) {
                     qb.andWhere("tp.status", query.status);
                 }
                 if (query.holiday_for) {
-                    qb.andWhere("tp.Holiday_for", query.holiday_for);
+                    if (query.holiday_for === holidayConstants_1.HOLIDAY_FOR_AGENT || query.holiday_for === holidayConstants_1.HOLIDAY_FOR_B2C) {
+                        qb.andWhere(function () {
+                            this.where("tp.holiday_for", query.holiday_for)
+                                .orWhere("tp.holiday_for", holidayConstants_1.HOLIDAY_FOR_BOTH);
+                        });
+                    }
+                    else if (query.holiday_for === holidayConstants_1.HOLIDAY_FOR_BOTH) {
+                        qb.andWhere("tp.holiday_for", holidayConstants_1.HOLIDAY_FOR_BOTH);
+                    }
                 }
                 if (query.slug) {
                     qb.andWhere("tp.slug", query.slug);
                 }
             })
-                .andWhere("tp.is_deleted", false)
                 .orderBy("tp.id", "desc")
                 .limit(query.limit || 100)
                 .offset(query.skip || 0);
             let total = [];
             if (is_total) {
-                total = yield this.db("holiday_package as tp")
+                total = yield this.db(`${view_name} as tp`)
                     .withSchema(this.SERVICE_SCHEMA)
-                    .count("tp.id as total")
+                    .countDistinct("tp.id as total")
                     .where((qb) => {
                     if (query.city_id) {
-                        qb.andWhere("tp.city_id", query.city_id);
+                        qb.whereIn("tp.id", function () {
+                            this.select("hpc.holiday_package_id")
+                                .from(`${schema}.holiday_package_city as hpc`)
+                                .where("hpc.city_id", query.city_id);
+                        });
                     }
                     if (query.status !== undefined) {
                         qb.andWhere("tp.status", query.status);
                     }
                     if (query.holiday_for) {
-                        qb.andWhere("tp.Holiday_for", query.holiday_for);
+                        if (query.holiday_for === holidayConstants_1.HOLIDAY_FOR_AGENT || query.holiday_for === holidayConstants_1.HOLIDAY_FOR_B2C) {
+                            qb.andWhere(function () {
+                                this.where("tp.holiday_for", query.holiday_for)
+                                    .orWhere("tp.holiday_for", holidayConstants_1.HOLIDAY_FOR_BOTH);
+                            });
+                        }
+                        else if (query.holiday_for === holidayConstants_1.HOLIDAY_FOR_BOTH) {
+                            qb.andWhere("tp.holiday_for", holidayConstants_1.HOLIDAY_FOR_BOTH);
+                        }
                     }
                     if (query.slug) {
                         qb.andWhere("tp.slug", query.slug);
                     }
-                })
-                    .andWhere("tp.is_deleted", false);
+                });
             }
             return {
                 data,
@@ -94,15 +237,10 @@ class HolidayPackageModel extends schema_1.default {
     }
     getSingleHolidayPackage(where) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("holiday_package as tp")
+            const view_name = where.created_by === holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN ? holidayConstants_1.VIEW_HOLIDAY_PACKAGE_CREATED_BY_ADMIN : holidayConstants_1.VIEW_HOLIDAY_PACKAGE_CREATED_BY_AGENT;
+            return yield this.db(`${view_name} as tp`)
                 .withSchema(this.SERVICE_SCHEMA)
-                .select("tp.id", "tp.slug", "tp.city_id", "c.name as city", "cn.name as country", "tp.title", "tp.details", "tp.holiday_type", "tp.duration", "tp.valid_till_date", "tp.group_size", "tp.cancellation_policy", "tp.tax_details", "tp.general_condition", "tp.holiday_for", "tp.status", "tp.created_at", this.db.raw(`COALESCE(json_agg(DISTINCT tpp.*) FILTER (WHERE tpp.id IS NOT NULL), '[]') as pricing`), this.db.raw(`COALESCE(json_agg(DISTINCT tpi.*) FILTER (WHERE tpi.id IS NOT NULL), '[]') as itinerary`), this.db.raw(`COALESCE(json_agg(DISTINCT tps.*) FILTER (WHERE tps.id IS NOT NULL), '[]') as services`), this.db.raw(`COALESCE(json_agg(DISTINCT tpim.*) FILTER (WHERE tpim.id IS NOT NULL), '[]') as images`))
-                .joinRaw(`left join ${this.PUBLIC_SCHEMA}.city as c on c.id = tp.city_id`)
-                .joinRaw(`left join ${this.PUBLIC_SCHEMA}.country as cn on cn.id = c.country_id`)
-                .leftJoin("holiday_package_pricing as tpp", "tp.id", "tpp.holiday_package_id")
-                .leftJoin("holiday_package_itinerary as tpi", "tp.id", "tpi.holiday_package_id")
-                .leftJoin("holiday_package_service as tps", "tp.id", "tps.holiday_package_id")
-                .leftJoin("holiday_package_images as tpim", "tp.id", "tpim.holiday_package_id")
+                .select("tp.id", "tp.slug", "tp.title", "tp.details", "tp.holiday_type", "tp.duration", "tp.valid_till_date", "tp.group_size", "tp.cancellation_policy", "tp.tax_details", "tp.general_condition", "tp.holiday_for", "tp.status", "tp.created_at", "tp.cities", "tp.pricing", "tp.itinerary", "tp.services", "tp.images")
                 .where((qb) => {
                 if (where.id) {
                     qb.andWhere("tp.id", where.id);
@@ -113,21 +251,14 @@ class HolidayPackageModel extends schema_1.default {
                 if (where.status !== undefined) {
                     qb.andWhere("tp.status", where.status);
                 }
+                if (where.holiday_for) {
+                    qb.andWhere("tp.holiday_for", where.holiday_for);
+                }
             })
-                .andWhere("tp.is_deleted", false)
-                .groupBy("tp.id", "tp.slug", "tp.city_id", "c.name", "cn.name", "tp.title", "tp.details", "tp.holiday_type", "tp.duration", "tp.valid_till_date", "tp.group_size", "tp.cancellation_policy", "tp.tax_details", "tp.general_condition", "tp.holiday_for", "tp.status", "tp.created_at")
                 .first();
         });
     }
     updateHolidayPackage(payload, id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("holiday_package")
-                .withSchema(this.SERVICE_SCHEMA)
-                .update(payload)
-                .where({ id });
-        });
-    }
-    deleteHolidayPackage(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db("holiday_package")
                 .withSchema(this.SERVICE_SCHEMA)

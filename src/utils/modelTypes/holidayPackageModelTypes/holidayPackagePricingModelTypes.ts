@@ -1,13 +1,13 @@
 export type PriceForType = "AGENT" | "B2C";
-export type HolidayPriceDiscountType = "FLAT" | "PER";
+export type HolidayPriceMarkupType = "FLAT" | "PER";
 
 export interface IInsertHolidayPackagePricingPayload {
   holiday_package_id: number;
   price_for: PriceForType;
   adult_price: number;
   child_price?: number;
-  discount_price?: number;
-  discount_type?: HolidayPriceDiscountType;
+  markup_price?: number;
+  markup_type?: HolidayPriceMarkupType;
 }
 
 export interface IGetHolidayPackagePricingListFilterQuery {
@@ -21,14 +21,14 @@ export interface IGetHolidayPackagePricingList {
   price_for: PriceForType;
   adult_price: number;
   child_price: number | null;
-  discount_price: number;
-  discount_type: HolidayPriceDiscountType | null;
+  markup_price: number;
+  markup_type: HolidayPriceMarkupType | null;
   created_at: Date;
 }
 
 export interface IUpdateHolidayPackagePricingPayload {
   adult_price?: number;
   child_price?: number;
-  discount_price?: number;
-  discount_type?: HolidayPriceDiscountType | null;
+  markup_price?: number;
+  markup_type?: HolidayPriceMarkupType | null;
 }

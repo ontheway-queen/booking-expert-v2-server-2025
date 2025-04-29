@@ -8,7 +8,7 @@ import SabreFlightService from "../../../utils/supportServices/flightSupportServ
 import { CommonFlightSupportService } from "../../../utils/supportServices/flightSupportServices/commonFlightSupport.service";
 import FlightUtils from "../../../utils/lib/flight/flightUtils";
 import { CommonFlightBookingSupportService } from "../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service";
-import { SOURCE_AGENT } from "../../../utils/miscellaneous/constants";
+import { ERROR_LEVEL_INFO, SOURCE_AGENT } from "../../../utils/miscellaneous/constants";
 
 export class AgentFlightService extends AbstractServices {
   constructor() {
@@ -390,6 +390,25 @@ export class AgentFlightService extends AbstractServices {
           refundable = grnData.refundable;
         }
       }
+
+      //insert the revalidate data as info log
+      await this.Model.ErrorLogsModel().insertErrorLogs({
+        http_method: "POST",
+        level: ERROR_LEVEL_INFO,
+        message: "Flight booking revalidate data",
+        url: "/flight/booking",
+        user_id: user_id,
+        source: "AGENT",
+        metadata: {
+          api: data.api,
+          request_body:{
+            flight_id: body.flight_id,
+            search_id: body.search_id,
+            api_search_id: data.api_search_id
+          },
+          response: data
+        }
+      });
 
       //insert booking data
       const { booking_id, booking_ref } = await bookingSupportService.insertFlightBookingData({

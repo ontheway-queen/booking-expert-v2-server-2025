@@ -50,6 +50,12 @@ class AdminHolidayController extends abstract_controller_1.default {
             const _a = yield this.service.updateHolidayPackage(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
+        this.deleteHolidayPackage = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator("id")
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.deleteHolidayPackage(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
     }
 }
 exports.default = AdminHolidayController;

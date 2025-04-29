@@ -53,7 +53,14 @@ class ResMsg {
   static readonly AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP = "Airline data not found for the markup set";
   static readonly REVALIDATE_BEFORE_BOOKING = "Revalidate the flight before booking";
 
-  static readonly SLUG_ALREADY_EXISTS = 'Slug already exists. Please change the slug to continue.';
+  static readonly SLUG_ALREADY_EXISTS = 'Slug already exists. Please change the slug to continue';
+  static readonly AVAILABLE_SLUG = 'This slug is available to use';
+
+
+  static readonly HOLIDAY_PACKAGE_ALREADY_BOOKED = 'This holiday package is already booked!';
+  static readonly PRICE_NOT_FOUND = 'An issue occurred while getting the price. Please contact the admin for more information!';
+  static readonly BOOKING_CANCELLATION_NOT_ALLOWED = 'Cancellation is not allowed for this booking!'
+
 }
 
 export default ResMsg;

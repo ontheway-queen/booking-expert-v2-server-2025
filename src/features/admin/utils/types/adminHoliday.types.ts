@@ -1,8 +1,8 @@
-import { HOLIDAY_FOR_AGENT, HOLIDAY_FOR_B2C, HOLIDAY_FOR_BOTH, HOLIDAY_PRICE_DISCOUNT_FLAT, HOLIDAY_PRICE_DISCOUNT_PER, HOLIDAY_SERVICE_TYPE_EXCLUDE, HOLIDAY_SERVICE_TYPE_INCLUDE, HOLIDAY_TYPE_DOMESTIC, HOLIDAY_TYPE_INTERNATIONAL } from "../../../../utils/miscellaneous/holidayConstants";
+import { HOLIDAY_FOR_AGENT, HOLIDAY_FOR_B2C, HOLIDAY_FOR_BOTH, HOLIDAY_PRICE_MARKUP_FLAT, HOLIDAY_PRICE_MARKUP_PER, HOLIDAY_SERVICE_TYPE_EXCLUDE, HOLIDAY_SERVICE_TYPE_INCLUDE, HOLIDAY_TYPE_DOMESTIC, HOLIDAY_TYPE_INTERNATIONAL } from "../../../../utils/miscellaneous/holidayConstants";
 
 export interface ICreateHolidayReqBody {
     slug: string;
-    city_id: number;
+    city_id: number[];
     title: string;
     details: string;
     holiday_type: typeof HOLIDAY_TYPE_DOMESTIC | typeof HOLIDAY_TYPE_INTERNATIONAL;
@@ -23,8 +23,8 @@ interface IHolidayPricingReqBody {
     price_for: typeof HOLIDAY_FOR_AGENT | typeof HOLIDAY_FOR_B2C;
     adult_price: number;
     child_price: number;
-    discount_price?: number;
-    discount_type?: typeof HOLIDAY_PRICE_DISCOUNT_FLAT | typeof HOLIDAY_PRICE_DISCOUNT_PER;
+    markup_price?: number;
+    markup_type?: typeof HOLIDAY_PRICE_MARKUP_FLAT | typeof HOLIDAY_PRICE_MARKUP_PER;
 }
 
 interface IHolidayItineraryReqBody {
@@ -40,7 +40,7 @@ interface IHolidayServiceReqBody {
 
 export interface IUpdateHolidayPackageReqBody {
     slug?: string;
-    city_id?: number;
+    city?: IHolidayCityUpdateReqBody;
     title?: string;
     details?: string;
     holiday_type?: typeof HOLIDAY_TYPE_DOMESTIC | typeof HOLIDAY_TYPE_INTERNATIONAL;
@@ -66,8 +66,8 @@ interface IHolidayPricingUpdateReqBody {
         price_for?: typeof HOLIDAY_FOR_AGENT | typeof HOLIDAY_FOR_B2C;
         adult_price?: number;
         child_price?: number;
-        discount_price?: number;
-        discount_type?: typeof HOLIDAY_PRICE_DISCOUNT_FLAT | typeof HOLIDAY_PRICE_DISCOUNT_PER;
+        markup_price?: number;
+        markup_type?: typeof HOLIDAY_PRICE_MARKUP_FLAT | typeof HOLIDAY_PRICE_MARKUP_PER;
     }[];
 }
 
@@ -90,4 +90,9 @@ interface IHolidayServiceUpdateReqBody {
         type?: typeof HOLIDAY_SERVICE_TYPE_INCLUDE | typeof HOLIDAY_SERVICE_TYPE_EXCLUDE;
         title?: string;
     }[];
+}
+
+interface IHolidayCityUpdateReqBody {
+    add: number[];
+    delete: number[];
 }

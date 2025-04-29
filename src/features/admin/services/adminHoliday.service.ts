@@ -3,6 +3,7 @@ import AbstractServices from "../../../abstract/abstract.service";
 import { ICreateHolidayReqBody, IUpdateHolidayPackageReqBody } from "../utils/types/adminHoliday.types";
 import { IGetHolidayPackageListFilterQuery } from "../../../utils/modelTypes/holidayPackageModelTypes/holidayPackageModelTypes";
 import CustomError from "../../../utils/lib/customError";
+import { HOLIDAY_CREATED_BY_ADMIN } from "../../../utils/miscellaneous/holidayConstants";
 
 export class AdminHolidayService extends AbstractServices {
 
@@ -10,15 +11,16 @@ export class AdminHolidayService extends AbstractServices {
         return await this.db.transaction(async (trx) => {
             const { user_id } = req.admin;
             const body = req.body as ICreateHolidayReqBody;
-            const { pricing, itinerary, services, ...rest } = body;
+            const { pricing, itinerary, services, city_id, ...rest } = body;
             const holidayPackageModel = this.Model.HolidayPackageModel(trx);
+            const holidayPackageCityModel = this.Model.HolidayPackageCityModel(trx);
             const holidayPackagePricingModel = this.Model.HolidayPackagePricingModel(trx);
             const holidayPackageImagesModel = this.Model.HolidayPackageImagesModel(trx);
             const holidayPackageServiceModel = this.Model.HolidayPackageServiceModel(trx);
             const holidayPackageItineraryModel = this.Model.HolidayPackageItineraryModel(trx);
 
             //check slug
-            const slugCheck = await holidayPackageModel.getHolidayPackageList({ slug: rest.slug });
+            const slugCheck = await holidayPackageModel.getHolidayPackageList({ slug: rest.slug, created_by: HOLIDAY_CREATED_BY_ADMIN });
             if (slugCheck.data.length) {
                 return {
                     success: false,
@@ -30,8 +32,16 @@ export class AdminHolidayService extends AbstractServices {
             //insert holiday package
             const holidayPackage = await holidayPackageModel.insertHolidayPackage({
                 ...rest,
-                created_by: user_id
+                created_by: HOLIDAY_CREATED_BY_ADMIN,
+                created_by_id: user_id
             });
+
+            //insert city
+            const holidayPackageCityBody = city_id.map((item) => ({
+                holiday_package_id: holidayPackage[0].id,
+                city_id: item
+            }));
+            await holidayPackageCityModel.createHolidayPackageCity(holidayPackageCityBody);
 
             //insert pricing
             const pricing_body = pricing.map((item) => ({
@@ -64,8 +74,8 @@ export class AdminHolidayService extends AbstractServices {
                         image: file.filename
                     });
                 }
+                await holidayPackageImagesModel.insertHolidayPackageImages(image_body);
             }
-            await holidayPackageImagesModel.insertHolidayPackageImages(image_body);
 
             return {
                 success: true,
@@ -81,7 +91,8 @@ export class AdminHolidayService extends AbstractServices {
 
     public async getHolidayPackageList(req: Request) {
         return await this.db.transaction(async (trx) => {
-            const query = req.query as IGetHolidayPackageListFilterQuery;
+            const query = req.query as unknown as IGetHolidayPackageListFilterQuery;
+            query.created_by = HOLIDAY_CREATED_BY_ADMIN;
             const holidayPackageModel = this.Model.HolidayPackageModel(trx);
 
             const data = await holidayPackageModel.getHolidayPackageList(query, true);
@@ -98,7 +109,16 @@ export class AdminHolidayService extends AbstractServices {
         return await this.db.transaction(async (trx) => {
             const { id } = req.params;
             const holidayPackageModel = this.Model.HolidayPackageModel(trx);
-            const data = await holidayPackageModel.getSingleHolidayPackage({ id: Number(id) });
+            const data = await holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: HOLIDAY_CREATED_BY_ADMIN });
+
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -111,16 +131,26 @@ export class AdminHolidayService extends AbstractServices {
         return await this.db.transaction(async (trx) => {
             const { id } = req.params;
             const body = req.body as IUpdateHolidayPackageReqBody;
-            const { pricing, itinerary, services, delete_images, ...rest } = body;
+            const { pricing, itinerary, services, delete_images, city, ...rest } = body;
             const holidayPackageModel = this.Model.HolidayPackageModel(trx);
+            const holidayPackageCityModel = this.Model.HolidayPackageCityModel(trx);
             const holidayPackagePricingModel = this.Model.HolidayPackagePricingModel(trx);
             const holidayPackageImagesModel = this.Model.HolidayPackageImagesModel(trx);
             const holidayPackageServiceModel = this.Model.HolidayPackageServiceModel(trx);
             const holidayPackageItineraryModel = this.Model.HolidayPackageItineraryModel(trx);
 
+            const data = await holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: HOLIDAY_CREATED_BY_ADMIN });
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: "Holiday package not found"
+                }
+            }
+
             //check slug
             if (rest.slug) {
-                const slugCheck = await holidayPackageModel.getHolidayPackageList({ slug: rest.slug });
+                const slugCheck = await holidayPackageModel.getHolidayPackageList({ slug: rest.slug, created_by: HOLIDAY_CREATED_BY_ADMIN });
                 if (slugCheck.data.length && Number(slugCheck.data?.[0]?.id) !== Number(id)) {
                     return {
                         success: false,
@@ -132,6 +162,24 @@ export class AdminHolidayService extends AbstractServices {
 
             //update holiday package
             await holidayPackageModel.updateHolidayPackage(rest, Number(id));
+
+            //update city
+            if (city) {
+                if (city.add) {
+                    const cityInsertBody = city.add.map((item) => ({
+                        holiday_package_id: Number(id),
+                        city_id: item
+                    }));
+                    await holidayPackageCityModel.createHolidayPackageCity(cityInsertBody);
+                }
+                if (city.delete) {
+                    const cityDeleteBody = city.delete.map((item) => ({
+                        holiday_package_id: Number(id),
+                        city_id: item
+                    }));
+                    await holidayPackageCityModel.deleteHolidayPackageCity(cityDeleteBody);
+                }
+            }
 
             //update pricing
             if (pricing) {
@@ -211,10 +259,10 @@ export class AdminHolidayService extends AbstractServices {
 
             //update images
             if (delete_images) {
-                    const imageData = await holidayPackageImagesModel.getHolidayPackageImagesById(delete_images);
-                    const imagePaths = imageData.map((item) => item.image);
-                    await this.manageFile.deleteFromCloud(imagePaths);
-                    await holidayPackageImagesModel.deleteHolidayPackageImages(delete_images);
+                const imageData = await holidayPackageImagesModel.getHolidayPackageImagesById(delete_images);
+                const imagePaths = imageData.map((item) => item.image);
+                await this.manageFile.deleteFromCloud(imagePaths);
+                await holidayPackageImagesModel.deleteHolidayPackageImages(delete_images);
             }
             const files = req.files as Express.Multer.File[] || [];
             const imageBody: { holiday_package_id: number; image: string; }[] = [];
@@ -235,6 +283,27 @@ export class AdminHolidayService extends AbstractServices {
                 data: {
                     imageBody
                 }
+            }
+        });
+    }
+
+    public async deleteHolidayPackage(req: Request) {
+        return await this.db.transaction(async (trx) => {
+            const { id } = req.params;
+            const holidayPackageModel = this.Model.HolidayPackageModel(trx);
+            const data = await holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: HOLIDAY_CREATED_BY_ADMIN });
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: "Holiday package not found"
+                }
+            }
+            await holidayPackageModel.updateHolidayPackage({ is_deleted: true }, Number(id));
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: "Holiday package has been deleted successfully"
             }
         });
     }

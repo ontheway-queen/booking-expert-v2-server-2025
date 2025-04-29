@@ -45,4 +45,14 @@ export default class AdminHolidayController extends AbstractController {
         }
     );
 
+    public deleteHolidayPackage = this.asyncWrapper.wrap(
+        {
+            paramSchema: this.commonValidator.singleParamNumValidator("id")
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.deleteHolidayPackage(req);
+            res.status(code).json(data);
+        }
+    );
+
 }

@@ -50,12 +50,34 @@ export const ERROR_LEVEL_CRITICAL = 'CRITICAL';
 
 
 //panel source
-export const SOURCE_AGENT = "AGENT";
-export const SOURCE_SUB_AGENT = "SUB AGENT";
-export const SOURCE_AGENT_B2C = "AGENT B2C";
-export const SOURCE_B2C = "B2C";
-export const SOURCE_EXTERNAL = "EXTERNAL";
-export const SOURCE_ADMIN = "ADMIN";
+export const SOURCE_AGENT = "AGENT" as const;
+export const SOURCE_SUB_AGENT = "SUB AGENT" as const;
+export const SOURCE_AGENT_B2C = "AGENT B2C" as const;
+export const SOURCE_B2C = "B2C" as const;
+export const SOURCE_EXTERNAL = "EXTERNAL" as const;
+export const SOURCE_ADMIN = "ADMIN" as const;
+
+//slug type
+export const SLUG_TYPE_HOLIDAY = "holiday";
+export const SLUG_TYPE_UMRAH = "umrah";
+export const SLUG_TYPE_BLOG = "blog";
 
 // White label permissions modules
 export const WHITE_LABEL_PERMISSIONS_MODULES: string[] = [];
+
+//generate auto unique id
+export const GENERATE_AUTO_UNIQUE_ID = {
+  agent: 'Agent',
+  agent_flight: 'Agent_Flight',
+  agent_visa: 'Agent_Visa',
+  agent_holiday: 'Agent_Tour',
+  agent_umrah: 'Agent_Umrah',
+  agent_groupFare: 'Agent_GroupFare',
+  agent_supportTicket: 'Agent_SupportTicket',
+  agent_hotel: 'Agent_Hotel',
+  user_flight: 'User_Flight',
+  user_visa: 'User_Visa',
+  user_holiday: 'User_Tour',
+  user_umrah: 'User_Umrah',
+  user_supportTicket: 'User_SupportTicket'
+} as const;

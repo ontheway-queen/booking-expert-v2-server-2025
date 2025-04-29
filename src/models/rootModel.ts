@@ -24,6 +24,8 @@ import HolidayPackageItineraryModel from './holidayPackageModel/holidayPackageIt
 import HolidayPackageServiceModel from './holidayPackageModel/holidayPackageServiceModel';
 import HolidayPackageImagesModel from './holidayPackageModel/holidayPackageImagesModel';
 import HotelMarkupsModel from './markupSetModel/hotelMarkupsModel';
+import HolidayPackageCityModel from './holidayPackageModel/holidayPackageCityModel';
+import HolidayPackageBookingModel from './holidayPackageModel/holidayPackageBookingModel';
 
 export default class Models {
   //Common model
@@ -144,5 +146,15 @@ export default class Models {
   //Holiday package images model
   public HolidayPackageImagesModel(trx?: Knex.Transaction) {
     return new HolidayPackageImagesModel(trx || db);
+  }
+
+  //Holiday package city model
+  public HolidayPackageCityModel(trx?: Knex.Transaction) {
+    return new HolidayPackageCityModel(trx || db);
+  }
+
+  //Holiday package booking model
+  public HolidayPackageBookingModel(trx?: Knex.Transaction) {
+    return new HolidayPackageBookingModel(trx || db);
   }
 }

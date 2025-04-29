@@ -111,7 +111,7 @@ export default class FlightBookingModel extends Schema {
         }
     }
 
-    public async getSingleFlightBooking(id: number): Promise<IGetSingleFlightBookingData> {
+    public async getSingleFlightBooking(id: number): Promise<IGetSingleFlightBookingData | null> {
         return await this.db("flight_booking as fb")
             .withSchema(this.DBO_SCHEMA)
             .leftJoin("agent.agency as ag", function () {

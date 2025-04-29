@@ -28,6 +28,8 @@ const holidayPackageItineraryModel_1 = __importDefault(require("./holidayPackage
 const holidayPackageServiceModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageServiceModel"));
 const holidayPackageImagesModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageImagesModel"));
 const hotelMarkupsModel_1 = __importDefault(require("./markupSetModel/hotelMarkupsModel"));
+const holidayPackageCityModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageCityModel"));
+const holidayPackageBookingModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageBookingModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -124,6 +126,14 @@ class Models {
     //Holiday package images model
     HolidayPackageImagesModel(trx) {
         return new holidayPackageImagesModel_1.default(trx || database_1.db);
+    }
+    //Holiday package city model
+    HolidayPackageCityModel(trx) {
+        return new holidayPackageCityModel_1.default(trx || database_1.db);
+    }
+    //Holiday package booking model
+    HolidayPackageBookingModel(trx) {
+        return new holidayPackageBookingModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

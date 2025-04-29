@@ -26,20 +26,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminHolidayService = void 0;
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const customError_1 = __importDefault(require("../../../utils/lib/customError"));
+const holidayConstants_1 = require("../../../utils/miscellaneous/holidayConstants");
 class AdminHolidayService extends abstract_service_1.default {
     createHoliday(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id } = req.admin;
                 const body = req.body;
-                const { pricing, itinerary, services } = body, rest = __rest(body, ["pricing", "itinerary", "services"]);
+                const { pricing, itinerary, services, city_id } = body, rest = __rest(body, ["pricing", "itinerary", "services", "city_id"]);
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
+                const holidayPackageCityModel = this.Model.HolidayPackageCityModel(trx);
                 const holidayPackagePricingModel = this.Model.HolidayPackagePricingModel(trx);
                 const holidayPackageImagesModel = this.Model.HolidayPackageImagesModel(trx);
                 const holidayPackageServiceModel = this.Model.HolidayPackageServiceModel(trx);
                 const holidayPackageItineraryModel = this.Model.HolidayPackageItineraryModel(trx);
                 //check slug
-                const slugCheck = yield holidayPackageModel.getHolidayPackageList({ slug: rest.slug });
+                const slugCheck = yield holidayPackageModel.getHolidayPackageList({ slug: rest.slug, created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN });
                 if (slugCheck.data.length) {
                     return {
                         success: false,
@@ -48,7 +50,13 @@ class AdminHolidayService extends abstract_service_1.default {
                     };
                 }
                 //insert holiday package
-                const holidayPackage = yield holidayPackageModel.insertHolidayPackage(Object.assign(Object.assign({}, rest), { created_by: user_id }));
+                const holidayPackage = yield holidayPackageModel.insertHolidayPackage(Object.assign(Object.assign({}, rest), { created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN, created_by_id: user_id }));
+                //insert city
+                const holidayPackageCityBody = city_id.map((item) => ({
+                    holiday_package_id: holidayPackage[0].id,
+                    city_id: item
+                }));
+                yield holidayPackageCityModel.createHolidayPackageCity(holidayPackageCityBody);
                 //insert pricing
                 const pricing_body = pricing.map((item) => (Object.assign(Object.assign({}, item), { holiday_package_id: holidayPackage[0].id })));
                 yield holidayPackagePricingModel.insertHolidayPackagePricing(pricing_body);
@@ -68,8 +76,8 @@ class AdminHolidayService extends abstract_service_1.default {
                             image: file.filename
                         });
                     }
+                    yield holidayPackageImagesModel.insertHolidayPackageImages(image_body);
                 }
-                yield holidayPackageImagesModel.insertHolidayPackageImages(image_body);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -86,6 +94,7 @@ class AdminHolidayService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const query = req.query;
+                query.created_by = holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN;
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
                 const data = yield holidayPackageModel.getHolidayPackageList(query, true);
                 return {
@@ -102,7 +111,14 @@ class AdminHolidayService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
-                const data = yield holidayPackageModel.getSingleHolidayPackage({ id: Number(id) });
+                const data = yield holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN });
+                if (!data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -117,15 +133,24 @@ class AdminHolidayService extends abstract_service_1.default {
                 var _a, _b;
                 const { id } = req.params;
                 const body = req.body;
-                const { pricing, itinerary, services, delete_images } = body, rest = __rest(body, ["pricing", "itinerary", "services", "delete_images"]);
+                const { pricing, itinerary, services, delete_images, city } = body, rest = __rest(body, ["pricing", "itinerary", "services", "delete_images", "city"]);
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
+                const holidayPackageCityModel = this.Model.HolidayPackageCityModel(trx);
                 const holidayPackagePricingModel = this.Model.HolidayPackagePricingModel(trx);
                 const holidayPackageImagesModel = this.Model.HolidayPackageImagesModel(trx);
                 const holidayPackageServiceModel = this.Model.HolidayPackageServiceModel(trx);
                 const holidayPackageItineraryModel = this.Model.HolidayPackageItineraryModel(trx);
+                const data = yield holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN });
+                if (!data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: "Holiday package not found"
+                    };
+                }
                 //check slug
                 if (rest.slug) {
-                    const slugCheck = yield holidayPackageModel.getHolidayPackageList({ slug: rest.slug });
+                    const slugCheck = yield holidayPackageModel.getHolidayPackageList({ slug: rest.slug, created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN });
                     if (slugCheck.data.length && Number((_b = (_a = slugCheck.data) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.id) !== Number(id)) {
                         return {
                             success: false,
@@ -136,6 +161,23 @@ class AdminHolidayService extends abstract_service_1.default {
                 }
                 //update holiday package
                 yield holidayPackageModel.updateHolidayPackage(rest, Number(id));
+                //update city
+                if (city) {
+                    if (city.add) {
+                        const cityInsertBody = city.add.map((item) => ({
+                            holiday_package_id: Number(id),
+                            city_id: item
+                        }));
+                        yield holidayPackageCityModel.createHolidayPackageCity(cityInsertBody);
+                    }
+                    if (city.delete) {
+                        const cityDeleteBody = city.delete.map((item) => ({
+                            holiday_package_id: Number(id),
+                            city_id: item
+                        }));
+                        yield holidayPackageCityModel.deleteHolidayPackageCity(cityDeleteBody);
+                    }
+                }
                 //update pricing
                 if (pricing) {
                     if (pricing.delete) {
@@ -217,6 +259,28 @@ class AdminHolidayService extends abstract_service_1.default {
                     data: {
                         imageBody
                     }
+                };
+            }));
+        });
+    }
+    deleteHolidayPackage(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { id } = req.params;
+                const holidayPackageModel = this.Model.HolidayPackageModel(trx);
+                const data = yield holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN });
+                if (!data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: "Holiday package not found"
+                    };
+                }
+                yield holidayPackageModel.updateHolidayPackage({ is_deleted: true }, Number(id));
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: "Holiday package has been deleted successfully"
                 };
             }));
         });
