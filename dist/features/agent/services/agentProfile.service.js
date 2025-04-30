@@ -147,7 +147,7 @@ class AdminProfileService extends abstract_service_1.default {
                 };
             }
             const checkPass = yield lib_1.default.compareHashValue(old_password, checkUser.hashed_password);
-            if (checkPass) {
+            if (!checkPass) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -157,7 +157,7 @@ class AdminProfileService extends abstract_service_1.default {
             const hashed_password = yield lib_1.default.hashValue(new_password);
             yield agencyUserModel.updateUser({ hashed_password }, { id: user_id, agency_id });
             return {
-                success: false,
+                success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.PASSWORD_CHANGED,
             };

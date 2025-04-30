@@ -150,7 +150,7 @@ export default class AdminProfileService extends AbstractServices {
       checkUser.hashed_password
     );
 
-    if (checkPass) {
+    if (!checkPass) {
       return {
         success: false,
         code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -166,7 +166,7 @@ export default class AdminProfileService extends AbstractServices {
     );
 
     return {
-      success: false,
+      success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.PASSWORD_CHANGED,
     };
