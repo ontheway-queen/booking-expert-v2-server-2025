@@ -145,12 +145,12 @@ export default class AdminProfileService extends AbstractServices {
       };
     }
 
-    const checkPass = Lib.compareHashValue(
+    const checkPass = await Lib.compareHashValue(
       old_password,
       checkUser.hashed_password
     );
 
-    if (!checkPass) {
+    if (checkPass) {
       return {
         success: false,
         code: this.StatusCode.HTTP_BAD_REQUEST,

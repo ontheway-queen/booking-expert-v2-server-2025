@@ -146,8 +146,8 @@ class AdminProfileService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
-            const checkPass = lib_1.default.compareHashValue(old_password, checkUser.hashed_password);
-            if (!checkPass) {
+            const checkPass = yield lib_1.default.compareHashValue(old_password, checkUser.hashed_password);
+            if (checkPass) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_BAD_REQUEST,
