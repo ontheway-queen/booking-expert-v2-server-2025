@@ -2,6 +2,7 @@ export const origin: string[] = [
   'http://localhost:3000',
   'http://localhost:5000',
   'http://10.10.220.47:5000',
+  'http://10.10.220.31:3000',
 ];
 
 // OTP types constants
@@ -48,19 +49,18 @@ export const ERROR_LEVEL_WARNING = 'WARNING';
 export const ERROR_LEVEL_ERROR = 'ERROR';
 export const ERROR_LEVEL_CRITICAL = 'CRITICAL';
 
-
 //panel source
-export const SOURCE_AGENT = "AGENT" as const;
-export const SOURCE_SUB_AGENT = "SUB AGENT" as const;
-export const SOURCE_AGENT_B2C = "AGENT B2C" as const;
-export const SOURCE_B2C = "B2C" as const;
-export const SOURCE_EXTERNAL = "EXTERNAL" as const;
-export const SOURCE_ADMIN = "ADMIN" as const;
+export const SOURCE_AGENT = 'AGENT' as const;
+export const SOURCE_SUB_AGENT = 'SUB AGENT' as const;
+export const SOURCE_AGENT_B2C = 'AGENT B2C' as const;
+export const SOURCE_B2C = 'B2C' as const;
+export const SOURCE_EXTERNAL = 'EXTERNAL' as const;
+export const SOURCE_ADMIN = 'ADMIN' as const;
 
 //slug type
-export const SLUG_TYPE_HOLIDAY = "holiday";
-export const SLUG_TYPE_UMRAH = "umrah";
-export const SLUG_TYPE_BLOG = "blog";
+export const SLUG_TYPE_HOLIDAY = 'holiday';
+export const SLUG_TYPE_UMRAH = 'umrah';
+export const SLUG_TYPE_BLOG = 'blog';
 
 // White label permissions modules
 export const WHITE_LABEL_PERMISSIONS_MODULES: string[] = [];
@@ -79,5 +79,5 @@ export const GENERATE_AUTO_UNIQUE_ID = {
   user_visa: 'User_Visa',
   user_holiday: 'User_Tour',
   user_umrah: 'User_Umrah',
-  user_supportTicket: 'User_SupportTicket'
+  user_supportTicket: 'User_SupportTicket',
 } as const;

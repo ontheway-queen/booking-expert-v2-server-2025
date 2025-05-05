@@ -5,6 +5,7 @@ exports.origin = [
     'http://localhost:3000',
     'http://localhost:5000',
     'http://10.10.220.47:5000',
+    'http://10.10.220.31:3000',
 ];
 // OTP types constants
 exports.OTP_TYPES = {
@@ -43,16 +44,16 @@ exports.ERROR_LEVEL_WARNING = 'WARNING';
 exports.ERROR_LEVEL_ERROR = 'ERROR';
 exports.ERROR_LEVEL_CRITICAL = 'CRITICAL';
 //panel source
-exports.SOURCE_AGENT = "AGENT";
-exports.SOURCE_SUB_AGENT = "SUB AGENT";
-exports.SOURCE_AGENT_B2C = "AGENT B2C";
-exports.SOURCE_B2C = "B2C";
-exports.SOURCE_EXTERNAL = "EXTERNAL";
-exports.SOURCE_ADMIN = "ADMIN";
+exports.SOURCE_AGENT = 'AGENT';
+exports.SOURCE_SUB_AGENT = 'SUB AGENT';
+exports.SOURCE_AGENT_B2C = 'AGENT B2C';
+exports.SOURCE_B2C = 'B2C';
+exports.SOURCE_EXTERNAL = 'EXTERNAL';
+exports.SOURCE_ADMIN = 'ADMIN';
 //slug type
-exports.SLUG_TYPE_HOLIDAY = "holiday";
-exports.SLUG_TYPE_UMRAH = "umrah";
-exports.SLUG_TYPE_BLOG = "blog";
+exports.SLUG_TYPE_HOLIDAY = 'holiday';
+exports.SLUG_TYPE_UMRAH = 'umrah';
+exports.SLUG_TYPE_BLOG = 'blog';
 // White label permissions modules
 exports.WHITE_LABEL_PERMISSIONS_MODULES = [];
 //generate auto unique id
@@ -69,5 +70,5 @@ exports.GENERATE_AUTO_UNIQUE_ID = {
     user_visa: 'User_Visa',
     user_holiday: 'User_Tour',
     user_umrah: 'User_Umrah',
-    user_supportTicket: 'User_SupportTicket'
+    user_supportTicket: 'User_SupportTicket',
 };
