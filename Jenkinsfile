@@ -8,7 +8,14 @@ pipeline {
                 '''
             }
         }
-
+        stage('Restart App with PM2') {
+            steps {
+                sh '''
+                    echo "PM2 found, restarting all apps..."
+                    pm2 start dist/server.js
+                '''
+            }
+        }
         // stage('Restart App with PM2') {
         //     steps {
         //         sh '''
