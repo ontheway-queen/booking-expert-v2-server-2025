@@ -24,7 +24,7 @@ class AgentHolidayService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
                 const query = req.query;
-                const data = yield holidayPackageModel.getHolidayPackageList(Object.assign(Object.assign({}, query), { created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN, holiday_for: constants_1.SOURCE_AGENT }), true);
+                const data = yield holidayPackageModel.getHolidayPackageList(Object.assign(Object.assign({}, query), { created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN, holiday_for: constants_1.SOURCE_AGENT, status: true }), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -39,7 +39,7 @@ class AgentHolidayService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { slug } = req.params;
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
-                const get_holiday_data = yield holidayPackageModel.getSingleHolidayPackage({ slug, created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN, holiday_for: constants_1.SOURCE_AGENT });
+                const get_holiday_data = yield holidayPackageModel.getSingleHolidayPackage({ slug, created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN, holiday_for: constants_1.SOURCE_AGENT, status: true });
                 if (!get_holiday_data) {
                     return {
                         success: false,

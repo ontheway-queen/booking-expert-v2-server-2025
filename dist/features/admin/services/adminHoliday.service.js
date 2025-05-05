@@ -130,7 +130,7 @@ class AdminHolidayService extends abstract_service_1.default {
     updateHolidayPackage(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                var _a, _b;
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
                 const { id } = req.params;
                 const body = req.body;
                 const { pricing, itinerary, services, delete_images, city } = body, rest = __rest(body, ["pricing", "itinerary", "services", "delete_images", "city"]);
@@ -163,14 +163,14 @@ class AdminHolidayService extends abstract_service_1.default {
                 yield holidayPackageModel.updateHolidayPackage(rest, Number(id));
                 //update city
                 if (city) {
-                    if (city.add) {
+                    if ((_c = city.add) === null || _c === void 0 ? void 0 : _c.length) {
                         const cityInsertBody = city.add.map((item) => ({
                             holiday_package_id: Number(id),
                             city_id: item
                         }));
                         yield holidayPackageCityModel.createHolidayPackageCity(cityInsertBody);
                     }
-                    if (city.delete) {
+                    if ((_d = city.delete) === null || _d === void 0 ? void 0 : _d.length) {
                         const cityDeleteBody = city.delete.map((item) => ({
                             holiday_package_id: Number(id),
                             city_id: item
@@ -180,16 +180,16 @@ class AdminHolidayService extends abstract_service_1.default {
                 }
                 //update pricing
                 if (pricing) {
-                    if (pricing.delete) {
+                    if ((_e = pricing.delete) === null || _e === void 0 ? void 0 : _e.length) {
                         yield holidayPackagePricingModel.deleteHolidayPackagePricing(pricing.delete);
                     }
-                    if (pricing.update) {
+                    if ((_f = pricing.update) === null || _f === void 0 ? void 0 : _f.length) {
                         yield Promise.all(pricing.update.map((_a) => {
                             var { id } = _a, rest = __rest(_a, ["id"]);
                             return holidayPackagePricingModel.updateHolidayPackagePricing(rest, id);
                         }));
                     }
-                    if (pricing.add) {
+                    if ((_g = pricing.add) === null || _g === void 0 ? void 0 : _g.length) {
                         yield Promise.all(pricing.add.map((item) => __awaiter(this, void 0, void 0, function* () {
                             const checkDuplicateEntry = yield holidayPackagePricingModel.getHolidayPackagePricingList({
                                 holiday_package_id: Number(id),
@@ -204,38 +204,38 @@ class AdminHolidayService extends abstract_service_1.default {
                 }
                 //update itinerary
                 if (itinerary) {
-                    if (itinerary.delete) {
+                    if ((_h = itinerary.delete) === null || _h === void 0 ? void 0 : _h.length) {
                         yield holidayPackageItineraryModel.deleteHolidayPackageItinerary(itinerary.delete);
                     }
-                    if (itinerary.update) {
+                    if ((_j = itinerary.update) === null || _j === void 0 ? void 0 : _j.length) {
                         yield Promise.all(itinerary.update.map((_a) => {
                             var { id } = _a, rest = __rest(_a, ["id"]);
                             return holidayPackageItineraryModel.updateHolidayPackageItinerary(rest, id);
                         }));
                     }
-                    if (itinerary.add) {
+                    if ((_k = itinerary.add) === null || _k === void 0 ? void 0 : _k.length) {
                         const itineraryBody = itinerary.add.map((item) => (Object.assign(Object.assign({}, item), { holiday_package_id: Number(id) })));
                         yield holidayPackageItineraryModel.insertHolidayPackageItinerary(itineraryBody);
                     }
                 }
                 //update services
                 if (services) {
-                    if (services.delete) {
+                    if ((_l = services.delete) === null || _l === void 0 ? void 0 : _l.length) {
                         yield holidayPackageServiceModel.deleteHolidayPackageService(services.delete);
                     }
-                    if (services.update) {
+                    if ((_m = services.update) === null || _m === void 0 ? void 0 : _m.length) {
                         yield Promise.all(services.update.map((_a) => {
                             var { id } = _a, rest = __rest(_a, ["id"]);
                             return holidayPackageServiceModel.updateHolidayPackageService(rest, id);
                         }));
                     }
-                    if (services.add) {
+                    if ((_o = services.add) === null || _o === void 0 ? void 0 : _o.length) {
                         const servicesBody = services.add.map((item) => (Object.assign(Object.assign({}, item), { holiday_package_id: Number(id) })));
                         yield holidayPackageServiceModel.insertHolidayPackageService(servicesBody);
                     }
                 }
                 //update images
-                if (delete_images) {
+                if (delete_images === null || delete_images === void 0 ? void 0 : delete_images.length) {
                     const imageData = yield holidayPackageImagesModel.getHolidayPackageImagesById(delete_images);
                     const imagePaths = imageData.map((item) => item.image);
                     yield this.manageFile.deleteFromCloud(imagePaths);

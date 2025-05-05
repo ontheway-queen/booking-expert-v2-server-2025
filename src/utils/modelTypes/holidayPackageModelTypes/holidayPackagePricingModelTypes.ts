@@ -1,5 +1,7 @@
-export type PriceForType = "AGENT" | "B2C";
-export type HolidayPriceMarkupType = "FLAT" | "PER";
+import { HOLIDAY_FOR_AGENT, HOLIDAY_FOR_AGENT_B2C, HOLIDAY_FOR_B2C, HOLIDAY_PRICE_MARKUP_FLAT, HOLIDAY_PRICE_MARKUP_PER } from "../../miscellaneous/holidayConstants";
+
+export type PriceForType = typeof HOLIDAY_FOR_AGENT | typeof HOLIDAY_FOR_B2C | typeof HOLIDAY_FOR_AGENT_B2C;
+export type HolidayPriceMarkupType = typeof HOLIDAY_PRICE_MARKUP_FLAT | typeof HOLIDAY_PRICE_MARKUP_PER;
 
 export interface IInsertHolidayPackagePricingPayload {
   holiday_package_id: number;

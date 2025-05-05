@@ -165,14 +165,14 @@ export class AdminHolidayService extends AbstractServices {
 
             //update city
             if (city) {
-                if (city.add) {
+                if (city.add?.length) {
                     const cityInsertBody = city.add.map((item) => ({
                         holiday_package_id: Number(id),
                         city_id: item
                     }));
                     await holidayPackageCityModel.createHolidayPackageCity(cityInsertBody);
                 }
-                if (city.delete) {
+                if (city.delete?.length) {
                     const cityDeleteBody = city.delete.map((item) => ({
                         holiday_package_id: Number(id),
                         city_id: item
@@ -183,17 +183,17 @@ export class AdminHolidayService extends AbstractServices {
 
             //update pricing
             if (pricing) {
-                if (pricing.delete) {
+                if (pricing.delete?.length) {
                     await holidayPackagePricingModel.deleteHolidayPackagePricing(pricing.delete);
                 }
-                if (pricing.update) {
+                if (pricing.update?.length) {
                     await Promise.all(
                         pricing.update.map(({ id, ...rest }) =>
                             holidayPackagePricingModel.updateHolidayPackagePricing(rest, id)
                         )
                     );
                 }
-                if (pricing.add) {
+                if (pricing.add?.length) {
                     await Promise.all(
                         pricing.add.map(async (item) => {
                             const checkDuplicateEntry = await holidayPackagePricingModel.getHolidayPackagePricingList({
@@ -217,17 +217,17 @@ export class AdminHolidayService extends AbstractServices {
 
             //update itinerary
             if (itinerary) {
-                if (itinerary.delete) {
+                if (itinerary.delete?.length) {
                     await holidayPackageItineraryModel.deleteHolidayPackageItinerary(itinerary.delete);
                 }
-                if (itinerary.update) {
+                if (itinerary.update?.length) {
                     await Promise.all(
                         itinerary.update.map(({ id, ...rest }) =>
                             holidayPackageItineraryModel.updateHolidayPackageItinerary(rest, id)
                         )
                     );
                 }
-                if (itinerary.add) {
+                if (itinerary.add?.length) {
                     const itineraryBody = itinerary.add.map((item) => ({
                         ...item,
                         holiday_package_id: Number(id)
@@ -238,17 +238,17 @@ export class AdminHolidayService extends AbstractServices {
 
             //update services
             if (services) {
-                if (services.delete) {
+                if (services.delete?.length) {
                     await holidayPackageServiceModel.deleteHolidayPackageService(services.delete);
                 }
-                if (services.update) {
+                if (services.update?.length) {
                     await Promise.all(
                         services.update.map(({ id, ...rest }) =>
                             holidayPackageServiceModel.updateHolidayPackageService(rest, id)
                         )
                     );
                 }
-                if (services.add) {
+                if (services.add?.length) {
                     const servicesBody = services.add.map((item) => ({
                         ...item,
                         holiday_package_id: Number(id)
@@ -258,7 +258,7 @@ export class AdminHolidayService extends AbstractServices {
             }
 
             //update images
-            if (delete_images) {
+            if (delete_images?.length) {
                 const imageData = await holidayPackageImagesModel.getHolidayPackageImagesById(delete_images);
                 const imagePaths = imageData.map((item) => item.image);
                 await this.manageFile.deleteFromCloud(imagePaths);

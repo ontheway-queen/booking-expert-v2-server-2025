@@ -21,7 +21,7 @@ export class AgentHolidayValidator {
     });
 
     public holidayPackageBookingListFilterQuery = Joi.object({
-        status: Joi.string().optional().valid(HOLIDAY_BOOKING_STATUS),
+        status: Joi.string().optional().valid(...Object.values(HOLIDAY_BOOKING_STATUS)),
         from_date: Joi.date().optional(),
         to_date: Joi.date().optional(),
         filter: Joi.string().trim().optional(),

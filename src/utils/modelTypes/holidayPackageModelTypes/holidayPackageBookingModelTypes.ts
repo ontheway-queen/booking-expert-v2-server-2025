@@ -10,7 +10,7 @@ export interface IInsertHolidayPackageBookingPayload {
     holiday_package_id: number;
     booking_ref: string;
     source_type: HolidayBookingSourceType;
-    source_id: number;
+    source_id?: number;
     user_id: number;
     total_adult: number;
     total_child: number;

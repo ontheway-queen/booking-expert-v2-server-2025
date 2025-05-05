@@ -1,0 +1,58 @@
+import { Request, Response } from 'express';
+import AbstractController from '../../../../abstract/abstract.controller';
+import { AgentB2CSubHolidayValidator } from '../../utils/validators/agentB2CValidators/agentB2CSubHoliday.validator';
+import { AgentB2CSubHolidayService } from '../../services/agentB2CServices/agentB2CSubHoliday.service';
+
+export default class AgentB2CSubHolidayController extends AbstractController {
+    private validator = new AgentB2CSubHolidayValidator();
+    private service = new AgentB2CSubHolidayService();
+    constructor() {
+        super();
+    }
+
+    public createHoliday = this.asyncWrapper.wrap(
+        { bodySchema: this.validator.createHolidaySchema },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.createHoliday(req);
+            res.status(code).json(data);
+        }
+    );
+
+    public getHolidayPackageList = this.asyncWrapper.wrap(
+        { querySchema: this.validator.getHolidayPackageListSchema },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.getHolidayPackageList(req);
+            res.status(code).json(data);
+        }
+    );
+
+    public getSingleHolidayPackage = this.asyncWrapper.wrap(
+        { paramSchema: this.commonValidator.singleParamNumValidator("id") },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.getSingleHolidayPackage(req);
+            res.status(code).json(data);
+        }
+    );
+
+    public updateHolidayPackage = this.asyncWrapper.wrap(
+        {
+            paramSchema: this.commonValidator.singleParamNumValidator("id"),
+            bodySchema: this.validator.updateHolidaySchema
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.updateHolidayPackage(req);
+            res.status(code).json(data);
+        }
+    );
+
+    public deleteHolidayPackage = this.asyncWrapper.wrap(
+        {
+            paramSchema: this.commonValidator.singleParamNumValidator("id")
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...data } = await this.service.deleteHolidayPackage(req);
+            res.status(code).json(data);
+        }
+    );
+
+}

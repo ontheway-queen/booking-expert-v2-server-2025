@@ -24,7 +24,7 @@ class AgentHolidayValidator {
             note_from_customer: joi_1.default.string().optional()
         });
         this.holidayPackageBookingListFilterQuery = joi_1.default.object({
-            status: joi_1.default.string().optional().valid(holidayConstants_1.HOLIDAY_BOOKING_STATUS),
+            status: joi_1.default.string().optional().valid(...Object.values(holidayConstants_1.HOLIDAY_BOOKING_STATUS)),
             from_date: joi_1.default.date().optional(),
             to_date: joi_1.default.date().optional(),
             filter: joi_1.default.string().trim().optional(),
