@@ -73,7 +73,7 @@ export class AdminAgentHolidayService extends AbstractServices {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_BAD_REQUEST,
-                    message: this.ResMsg.BOOKING_CANCELLATION_NOT_ALLOWED
+                    message: this.ResMsg.BOOKING_STATUS_NOT_ALLOWED_TO_CHANGE
                 }
             }
 

@@ -125,6 +125,7 @@ class AgentFlightService extends abstract_service_1.default {
                     status: true,
                     markup_set_id: agency_details.flight_markup_set
                 });
+                console.log({ apiData });
                 //extract API IDs
                 let sabre_set_flight_api_id = 0;
                 apiData.forEach((api) => {

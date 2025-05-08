@@ -43,4 +43,5 @@ ResMsg.AVAILABLE_SLUG = 'This slug is available to use';
 ResMsg.HOLIDAY_PACKAGE_ALREADY_BOOKED = 'This holiday package is already booked!';
 ResMsg.PRICE_NOT_FOUND = 'An issue occurred while getting the price. Please contact the admin for more information!';
 ResMsg.BOOKING_CANCELLATION_NOT_ALLOWED = 'Cancellation is not allowed for this booking!';
+ResMsg.BOOKING_STATUS_NOT_ALLOWED_TO_CHANGE = "Changing status is not allowed for this booking!";
 exports.default = ResMsg;

@@ -90,18 +90,20 @@ export default class AuthChecker {
   ) => {
     const { authorization } = req.headers;
     if (!authorization) {
-      return res
+      res
         .status(StatusCode.HTTP_UNAUTHORIZED)
         .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
+      return;
     }
 
     const authSplit = authorization.split(' ');
 
     if (authSplit.length !== 2) {
-      return res.status(StatusCode.HTTP_UNAUTHORIZED).json({
+      res.status(StatusCode.HTTP_UNAUTHORIZED).json({
         success: false,
         message: ResMsg.HTTP_UNAUTHORIZED,
       });
+      return;
     }
 
     const verify = Lib.verifyToken(
@@ -110,9 +112,10 @@ export default class AuthChecker {
     ) as ITokenParseUser;
 
     if (!verify) {
-      return res
+      res
         .status(StatusCode.HTTP_UNAUTHORIZED)
         .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
+      return;
     } else {
       const { user_id } = verify;
       const userModel = new B2CUserModel(db);
@@ -121,7 +124,7 @@ export default class AuthChecker {
 
       if (user) {
         if (!user.status) {
-          return res
+          res
             .status(StatusCode.HTTP_UNAUTHORIZED)
             .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
         }
@@ -136,7 +139,7 @@ export default class AuthChecker {
         };
         next();
       } else {
-        return res
+        res
           .status(StatusCode.HTTP_UNAUTHORIZED)
           .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
       }
@@ -149,8 +152,8 @@ export default class AuthChecker {
     res: Response,
     next: NextFunction
   ) => {
-    const { authorization } = req.headers;
-
+    let { authorization } = req.headers;
+    if (!authorization) authorization = req.query.token as string;
     if (!authorization) {
       res
         .status(StatusCode.HTTP_UNAUTHORIZED)
@@ -267,7 +270,7 @@ export default class AuthChecker {
   };
 
   // Agency B2C White label Auth Checker
-  public whiteLabelAuthChecker = async () => {};
+  public whiteLabelAuthChecker = async () => { };
 
   // Agency B2C API Authorizer
   public agencyB2CAPIAccessChecker = async (

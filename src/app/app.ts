@@ -38,8 +38,8 @@ class App {
 
   //start server
   public async startServer() {
-    // const services = new PublicCommonService();
-    // await services.getSabreToken();
+    const services = new PublicCommonService();
+    await services.getSabreToken();
     this.server.listen(this.port, () => {
       console.log(
         `Booking Expert V2 OTA server has started successfully at port: ${this.port}...🚀`

@@ -1,11 +1,11 @@
-import { HOLIDAY_CREATED_BY_ADMIN, HOLIDAY_CREATED_BY_AGENT } from "../../miscellaneous/holidayConstants";
+import { HOLIDAY_CREATED_BY_ADMIN, HOLIDAY_CREATED_BY_AGENT, HOLIDAY_FOR_AGENT, HOLIDAY_FOR_AGENT_B2C, HOLIDAY_FOR_B2C, HOLIDAY_FOR_BOTH, HOLIDAY_TYPE_DOMESTIC, HOLIDAY_TYPE_INTERNATIONAL } from "../../miscellaneous/holidayConstants";
 import { IGetHolidayPackageImage, IUpdateHolidayPackageImagePayload } from "./holidayPackageImagesModelTypes";
 import { IGetHolidayPackageItinerary, IUpdateHolidayPackageItineraryPayload } from "./holidayPackageItineraryModelTypes";
 import { IGetHolidayPackagePricingList, IUpdateHolidayPackagePricingPayload } from "./holidayPackagePricingModelTypes";
 import { IGetHolidayPackageService, IUpdateHolidayPackageServicePayload } from "./holidayPackageServiceModelTypes";
 
-export type HolidayType = "Domestic" | "International";
-export type HolidayForType = "AGENT" | "B2C" | "BOTH";
+export type HolidayType = typeof HOLIDAY_TYPE_DOMESTIC | typeof HOLIDAY_TYPE_INTERNATIONAL;
+export type HolidayForType = typeof HOLIDAY_FOR_AGENT | typeof HOLIDAY_FOR_B2C | typeof HOLIDAY_FOR_BOTH | typeof HOLIDAY_FOR_AGENT_B2C;
 
 export interface IInsertHolidayPackagePayload {
     slug: string;
@@ -21,6 +21,7 @@ export interface IInsertHolidayPackagePayload {
     holiday_for: HolidayForType;
     created_by: typeof HOLIDAY_CREATED_BY_ADMIN | typeof HOLIDAY_CREATED_BY_AGENT;
     created_by_id: number;
+    agency_id?: number;
 }
 
 export interface IGetHolidayPackageListFilterQuery {
@@ -32,6 +33,7 @@ export interface IGetHolidayPackageListFilterQuery {
     limit?: number;
     skip?: number;
     created_by: typeof HOLIDAY_CREATED_BY_ADMIN | typeof HOLIDAY_CREATED_BY_AGENT;
+    agency_id?: number;
 }
 
 export interface IGetHolidayPackageList {
@@ -84,6 +86,7 @@ export interface IGetSingleHolidayPackageParams {
     status?: boolean;
     created_by: typeof HOLIDAY_CREATED_BY_ADMIN | typeof HOLIDAY_CREATED_BY_AGENT;
     holiday_for?: HolidayForType;
+    agency_id?: number;
 }
 
 export interface IUpdateHolidayPackagePayload {

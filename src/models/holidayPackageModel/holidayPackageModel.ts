@@ -205,7 +205,11 @@ export default class HolidayPackageModel extends Schema {
                 if (query.slug) {
                     qb.andWhere("tp.slug", query.slug);
                 }
+                if(query.agency_id){
+                    qb.andWhere("tp.agency_id",query.agency_id);
+                }
             })
+            .andWhere("tp.is_deleted", false)
             .orderBy("tp.id", "desc")
             .limit(query.limit || 100)
             .offset(query.skip || 0);
@@ -239,7 +243,11 @@ export default class HolidayPackageModel extends Schema {
                     if (query.slug) {
                         qb.andWhere("tp.slug", query.slug);
                     }
+                    if(query.agency_id){
+                        qb.andWhere("tp.agency_id",query.agency_id);
+                    }
                 })
+                .andWhere("tp.is_deleted", false)
         }
 
         return {
@@ -286,9 +294,20 @@ export default class HolidayPackageModel extends Schema {
                     qb.andWhere("tp.status", where.status);
                 }
                 if (where.holiday_for) {
-                    qb.andWhere("tp.holiday_for", where.holiday_for);
+                    if (where.holiday_for === HOLIDAY_FOR_AGENT || where.holiday_for === HOLIDAY_FOR_B2C) {
+                        qb.andWhere(function () {
+                            this.where("tp.holiday_for", where.holiday_for)
+                                .orWhere("tp.holiday_for", HOLIDAY_FOR_BOTH);
+                        });
+                    } else if (where.holiday_for === HOLIDAY_FOR_BOTH) {
+                        qb.andWhere("tp.holiday_for", HOLIDAY_FOR_BOTH);
+                    }
+                }
+                if(where.agency_id){
+                    qb.andWhere("tp.agency_id", where.agency_id);
                 }
             })
+            .andWhere("tp.is_deleted", false)
             .first();
     }
 

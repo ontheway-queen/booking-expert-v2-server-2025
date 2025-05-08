@@ -78,22 +78,25 @@ class AuthChecker {
         this.b2cUserAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { authorization } = req.headers;
             if (!authorization) {
-                return res
+                res
                     .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                return;
             }
             const authSplit = authorization.split(' ');
             if (authSplit.length !== 2) {
-                return res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
                     success: false,
                     message: responseMessage_1.default.HTTP_UNAUTHORIZED,
                 });
+                return;
             }
             const verify = lib_1.default.verifyToken(authSplit[1], config_1.default.JWT_SECRET_USER);
             if (!verify) {
-                return res
+                res
                     .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                return;
             }
             else {
                 const { user_id } = verify;
@@ -101,7 +104,7 @@ class AuthChecker {
                 const user = yield userModel.checkUser({ id: user_id });
                 if (user) {
                     if (!user.status) {
-                        return res
+                        res
                             .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                             .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
                     }
@@ -116,7 +119,7 @@ class AuthChecker {
                     next();
                 }
                 else {
-                    return res
+                    res
                         .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                         .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
                 }
@@ -124,7 +127,9 @@ class AuthChecker {
         });
         // agency user auth checker
         this.agencyUserAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const { authorization } = req.headers;
+            let { authorization } = req.headers;
+            if (!authorization)
+                authorization = req.query.token;
             if (!authorization) {
                 res
                     .status(statusCode_1.default.HTTP_UNAUTHORIZED)

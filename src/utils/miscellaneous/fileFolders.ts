@@ -8,7 +8,8 @@ class FileFolder {
   static readonly B2C_TRAVELER_FILES = 'b2c/traveler-files';
   static readonly AGENCY_USER = 'agent/agency-user';
   static readonly AGENCY_FILES = 'agent/agency-files';
-  static readonly HOLIDAY_PACKAGE = 'holiday-package';
+  static readonly ADMIN_HOLIDAY_PACKAGE = 'admin/holiday-package';
+  static readonly AGENT_HOLIDAY_PACKAGE = 'agent/holiday-package';
   static readonly PACKAGE_FILE = 'package-file';
   static readonly VISA_FILES = 'visa-files';
   static readonly SPECIAL_OFFER = 'special-offer';

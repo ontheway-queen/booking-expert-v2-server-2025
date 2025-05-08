@@ -21,6 +21,7 @@ const node_cron_1 = __importDefault(require("node-cron"));
 const customError_1 = __importDefault(require("../utils/lib/customError"));
 const errorHandler_1 = __importDefault(require("../middleware/errorHandler/errorHandler"));
 const router_1 = __importDefault(require("./router"));
+const publicCommon_service_1 = __importDefault(require("../features/public/services/publicCommon.service"));
 class App {
     constructor(port) {
         this.app = (0, express_1.default)();
@@ -47,8 +48,8 @@ class App {
     //start server
     startServer() {
         return __awaiter(this, void 0, void 0, function* () {
-            // const services = new PublicCommonService();
-            // await services.getSabreToken();
+            const services = new publicCommon_service_1.default();
+            yield services.getSabreToken();
             this.server.listen(this.port, () => {
                 console.log(`Booking Expert V2 OTA server has started successfully at port: ${this.port}...🚀`);
             });

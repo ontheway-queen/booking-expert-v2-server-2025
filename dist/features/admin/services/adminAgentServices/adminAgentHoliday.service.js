@@ -81,7 +81,7 @@ class AdminAgentHolidayService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: this.ResMsg.BOOKING_CANCELLATION_NOT_ALLOWED
+                        message: this.ResMsg.BOOKING_STATUS_NOT_ALLOWED_TO_CHANGE
                     };
                 }
                 const update_res = yield holidayPackageBookingModel.updateHolidayBooking({ status: req.body.status, updated_by: user_id, updated_at: new Date() }, id);

@@ -12,7 +12,7 @@ export class AgentHolidayService extends AbstractServices {
         return this.db.transaction(async (trx) => {
             const holidayPackageModel = this.Model.HolidayPackageModel(trx);
             const query = req.query;
-            const data = await holidayPackageModel.getHolidayPackageList({ ...query, created_by: HOLIDAY_CREATED_BY_ADMIN, holiday_for: SOURCE_AGENT }, true);
+            const data = await holidayPackageModel.getHolidayPackageList({ ...query, created_by: HOLIDAY_CREATED_BY_ADMIN, holiday_for: SOURCE_AGENT, status: true }, true);
 
             return {
                 success: true,
@@ -28,7 +28,7 @@ export class AgentHolidayService extends AbstractServices {
             const { slug } = req.params as unknown as IGetSingleHolidayPackageByAgentParams;
             const holidayPackageModel = this.Model.HolidayPackageModel(trx);
 
-            const get_holiday_data = await holidayPackageModel.getSingleHolidayPackage({ slug, created_by: HOLIDAY_CREATED_BY_ADMIN, holiday_for: SOURCE_AGENT });
+            const get_holiday_data = await holidayPackageModel.getSingleHolidayPackage({ slug, created_by: HOLIDAY_CREATED_BY_ADMIN, holiday_for: SOURCE_AGENT, status: true });
             if (!get_holiday_data) {
                 return {
                     success: false,

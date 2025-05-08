@@ -130,6 +130,8 @@ export class AgentFlightService extends AbstractServices {
         markup_set_id: agency_details.flight_markup_set
       });
 
+      console.log({apiData});
+
       //extract API IDs
       let sabre_set_flight_api_id = 0;
 

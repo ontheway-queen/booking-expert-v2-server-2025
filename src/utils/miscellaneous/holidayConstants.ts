@@ -4,6 +4,7 @@ export const HOLIDAY_TYPE_INTERNATIONAL = "International";
 export const HOLIDAY_FOR_AGENT = "AGENT";
 export const HOLIDAY_FOR_B2C = "B2C";
 export const HOLIDAY_FOR_BOTH = "BOTH";
+export const HOLIDAY_FOR_AGENT_B2C = "AGENT B2C";
 
 export const HOLIDAY_PRICE_MARKUP_FLAT = "FLAT";
 export const HOLIDAY_PRICE_MARKUP_PER = "PER";
