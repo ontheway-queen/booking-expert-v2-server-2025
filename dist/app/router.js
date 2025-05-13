@@ -12,6 +12,7 @@ const adminRoot_router_1 = __importDefault(require("../features/admin/adminRoot.
 const agentB2CRoot_router_1 = __importDefault(require("../features/agentB2C/agentB2CRoot.router"));
 const externalRoot_router_1 = __importDefault(require("../features/external/externalRoot.router"));
 const authChecker_1 = __importDefault(require("../middleware/authChecker/authChecker"));
+const publicPayment_router_1 = require("../features/public/routers/publicPayment.router");
 class RootRouter {
     constructor() {
         this.v2Router = (0, express_1.Router)();
@@ -22,6 +23,7 @@ class RootRouter {
         this.adminRootRouter = new adminRoot_router_1.default();
         this.agentB2CRootRouter = new agentB2CRoot_router_1.default();
         this.externalRootRouter = new externalRoot_router_1.default();
+        this.paymentRootRouter = new publicPayment_router_1.PublicPaymentRouter();
         // Auth checker
         this.authChecker = new authChecker_1.default();
         this.callV2Router();
@@ -41,6 +43,8 @@ class RootRouter {
         this.v2Router.use('/agent-b2c', this.agentB2CRootRouter.Router);
         // External Routes
         this.v2Router.use('/external', this.externalRootRouter.Router);
+        //Payment Routes
+        this.v2Router.use('/payment', this.paymentRootRouter.router);
     }
 }
 exports.default = RootRouter;

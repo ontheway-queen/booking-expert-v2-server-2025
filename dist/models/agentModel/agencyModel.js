@@ -42,7 +42,16 @@ class AgencyModel extends schema_1.default {
             var _a;
             const data = yield this.db('agency AS ag')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.phone', 'ag.status', 'ag.white_label', 'ag.allow_api')
+                .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.phone', 'ag.status', 'ag.white_label', 'ag.allow_api', this.db.raw(`
+          (
+            SELECT 
+              COALESCE(SUM(CASE WHEN ad.type = 'Credit' THEN amount ELSE 0 END), 0) - 
+              COALESCE(SUM(CASE WHEN ad.type = 'Debit' THEN amount ELSE 0 END), 0) 
+            AS balance 
+            FROM agent.agency_ledger as ad
+            WHERE ag.id = ad.agency_id
+          ) AS balance
+          `))
                 .where((qb) => {
                 if (query.filter) {
                     qb.where('ag.agency_name', 'like', `%${query.filter}%`)
@@ -51,6 +60,9 @@ class AgencyModel extends schema_1.default {
                 }
                 if (query.status) {
                     qb.andWhere('ag.status', query.status);
+                }
+                if (query.ref_id) {
+                    qb.andWhere('ag.ref_id', query.ref_id);
                 }
             })
                 .limit(Number(query.limit) || constants_1.DATA_LIMIT)
@@ -70,6 +82,9 @@ class AgencyModel extends schema_1.default {
                     if (query.status) {
                         qb.andWhere('ag.status', query.status);
                     }
+                    if (query.ref_id) {
+                        qb.andWhere('ag.ref_id', query.ref_id);
+                    }
                 });
             }
             return { data, total: (_a = total[0]) === null || _a === void 0 ? void 0 : _a.total };
@@ -77,7 +92,7 @@ class AgencyModel extends schema_1.default {
     }
     // check Agency
     checkAgency(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ agency_id, email, name, agent_no, }) {
+        return __awaiter(this, arguments, void 0, function* ({ agency_id, email, name, agent_no, ref_id }) {
             return yield this.db('agency')
                 .withSchema(this.AGENT_SCHEMA)
                 .select('id', 'email', 'phone', 'agency_logo', 'agency_name', 'agent_no', 'status', 'white_label', 'allow_api', 'civil_aviation', 'trade_license', 'national_id', 'usable_loan', 'flight_markup_set', 'hotel_markup_set')
@@ -93,6 +108,9 @@ class AgencyModel extends schema_1.default {
                 }
                 if (agent_no) {
                     qb.where('agent_no', agent_no);
+                }
+                if (ref_id) {
+                    qb.andWhere('ref_id', ref_id);
                 }
             })
                 .first();
@@ -167,7 +185,7 @@ class AgencyModel extends schema_1.default {
         });
     }
     // get single agency
-    getSingleAgency(id) {
+    getSingleAgency(id, ref_id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('agency AS ag')
                 .withSchema(this.AGENT_SCHEMA)
@@ -185,6 +203,11 @@ class AgencyModel extends schema_1.default {
                 .joinRaw('LEFT JOIN admin.user_admin AS ua ON ag.created_by = ua.id')
                 .joinRaw('LEFT JOIN agent.agency AS ar ON ag.ref_id = ar.id')
                 .where('ag.id', id)
+                .andWhere((qb) => {
+                if (ref_id) {
+                    qb.andWhere("ag.ref_id", ref_id);
+                }
+            })
                 .first();
         });
     }
@@ -193,7 +216,7 @@ class AgencyModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('white_label_permissions')
                 .withSchema(this.AGENT_SCHEMA)
-                .insert(payload, 'id');
+                .insert(payload);
         });
     }
     updateWhiteLabelPermission(payload, agency_id) {
@@ -239,6 +262,62 @@ class AgencyModel extends schema_1.default {
                 .withSchema(this.AGENT_SCHEMA)
                 .update(payload)
                 .where('agency_id', agency_id);
+        });
+    }
+    //create audit
+    createAudit(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('audit_trail')
+                .withSchema(this.AGENT_SCHEMA)
+                .insert(payload);
+        });
+    }
+    //get audit
+    getAudit(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            const data = yield this.db('audit_trail as at')
+                .withSchema(this.AGENT_SCHEMA)
+                .select('at.id', 'ad.name as created_by', 'at.type', 'at.details', 'at.created_at')
+                .leftJoin('agent as ad', 'ad.id', 'at.created_by')
+                .andWhere((qb) => {
+                if (payload.created_by) {
+                    qb.andWhere('at.created_by', payload.created_by);
+                }
+                if (payload.type) {
+                    qb.andWhere('at.type', payload.type);
+                }
+                if (payload.from_date && payload.to_date) {
+                    qb.andWhereBetween('at.created_at', [
+                        payload.from_date,
+                        payload.to_date,
+                    ]);
+                }
+            })
+                .limit(payload.limit || 100)
+                .offset(payload.skip || 0)
+                .orderBy('at.id', 'desc');
+            const total = yield this.db('audit_trail as at')
+                .count('at.id as total')
+                .withSchema(this.AGENT_SCHEMA)
+                .andWhere((qb) => {
+                if (payload.created_by) {
+                    qb.andWhere('at.created_by', payload.created_by);
+                }
+                if (payload.type) {
+                    qb.andWhere('at.type', payload.type);
+                }
+                if (payload.from_date && payload.to_date) {
+                    qb.andWhereBetween('at.created_at', [
+                        payload.from_date,
+                        payload.to_date,
+                    ]);
+                }
+            });
+            return {
+                data,
+                total: (_a = total[0]) === null || _a === void 0 ? void 0 : _a.total,
+            };
         });
     }
 }

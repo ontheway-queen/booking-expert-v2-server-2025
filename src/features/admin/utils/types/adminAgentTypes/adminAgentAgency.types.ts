@@ -2,7 +2,7 @@ export interface IAdminAgentGetAgencyReqQuery {
   filter?: string;
   limit?: string;
   skip?: string;
-  status: string;
+  status: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
 }
 
 export interface IAdminAgentUpdateAgencyReqBody {
@@ -30,4 +30,25 @@ export interface IAdminAgentUpdateAgencyApplicationReqBody {
   status: 'Active' | 'Rejected';
   hotel_markup_set: number;
   flight_markup_set: number;
+}
+
+export interface IAdminCreateAgentReqBody {
+  email: string;
+  agency_name: string;
+  user_name: string;
+  address: string;
+  phone: string;
+  flight_markup_set: number;
+  hotel_markup_set: number;
+  white_label: boolean;
+  allow_api: boolean;
+  white_label_permissions?: {
+    flight: boolean;
+    hotel: boolean;
+    visa: boolean;
+    holiday: boolean;
+    umrah: boolean;
+    group_fare: boolean;
+    blog: boolean;
+  };
 }

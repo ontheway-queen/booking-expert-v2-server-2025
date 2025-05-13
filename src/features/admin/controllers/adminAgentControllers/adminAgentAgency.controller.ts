@@ -62,4 +62,12 @@ export default class AdminAgentAgencyController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public createAgency = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.createAgency },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.createAgency(req);
+      res.status(code).json(rest);
+    }
+  );
 }

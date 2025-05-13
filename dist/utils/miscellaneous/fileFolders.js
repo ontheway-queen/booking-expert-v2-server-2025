@@ -5,6 +5,7 @@ class FileFolder {
 FileFolder.PROMOTIONAL_FILES = 'promotional-files';
 FileFolder.ARTICLE_FILES = 'article-files';
 FileFolder.ADMIN_FILES = 'admin/admin-files';
+FileFolder.AGENT_SUB_AGENT_FILES = 'agent/sub-agent';
 FileFolder.COMMON_FILES = 'common-files';
 FileFolder.B2C_USER_FILES = 'b2c/user-files';
 FileFolder.AGENT_TRAVELER_FILES = 'agent/traveler-files';

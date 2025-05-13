@@ -49,9 +49,11 @@ class B2CProfileService extends abstract_service_1.default {
                     username: user.username,
                     name: user.name,
                     email: user.email,
+                    phone_number: user.phone_number,
                     two_fa: user.two_fa,
                     status: user.status,
                     photo: user.photo,
+                    gender: user.gender,
                 },
                 token,
             };

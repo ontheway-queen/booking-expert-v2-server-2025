@@ -17,7 +17,6 @@ export default class B2CProfileService extends AbstractServices {
   public async getProfile(req: Request) {
     const { user_id } = req.user;
     const B2CUserModel = this.Model.B2CUserModel();
-
     const user = await B2CUserModel.checkUser({ id: user_id });
 
     if (!user) {
@@ -27,7 +26,7 @@ export default class B2CProfileService extends AbstractServices {
         message: this.ResMsg.HTTP_NOT_FOUND,
       };
     }
-
+    
     const tokenData: ITokenParseUser = {
       name: user.name,
       photo: user.photo,
@@ -48,9 +47,11 @@ export default class B2CProfileService extends AbstractServices {
         username: user.username,
         name: user.name,
         email: user.email,
+        phone_number: user.phone_number,
         two_fa: user.two_fa,
         status: user.status,
         photo: user.photo,
+        gender: user.gender,
       },
       token,
     };

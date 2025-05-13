@@ -263,6 +263,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_logo,
         agency_name,
         is_main_user,
+        ref_id
       } = checkUserAgency;
 
       if (
@@ -351,6 +352,7 @@ export default class AuthAgentService extends AbstractServices {
         is_main_user,
         phone_number,
         photo,
+        ref_id
       };
 
       const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
@@ -430,6 +432,7 @@ export default class AuthAgentService extends AbstractServices {
         agency_logo,
         agency_name,
         is_main_user,
+        ref_id
       } = checkAgencyUser;
 
       if (!status) {
@@ -490,6 +493,7 @@ export default class AuthAgentService extends AbstractServices {
         phone_number,
         is_main_user,
         photo,
+        ref_id
       };
 
       const authToken = Lib.createToken(

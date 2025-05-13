@@ -43,6 +43,58 @@ class AdminAgentPaymentsController extends abstract_controller_1.default {
             const _a = yield this.services.getLedger(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.getDepositRequestList = this.asyncWrapper.wrap({ querySchema: this.validator.getDepositRequest }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.getDepositRequestList(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.getSingleDepositRequest = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.getSingleDepositRequest(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.updateDepositRequest = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+            bodySchema: this.validator.updateDepositRequest
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.updateDepositRequest(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.adjustBalance = this.asyncWrapper.wrap({
+            bodySchema: this.validator.adjustBalance
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.adjustBalance(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.createADM = this.asyncWrapper.wrap({
+            bodySchema: this.validator.createADM
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.createADM(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.getADMList = this.asyncWrapper.wrap({
+            querySchema: this.validator.getADM
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.getADMList(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.getSingleADM = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator()
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.getSingleADM(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.updateADM = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+            bodySchema: this.validator.updateADM
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.updateADM(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.deleteADM = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator()
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.deleteADM(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.default = AdminAgentPaymentsController;

@@ -62,6 +62,43 @@ class AdminAgentAgencyValidator {
                 then: joi_1.default.number().required(),
             }),
         });
+        this.createAgency = joi_1.default.object({
+            agency_name: joi_1.default.string().trim().required(),
+            email: joi_1.default.string().trim().required(),
+            phone: joi_1.default.string().trim().required(),
+            address: joi_1.default.string().trim().required(),
+            user_name: joi_1.default.string().trim().required(),
+            flight_markup_set: joi_1.default.number().required(),
+            hotel_markup_set: joi_1.default.number().required(),
+            white_label: joi_1.default.boolean().required(),
+            allow_api: joi_1.default.boolean().required(),
+            white_label_permissions: joi_1.default.string()
+                .optional()
+                .custom((value, helpers) => {
+                try {
+                    const innerSchema = joi_1.default.object({
+                        flight: joi_1.default.boolean().required(),
+                        hotel: joi_1.default.boolean().required(),
+                        visa: joi_1.default.boolean().required(),
+                        holiday: joi_1.default.boolean().required(),
+                        umrah: joi_1.default.boolean().required(),
+                        group_fare: joi_1.default.boolean().required(),
+                        blog: joi_1.default.boolean().required(),
+                    });
+                    const parsedValue = JSON.parse(value);
+                    const { error } = innerSchema.validate(parsedValue);
+                    if (error) {
+                        return helpers.error('any.invalid');
+                    }
+                    else {
+                        return parsedValue;
+                    }
+                }
+                catch (err) {
+                    return helpers.error('any.invalid');
+                }
+            }),
+        });
     }
 }
 exports.default = AdminAgentAgencyValidator;

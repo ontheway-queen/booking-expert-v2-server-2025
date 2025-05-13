@@ -29,6 +29,8 @@ const uuid_1 = require("uuid");
 const lib_1 = __importDefault(require("../../../../utils/lib/lib"));
 const config_1 = __importDefault(require("../../../../config/config"));
 const constants_1 = require("../../../../utils/miscellaneous/constants");
+const emailSendLib_1 = __importDefault(require("../../../../utils/lib/emailSendLib"));
+const registrationVerificationCompletedTemplate_1 = require("../../../../utils/templates/registrationVerificationCompletedTemplate");
 class AdminAgentAgencyService extends abstract_service_1.default {
     constructor() {
         super();
@@ -165,7 +167,9 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 if (payload.trade_license && checkAgency.trade_license) {
                     deleteFiles.push(checkAgency.trade_license);
                 }
-                yield AgentModel.updateAgency(payload, agency_id);
+                if (Object.keys(payload).length) {
+                    yield AgentModel.updateAgency(payload, agency_id);
+                }
                 if (deleteFiles.length) {
                     yield this.manageFile.deleteFromCloud(deleteFiles);
                 }
@@ -216,7 +220,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         };
                     }
                     const checkHotelMarkupSet = yield MarkupSetModel.getSingleMarkupSet({
-                        id: body.flight_markup_set,
+                        id: body.hotel_markup_set,
                         status: true,
                         type: constants_1.MARKUP_SET_TYPE_HOTEL,
                     });
@@ -261,7 +265,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                const { status, email, id, username, name, photo, agency_status, phone_number, agency_email, agency_name, is_main_user, } = checkUserAgency;
+                const { status, email, id, username, name, photo, agency_status, phone_number, agency_email, agency_name, is_main_user, ref_id } = checkUserAgency;
                 if (agency_status === 'Inactive' ||
                     agency_status === 'Incomplete' ||
                     agency_status === 'Rejected') {
@@ -289,6 +293,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     is_main_user,
                     phone_number,
                     photo,
+                    ref_id
                 };
                 const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
                 yield this.insertAdminAudit(trx, {
@@ -303,6 +308,136 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     data: {
                         token,
                     },
+                };
+            }));
+        });
+    }
+    createAgency(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { user_id } = req.admin;
+                const body = req.body;
+                const { white_label_permissions, user_name } = body, rest = __rest(body, ["white_label_permissions", "user_name"]);
+                const agencyModel = this.Model.AgencyModel(trx);
+                const agencyUserModel = this.Model.AgencyUserModel(trx);
+                const checkSubAgentName = yield agencyModel.checkAgency({
+                    name: body.agency_name
+                });
+                if (checkSubAgentName) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_CONFLICT,
+                        message: "Duplicate agency name! Agency already exists with this name"
+                    };
+                }
+                const checkAgentUser = yield agencyUserModel.checkUser({
+                    email: body.email
+                });
+                if (checkAgentUser) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_CONFLICT,
+                        message: "Email already exists. Please use another email"
+                    };
+                }
+                let agency_logo = '';
+                let civil_aviation = '';
+                let trade_license = '';
+                let national_id = '';
+                const files = req.files || [];
+                files.forEach((file) => {
+                    switch (file.fieldname) {
+                        case 'agency_logo':
+                            agency_logo = file.filename;
+                            break;
+                        case 'civil_aviation':
+                            civil_aviation = file.filename;
+                            break;
+                        case 'trade_license':
+                            trade_license = file.filename;
+                            break;
+                        case 'national_id':
+                            national_id = file.filename;
+                            break;
+                        default:
+                            throw new customError_1.default('Invalid files. Please provide valid trade license, civil aviation, NID, logo', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
+                    }
+                });
+                const agent_no = yield lib_1.default.generateNo({ trx, type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent });
+                const newAgency = yield agencyModel.createAgency(Object.assign({ status: 'Active', agent_no: agent_no, agency_logo,
+                    civil_aviation,
+                    trade_license,
+                    national_id, created_by: user_id }, rest));
+                const newRole = yield agencyUserModel.createRole({
+                    agency_id: newAgency[0].id,
+                    name: 'Super Admin',
+                    is_main_role: true
+                });
+                let username = lib_1.default.generateUsername(body.user_name);
+                let suffix = 1;
+                while (yield agencyUserModel.checkUser({ username })) {
+                    username = `${username}${suffix}`;
+                    suffix += 1;
+                }
+                const password = lib_1.default.generateRandomPassword(8);
+                const hashed_password = yield lib_1.default.hashValue(password);
+                const newUser = yield agencyUserModel.createUser({
+                    agency_id: newAgency[0].id,
+                    email: body.email,
+                    hashed_password,
+                    is_main_user: true,
+                    name: body.user_name,
+                    phone_number: body.phone,
+                    role_id: newRole[0].id,
+                    username
+                });
+                if (body.white_label && !white_label_permissions) {
+                    const checkPermission = yield agencyModel.getWhiteLabelPermission(newAgency[0].id);
+                    if (!checkPermission) {
+                        const uuid = (0, uuid_1.v4)();
+                        yield agencyModel.createWhiteLabelPermission({
+                            agency_id: newAgency[0].id,
+                            token: uuid,
+                            blog: false,
+                            flight: false,
+                            group_fare: false,
+                            holiday: false,
+                            hotel: false,
+                            umrah: false,
+                            visa: false,
+                        });
+                    }
+                }
+                if (white_label_permissions) {
+                    const checkPermission = yield agencyModel.getWhiteLabelPermission(newAgency[0].id);
+                    if (checkPermission && white_label_permissions) {
+                        yield agencyModel.updateWhiteLabelPermission(white_label_permissions, newAgency[0].id);
+                    }
+                    else {
+                        const uuid = (0, uuid_1.v4)();
+                        yield agencyModel.createWhiteLabelPermission(Object.assign({ agency_id: newAgency[0].id, token: uuid }, white_label_permissions));
+                    }
+                }
+                yield emailSendLib_1.default.sendEmail({
+                    email: body.email,
+                    emailSub: `Booking Expert Agency Credentials`,
+                    emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(body.agency_name, {
+                        email: body.email,
+                        password: password
+                    })
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: "Agent has been created",
+                    data: {
+                        agency_id: newAgency[0].id,
+                        user_id: newUser[0].id,
+                        agency_logo,
+                        civil_aviation,
+                        trade_license,
+                        national_id
+                    }
                 };
             }));
         });

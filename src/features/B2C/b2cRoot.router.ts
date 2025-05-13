@@ -8,9 +8,11 @@ import B2CSupportTicketRouter from './routers/b2cSupportTicket.router';
 import B2CTravelerRouter from './routers/b2cTraveler.router';
 import B2CUmrahRouter from './routers/b2cUmrah.router';
 import B2CVisaRouter from './routers/b2cVisa.router';
+import AuthChecker from '../../middleware/authChecker/authChecker';
 
 export default class B2CRootRouter {
   public Router = Router();
+  private authChecker = new AuthChecker();
 
   // Router classes
   private b2cMainRouter = new B2CMainRouter();
@@ -33,7 +35,7 @@ export default class B2CRootRouter {
     this.Router.use('/visa', this.b2cVisaRouter.router);
     this.Router.use('/holiday', this.b2cHolidayRouter.router);
     this.Router.use('/umrah', this.b2cUmrahRouter.router);
-    this.Router.use('/profile', this.b2cProfileRouter.router);
+    this.Router.use('/profile', this.authChecker.b2cUserAuthChecker, this.b2cProfileRouter.router);
     this.Router.use('/traveler', this.b2cTravelerRouter.router);
     this.Router.use('/support-ticket', this.b2cSupportTicketRouter.router);
   }

@@ -7,6 +7,7 @@ import AdminRootRouter from '../features/admin/adminRoot.router';
 import AgentB2CRootRouter from '../features/agentB2C/agentB2CRoot.router';
 import ExternalRootRouter from '../features/external/externalRoot.router';
 import AuthChecker from '../middleware/authChecker/authChecker';
+import { PublicPaymentRouter } from '../features/public/routers/publicPayment.router';
 
 export default class RootRouter {
   public v2Router = Router();
@@ -17,6 +18,7 @@ export default class RootRouter {
   private adminRootRouter = new AdminRootRouter();
   private agentB2CRootRouter = new AgentB2CRootRouter();
   private externalRootRouter = new ExternalRootRouter();
+  private paymentRootRouter = new PublicPaymentRouter();
 
   // Auth checker
   private authChecker = new AuthChecker();
@@ -53,5 +55,8 @@ export default class RootRouter {
 
     // External Routes
     this.v2Router.use('/external', this.externalRootRouter.Router);
+
+    //Payment Routes
+    this.v2Router.use('/payment', this.paymentRootRouter.router);
   }
 }

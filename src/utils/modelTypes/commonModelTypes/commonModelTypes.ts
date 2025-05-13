@@ -54,11 +54,13 @@ export interface IInsertLastNoPayload {
     | 'Agent_GroupFare'
     | 'Agent_SupportTicket'
     | 'Agent_Hotel'
+    | 'Agent_Deposit_Request'
     | 'User_Flight'
     | 'User_Visa'
     | 'User_Tour'
     | 'User_Umrah'
-    | 'User_SupportTicket';
+    | 'User_SupportTicket'
+    |'ADM_Management';
   last_updated: Date;
 }
 
@@ -77,11 +79,13 @@ export interface IGetLastIdParams {
     | 'Agent_GroupFare'
     | 'Agent_SupportTicket'
     | 'Agent_Hotel'
+    |'Agent_Deposit_Request'
     | 'User_Flight'
     | 'User_Visa'
     | 'User_Tour'
     | 'User_Umrah'
-    | 'User_SupportTicket';
+    | 'User_SupportTicket'
+    |'ADM_Management';
 }
 
 export interface IGetLastIdData {

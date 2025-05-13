@@ -4,6 +4,7 @@ import {
   IAdminAgentGetAgencyReqQuery,
   IAdminAgentUpdateAgencyReqBody,
   IAdminAgentUpdateAgencyApplicationReqBody,
+  IAdminCreateAgentReqBody,
 } from '../../utils/types/adminAgentTypes/adminAgentAgency.types';
 import CustomError from '../../../../utils/lib/customError';
 import { IUpdateAgencyPayload } from '../../../../utils/modelTypes/agentModel/agencyModelTypes';
@@ -12,9 +13,12 @@ import { ITokenParseAgencyUser } from '../../../public/utils/types/publicCommon.
 import Lib from '../../../../utils/lib/lib';
 import config from '../../../../config/config';
 import {
+  GENERATE_AUTO_UNIQUE_ID,
   MARKUP_SET_TYPE_FLIGHT,
   MARKUP_SET_TYPE_HOTEL,
 } from '../../../../utils/miscellaneous/constants';
+import EmailSendLib from '../../../../utils/lib/emailSendLib';
+import { registrationVerificationCompletedTemplate } from '../../../../utils/templates/registrationVerificationCompletedTemplate';
 
 export default class AdminAgentAgencyService extends AbstractServices {
   constructor() {
@@ -193,8 +197,10 @@ export default class AdminAgentAgencyService extends AbstractServices {
       if (payload.trade_license && checkAgency.trade_license) {
         deleteFiles.push(checkAgency.trade_license);
       }
-
-      await AgentModel.updateAgency(payload, agency_id);
+      
+      if(Object.keys(payload).length){
+        await AgentModel.updateAgency(payload, agency_id);
+      }
 
       if (deleteFiles.length) {
         await this.manageFile.deleteFromCloud(deleteFiles);
@@ -261,7 +267,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
           };
         }
         const checkHotelMarkupSet = await MarkupSetModel.getSingleMarkupSet({
-          id: body.flight_markup_set,
+          id: body.hotel_markup_set,
           status: true,
           type: MARKUP_SET_TYPE_HOTEL,
         });
@@ -323,6 +329,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         agency_email,
         agency_name,
         is_main_user,
+        ref_id
       } = checkUserAgency;
 
       if (
@@ -356,6 +363,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         is_main_user,
         phone_number,
         photo,
+        ref_id
       };
 
       const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
@@ -374,6 +382,180 @@ export default class AdminAgentAgencyService extends AbstractServices {
           token,
         },
       };
+    });
+  }
+
+  public async createAgency(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { user_id } = req.admin;
+
+      const body = req.body as IAdminCreateAgentReqBody;
+      const { white_label_permissions, user_name, ...rest } = body;
+
+      const agencyModel = this.Model.AgencyModel(trx);
+      const agencyUserModel = this.Model.AgencyUserModel(trx);
+
+      const checkSubAgentName = await agencyModel.checkAgency({
+        name: body.agency_name
+      });
+
+      if (checkSubAgentName) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_CONFLICT,
+          message: "Duplicate agency name! Agency already exists with this name"
+        };
+      }
+
+      const checkAgentUser = await agencyUserModel.checkUser({
+        email: body.email
+      });
+
+      if (checkAgentUser) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_CONFLICT,
+          message: "Email already exists. Please use another email"
+        }
+      }
+
+      let agency_logo = '';
+      let civil_aviation = '';
+      let trade_license = '';
+      let national_id = '';
+
+      const files = (req.files as Express.Multer.File[]) || [];
+      files.forEach((file) => {
+        switch (file.fieldname) {
+          case 'agency_logo':
+            agency_logo = file.filename;
+            break;
+          case 'civil_aviation':
+            civil_aviation = file.filename;
+            break;
+          case 'trade_license':
+            trade_license = file.filename;
+            break;
+          case 'national_id':
+            national_id = file.filename;
+            break;
+          default:
+            throw new CustomError(
+              'Invalid files. Please provide valid trade license, civil aviation, NID, logo',
+              this.StatusCode.HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
+      });
+
+      const agent_no = await Lib.generateNo({ trx, type: GENERATE_AUTO_UNIQUE_ID.agent });
+
+      const newAgency = await agencyModel.createAgency({
+        status: 'Active',
+        agent_no: agent_no,
+        agency_logo,
+        civil_aviation,
+        trade_license,
+        national_id,
+        created_by: user_id,
+        ...rest
+      });
+
+      const newRole = await agencyUserModel.createRole({
+        agency_id: newAgency[0].id,
+        name: 'Super Admin',
+        is_main_role: true
+      });
+
+      let username = Lib.generateUsername(body.user_name);
+
+      let suffix = 1;
+
+      while (await agencyUserModel.checkUser({ username })) {
+        username = `${username}${suffix}`;
+        suffix += 1;
+      }
+
+      const password = Lib.generateRandomPassword(8);
+      const hashed_password = await Lib.hashValue(password);
+
+      const newUser = await agencyUserModel.createUser({
+        agency_id: newAgency[0].id,
+        email: body.email,
+        hashed_password,
+        is_main_user: true,
+        name: body.user_name,
+        phone_number: body.phone,
+        role_id: newRole[0].id,
+        username
+      });
+
+      if (body.white_label && !white_label_permissions) {
+        const checkPermission = await agencyModel.getWhiteLabelPermission(
+          newAgency[0].id
+        );
+
+        if (!checkPermission) {
+          const uuid = uuidv4();
+          await agencyModel.createWhiteLabelPermission({
+            agency_id: newAgency[0].id,
+            token: uuid,
+            blog: false,
+            flight: false,
+            group_fare: false,
+            holiday: false,
+            hotel: false,
+            umrah: false,
+            visa: false,
+          });
+        }
+      }
+
+      if (white_label_permissions) {
+        const checkPermission = await agencyModel.getWhiteLabelPermission(
+          newAgency[0].id
+        );
+
+        if (checkPermission && white_label_permissions) {
+          await agencyModel.updateWhiteLabelPermission(
+            white_label_permissions,
+            newAgency[0].id
+          );
+        } else {
+          const uuid = uuidv4();
+          await agencyModel.createWhiteLabelPermission({
+            agency_id: newAgency[0].id,
+            token: uuid,
+            ...white_label_permissions,
+          });
+        }
+      }
+
+
+      await EmailSendLib.sendEmail({
+        email: body.email,
+        emailSub: `Booking Expert Agency Credentials`,
+        emailBody: registrationVerificationCompletedTemplate(
+          body.agency_name,
+          {
+            email: body.email,
+            password: password
+          }
+        )
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: "Agent has been created",
+        data: {
+          agency_id: newAgency[0].id,
+          user_id: newUser[0].id,
+          agency_logo,
+          civil_aviation,
+          trade_license,
+          national_id
+        }
+      }
     });
   }
 }

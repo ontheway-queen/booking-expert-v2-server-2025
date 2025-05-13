@@ -156,6 +156,9 @@ class Lib {
                 case 'Agent_SupportTicket':
                     NoCode = 'AST';
                     break;
+                case 'Agent_Deposit_Request':
+                    NoCode = 'ADR';
+                    break;
                 case 'User_Flight':
                     NoCode = 'CF';
                     break;

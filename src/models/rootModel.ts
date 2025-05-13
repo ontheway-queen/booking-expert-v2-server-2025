@@ -26,6 +26,8 @@ import HolidayPackageImagesModel from './holidayPackageModel/holidayPackageImage
 import HotelMarkupsModel from './markupSetModel/hotelMarkupsModel';
 import HolidayPackageCityModel from './holidayPackageModel/holidayPackageCityModel';
 import HolidayPackageBookingModel from './holidayPackageModel/holidayPackageBookingModel';
+import SubAgentMarkupModel from './agentModel/subAgentMarkupModel';
+import ADMManagementModel from './paymentModel/admManagementModel';
 
 export default class Models {
   //Common model
@@ -156,5 +158,15 @@ export default class Models {
   //Holiday package booking model
   public HolidayPackageBookingModel(trx?: Knex.Transaction) {
     return new HolidayPackageBookingModel(trx || db);
+  }
+
+  //Sub agent markup model
+  public SubAgentMarkupModel(trx?: Knex.Transaction) {
+    return new SubAgentMarkupModel(trx || db);
+  }
+
+  //ADM management model
+  public ADMManagementModel(trx?: Knex.Transaction) {
+    return new ADMManagementModel(trx || db);
   }
 }

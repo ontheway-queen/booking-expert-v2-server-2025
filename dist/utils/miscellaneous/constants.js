@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GENERATE_AUTO_UNIQUE_ID = exports.WHITE_LABEL_PERMISSIONS_MODULES = exports.SLUG_TYPE_BLOG = exports.SLUG_TYPE_UMRAH = exports.SLUG_TYPE_HOLIDAY = exports.SOURCE_ADMIN = exports.SOURCE_EXTERNAL = exports.SOURCE_B2C = exports.SOURCE_AGENT_B2C = exports.SOURCE_SUB_AGENT = exports.SOURCE_AGENT = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.MARKUP_SET_TYPE_HOTEL = exports.MARKUP_SET_TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL = exports.PROJECT_LINK = exports.PROJECT_ICON = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
+exports.PAYMENT_GATEWAYS = exports.GENERATE_AUTO_UNIQUE_ID = exports.WHITE_LABEL_PERMISSIONS_MODULES = exports.DEPOSIT_STATUS_CANCELLED = exports.DEPOSIT_STATUS_REJECTED = exports.DEPOSIT_STATUS_APPROVED = exports.DEPOSIT_STATUS_PENDING = exports.SLUG_TYPE_BLOG = exports.SLUG_TYPE_UMRAH = exports.SLUG_TYPE_HOLIDAY = exports.SOURCE_ADMIN = exports.SOURCE_EXTERNAL = exports.SOURCE_B2C = exports.SOURCE_AGENT_B2C = exports.SOURCE_SUB_AGENT = exports.SOURCE_AGENT = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.MARKUP_SET_TYPE_HOTEL = exports.MARKUP_SET_TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL = exports.PROJECT_LINK = exports.PROJECT_ICON = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
 exports.origin = [
     'http://localhost:3000',
     'http://localhost:5000',
@@ -54,6 +54,11 @@ exports.SOURCE_ADMIN = "ADMIN";
 exports.SLUG_TYPE_HOLIDAY = "holiday";
 exports.SLUG_TYPE_UMRAH = "umrah";
 exports.SLUG_TYPE_BLOG = "blog";
+//deposit type
+exports.DEPOSIT_STATUS_PENDING = "PENDING";
+exports.DEPOSIT_STATUS_APPROVED = "APPROVED";
+exports.DEPOSIT_STATUS_REJECTED = "REJECTED";
+exports.DEPOSIT_STATUS_CANCELLED = "CANCELLED";
 // White label permissions modules
 exports.WHITE_LABEL_PERMISSIONS_MODULES = [];
 //generate auto unique id
@@ -66,9 +71,15 @@ exports.GENERATE_AUTO_UNIQUE_ID = {
     agent_groupFare: 'Agent_GroupFare',
     agent_supportTicket: 'Agent_SupportTicket',
     agent_hotel: 'Agent_Hotel',
+    agent_deposit_request: 'Agent_Deposit_Request',
     user_flight: 'User_Flight',
     user_visa: 'User_Visa',
     user_holiday: 'User_Tour',
     user_umrah: 'User_Umrah',
-    user_supportTicket: 'User_SupportTicket'
+    user_supportTicket: 'User_SupportTicket',
+    adm_management: 'ADM_Management'
+};
+//payment gateways
+exports.PAYMENT_GATEWAYS = {
+    'SSL': 'SSL'
 };

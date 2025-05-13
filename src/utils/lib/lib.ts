@@ -179,6 +179,9 @@ class Lib {
       case 'Agent_SupportTicket':
         NoCode = 'AST';
         break;
+      case 'Agent_Deposit_Request':
+        NoCode = 'ADR';
+        break;
       case 'User_Flight':
         NoCode = 'CF';
         break;
@@ -214,9 +217,11 @@ interface IGenNoParams {
     | 'Agent_GroupFare'
     | 'Agent_SupportTicket'
     | 'Agent_Hotel'
+    | 'Agent_Deposit_Request'
     | 'User_Flight'
     | 'User_Visa'
     | 'User_Tour'
     | 'User_Umrah'
-    | 'User_SupportTicket';
+    | 'User_SupportTicket'
+    |'ADM_Management';
 }

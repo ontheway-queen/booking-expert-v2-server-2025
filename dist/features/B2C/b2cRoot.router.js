@@ -13,9 +13,11 @@ const b2cSupportTicket_router_1 = __importDefault(require("./routers/b2cSupportT
 const b2cTraveler_router_1 = __importDefault(require("./routers/b2cTraveler.router"));
 const b2cUmrah_router_1 = __importDefault(require("./routers/b2cUmrah.router"));
 const b2cVisa_router_1 = __importDefault(require("./routers/b2cVisa.router"));
+const authChecker_1 = __importDefault(require("../../middleware/authChecker/authChecker"));
 class B2CRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
+        this.authChecker = new authChecker_1.default();
         // Router classes
         this.b2cMainRouter = new b2cMain_router_1.default();
         this.b2cHolidayRouter = new b2cHoliday_router_1.default();
@@ -35,7 +37,7 @@ class B2CRootRouter {
         this.Router.use('/visa', this.b2cVisaRouter.router);
         this.Router.use('/holiday', this.b2cHolidayRouter.router);
         this.Router.use('/umrah', this.b2cUmrahRouter.router);
-        this.Router.use('/profile', this.b2cProfileRouter.router);
+        this.Router.use('/profile', this.authChecker.b2cUserAuthChecker, this.b2cProfileRouter.router);
         this.Router.use('/traveler', this.b2cTravelerRouter.router);
         this.Router.use('/support-ticket', this.b2cSupportTicketRouter.router);
     }

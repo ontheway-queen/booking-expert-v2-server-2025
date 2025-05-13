@@ -61,6 +61,7 @@ class ResMsg {
   static readonly PRICE_NOT_FOUND = 'An issue occurred while getting the price. Please contact the admin for more information!';
   static readonly BOOKING_CANCELLATION_NOT_ALLOWED = 'Cancellation is not allowed for this booking!'
   static readonly BOOKING_STATUS_NOT_ALLOWED_TO_CHANGE = "Changing status is not allowed for this booking!"
+  static readonly REQUEST_STATUS_NOT_ALLOWED_TO_CHANGE = "Changing status is not allowed for this request!"
 
 }
 

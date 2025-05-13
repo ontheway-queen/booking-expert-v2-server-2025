@@ -38,7 +38,8 @@ export interface IGetAgencyListQuery {
   limit?: string;
   skip?: string;
   filter?: string;
-  status?: string;
+  status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
+  ref_id?: number;
 }
 export interface IGetAgencyListWithBalanceQuery {
   limit?: string;
@@ -106,6 +107,7 @@ export interface ICheckAgencyQuery {
   name?: string;
   agent_no?: string;
   status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
+  ref_id?: number;
 }
 
 export interface ICheckAgencyData {
@@ -174,4 +176,21 @@ export interface IGetAPICredsData {
 export interface IUpdateAPICredsPayload {
   api_pass?: string;
   last_access?: string;
+}
+
+export interface ICreateAgentAuditTrailPayload {
+  agency_id: number;
+  created_by: number;
+  type: 'CREATE' | 'GET' | 'UPDATE' | 'DELETE';
+  details: string;
+  payload?: object | string;
+}
+
+export interface IGetAgentAuditTrailQuery {
+  type?: 'CREATE' | 'GET' | 'UPDATE' | 'DELETE';
+  created_by?: number;
+  limit?: number;
+  skip?: number;
+  from_date?: string;
+  to_date?: string;
 }

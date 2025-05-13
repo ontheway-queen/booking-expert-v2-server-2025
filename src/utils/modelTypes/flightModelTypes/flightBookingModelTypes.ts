@@ -38,6 +38,14 @@ export interface IGetFlightBookingListFilterQuery {
     limit?: number;
     skip?: number;
     source_id?: number;
+    booked_by: SourceType;
+}
+
+export interface IGetSingleFlightBookingParams {
+    id: number;
+    booked_by: SourceType;
+    agency_id?: number;
+    user_id?: number;
 }
 
 export interface IGetFlightBookingList {

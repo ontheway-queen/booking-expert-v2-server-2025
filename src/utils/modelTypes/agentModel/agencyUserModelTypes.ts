@@ -48,6 +48,7 @@ export interface IGetAgencyUserListData {
 export interface ICheckAgencyUserData {
   id: number;
   agency_id: number;
+  ref_id: number | null;
   email: string;
   name: string;
   photo: string;

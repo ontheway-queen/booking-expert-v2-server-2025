@@ -5,12 +5,14 @@ import {
   ICheckAgencyData,
   ICheckAgencyQuery,
   ICreateAgencyPayload,
+  ICreateAgentAuditTrailPayload,
   ICreateAPICredsPayload,
   ICreateWhiteLabelPermissionPayload,
   IGetAgencyListData,
   IGetAgencyListQuery,
   IGetAgencyListWithBalanceData,
   IGetAgencyListWithBalanceQuery,
+  IGetAgentAuditTrailQuery,
   IGetAPICredsData,
   IGetSingleAgencyData,
   IGetWhiteLabelPermissionData,
@@ -58,7 +60,17 @@ export default class AgencyModel extends Schema {
         'ag.phone',
         'ag.status',
         'ag.white_label',
-        'ag.allow_api'
+        'ag.allow_api',
+        this.db.raw(`
+          (
+            SELECT 
+              COALESCE(SUM(CASE WHEN ad.type = 'Credit' THEN amount ELSE 0 END), 0) - 
+              COALESCE(SUM(CASE WHEN ad.type = 'Debit' THEN amount ELSE 0 END), 0) 
+            AS balance 
+            FROM agent.agency_ledger as ad
+            WHERE ag.id = ad.agency_id
+          ) AS balance
+          `)
       )
       .where((qb) => {
         if (query.filter) {
@@ -68,6 +80,9 @@ export default class AgencyModel extends Schema {
         }
         if (query.status) {
           qb.andWhere('ag.status', query.status);
+        }
+        if (query.ref_id) {
+          qb.andWhere('ag.ref_id', query.ref_id);
         }
       })
       .limit(Number(query.limit) || DATA_LIMIT)
@@ -89,6 +104,9 @@ export default class AgencyModel extends Schema {
           if (query.status) {
             qb.andWhere('ag.status', query.status);
           }
+          if (query.ref_id) {
+            qb.andWhere('ag.ref_id', query.ref_id);
+          }
         });
     }
     return { data, total: total[0]?.total };
@@ -100,6 +118,7 @@ export default class AgencyModel extends Schema {
     email,
     name,
     agent_no,
+    ref_id
   }: ICheckAgencyQuery): Promise<ICheckAgencyData | undefined> {
     return await this.db('agency')
       .withSchema(this.AGENT_SCHEMA)
@@ -132,6 +151,9 @@ export default class AgencyModel extends Schema {
         }
         if (agent_no) {
           qb.where('agent_no', agent_no);
+        }
+        if (ref_id) {
+          qb.andWhere('ref_id', ref_id);
         }
       })
       .first();
@@ -227,7 +249,8 @@ export default class AgencyModel extends Schema {
 
   // get single agency
   public async getSingleAgency(
-    id: number
+    id: number,
+    ref_id?: number
   ): Promise<IGetSingleAgencyData | null> {
     return await this.db('agency AS ag')
       .withSchema(this.AGENT_SCHEMA)
@@ -268,6 +291,11 @@ export default class AgencyModel extends Schema {
       .joinRaw('LEFT JOIN admin.user_admin AS ua ON ag.created_by = ua.id')
       .joinRaw('LEFT JOIN agent.agency AS ar ON ag.ref_id = ar.id')
       .where('ag.id', id)
+      .andWhere((qb) => {
+        if (ref_id) {
+          qb.andWhere("ag.ref_id", ref_id);
+        }
+      })
       .first();
   }
 
@@ -277,7 +305,7 @@ export default class AgencyModel extends Schema {
   ) {
     return await this.db('white_label_permissions')
       .withSchema(this.AGENT_SCHEMA)
-      .insert(payload, 'id');
+      .insert(payload);
   }
 
   public async updateWhiteLabelPermission(
@@ -336,5 +364,66 @@ export default class AgencyModel extends Schema {
       .withSchema(this.AGENT_SCHEMA)
       .update(payload)
       .where('agency_id', agency_id);
+  }
+
+  //create audit
+  public async createAudit(payload: ICreateAgentAuditTrailPayload) {
+    return await this.db('audit_trail')
+      .withSchema(this.AGENT_SCHEMA)
+      .insert(payload);
+  }
+
+  //get audit
+  public async getAudit(payload: IGetAgentAuditTrailQuery) {
+    const data = await this.db('audit_trail as at')
+      .withSchema(this.AGENT_SCHEMA)
+      .select(
+        'at.id',
+        'ad.name as created_by',
+        'at.type',
+        'at.details',
+        'at.created_at'
+      )
+      .leftJoin('agent as ad', 'ad.id', 'at.created_by')
+      .andWhere((qb) => {
+        if (payload.created_by) {
+          qb.andWhere('at.created_by', payload.created_by);
+        }
+        if (payload.type) {
+          qb.andWhere('at.type', payload.type);
+        }
+        if (payload.from_date && payload.to_date) {
+          qb.andWhereBetween('at.created_at', [
+            payload.from_date,
+            payload.to_date,
+          ]);
+        }
+      })
+      .limit(payload.limit || 100)
+      .offset(payload.skip || 0)
+      .orderBy('at.id', 'desc');
+
+    const total = await this.db('audit_trail as at')
+      .count('at.id as total')
+      .withSchema(this.AGENT_SCHEMA)
+      .andWhere((qb) => {
+        if (payload.created_by) {
+          qb.andWhere('at.created_by', payload.created_by);
+        }
+        if (payload.type) {
+          qb.andWhere('at.type', payload.type);
+        }
+        if (payload.from_date && payload.to_date) {
+          qb.andWhereBetween('at.created_at', [
+            payload.from_date,
+            payload.to_date,
+          ]);
+        }
+      });
+
+    return {
+      data,
+      total: total[0]?.total,
+    };
   }
 }

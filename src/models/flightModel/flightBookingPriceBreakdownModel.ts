@@ -11,16 +11,23 @@ export default class FlightBookingPriceBreakdownModel extends Schema {
         this.db = db;
     }
 
-    public async insertFlightBookingPriceBreakdown(payload: IInsertFlightBookingPriceBreakdownPayload|IInsertFlightBookingPriceBreakdownPayload[]): Promise<{ id: number }[]> {
+    public async insertFlightBookingPriceBreakdown(payload: IInsertFlightBookingPriceBreakdownPayload | IInsertFlightBookingPriceBreakdownPayload[]): Promise<{ id: number }[]> {
         return await this.db("flight_booking_price_breakdown")
             .withSchema(this.DBO_SCHEMA)
             .insert(payload, 'id');
     }
 
-    public async getFlightBookingPriceBreakdown(flight_booking_id: number): Promise<IGetFlightBookingPriceBreakdownData[]>{
+    public async getFlightBookingPriceBreakdown(flight_booking_id: number): Promise<IGetFlightBookingPriceBreakdownData[]> {
         return await this.db("flight_booking_price_breakdown")
-        .withSchema(this.DBO_SCHEMA)
-        .select("*")
-        .where({flight_booking_id});
+            .withSchema(this.DBO_SCHEMA)
+            .select(
+                "id",
+                "type",
+                "total_passenger",
+                "base_fare",
+                "tax",
+                "total_fare"
+            )
+            .where({ flight_booking_id });
     }
 }

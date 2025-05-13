@@ -63,6 +63,12 @@ export const SLUG_TYPE_HOLIDAY = "holiday";
 export const SLUG_TYPE_UMRAH = "umrah";
 export const SLUG_TYPE_BLOG = "blog";
 
+//deposit type
+export const DEPOSIT_STATUS_PENDING = "PENDING";
+export const DEPOSIT_STATUS_APPROVED = "APPROVED";
+export const DEPOSIT_STATUS_REJECTED = "REJECTED";
+export const DEPOSIT_STATUS_CANCELLED = "CANCELLED";
+
 // White label permissions modules
 export const WHITE_LABEL_PERMISSIONS_MODULES: string[] = [];
 
@@ -76,9 +82,16 @@ export const GENERATE_AUTO_UNIQUE_ID = {
   agent_groupFare: 'Agent_GroupFare',
   agent_supportTicket: 'Agent_SupportTicket',
   agent_hotel: 'Agent_Hotel',
+  agent_deposit_request: 'Agent_Deposit_Request',
   user_flight: 'User_Flight',
   user_visa: 'User_Visa',
   user_holiday: 'User_Tour',
   user_umrah: 'User_Umrah',
-  user_supportTicket: 'User_SupportTicket'
+  user_supportTicket: 'User_SupportTicket',
+  adm_management: 'ADM_Management'
 } as const;
+
+//payment gateways
+export const PAYMENT_GATEWAYS = {
+  'SSL': 'SSL'
+}

@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const schema_1 = __importDefault(require("../../utils/miscellaneous/schema"));
 const constants_1 = require("../../utils/miscellaneous/constants");
+const schema_1 = __importDefault(require("../../utils/miscellaneous/schema"));
 class FlightBookingModel extends schema_1.default {
     constructor(db) {
         super();
@@ -29,65 +29,52 @@ class FlightBookingModel extends schema_1.default {
     getFlightBookingList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, is_total = false) {
             var _a;
-            const data = yield this.db("flight_booking as fb")
+            const view_name = query.booked_by === constants_1.SOURCE_AGENT ? "view_flight_booking_by_agent" : query.booked_by === constants_1.SOURCE_SUB_AGENT ? "view_flight_booking_by_agent" : query.booked_by === constants_1.SOURCE_AGENT_B2C ? "view_flight_booking_by_agent_b2c" : query.booked_by === constants_1.SOURCE_B2C ? "view_flight_booking_by_b2c" : undefined;
+            const data = yield this.db(`${view_name}`)
                 .withSchema(this.DBO_SCHEMA)
-                .leftJoin("agent.agency as ag", function () {
-                this.on("fb.source_id", "=", "ag.id").andOnVal("fb.source_type", "in", [constants_1.SOURCE_AGENT, constants_1.SOURCE_SUB_AGENT, constants_1.SOURCE_AGENT_B2C]);
-            })
-                .leftJoin("b2c.users as b2c", function () {
-                this.on("fb.created_by", "=", "b2c.id").andOnVal("fb.source_type", "=", constants_1.SOURCE_B2C);
-            })
-                .leftJoin("external.external as ex", function () {
-                this.on("fb.source_id", "=", "ex.id").andOnVal("fb.source_type", "=", constants_1.SOURCE_EXTERNAL);
-            })
-                .select("fb.id", "fb.booking_ref", "fb.source_type", "fb.source_id", this.db.raw(`
-      CASE 
-        WHEN fb.source_type IN (${constants_1.SOURCE_AGENT}, ${constants_1.SOURCE_SUB_AGENT}, ${constants_1.SOURCE_AGENT_B2C}) THEN ag.agency_name
-        WHEN fb.source_type = ${constants_1.SOURCE_B2C} THEN b2c.name
-        WHEN fb.source_type = ${constants_1.SOURCE_EXTERNAL} THEN ex.name
-        ELSE NULL
-      END AS source_name
-    `), "fb.api", "fb.created_at", "fb.travel_date", "fb.gds_pnr", "fb.journey_type", "fb.total_passenger", "fb.status", "fb.payable_amount", "fb.route")
+                .select("id", "booking_ref", "source_type", "source_id", "source_name", "source_logo", "api", "created_at", "travel_date", "gds_pnr", "journey_type", "total_passenger", "status", "payable_amount", "route")
                 .where((qb) => {
                 if (query.status) {
-                    qb.andWhere("fb.status", query.status);
+                    qb.andWhere("status", query.status);
                 }
                 if (query.from_date && query.to_date) {
-                    qb.andWhereBetween("fb.created_at", [query.from_date, query.to_date]);
+                    qb.andWhereBetween("created_at", [query.from_date, query.to_date]);
                 }
                 if (query.filter) {
                     qb.andWhere((qbc) => {
-                        qbc.whereILike("fb.booking_ref", `${query.filter}%`);
-                        qbc.orWhereILike("fb.gds_pnr", `${query.filter}`);
+                        qbc.whereILike("booking_ref", `${query.filter}%`);
+                        qbc.orWhereILike("gds_pnr", `${query.filter}`),
+                            qbc.orWhereILike("source_name", `%${query.filter}%`);
                     });
                 }
                 if (query.source_id) {
-                    qb.andWhere("fb.source_id", query.source_id);
+                    qb.andWhere("source_id", query.source_id);
                 }
             })
-                .orderBy("fb.id", "desc")
+                .orderBy("id", "desc")
                 .limit(query.limit || 100)
                 .offset(query.skip || 0);
             let total = [];
             if (is_total) {
-                total = yield this.db("flight_booking as fb")
+                total = yield this.db(`${view_name}`)
                     .withSchema(this.DBO_SCHEMA)
-                    .count("fb.id as total")
+                    .count("id as total")
                     .where((qb) => {
                     if (query.status) {
-                        qb.andWhere("fb.status", query.status);
+                        qb.andWhere("status", query.status);
                     }
                     if (query.from_date && query.to_date) {
-                        qb.andWhereBetween("fb.created_at", [query.from_date, query.to_date]);
+                        qb.andWhereBetween("created_at", [query.from_date, query.to_date]);
                     }
                     if (query.filter) {
                         qb.andWhere((qbc) => {
-                            qbc.whereILike("fb.booking_ref", `${query.filter}%`);
-                            qbc.orWhereILike("fb.gds_pnr", `${query.filter}`);
+                            qbc.whereILike("booking_ref", `${query.filter}%`);
+                            qbc.orWhereILike("gds_pnr", `${query.filter}`);
+                            qbc.orWhereILike("source_name", `%${query.filter}%`);
                         });
                     }
                     if (query.source_id) {
-                        qb.andWhere("fb.source_id", query.source_id);
+                        qb.andWhere("source_id", query.source_id);
                     }
                 });
             }
@@ -97,49 +84,21 @@ class FlightBookingModel extends schema_1.default {
             };
         });
     }
-    getSingleFlightBooking(id) {
+    getSingleFlightBooking(where) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("flight_booking as fb")
+            const { id, booked_by, agency_id, user_id } = where;
+            const view_name = booked_by === constants_1.SOURCE_AGENT ? "view_flight_booking_by_agent" : booked_by === constants_1.SOURCE_SUB_AGENT ? "view_flight_booking_by_agent" : booked_by === constants_1.SOURCE_AGENT_B2C ? "view_flight_booking_by_agent_b2c" : booked_by === constants_1.SOURCE_B2C ? "view_flight_booking_by_b2c" : undefined;
+            return yield this.db(`${view_name}`)
                 .withSchema(this.DBO_SCHEMA)
-                .leftJoin("agent.agency as ag", function () {
-                this.on("fb.source_id", "=", "ag.id").andOnVal("fb.source_type", "in", [constants_1.SOURCE_AGENT, constants_1.SOURCE_SUB_AGENT, constants_1.SOURCE_AGENT_B2C]);
-            })
-                .leftJoin("b2c.users as b2c", function () {
-                this.on("fb.created_by", "=", "b2c.id").andOnVal("fb.source_type", "=", constants_1.SOURCE_B2C);
-            })
-                .leftJoin("external.external as ex", function () {
-                this.on("fb.source_id", "=", "ex.id").andOnVal("fb.source_type", "=", constants_1.SOURCE_EXTERNAL);
-            })
-                .leftJoin("agent.agency_user as agu", function () {
-                this.on("fb.created_by_user_id", "=", "agu.id").andOnVal("fb.source_type", "in", [constants_1.SOURCE_AGENT, constants_1.SOURCE_SUB_AGENT]);
-            })
-                .leftJoin("agent_b2c.users as ab", function () {
-                this.on("fb.created_by_user_id", "=", "ab.id").andOnVal("fb.source_type", "=", constants_1.SOURCE_AGENT_B2C);
-            })
-                .leftJoin("b2c.users as b2c2", function () {
-                this.on("fb.created_by_user_id", "=", "b2c2.id").andOnVal("fb.source_type", "=", constants_1.SOURCE_B2C);
-            })
-                .leftJoin("external.external_user as eu", function () {
-                this.on("fb.created_by_user_id", "=", "eu.id").andOnVal("fb.source_type", "=", constants_1.SOURCE_EXTERNAL);
-            })
-                .select("fb.id", "fb.booking_ref", "fb.source_type", "fb.source_id", this.db.raw(`
-      CASE 
-        WHEN fb.source_type IN (${constants_1.SOURCE_AGENT}, ${constants_1.SOURCE_SUB_AGENT}, ${constants_1.SOURCE_AGENT_B2C}) THEN ag.agency_name
-        WHEN fb.source_type = ${constants_1.SOURCE_B2C} THEN b2c.name
-        WHEN fb.source_type = ${constants_1.SOURCE_EXTERNAL} THEN ex.name
-        ELSE NULL
-      END AS source_name
-    `), this.db.raw(`
-        CASE 
-          WHEN fb.source_type IN (${constants_1.SOURCE_AGENT}, ${constants_1.SOURCE_SUB_AGENT}) THEN agu.name
-          WHEN fb.source_type = ${constants_1.SOURCE_AGENT_B2C} THEN ab.name
-          WHEN fb.source_type = ${constants_1.SOURCE_B2C} THEN b2c2.name
-          WHEN fb.source_type = ${constants_1.SOURCE_EXTERNAL} THEN eu.name
-          ELSE NULL
-        END AS created_by
-      `), "fb.api", "fb.created_at", "fb.travel_date", "fb.gds_pnr", "fb.journey_type", "fb.total_passenger", "fb.status", "fb.payable_amount", "fb.source_id", "fb.base_fare", "fb.tax", "fb.ait", "fb.ticket_price", "fb.markup_price", "fb.markup_type", "fb.agent_markup", "fb.refundable", "fb.api_booking_ref", "fb.route", "fb.ticket_issue_last_time", "fb.airline_pnr", "fb.cancelled_at", "fb.issued_at")
+                .select("*")
                 .where((qb) => {
-                qb.andWhere("fb.id", id);
+                qb.andWhere({ id });
+                if (agency_id) {
+                    qb.andWhere("source_id", agency_id);
+                }
+                if (user_id) {
+                    qb.andWhere("created_by", user_id);
+                }
             })
                 .first();
         });

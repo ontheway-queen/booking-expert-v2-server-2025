@@ -146,7 +146,8 @@ export default class AgencyUserModel extends Schema {
         'a.agency_name',
         'a.agency_logo',
         'a.allow_api',
-        'a.white_label'
+        'a.white_label',
+        'a.ref_id'
       )
       .leftJoin('agency AS a', 'au.agency_id', 'a.id')
       .where((qb) => {

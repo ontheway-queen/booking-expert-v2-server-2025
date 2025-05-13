@@ -48,5 +48,13 @@ class ErrorLogsModel extends schema_1.default {
             return { data, total: Number((_a = total === null || total === void 0 ? void 0 : total[0]) === null || _a === void 0 ? void 0 : _a.total) };
         });
     }
+    deleteErrorLogs(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db("error_logs")
+                .withSchema(this.DBO_SCHEMA)
+                .delete()
+                .where({ id });
+        });
+    }
 }
 exports.default = ErrorLogsModel;

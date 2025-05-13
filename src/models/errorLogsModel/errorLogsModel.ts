@@ -41,4 +41,11 @@ export default class ErrorLogsModel extends Schema {
 
         return { data, total: Number(total?.[0]?.total) };
     }
+
+    public async deleteErrorLogs(id: number) {
+        return await this.db("error_logs")
+            .withSchema(this.DBO_SCHEMA)
+            .delete()
+            .where({ id });
+    }
 }

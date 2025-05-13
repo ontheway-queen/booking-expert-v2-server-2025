@@ -70,4 +70,20 @@ export default class AgentFlightController extends AbstractController {
     }
   );
 
+  public getAllBookingList = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.getFlightListSchema },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getAllBookingList(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public getSingleBooking = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getSingleBooking(req);
+      res.status(code).json(rest);
+    }
+  );
+
 }

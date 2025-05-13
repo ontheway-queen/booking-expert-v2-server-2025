@@ -59,4 +59,41 @@ export default class AdminAgentAgencyValidator {
       then: Joi.number().required(),
     }),
   });
+
+  public createAgency = Joi.object({
+    agency_name: Joi.string().trim().required(),
+    email: Joi.string().trim().required(),
+    phone: Joi.string().trim().required(),
+    address: Joi.string().trim().required(),
+    user_name: Joi.string().trim().required(),
+    flight_markup_set: Joi.number().required(),
+    hotel_markup_set: Joi.number().required(),
+    white_label: Joi.boolean().required(),
+    allow_api: Joi.boolean().required(),
+    white_label_permissions: Joi.string()
+      .optional()
+      .custom((value, helpers) => {
+        try {
+          const innerSchema = Joi.object({
+            flight: Joi.boolean().required(),
+            hotel: Joi.boolean().required(),
+            visa: Joi.boolean().required(),
+            holiday: Joi.boolean().required(),
+            umrah: Joi.boolean().required(),
+            group_fare: Joi.boolean().required(),
+            blog: Joi.boolean().required(),
+          });
+          const parsedValue = JSON.parse(value);
+          const { error } = innerSchema.validate(parsedValue);
+
+          if (error) {
+            return helpers.error('any.invalid');
+          } else {
+            return parsedValue;
+          }
+        } catch (err) {
+          return helpers.error('any.invalid');
+        }
+      }),
+  });
 }

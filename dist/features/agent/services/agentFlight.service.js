@@ -344,7 +344,7 @@ class AgentFlightService extends abstract_service_1.default {
                     }
                 }
                 //insert the revalidate data as info log
-                yield this.Model.ErrorLogsModel().insertErrorLogs({
+                const log_id = yield this.Model.ErrorLogsModel().insertErrorLogs({
                     http_method: "POST",
                     level: constants_1.ERROR_LEVEL_INFO,
                     message: "Flight booking revalidate data",
@@ -379,6 +379,8 @@ class AgentFlightService extends abstract_service_1.default {
                     source_type: constants_1.SOURCE_AGENT,
                     source_id: agency_id,
                 });
+                //if booking insertion is successful then delete the revalidate log
+                yield this.Model.ErrorLogsModel(trx).deleteErrorLogs(log_id[0].id);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -389,6 +391,57 @@ class AgentFlightService extends abstract_service_1.default {
                         gds_pnr,
                         status: directBookingPermission.booking_block ? flightConstent_1.FLIGHT_BOOKING_IN_PROCESS : flightConstent_1.FLIGHT_BOOKING_CONFIRMED
                     }
+                };
+            }));
+        });
+    }
+    getAllBookingList(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const flightBookingModel = this.Model.FlightBookingModel(trx);
+                const query = req.query;
+                const data = yield flightBookingModel.getFlightBookingList(Object.assign(Object.assign({}, query), { source_id: agency_id, booked_by: constants_1.SOURCE_AGENT }), true);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    total: data.total,
+                    data: data.data
+                };
+            }));
+        });
+    }
+    getSingleBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const { id } = req.params;
+                const flightBookingModel = this.Model.FlightBookingModel(trx);
+                const flightSegmentModel = this.Model.FlightBookingSegmentModel(trx);
+                const flightTravelerModel = this.Model.FlightBookingTravelerModel(trx);
+                const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(trx);
+                const booking_data = yield flightBookingModel.getSingleFlightBooking({
+                    id: Number(id),
+                    booked_by: constants_1.SOURCE_AGENT,
+                    agency_id
+                });
+                if (!booking_data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND
+                    };
+                }
+                ;
+                const price_breakdown_data = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(Number(id));
+                const segment_data = yield flightSegmentModel.getFlightBookingSegment(Number(id));
+                const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(Number(id));
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    data: Object.assign(Object.assign({}, booking_data), { price_breakdown_data,
+                        segment_data,
+                        traveler_data })
                 };
             }));
         });

@@ -2,6 +2,7 @@ class FileFolder {
   static readonly PROMOTIONAL_FILES = 'promotional-files';
   static readonly ARTICLE_FILES = 'article-files';
   static readonly ADMIN_FILES = 'admin/admin-files';
+  static readonly AGENT_SUB_AGENT_FILES = 'agent/sub-agent';
   static readonly COMMON_FILES = 'common-files';
   static readonly B2C_USER_FILES = 'b2c/user-files';
   static readonly AGENT_TRAVELER_FILES = 'agent/traveler-files';

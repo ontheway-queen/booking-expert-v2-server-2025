@@ -25,12 +25,27 @@ class FlightBookingTrackingModel extends schema_1.default {
                 .insert(payload, 'id');
         });
     }
-    getFlightBookingTracking(flight_booking_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("flight_booking_tracking")
+    getFlightBookingTracking(query_1) {
+        return __awaiter(this, arguments, void 0, function* (query, is_total = false) {
+            var _a;
+            const { flight_booking_id, limit, skip } = query;
+            const data = yield this.db("flight_booking_tracking")
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
-                .where({ flight_booking_id });
+                .select("id", "description", "created_at")
+                .where({ flight_booking_id })
+                .limit(limit || 100)
+                .offset(skip || 0);
+            let total = [];
+            if (is_total) {
+                total = yield this.db("flight_booking_tracking")
+                    .withSchema(this.DBO_SCHEMA)
+                    .count("id as total")
+                    .where({ flight_booking_id });
+            }
+            return {
+                data,
+                total: (_a = total[0]) === null || _a === void 0 ? void 0 : _a.total
+            };
         });
     }
 }

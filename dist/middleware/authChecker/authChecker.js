@@ -183,6 +183,7 @@ class AuthChecker {
                             user_id,
                             username: checkAgencyUser.username,
                             phone_number: checkAgencyUser.phone_number,
+                            ref_id: checkAgencyUser.ref_id
                         };
                         next();
                     }
