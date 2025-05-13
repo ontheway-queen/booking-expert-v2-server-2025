@@ -25,9 +25,9 @@ exports.OTP_TYPES = {
     register_agent_b2c: 'register_agent_b2c',
 };
 //Project Info
-exports.PROJECT_NAME = 'Booking Expert V2';
-exports.PROJECT_LOGO = 'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_logo.png';
-exports.PROJECT_ICON = 'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_icon.png';
+exports.PROJECT_NAME = 'Booking Expert';
+exports.PROJECT_LOGO = 'https://m360ict-data.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_logo.png';
+exports.PROJECT_ICON = 'https://m360ict-data.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_fab.png';
 exports.PROJECT_LINK = 'http://10.10.220.31:3000';
 exports.PROJECT_EMAIL = 'sup.m360ict@gmail.com';
 exports.PROJECT_NUMBER = '+8801958398339';
