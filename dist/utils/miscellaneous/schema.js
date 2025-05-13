@@ -8,7 +8,7 @@ class Schema {
         this.B2C_SCHEMA = 'b2c';
         this.SERVICE_SCHEMA = 'services';
         this.AGENT_SCHEMA = 'agent';
-        this.AGENT_B2C_SCHEMA = 'agent_btoc';
+        this.AGENT_B2C_SCHEMA = 'agent_b2c';
         this.EXTERNAL_SCHEMA = 'external';
     }
 }

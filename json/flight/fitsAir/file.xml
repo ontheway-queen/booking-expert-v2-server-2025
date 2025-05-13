@@ -1,0 +1,23 @@
+<KIU_AirShoppingRQ xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" xmlns:ns="http://www.opentravel.org/OTA/2003/05/common" xmlns="http://www.opentravel.org/OTA/2003/05" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opentravel.org/OTA/2003/05" EchoToken="SHOPPEXAMPLEDOCS" TimeStamp="2021-12-14T02:23:13+00:00" Target="Testing" Version="3.0" SequenceNmbr="1" PrimaryLangID="en-us">
+ <POS> 
+ <Source AgentSine="BUEA77601" TerminalID="BUEA776001" ISOCountry="AR"/> 
+ </POS> 
+ <Parameters> 
+ <CurrCode>EUR</CurrCode> 
+ <AirPreferences> 
+ <SpecificCarrier Code="XX"/> 
+ </AirPreferences> 
+ </Parameters> 
+ <JourneyInformation> 
+ <AirItinerary> 
+ <OriginDestinationInfo OriginDestRPH="1"> 
+ <OriginLocation>SEZ</OriginLocation> 
+ <DestinationLocation>JNB</DestinationLocation> 
+ <DepartureDate>2022-06-28</DepartureDate> 
+ </OriginDestinationInfo> 
+ </AirItinerary> 
+ <TravelerInfo> 
+  <PassengerTypeQuantity Code="ADT" Quantity="1"/> 
+ </TravelerInfo> 
+ </JourneyInformation> 
+</KIU_AirShoppingRQ>

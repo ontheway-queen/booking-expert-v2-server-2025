@@ -5,7 +5,8 @@ exports.origin = [
     'http://localhost:3000',
     'http://localhost:5000',
     'http://10.10.220.47:5000',
-    "http://10.10.220.31:3000"
+    'http://10.10.220.31:3000',
+    'http://10.10.220.31:3000',
 ];
 // OTP types constants
 exports.OTP_TYPES = {
@@ -44,12 +45,12 @@ exports.ERROR_LEVEL_WARNING = 'WARNING';
 exports.ERROR_LEVEL_ERROR = 'ERROR';
 exports.ERROR_LEVEL_CRITICAL = 'CRITICAL';
 //panel source
-exports.SOURCE_AGENT = "AGENT";
-exports.SOURCE_SUB_AGENT = "SUB AGENT";
-exports.SOURCE_AGENT_B2C = "AGENT B2C";
-exports.SOURCE_B2C = "B2C";
-exports.SOURCE_EXTERNAL = "EXTERNAL";
-exports.SOURCE_ADMIN = "ADMIN";
+exports.SOURCE_AGENT = 'AGENT';
+exports.SOURCE_SUB_AGENT = 'SUB AGENT';
+exports.SOURCE_AGENT_B2C = 'AGENT B2C';
+exports.SOURCE_B2C = 'B2C';
+exports.SOURCE_EXTERNAL = 'EXTERNAL';
+exports.SOURCE_ADMIN = 'ADMIN';
 //slug type
 exports.SLUG_TYPE_HOLIDAY = "holiday";
 exports.SLUG_TYPE_UMRAH = "umrah";

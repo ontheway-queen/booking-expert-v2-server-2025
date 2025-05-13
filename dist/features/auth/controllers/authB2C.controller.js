@@ -39,7 +39,7 @@ class AuthB2CController extends abstract_controller_1.default {
             const _a = yield this.service.login2FA(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
-        this.register = this.asyncWrapper.wrap({ bodySchema: this.validator.agencyRegisterValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.register = this.asyncWrapper.wrap({ bodySchema: this.validator.b2cRegisterValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.register(req), { code } = _a, data = __rest(_a, ["code"]);
             if (data.success) {
                 res.status(code).json(data);

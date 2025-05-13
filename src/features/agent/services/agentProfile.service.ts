@@ -145,7 +145,7 @@ export default class AdminProfileService extends AbstractServices {
       };
     }
 
-    const checkPass = Lib.compareHashValue(
+    const checkPass = await Lib.compareHashValue(
       old_password,
       checkUser.hashed_password
     );
@@ -166,7 +166,7 @@ export default class AdminProfileService extends AbstractServices {
     );
 
     return {
-      success: false,
+      success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.PASSWORD_CHANGED,
     };
