@@ -26,7 +26,7 @@ export default class AuthB2CController extends AbstractController {
   );
 
   public register = this.asyncWrapper.wrap(
-    { bodySchema: this.validator.agencyRegisterValidator },
+    { bodySchema: this.validator.b2cRegisterValidator },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.register(req);
       if (data.success) {

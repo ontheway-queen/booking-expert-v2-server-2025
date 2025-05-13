@@ -25,6 +25,14 @@ export default class AuthValidator {
     phone: Joi.string().min(7).max(20).required().trim(),
   });
 
+  //B2C register validator
+  public b2cRegisterValidator = Joi.object({
+    name: Joi.string().trim().min(4).max(255).required(),
+    phone_number: Joi.string().trim().min(10).max(14).required(),
+    email: Joi.string().email().trim().lowercase().max(255).required(),
+    gender: Joi.string().valid('Male', 'Female', 'Other').required(),
+  });
+
   //Complete Registration Validator
   public agencyRegisterCompleteValidator = Joi.object({
     token: Joi.string().required().trim(),
