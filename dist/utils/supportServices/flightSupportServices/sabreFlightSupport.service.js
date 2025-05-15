@@ -21,7 +21,7 @@ const sabreRequest_1 = __importDefault(require("../../lib/flight/sabreRequest"))
 const lib_1 = __importDefault(require("../../lib/lib"));
 const constants_1 = require("../../miscellaneous/constants");
 const flightConstent_1 = require("../../miscellaneous/flightConstent");
-const sabreApiEndpoints_1 = __importDefault(require("../../miscellaneous/sabreApiEndpoints"));
+const sabreApiEndpoints_1 = __importDefault(require("../../miscellaneous/endpoints/sabreApiEndpoints"));
 const staticData_1 = require("../../miscellaneous/staticData");
 const commonFlightSupport_service_1 = require("./commonFlightSupport.service");
 class SabreFlightService extends abstract_service_1.default {
@@ -164,8 +164,12 @@ class SabreFlightService extends abstract_service_1.default {
             let domestic_flight = airports.every((airport) => staticData_1.BD_AIRPORT.includes(airport));
             const scheduleDesc = [];
             for (const item of data.scheduleDescs) {
-                const dAirport = yield commonModel.getAirport({ code: item.departure.airport });
-                const AAirport = yield commonModel.getAirport({ code: item.arrival.airport });
+                const dAirport = yield commonModel.getAirport({
+                    code: item.departure.airport,
+                });
+                const AAirport = yield commonModel.getAirport({
+                    code: item.arrival.airport,
+                });
                 const DCity = yield commonModel.getCity({ code: item.departure.city });
                 const ACity = yield commonModel.getCity({ code: item.arrival.city });
                 const marketing_airline = yield commonModel.getAirlines({ code: item.carrier.marketing }, false);
@@ -177,8 +181,8 @@ class SabreFlightService extends abstract_service_1.default {
                 const departure = {
                     airport_code: item.departure.airport,
                     city_code: item.departure.city,
-                    airport: ((_c = (_b = dAirport.data) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.name) || "-",
-                    city: ((_d = DCity === null || DCity === void 0 ? void 0 : DCity[0]) === null || _d === void 0 ? void 0 : _d.name) || "-",
+                    airport: ((_c = (_b = dAirport.data) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.name) || '-',
+                    city: ((_d = DCity === null || DCity === void 0 ? void 0 : DCity[0]) === null || _d === void 0 ? void 0 : _d.name) || '-',
                     country: item.departure.country,
                     terminal: item.departure.terminal,
                     time: item.departure.time,
@@ -186,8 +190,8 @@ class SabreFlightService extends abstract_service_1.default {
                     date_adjustment: item.departure.dateAdjustment,
                 };
                 const arrival = {
-                    airport: ((_f = (_e = AAirport.data) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.name) || "-",
-                    city: ((_g = ACity === null || ACity === void 0 ? void 0 : ACity[0]) === null || _g === void 0 ? void 0 : _g.name) || "-",
+                    airport: ((_f = (_e = AAirport.data) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.name) || '-',
+                    city: ((_g = ACity === null || ACity === void 0 ? void 0 : ACity[0]) === null || _g === void 0 ? void 0 : _g.name) || '-',
                     airport_code: item.arrival.airport,
                     city_code: item.arrival.city,
                     country: item.arrival.country,
@@ -198,12 +202,12 @@ class SabreFlightService extends abstract_service_1.default {
                 };
                 const carrier = {
                     carrier_marketing_code: item.carrier.marketing,
-                    carrier_marketing_airline: ((_j = (_h = marketing_airline.data) === null || _h === void 0 ? void 0 : _h[0]) === null || _j === void 0 ? void 0 : _j.name) || "-",
-                    carrier_marketing_logo: ((_l = (_k = marketing_airline.data) === null || _k === void 0 ? void 0 : _k[0]) === null || _l === void 0 ? void 0 : _l.logo) || "-",
+                    carrier_marketing_airline: ((_j = (_h = marketing_airline.data) === null || _h === void 0 ? void 0 : _h[0]) === null || _j === void 0 ? void 0 : _j.name) || '-',
+                    carrier_marketing_logo: ((_l = (_k = marketing_airline.data) === null || _k === void 0 ? void 0 : _k[0]) === null || _l === void 0 ? void 0 : _l.logo) || '-',
                     carrier_marketing_flight_number: String(item.carrier.marketingFlightNumber),
                     carrier_operating_code: item.carrier.operating,
-                    carrier_operating_airline: ((_o = (_m = operating_airline.data) === null || _m === void 0 ? void 0 : _m[0]) === null || _o === void 0 ? void 0 : _o.name) || "-",
-                    carrier_operating_logo: ((_q = (_p = operating_airline.data) === null || _p === void 0 ? void 0 : _p[0]) === null || _q === void 0 ? void 0 : _q.logo) || "-",
+                    carrier_operating_airline: ((_o = (_m = operating_airline.data) === null || _m === void 0 ? void 0 : _m[0]) === null || _o === void 0 ? void 0 : _o.name) || '-',
+                    carrier_operating_logo: ((_q = (_p = operating_airline.data) === null || _p === void 0 ? void 0 : _p[0]) === null || _q === void 0 ? void 0 : _q.logo) || '-',
                     carrier_operating_flight_number: String(item.carrier.operatingFlightNumber),
                     carrier_aircraft_code: aircraft.code,
                     carrier_aircraft_name: aircraft.name,
@@ -417,7 +421,10 @@ class SabreFlightService extends abstract_service_1.default {
                         }
                     }
                 }
-                const ait = Math.round(((Number(fare.totalFare.equivalentAmount) + Number(fare.totalFare.totalTaxAmount)) / 100) * 0.3);
+                const ait = Math.round(((Number(fare.totalFare.equivalentAmount) +
+                    Number(fare.totalFare.totalTaxAmount)) /
+                    100) *
+                    0.3);
                 const new_fare = {
                     base_fare: fare.totalFare.equivalentAmount,
                     total_tax: Number(fare.totalFare.totalTaxAmount),
@@ -540,14 +547,16 @@ class SabreFlightService extends abstract_service_1.default {
                     booking_block,
                     domestic_flight,
                     price_changed: false,
-                    direct_ticket_issue: new commonFlightSupport_service_1.CommonFlightSupportService().checkDirectTicketIssue({ journey_date: reqBody.OriginDestinationInformation[0].DepartureDateTime }),
+                    direct_ticket_issue: new commonFlightSupport_service_1.CommonFlightSupportService().checkDirectTicketIssue({
+                        journey_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
+                    }),
                     journey_type: reqBody.JourneyType,
                     api: flightConstent_1.SABRE_API,
                     fare: new_fare,
                     refundable,
                     carrier_code: fare.validatingCarrierCode,
-                    carrier_name: ((_t = (_s = validatingCarrier.data) === null || _s === void 0 ? void 0 : _s[0]) === null || _t === void 0 ? void 0 : _t.name) || "-",
-                    carrier_logo: ((_v = (_u = validatingCarrier.data) === null || _u === void 0 ? void 0 : _u[0]) === null || _v === void 0 ? void 0 : _v.logo) || "-",
+                    carrier_name: ((_t = (_s = validatingCarrier.data) === null || _s === void 0 ? void 0 : _s[0]) === null || _t === void 0 ? void 0 : _t.name) || '-',
+                    carrier_logo: ((_v = (_u = validatingCarrier.data) === null || _u === void 0 ? void 0 : _u[0]) === null || _v === void 0 ? void 0 : _v.logo) || '-',
                     ticket_last_date: fare.lastTicketDate,
                     ticket_last_time: fare.lastTicketTime,
                     flights: legsDesc,
@@ -1056,7 +1065,7 @@ class SabreFlightService extends abstract_service_1.default {
                     api: flightConstent_1.SABRE_API,
                     endpoint: sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT,
                     payload: requestBody,
-                    response: (_d = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _d === void 0 ? void 0 : _d.ApplicationResults
+                    response: (_d = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _d === void 0 ? void 0 : _d.ApplicationResults,
                 });
                 // return {
                 //   success: false,
@@ -1215,7 +1224,7 @@ class SabreFlightService extends abstract_service_1.default {
     }
     //sabre booking cancel service
     SabreBookingCancelService(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ pnr }) {
+        return __awaiter(this, arguments, void 0, function* ({ pnr, }) {
             //cancel booking req formatter
             const cancelBookingBody = this.SabreBookingCancelReqFormatter(pnr);
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.CANCEL_BOOKING_ENDPOINT, cancelBookingBody);

@@ -13,20 +13,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
-const rootModel_1 = __importDefault(require("../../../models/rootModel"));
-const flightConstent_1 = require("../../miscellaneous/flightConstent");
 const config_1 = __importDefault(require("../../../config/config"));
+const rootModel_1 = __importDefault(require("../../../models/rootModel"));
 const constants_1 = require("../../miscellaneous/constants");
-const BASE_URL = config_1.default.SABRE_URL;
-class SabreRequests {
+const flightConstent_1 = require("../../miscellaneous/flightConstent");
+const BASE_URL = config_1.default.CT_URL;
+const API_KEY = config_1.default.CT_API_KEY;
+class CTHotelRequests {
     // get request
     getRequest(endpoint) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const authModel = new rootModel_1.default().CommonModel();
-                const token = yield authModel.getEnv(flightConstent_1.SABRE_TOKEN_ENV);
                 const headers = {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${API_KEY}`,
                     'Content-Type': 'application/json',
                 };
                 const apiUrl = BASE_URL + endpoint;
@@ -40,19 +39,14 @@ class SabreRequests {
             }
         });
     }
-    // post request
     postRequest(endpoint, requestData) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const apiUrl = BASE_URL + endpoint;
-                const authModel = new rootModel_1.default().CommonModel();
-                const token = yield authModel.getEnv(flightConstent_1.SABRE_TOKEN_ENV);
-                // console.log(token)
                 const headers = {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${API_KEY}`,
                     'Content-Type': 'application/json',
                 };
-                // const response = await axios.post(apiUrl, requestData, { headers });
                 const response = yield axios_1.default.request({
                     method: 'post',
                     url: apiUrl,
@@ -64,11 +58,11 @@ class SabreRequests {
                 if (response.status !== 200) {
                     yield new rootModel_1.default().ErrorLogsModel().insertErrorLogs({
                         level: constants_1.ERROR_LEVEL_WARNING,
-                        message: `Error from Sabre`,
+                        message: `Error from Cholo Travel API`,
                         url: apiUrl,
                         http_method: 'POST',
                         metadata: {
-                            api: flightConstent_1.SABRE_API,
+                            api: flightConstent_1.CT_API,
                             endpoint: apiUrl,
                             payload: requestData,
                             response: response.data,
@@ -86,4 +80,4 @@ class SabreRequests {
         });
     }
 }
-exports.default = SabreRequests;
+exports.default = CTHotelRequests;

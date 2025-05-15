@@ -2,7 +2,7 @@ import axios from 'axios';
 import qs from 'qs';
 import AbstractServices from '../../../abstract/abstract.service';
 import config from '../../../config/config';
-import SabreAPIEndpoints from '../../../utils/miscellaneous/sabreApiEndpoints';
+import SabreAPIEndpoints from '../../../utils/miscellaneous/endpoints/sabreApiEndpoints';
 import { SABRE_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstent';
 import { Request } from 'express';
 
@@ -37,9 +37,7 @@ export default class PublicCommonService extends AbstractServices {
           const data = response.data;
 
           const authModel = this.Model.CommonModel();
-          await authModel.updateEnv(SABRE_TOKEN_ENV,
-            data.access_token,
-          );
+          await authModel.updateEnv(SABRE_TOKEN_ENV, data.access_token);
         })
         .catch((error) => {
           console.log(error);

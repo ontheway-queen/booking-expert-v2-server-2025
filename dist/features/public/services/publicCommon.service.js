@@ -16,7 +16,7 @@ const axios_1 = __importDefault(require("axios"));
 const qs_1 = __importDefault(require("qs"));
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const config_1 = __importDefault(require("../../../config/config"));
-const sabreApiEndpoints_1 = __importDefault(require("../../../utils/miscellaneous/sabreApiEndpoints"));
+const sabreApiEndpoints_1 = __importDefault(require("../../../utils/miscellaneous/endpoints/sabreApiEndpoints"));
 const flightConstent_1 = require("../../../utils/miscellaneous/flightConstent");
 class PublicCommonService extends abstract_service_1.default {
     constructor() {

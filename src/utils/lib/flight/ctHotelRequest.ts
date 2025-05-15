@@ -1,19 +1,18 @@
 import axios from 'axios';
-import Models from '../../../models/rootModel';
-import { SABRE_API, SABRE_TOKEN_ENV } from '../../miscellaneous/flightConstent';
 import config from '../../../config/config';
+import Models from '../../../models/rootModel';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
-const BASE_URL = config.SABRE_URL;
+import { CT_API } from '../../miscellaneous/flightConstent';
 
-export default class SabreRequests {
+const BASE_URL = config.CT_URL;
+const API_KEY = config.CT_API_KEY;
+
+export default class CTHotelRequests {
   // get request
   public async getRequest(endpoint: string) {
     try {
-      const authModel = new Models().CommonModel();
-
-      const token = await authModel.getEnv(SABRE_TOKEN_ENV);
       const headers = {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${API_KEY}`,
         'Content-Type': 'application/json',
       };
 
@@ -30,20 +29,15 @@ export default class SabreRequests {
     }
   }
 
-  // post request
   public async postRequest(endpoint: string, requestData: any) {
     try {
       const apiUrl = BASE_URL + endpoint;
-      const authModel = new Models().CommonModel();
 
-      const token = await authModel.getEnv(SABRE_TOKEN_ENV);
-      // console.log(token)
       const headers = {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${API_KEY}`,
         'Content-Type': 'application/json',
       };
 
-      // const response = await axios.post(apiUrl, requestData, { headers });
       const response = await axios.request({
         method: 'post',
         url: apiUrl,
@@ -56,11 +50,11 @@ export default class SabreRequests {
       if (response.status !== 200) {
         await new Models().ErrorLogsModel().insertErrorLogs({
           level: ERROR_LEVEL_WARNING,
-          message: `Error from Sabre`,
+          message: `Error from Cholo Travel API`,
           url: apiUrl,
           http_method: 'POST',
           metadata: {
-            api: SABRE_API,
+            api: CT_API,
             endpoint: apiUrl,
             payload: requestData,
             response: response.data,
