@@ -61,6 +61,10 @@ class PublicCommonValidator {
             limit: joi_1.default.number(),
             skip: joi_1.default.number(),
         });
+        //location Hotel get filter
+        this.getLocationHotelSchema = joi_1.default.object({
+            filter: joi_1.default.string().optional(),
+        });
         // get country
         this.getCountry = joi_1.default.object({
             name: joi_1.default.string().optional(),

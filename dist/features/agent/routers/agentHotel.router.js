@@ -4,11 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_router_1 = __importDefault(require("../../../abstract/abstract.router"));
+const agentHotel_controller_1 = __importDefault(require("../controllers/agentHotel.controller"));
 class AgentHotelRouter extends abstract_router_1.default {
     constructor() {
         super();
+        this.controller = new agentHotel_controller_1.default();
         this.callRouter();
     }
-    callRouter() { }
+    callRouter() {
+        this.router.post('/search', this.controller.hotelSearch);
+        this.router.post('/rooms', this.controller.hotelRooms);
+    }
 }
 exports.default = AgentHotelRouter;

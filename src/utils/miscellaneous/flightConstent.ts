@@ -7,12 +7,6 @@ export const SABRE_FLIGHT_ITINS = '200ITINS';
 export const SABRE_API = 'SABRE';
 export const CT_API = 'CHOLO_TRAVEL';
 
-// airlines MARKUP const
-export const MARKUP_TYPE_PER = 'PER';
-export const MARKUP_TYPE_FLAT = 'FLAT';
-export const MARKUP_MODE_INCREASE = 'INCREASE';
-export const MARKUP_MODE_DECREASE = 'DECREASE';
-
 //booking status
 export const FLIGHT_BOOKING_REQUEST = 'PENDING';
 export const FLIGHT_BOOKING_CONFIRMED = 'BOOKED';

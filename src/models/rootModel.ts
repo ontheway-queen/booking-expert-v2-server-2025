@@ -28,6 +28,7 @@ import HolidayPackageCityModel from './holidayPackageModel/holidayPackageCityMod
 import HolidayPackageBookingModel from './holidayPackageModel/holidayPackageBookingModel';
 import SubAgentMarkupModel from './agentModel/subAgentMarkupModel';
 import ADMManagementModel from './paymentModel/admManagementModel';
+import OthersModel from './othersModel/othersModel';
 
 export default class Models {
   //Common model
@@ -168,5 +169,9 @@ export default class Models {
   //ADM management model
   public ADMManagementModel(trx?: Knex.Transaction) {
     return new ADMManagementModel(trx || db);
+  }
+  //ADM management model
+  public OthersModel(trx?: Knex.Transaction) {
+    return new OthersModel(trx || db);
   }
 }

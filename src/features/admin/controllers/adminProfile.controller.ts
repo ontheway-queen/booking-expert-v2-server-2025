@@ -39,4 +39,12 @@ export default class AdminProfileController extends AbstractController {
       res.status(code).json(data);
     }
   );
+
+  public getBalance = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getBalance(req);
+      res.status(code).json(data);
+    }
+  );
 }

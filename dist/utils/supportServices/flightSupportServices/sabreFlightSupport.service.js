@@ -436,9 +436,9 @@ class SabreFlightService extends abstract_service_1.default {
                 };
                 // Set Markup to fare
                 if (finalMarkup && finalMarkupMode && finalMarkupType) {
-                    if (finalMarkupType === flightConstent_1.MARKUP_TYPE_PER) {
+                    if (finalMarkupType === constants_1.MARKUP_TYPE_PER) {
                         const markupAmount = (Number(new_fare.base_fare) * Number(finalMarkup)) / 100;
-                        if (finalMarkupMode === flightConstent_1.MARKUP_MODE_INCREASE) {
+                        if (finalMarkupMode === constants_1.MARKUP_MODE_INCREASE) {
                             new_fare.convenience_fee += Number(markupAmount);
                         }
                         else {
@@ -446,7 +446,7 @@ class SabreFlightService extends abstract_service_1.default {
                         }
                     }
                     else {
-                        if (finalMarkupMode === flightConstent_1.MARKUP_MODE_INCREASE) {
+                        if (finalMarkupMode === constants_1.MARKUP_MODE_INCREASE) {
                             new_fare.convenience_fee += Number(finalMarkup);
                         }
                         else {

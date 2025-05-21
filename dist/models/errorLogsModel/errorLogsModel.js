@@ -20,7 +20,7 @@ class ErrorLogsModel extends schema_1.default {
     }
     insertErrorLogs(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("error_logs")
+            return yield this.db('error_logs')
                 .withSchema(this.DBO_SCHEMA)
                 .insert(payload, 'id');
         });
@@ -28,29 +28,29 @@ class ErrorLogsModel extends schema_1.default {
     getErrorLogs(query) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            const data = yield this.db("error_logs")
+            const data = yield this.db('error_logs')
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
+                .select('*')
                 .where((qb) => {
                 if (query.level) {
-                    qb.andWhere("level", "ilike", query.level);
+                    qb.andWhere('level', 'ilike', query.level);
                 }
                 if (query.search) {
-                    qb.andWhere("message", "ilike", `%${query.search}%`);
+                    qb.andWhere('message', 'ilike', `%${query.search}%`);
                 }
             })
-                .orderBy("id", "desc")
+                .orderBy('id', 'desc')
                 .limit(query.limit || 50)
                 .offset(query.skip || 0);
-            const total = yield this.db("error_logs")
+            const total = yield this.db('error_logs')
                 .withSchema(this.DBO_SCHEMA)
-                .count("id as total");
+                .count('id as total');
             return { data, total: Number((_a = total === null || total === void 0 ? void 0 : total[0]) === null || _a === void 0 ? void 0 : _a.total) };
         });
     }
     deleteErrorLogs(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("error_logs")
+            return yield this.db('error_logs')
                 .withSchema(this.DBO_SCHEMA)
                 .delete()
                 .where({ id });

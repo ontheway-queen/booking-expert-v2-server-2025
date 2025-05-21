@@ -32,6 +32,7 @@ const holidayPackageCityModel_1 = __importDefault(require("./holidayPackageModel
 const holidayPackageBookingModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageBookingModel"));
 const subAgentMarkupModel_1 = __importDefault(require("./agentModel/subAgentMarkupModel"));
 const admManagementModel_1 = __importDefault(require("./paymentModel/admManagementModel"));
+const othersModel_1 = __importDefault(require("./othersModel/othersModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -144,6 +145,10 @@ class Models {
     //ADM management model
     ADMManagementModel(trx) {
         return new admManagementModel_1.default(trx || database_1.db);
+    }
+    //ADM management model
+    OthersModel(trx) {
+        return new othersModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

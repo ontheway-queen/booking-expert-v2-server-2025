@@ -97,3 +97,9 @@ export const GENERATE_AUTO_UNIQUE_ID = {
 export const PAYMENT_GATEWAYS = {
   SSL: 'SSL',
 };
+
+// MARKUP const
+export const MARKUP_TYPE_PER = 'PER';
+export const MARKUP_TYPE_FLAT = 'FLAT';
+export const MARKUP_MODE_INCREASE = 'INCREASE';
+export const MARKUP_MODE_DECREASE = 'DECREASE';

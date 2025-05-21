@@ -1,10 +1,16 @@
 import AbstractRouter from '../../../abstract/abstract.router';
+import AgentHotelController from '../controllers/agentHotel.controller';
 
 export default class AgentHotelRouter extends AbstractRouter {
+  private controller = new AgentHotelController();
+
   constructor() {
     super();
     this.callRouter();
   }
 
-  private callRouter() {}
+  private callRouter() {
+    this.router.post('/search', this.controller.hotelSearch);
+    this.router.post('/rooms', this.controller.hotelRooms);
+  }
 }

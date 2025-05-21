@@ -8,6 +8,8 @@ import SabreRequests from '../../lib/flight/sabreRequest';
 import Lib from '../../lib/lib';
 import {
   ERROR_LEVEL_WARNING,
+  MARKUP_MODE_INCREASE,
+  MARKUP_TYPE_PER,
   PROJECT_EMAIL,
 } from '../../miscellaneous/constants';
 import {
@@ -15,8 +17,6 @@ import {
   FLIGHT_BOOKING_REFUNDED,
   FLIGHT_BOOKING_VOID,
   FLIGHT_TICKET_ISSUE,
-  MARKUP_MODE_INCREASE,
-  MARKUP_TYPE_PER,
   SABRE_API,
   SABRE_FLIGHT_ITINS,
 } from '../../miscellaneous/flightConstent';

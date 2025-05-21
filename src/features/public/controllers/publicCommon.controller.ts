@@ -39,4 +39,12 @@ export default class PublicCommonController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public getLocationHotel = this.asyncWrapper.wrap(
+    { bodySchema: this.commonValidator.getLocationHotelSchema },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getLocationHotel(req);
+      res.status(code).json(rest);
+    }
+  );
 }
