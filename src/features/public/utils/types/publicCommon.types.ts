@@ -15,6 +15,8 @@ export interface ITokenParseAgencyUser {
   name: string;
   phone_number: string | null;
   is_main_user: boolean;
+  address: string;
+  agency_logo: string;
 }
 
 export interface ITokenParseUser {

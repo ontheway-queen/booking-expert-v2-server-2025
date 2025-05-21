@@ -28,6 +28,8 @@ class AgentSubAgentRouter extends abstract_router_1.default {
             'trade_license',
             'national_id'
         ]), this.controller.updateAgency);
+        this.router.route('/:id/users')
+            .get(this.controller.getAllUsersOfAgency);
     }
 }
 exports.default = AgentSubAgentRouter;

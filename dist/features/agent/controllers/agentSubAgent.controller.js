@@ -56,6 +56,13 @@ class AgentSubAgentController extends abstract_controller_1.default {
             const _a = yield this.service.updateAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.getAllUsersOfAgency = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+            querySchema: this.validator.getSubAgencyUsersQuerySchema
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getAllUsersOfAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.AgentSubAgentController = AgentSubAgentController;

@@ -67,7 +67,7 @@ class AgencyModel extends schema_1.default {
             })
                 .limit(Number(query.limit) || constants_1.DATA_LIMIT)
                 .offset(Number(query.skip) || 0)
-                .orderBy('ag.agency_name', 'asc');
+                .orderBy('ag.id', query.order || 'desc');
             let total = [];
             if (need_total) {
                 total = yield this.db('agency AS ag')

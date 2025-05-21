@@ -22,6 +22,11 @@ export const getRedis = async (key: string) => {
   }
 };
 
+export const getRedisTTL = async (key: string): Promise<number> => {
+  const ttl = await client.ttl(key);
+  return ttl;
+};
+
 export const deleteRedis = async (key: string) => {
   await client.del(key);
 };

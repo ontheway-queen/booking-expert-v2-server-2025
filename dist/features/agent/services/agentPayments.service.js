@@ -39,7 +39,7 @@ class AgentPaymentsService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const restQuery = req.query;
             const AgencyPaymentModel = this.Model.AgencyPaymentModel();
-            const data = yield AgencyPaymentModel.getAgencyLedger(Object.assign({ agency_id }, restQuery));
+            const data = yield AgencyPaymentModel.getAgencyLedger(Object.assign({ agency_id }, restQuery), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -55,7 +55,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                 const { user_id, agency_id } = req.agencyUser;
                 const paymentModel = this.Model.AgencyPaymentModel(trx);
                 const check_duplicate = yield paymentModel.getDepositRequestList({ agency_id, status: constants_1.DEPOSIT_STATUS_PENDING });
-                if (!check_duplicate.data.length) {
+                if (check_duplicate.data.length) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -143,7 +143,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    count: depositData.total,
+                    total: depositData.total,
                     data: depositData.data
                 };
             }));
@@ -153,7 +153,6 @@ class AgentPaymentsService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id, user_id, name, user_email, phone_number } = req.agencyUser;
-                const body = req.body;
                 const { amount, currency, payment_gateway, success_page, failed_page, cancelled_page, is_app } = req.body;
                 const paymentService = new paymentSupport_service_1.PaymentSupportService();
                 switch (payment_gateway) {

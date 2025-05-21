@@ -246,6 +246,10 @@ class AgentFlightValidator {
             limit: joi_1.default.number(),
             skip: joi_1.default.number()
         });
+        //ISSUE TICKET SCHEMA
+        this.issueTicketSchema = joi_1.default.object({
+            payment_type: joi_1.default.string().valid(flightConstent_1.PAYMENT_TYPE_FULL, flightConstent_1.PAYMENT_TYPE_PARTIAL).required(),
+        });
     }
 }
 exports.default = AgentFlightValidator;

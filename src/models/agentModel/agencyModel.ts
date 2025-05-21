@@ -87,7 +87,7 @@ export default class AgencyModel extends Schema {
       })
       .limit(Number(query.limit) || DATA_LIMIT)
       .offset(Number(query.skip) || 0)
-      .orderBy('ag.agency_name', 'asc');
+      .orderBy('ag.id', query.order || 'desc');
 
     let total: any[] = [];
 

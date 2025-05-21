@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
-import { IAgentCreateSubAgentReqBody, IAgentGetSubAgencyReqQuery, IAgentUpdateSubAgencyPayload } from '../utils/types/agentSubAgent.types';
+import { IAgentCreateSubAgentReqBody, IAgentGetSubAgencyReqQuery, IAgentSubAgencyUsersQueryFilter, IAgentUpdateSubAgencyPayload } from '../utils/types/agentSubAgent.types';
 import CustomError from '../../../utils/lib/customError';
 import Lib from '../../../utils/lib/lib';
 import { GENERATE_AUTO_UNIQUE_ID } from '../../../utils/miscellaneous/constants';
@@ -128,7 +128,7 @@ export default class AgentSubAgentService extends AbstractServices {
             });
 
             await subAgentMarkupModel.createSubAgentMarkup({
-                agency_id,
+                agency_id: newSubAgency[0].id,
                 flight_markup_mode,
                 hotel_markup_mode,
                 flight_markup_type,
@@ -199,7 +199,7 @@ export default class AgentSubAgentService extends AbstractServices {
                 };
             }
 
-            const markup_data = await subAgentMarkupModel.getSubAgentMarkup(agency_id);
+            const markup_data = await subAgentMarkupModel.getSubAgentMarkup(Number(id));
 
             return {
                 success: true,
@@ -344,5 +344,19 @@ export default class AgentSubAgentService extends AbstractServices {
                 message: this.ResMsg.HTTP_OK,
             };
         });
+    }
+
+    public async getAllUsersOfAgency(req: Request) {
+        const { id } = req.params;
+        const agencyUserModel = this.Model.AgencyUserModel();
+        const query = req.query as unknown as IAgentSubAgencyUsersQueryFilter;
+        const users = await agencyUserModel.getUserList({...query, agency_id: Number(id) }, true);
+        return{
+            success: true,
+            code: this.StatusCode.HTTP_OK,
+            message: this.ResMsg.HTTP_OK,
+            data: users.data,
+            total: users.total
+        }
     }
 }

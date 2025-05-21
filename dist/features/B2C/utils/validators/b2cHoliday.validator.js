@@ -21,7 +21,7 @@ class B2CHolidayValidator {
             travel_date: joi_1.default.date().required(),
             contact_email: joi_1.default.string().email().lowercase().trim().required(),
             contact_number: joi_1.default.string().trim().required(),
-            note_from_customer: joi_1.default.string().optional()
+            note_from_customer: joi_1.default.string().optional().allow(""),
         });
         this.holidayPackageBookingListFilterQuery = joi_1.default.object({
             status: joi_1.default.string().optional().valid(...Object.values(holidayConstants_1.HOLIDAY_BOOKING_STATUS)),

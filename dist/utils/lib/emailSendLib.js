@@ -14,6 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = __importDefault(require("../../config/config"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const puppeteer_extra_1 = __importDefault(require("puppeteer-extra"));
+const puppeteer_extra_plugin_stealth_1 = __importDefault(require("puppeteer-extra-plugin-stealth"));
+puppeteer_extra_1.default.use((0, puppeteer_extra_plugin_stealth_1.default)());
 class EmailSendLib {
     static sendEmail(payload) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -104,6 +107,25 @@ class EmailSendLib {
                 console.log({ err });
                 return false;
             }
+        });
+    }
+    //generate email pdf
+    static generateEmailPdfBuffer(htmlContent) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const browser = yield puppeteer_extra_1.default.launch({
+                headless: true,
+                args: [
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--window-size=1920,1080",
+                    "--disable-infobars",
+                ],
+            });
+            const page = yield browser.newPage();
+            yield page.setContent(htmlContent);
+            const pdfBuffer = yield page.pdf();
+            yield browser.close();
+            return Buffer.from(pdfBuffer);
         });
     }
 }

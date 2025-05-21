@@ -4,6 +4,8 @@ export const origin: string[] = [
   'http://10.10.220.47:5000',
   'http://10.10.220.31:3000',
   'http://10.10.220.31:3000',
+  'http://10.10.220.42:3000',
+  'http://10.10.220.42:6565'
 ];
 
 // OTP types constants
@@ -27,8 +29,10 @@ export const PROJECT_LOGO =
   'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_logo.png';
 export const PROJECT_ICON =
   'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_icon.png';
-export const PROJECT_LINK = 'http://10.10.220.31:3000';
-export const PROJECT_EMAIL = 'sup.m360ict@gmail.com';
+export const AGENT_PROJECT_LINK = 'http://10.10.220.42:3000';
+export const B2C_PROJECT_LINK = '';
+// export const PROJECT_EMAIL = 'sup.m360ict@gmail.com';
+export const PROJECT_EMAIL = 'shakeeb.m360ict@gmail.com';
 export const PROJECT_NUMBER = '+8801958398339';
 export const PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 
@@ -88,10 +92,30 @@ export const GENERATE_AUTO_UNIQUE_ID = {
   user_holiday: 'User_Tour',
   user_umrah: 'User_Umrah',
   user_supportTicket: 'User_SupportTicket',
-  adm_management: 'ADM_Management'
+  adm_management: 'ADM_Management',
+  money_receipt: 'Money_Receipt',
+  invoice: 'Invoice',
 } as const;
 
 //payment gateways
 export const PAYMENT_GATEWAYS = {
   'SSL': 'SSL'
 }
+
+//invoice type
+export const INVOICE_TYPES = {
+  'SALE': 'SALE',
+  'REFUND': 'REFUND',
+  'REISSUE': 'REISSUE'
+}
+
+//invoice ref type
+export const INVOICE_REF_TYPES = {
+  'agent_flight_booking': 'agent_flight_booking',
+  'b2c_flight_booking': 'b2c_flight_booking',
+  'external_flight_booking': 'external_flight_booking',
+  'agent_b2c_flight_booking': 'agent_b2c_flight_booking',
+}
+
+//frontend endpoints
+export const FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = '/dashboard/flights/';

@@ -60,7 +60,9 @@ export interface IInsertLastNoPayload {
     | 'User_Tour'
     | 'User_Umrah'
     | 'User_SupportTicket'
-    |'ADM_Management';
+    |'ADM_Management'
+    |'Money_Receipt'
+    |'Invoice';
   last_updated: Date;
 }
 
@@ -85,7 +87,9 @@ export interface IGetLastIdParams {
     | 'User_Tour'
     | 'User_Umrah'
     | 'User_SupportTicket'
-    |'ADM_Management';
+    |'ADM_Management'
+    |'Money_Receipt'
+    |'Invoice';
 }
 
 export interface IGetLastIdData {

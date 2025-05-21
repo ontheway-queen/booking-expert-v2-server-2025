@@ -1,6 +1,9 @@
 import { Attachment } from 'nodemailer/lib/mailer';
 import config from '../../config/config';
 import nodemailer from 'nodemailer';
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+puppeteer.use(StealthPlugin());
 
 export default class EmailSendLib {
   public static async sendEmail(payload: {
@@ -141,5 +144,24 @@ export default class EmailSendLib {
       console.log({ err });
       return false;
     }
+  }
+
+  //generate email pdf
+  public static async generateEmailPdfBuffer(htmlContent: string): Promise<Buffer> {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--window-size=1920,1080",
+        "--disable-infobars",
+      ],
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(htmlContent);
+    const pdfBuffer = await page.pdf();
+    await browser.close();
+    return Buffer.from(pdfBuffer);
   }
 }

@@ -265,7 +265,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                const { status, email, id, username, name, photo, agency_status, phone_number, agency_email, agency_name, is_main_user, ref_id } = checkUserAgency;
+                const { status, email, id, username, name, photo, agency_status, phone_number, agency_email, agency_name, is_main_user, ref_id, agency_logo, address } = checkUserAgency;
                 if (agency_status === 'Inactive' ||
                     agency_status === 'Incomplete' ||
                     agency_status === 'Rejected') {
@@ -293,7 +293,9 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     is_main_user,
                     phone_number,
                     photo,
-                    ref_id
+                    ref_id,
+                    address,
+                    agency_logo
                 };
                 const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
                 yield this.insertAdminAudit(trx, {

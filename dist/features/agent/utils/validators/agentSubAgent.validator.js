@@ -24,7 +24,13 @@ class AgentSubAgentValidator {
             filter: joi_1.default.string(),
             status: joi_1.default.string().valid('Pending', 'Active', 'Inactive', 'Rejected', 'Incomplete'),
             limit: joi_1.default.number().allow(""),
-            skip: joi_1.default.number().allow("")
+            skip: joi_1.default.number().allow(""),
+            order: joi_1.default.string().valid("asc", "desc"),
+        });
+        this.getSubAgencyUsersQuerySchema = joi_1.default.object({
+            status: joi_1.default.boolean(),
+            limit: joi_1.default.number().allow(""),
+            skip: joi_1.default.number().allow(""),
         });
         this.updateSubAgencySchema = joi_1.default.object({
             email: joi_1.default.string().email().trim().lowercase(),

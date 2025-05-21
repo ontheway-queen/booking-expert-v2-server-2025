@@ -50,4 +50,15 @@ export class AgentSubAgentController extends AbstractController {
         }
     );
 
+    public getAllUsersOfAgency = this.asyncWrapper.wrap(
+        {
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+            querySchema: this.validator.getSubAgencyUsersQuerySchema
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...rest } = await this.service.getAllUsersOfAgency(req);
+            res.status(code).json(rest);
+        }
+    );
+
 }

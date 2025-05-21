@@ -1148,25 +1148,24 @@ class SabreFlightService extends abstract_service_1.default {
                     confirmationId: pnr,
                 });
                 if (!retrieve_booking || !(retrieve_booking === null || retrieve_booking === void 0 ? void 0 : retrieve_booking.flightTickets)) {
-                    // await this.Model.errorLogsModel(trx).insert({
-                    //   level: ERROR_LEVEL_WARNING,
-                    //   message: 'Error from sabre while ticket issue',
-                    //   url: SabreAPIEndpoints.GET_BOOKING_ENDPOINT,
-                    //   http_method: 'POST',
-                    //   metadata: {
-                    //     api: SABRE_API,
-                    //     endpoint: SabreAPIEndpoints.GET_BOOKING_ENDPOINT,
-                    //     payload: { confirmationId: pnr },
-                    //     response: retrieve_booking,
-                    //   },
-                    //   source,
-                    // });
-                    return {
-                        success: true,
-                        code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
-                        message: 'An error occurred while retrieving the ticket numbers',
-                        error: retrieve_booking === null || retrieve_booking === void 0 ? void 0 : retrieve_booking.errors,
-                    };
+                    yield this.Model.ErrorLogsModel().insertErrorLogs({
+                        level: constants_1.ERROR_LEVEL_WARNING,
+                        message: 'Error from sabre while ticket issue',
+                        url: sabreApiEndpoints_1.default.GET_BOOKING_ENDPOINT,
+                        http_method: 'POST',
+                        metadata: {
+                            api: flightConstent_1.SABRE_API,
+                            endpoint: sabreApiEndpoints_1.default.GET_BOOKING_ENDPOINT,
+                            payload: { confirmationId: pnr },
+                            response: retrieve_booking,
+                        },
+                    });
+                    // return {
+                    //   success: true,
+                    //   code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
+                    //   message: 'An error occurred while retrieving the ticket numbers',
+                    //   error: retrieve_booking?.errors,
+                    // };
                 }
                 const ticket_number = [];
                 for (let i = 0; i < retrieve_booking.flightTickets.length; i++) {
@@ -1180,25 +1179,24 @@ class SabreFlightService extends abstract_service_1.default {
                 };
             }
             else {
-                // await this.Model.errorLogsModel(trx).insert({
-                //   level: ERROR_LEVEL_WARNING,
-                //   message: 'Error from sabre while ticket issue',
-                //   url: SabreAPIEndpoints.TICKET_ISSUE_ENDPOINT,
-                //   http_method: 'POST',
-                //   metadata: {
-                //     api: SABRE_API,
-                //     endpoint: SabreAPIEndpoints.TICKET_ISSUE_ENDPOINT,
-                //     payload: ticketReqBody,
-                //     response: response,
-                //   },
-                //   source,
-                // });
-                return {
-                    success: false,
-                    code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
-                    message: 'An error occurred while issuing the ticket',
-                    error: response === null || response === void 0 ? void 0 : response.errors,
-                };
+                yield this.Model.ErrorLogsModel().insertErrorLogs({
+                    level: constants_1.ERROR_LEVEL_WARNING,
+                    message: 'Error from sabre while ticket issue',
+                    url: sabreApiEndpoints_1.default.TICKET_ISSUE_ENDPOINT,
+                    http_method: 'POST',
+                    metadata: {
+                        api: flightConstent_1.SABRE_API,
+                        endpoint: sabreApiEndpoints_1.default.TICKET_ISSUE_ENDPOINT,
+                        payload: ticketReqBody,
+                        response: response,
+                    }
+                });
+                // return {
+                //   success: false,
+                //   code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
+                //   message: 'An error occurred while issuing the ticket',
+                //   error: response?.errors,
+                // };
             }
         });
     }
@@ -1234,17 +1232,21 @@ class SabreFlightService extends abstract_service_1.default {
                 //   },
                 //   source,
                 // });
-                return {
-                    success: false,
-                    code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
-                    message: 'An error occurred while cancelling the booking',
-                    error: response === null || response === void 0 ? void 0 : response.errors,
-                };
+                throw new customError_1.default('An error occurred while cancelling the booking', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR, constants_1.ERROR_LEVEL_WARNING, {
+                    api: flightConstent_1.SABRE_API,
+                    endpoint: sabreApiEndpoints_1.default.CANCEL_BOOKING_ENDPOINT,
+                    payload: cancelBookingBody,
+                    response: response,
+                });
+                // return {
+                //   success: false,
+                //   code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
+                //   message: 'An error occurred while cancelling the booking',
+                //   error: response?.errors,
+                // };
             }
             return {
                 success: true,
-                message: 'Booking successfully cancelled',
-                code: this.StatusCode.HTTP_OK,
             };
         });
     }

@@ -308,7 +308,7 @@ export default class AuthB2CService extends AbstractServices {
 
       const parsedToken = Lib.verifyToken(
         token,
-        config.JWT_SECRET_AGENT + OTP_TYPES.register_agent
+        config.JWT_SECRET_USER + OTP_TYPES.register_b2c
       ) as ICompleteUserRegisterParsedTokenData | false;
 
       if (!parsedToken) {

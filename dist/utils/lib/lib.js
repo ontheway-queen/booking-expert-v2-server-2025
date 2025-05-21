@@ -174,6 +174,12 @@ class Lib {
                 case 'User_SupportTicket':
                     NoCode = 'CST';
                     break;
+                case 'Money_Receipt':
+                    NoCode = 'MR';
+                    break;
+                case 'Invoice':
+                    NoCode = 'INV';
+                    break;
                 default:
                     break;
             }

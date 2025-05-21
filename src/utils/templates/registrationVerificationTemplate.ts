@@ -1,5 +1,5 @@
 import {
-  PROJECT_LINK,
+  AGENT_PROJECT_LINK,
   PROJECT_LOGO,
   PROJECT_NAME,
 } from '../miscellaneous/constants';
@@ -83,7 +83,7 @@ export const registrationVerificationTemplate = (
                     margin: 20px 0;
                   "
                 >
-                 ${PROJECT_LINK}/${verificationLink}
+                 ${AGENT_PROJECT_LINK}/${verificationLink}
                 </div>
               </td>
             </tr>

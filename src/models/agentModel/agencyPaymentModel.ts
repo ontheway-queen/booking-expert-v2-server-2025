@@ -78,6 +78,7 @@ export default class AgencyPaymentModel extends Schema {
 
     if (need_total) {
       total = await this.db('agency_ledger')
+      .withSchema(this.AGENT_SCHEMA)
         .count('id AS total')
         .where((qb) => {
           if (agency_id) {

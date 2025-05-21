@@ -22,6 +22,7 @@ const commonFlightSupport_service_1 = require("../../../utils/supportServices/fl
 const flightUtils_1 = __importDefault(require("../../../utils/lib/flight/flightUtils"));
 const commonFlightBookingSupport_service_1 = require("../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service");
 const constants_1 = require("../../../utils/miscellaneous/constants");
+const agentFlightBookingSupport_service_1 = require("../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service");
 class AgentFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -236,12 +237,12 @@ class AgentFlightService extends abstract_service_1.default {
                     flight_id,
                     markup_set_id: agency_details.flight_markup_set
                 });
-                if (data) {
+                if (data === null || data === void 0 ? void 0 : data.revalidate_data) {
                     yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
                     return {
                         success: true,
                         message: "Ticket has been revalidated successfully!",
-                        data,
+                        data: Object.assign(Object.assign({}, data.revalidate_data), { remaining_time: data.redis_remaining_time }),
                         code: this.StatusCode.HTTP_OK,
                     };
                 }
@@ -256,7 +257,7 @@ class AgentFlightService extends abstract_service_1.default {
     flightBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id, user_email, name, phone_number } = req.agencyUser;
+                const { agency_id, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address } = req.agencyUser;
                 const body = req.body;
                 const booking_confirm = req.query.booking_confirm;
                 //get flight markup set id
@@ -271,18 +272,19 @@ class AgentFlightService extends abstract_service_1.default {
                 }
                 //revalidate
                 const flightSupportService = new commonFlightSupport_service_1.CommonFlightSupportService(trx);
-                const data = yield flightSupportService.FlightRevalidate({
+                let rev_data = yield flightSupportService.FlightRevalidate({
                     search_id: body.search_id,
                     flight_id: body.flight_id,
                     markup_set_id: agency_details.flight_markup_set
                 });
-                if (!data) {
+                if (!(rev_data === null || rev_data === void 0 ? void 0 : rev_data.revalidate_data)) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
+                const data = rev_data.revalidate_data;
                 //if price has been changed and no confirmation of booking then return
                 if (!booking_confirm) {
                     const price_changed = yield flightSupportService.checkBookingPriceChange({ flight_id: body.flight_id, booking_price: data.fare.total_price });
@@ -378,9 +380,26 @@ class AgentFlightService extends abstract_service_1.default {
                     type: "Agent_Flight",
                     source_type: constants_1.SOURCE_AGENT,
                     source_id: agency_id,
+                    invoice_ref_type: constants_1.INVOICE_REF_TYPES.agent_flight_booking,
+                    booking_block: directBookingPermission.booking_block,
                 });
                 //if booking insertion is successful then delete the revalidate log
                 yield this.Model.ErrorLogsModel(trx).deleteErrorLogs(log_id[0].id);
+                //send email
+                const bookingSubService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
+                yield bookingSubService.sendFlightBookingMail({
+                    booking_id: Number(booking_id),
+                    email: agency_email,
+                    booked_by: constants_1.SOURCE_AGENT,
+                    agency: {
+                        email: agency_email,
+                        name: agency_name,
+                        phone: String(phone_number),
+                        address: address,
+                        photo: agency_logo
+                    },
+                    panel_link: `${constants_1.AGENT_PROJECT_LINK}${constants_1.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${booking_id}`,
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -442,6 +461,193 @@ class AgentFlightService extends abstract_service_1.default {
                     data: Object.assign(Object.assign({}, booking_data), { price_breakdown_data,
                         segment_data,
                         traveler_data })
+                };
+            }));
+        });
+    }
+    issueTicket(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { id } = req.params; //booking id
+                const { agency_id, user_id, agency_email, agency_name, phone_number, agency_logo, address } = req.agencyUser;
+                //get flight details
+                const flightBookingModel = this.Model.FlightBookingModel(trx);
+                const bookingTravelerModel = this.Model.FlightBookingTravelerModel(trx);
+                const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(trx);
+                const flightSegmentModel = this.Model.FlightBookingSegmentModel(trx);
+                const booking_data = yield flightBookingModel.getSingleFlightBooking({ id: Number(id), booked_by: constants_1.SOURCE_AGENT, agency_id });
+                if (!booking_data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND
+                    };
+                }
+                ;
+                if (booking_data.status !== flightConstent_1.FLIGHT_BOOKING_CONFIRMED) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "Issue is not allowed for this booking. Contact support team."
+                    };
+                }
+                //get other information
+                const get_travelers = yield bookingTravelerModel.getFlightBookingTraveler(Number(id));
+                const { payment_type } = req.body;
+                //get payment details
+                const bookingSubService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
+                const payment_data = yield bookingSubService.getPaymentInformation({
+                    booking_id: Number(id),
+                    payment_type: payment_type,
+                    refundable: booking_data.refundable,
+                    departure_date: booking_data.travel_date,
+                    agency_id: agency_id,
+                    ticket_price: booking_data.payable_amount
+                });
+                if (payment_data.success === false) {
+                    return payment_data;
+                }
+                //check direct ticket issue permission
+                const flightSegmentsModel = this.Model.FlightBookingSegmentModel(trx);
+                const flightSegment = yield flightSegmentsModel.getFlightBookingSegment(Number(id));
+                const agentFlightBookingSupportService = new agentFlightBookingSupport_service_1.AgentFlightBookingSupportService(trx);
+                const ticketIssuePermission = yield agentFlightBookingSupportService.checkAgentDirectTicketIssuePermission({
+                    agency_id: agency_id,
+                    api_name: booking_data.api,
+                    airline: flightSegment[0].airline_code
+                });
+                if (ticketIssuePermission.success === false) {
+                    return ticketIssuePermission;
+                }
+                let status = null;
+                if (ticketIssuePermission.issue_block === true) {
+                    status = flightConstent_1.FLIGHT_TICKET_IN_PROCESS;
+                }
+                else {
+                    //issue ticket using API
+                    if (booking_data.api === flightConstent_1.SABRE_API) {
+                        const travelerSet = new Set(get_travelers.map((elem) => elem.type));
+                        const unique_traveler = travelerSet.size;
+                        const sabreSubService = new sabreFlightSupport_service_1.default(trx);
+                        const res = yield sabreSubService.TicketIssueService({
+                            pnr: String(booking_data.gds_pnr),
+                            unique_traveler
+                        });
+                        if (res === null || res === void 0 ? void 0 : res.success) {
+                            status = flightConstent_1.FLIGHT_TICKET_ISSUE;
+                        }
+                    }
+                }
+                if (status !== null) {
+                    yield agentFlightBookingSupportService.updateDataAfterTicketIssue({
+                        booking_id: Number(id),
+                        status,
+                        due: Number(payment_data.due),
+                        agency_id: agency_id,
+                        booking_ref: booking_data.booking_ref,
+                        paid_amount: Number(payment_data.paid_amount),
+                        loan_amount: Number(payment_data.loan_amount),
+                        email: agency_email,
+                        invoice_id: Number(payment_data.invoice_id),
+                        user_id,
+                        issued_by_type: constants_1.SOURCE_AGENT,
+                        issued_by_user_id: user_id,
+                        issue_block: ticketIssuePermission.issue_block
+                    });
+                    //send email
+                    yield bookingSubService.sendTicketIssueMail({
+                        booking_id: Number(id),
+                        email: agency_email,
+                        booked_by: constants_1.SOURCE_AGENT,
+                        agency: {
+                            email: agency_email,
+                            name: agency_name,
+                            phone: String(phone_number),
+                            address: address,
+                            photo: agency_logo
+                        },
+                        panel_link: `${constants_1.AGENT_PROJECT_LINK}${constants_1.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}`,
+                        due: Number(payment_data.due)
+                    });
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: "Ticket has been issued successfully!",
+                    data: {
+                        status,
+                        due: payment_data.due,
+                        paid_amount: payment_data.paid_amount,
+                        loan_amount: payment_data.loan_amount,
+                    }
+                };
+            }));
+        });
+    }
+    cancelBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { user_id, agency_id, agency_email, agency_logo } = req.agencyUser;
+                const { id } = req.params; //booking id
+                const flightBookingModel = this.Model.FlightBookingModel(trx);
+                const booking_data = yield flightBookingModel.getSingleFlightBooking({ id: Number(id), booked_by: constants_1.SOURCE_AGENT, agency_id });
+                if (!booking_data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND
+                    };
+                }
+                if (![flightConstent_1.FLIGHT_BOOKING_CONFIRMED, flightConstent_1.FLIGHT_BOOKING_REQUEST, flightConstent_1.FLIGHT_BOOKING_IN_PROCESS].includes(booking_data.status)) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "Cancellation is not allowed for this booking. Contact support team."
+                    };
+                }
+                let status = false;
+                if (booking_data.api === flightConstent_1.SABRE_API) {
+                    const sabreSubService = new sabreFlightSupport_service_1.default(trx);
+                    console.log("1");
+                    const res = yield sabreSubService.SabreBookingCancelService({
+                        pnr: String(booking_data.gds_pnr),
+                    });
+                    if (res === null || res === void 0 ? void 0 : res.success) {
+                        status = true;
+                    }
+                }
+                else if (booking_data.api === flightConstent_1.CUSTOM_API) {
+                    status = true;
+                }
+                if (status) {
+                    const flightBookingSupportService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
+                    //update booking data
+                    yield flightBookingSupportService.updateDataAfterBookingCancel({
+                        booking_id: Number(id),
+                        booking_ref: booking_data.booking_ref,
+                        cancelled_by_type: constants_1.SOURCE_AGENT,
+                        cancelled_by_user_id: user_id,
+                        api: booking_data.api,
+                    });
+                    //send email
+                    yield flightBookingSupportService.sendBookingCancelMail({
+                        email: agency_email,
+                        booking_data,
+                        agency: {
+                            photo: agency_logo
+                        },
+                        panel_link: `${constants_1.AGENT_PROJECT_LINK}${constants_1.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}`,
+                    });
+                    return {
+                        success: true,
+                        code: this.StatusCode.HTTP_OK,
+                        message: "Booking has been cancelled successfully!",
+                    };
+                }
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_BAD_REQUEST,
+                    message: "Cannot cancel this booking. Contact support team."
                 };
             }));
         });

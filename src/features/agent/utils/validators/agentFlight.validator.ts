@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_EXPIRED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_BOOKING_ON_HOLD, FLIGHT_BOOKING_REFUNDED, FLIGHT_BOOKING_REISSUED, FLIGHT_BOOKING_REQUEST, FLIGHT_BOOKING_VOID, FLIGHT_TICKET_IN_PROCESS, FLIGHT_TICKET_ISSUE } from "../../../../utils/miscellaneous/flightConstent";
+import { FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_EXPIRED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_BOOKING_ON_HOLD, FLIGHT_BOOKING_REFUNDED, FLIGHT_BOOKING_REISSUED, FLIGHT_BOOKING_REQUEST, FLIGHT_BOOKING_VOID, FLIGHT_TICKET_IN_PROCESS, FLIGHT_TICKET_ISSUE, PAYMENT_TYPE_FULL, PAYMENT_TYPE_PARTIAL } from "../../../../utils/miscellaneous/flightConstent";
 
 export default class AgentFlightValidator {
 
@@ -262,5 +262,10 @@ export default class AgentFlightValidator {
     filter: Joi.string(),
     limit: Joi.number(),
     skip: Joi.number()
+  });
+
+  //ISSUE TICKET SCHEMA
+  public issueTicketSchema = Joi.object({
+    payment_type: Joi.string().valid(PAYMENT_TYPE_FULL, PAYMENT_TYPE_PARTIAL).required(),
   });
 }

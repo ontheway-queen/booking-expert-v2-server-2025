@@ -32,7 +32,7 @@ class ResMsg {
   static readonly OTP_EXPIRED = 'OTP has been expired';
   static readonly OTP_NOT_SENT = 'Cannot send OTP now. Try again later.';
   static readonly THREE_TIMES_EXPIRED =
-    'Cannot send another OTP within 3 minutes';
+    'Please try again after 3 minutes before requesting a new OTP';
   static readonly TOO_MUCH_ATTEMPT =
     'You tried more then 3 time for this otp verification!';
   static readonly NOT_FOUND_USER_WITH_EMAIL = 'No user found with this email';

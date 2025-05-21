@@ -3,6 +3,7 @@ export interface IAgentGetSubAgencyReqQuery {
   limit?: string;
   skip?: string;
   status: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
+  order?: 'asc' | 'desc';
 }
 
 export interface IAgentCreateSubAgentReqBody {
@@ -35,4 +36,10 @@ export interface IAgentUpdateSubAgencyPayload {
   hotel_markup_mode: "INCREASE" | "DECREASE";
   flight_markup: number;
   hotel_markup: number;
+}
+
+export interface IAgentSubAgencyUsersQueryFilter {
+  limit?: string;
+  skip?: string;
+  status?: string;
 }

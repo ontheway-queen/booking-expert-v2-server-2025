@@ -31,27 +31,6 @@ export interface IMultiAPIFlightSearchReqBody {
   PassengerTypeQuantity: IPassengerTypeQuantityPayload[];
 }
 
-export interface IMultipleAPIFlightBookingPassengerReqBody {
-  key: string;
-  type: "ADT" | "C02" | "C03" | "C04" | "C05" | "C06" | "C07" | "C08" | "C09" | "C10" | "C11" | "INF";
-  reference: "Mr" | "Mrs" | "Ms" | "Miss" | "MSTR";
-  first_name: string;
-  last_name: string;
-  contact_number?: string;
-  contact_email?: string;
-  date_of_birth: string | Date;
-  gender: "Male" | "Female";
-  passport_number?: string;
-  passport_expiry_date?: string | Date;
-  nationality: number;
-  issuing_country: number;
-  frequent_flyer_airline?: string;
-  frequent_flyer_number?: string;
-  visa_file?: string;
-  passport_file?: string;
-  save_information?: boolean;
-}
-
 export interface IMultiFlightAvailability {
   from_airport: string;
   to_airport: string;
@@ -77,13 +56,6 @@ export interface IMultiFlightDataAvailabilitySegment {
   name: string;
   passenger: IMultiFlightDataAvailabilityPassenger[];
 }
-
-export interface IMultipleApiFlightBookingRequestBody {
-  search_id: string;
-  flight_id: string;
-  passengers: IMultipleAPIFlightBookingPassengerReqBody[];
-}
-
 
 // Common types for response after format==============
 

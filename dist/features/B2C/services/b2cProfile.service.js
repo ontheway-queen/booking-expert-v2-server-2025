@@ -116,7 +116,7 @@ class B2CProfileService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
-            const checkPass = lib_1.default.compareHashValue(old_password, checkUser.password_hash);
+            const checkPass = yield lib_1.default.compareHashValue(old_password, checkUser.password_hash);
             if (!checkPass) {
                 return {
                     success: false,

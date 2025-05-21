@@ -131,7 +131,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                     username
                 });
                 yield subAgentMarkupModel.createSubAgentMarkup({
-                    agency_id,
+                    agency_id: newSubAgency[0].id,
                     flight_markup_mode,
                     hotel_markup_mode,
                     flight_markup_type,
@@ -193,7 +193,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                const markup_data = yield subAgentMarkupModel.getSubAgentMarkup(agency_id);
+                const markup_data = yield subAgentMarkupModel.getSubAgentMarkup(Number(id));
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -299,6 +299,21 @@ class AgentSubAgentService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_OK,
                 };
             }));
+        });
+    }
+    getAllUsersOfAgency(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const agencyUserModel = this.Model.AgencyUserModel();
+            const query = req.query;
+            const users = yield agencyUserModel.getUserList(Object.assign(Object.assign({}, query), { agency_id: Number(id) }), true);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: users.data,
+                total: users.total
+            };
         });
     }
 }

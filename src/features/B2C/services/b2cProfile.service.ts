@@ -121,7 +121,7 @@ export default class B2CProfileService extends AbstractServices {
       };
     }
 
-    const checkPass = Lib.compareHashValue(
+    const checkPass = await Lib.compareHashValue(
       old_password,
       checkUser.password_hash
     );

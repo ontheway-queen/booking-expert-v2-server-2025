@@ -25,6 +25,10 @@ class AgentFlightRouter extends abstract_router_1.default {
             .get(this.controller.getAllBookingList);
         this.router.route('/booking/:id')
             .get(this.controller.getSingleBooking);
+        this.router.route('/booking/:id/issue')
+            .post(this.controller.issueTicket);
+        this.router.route('/booking/:id/cancel')
+            .post(this.controller.cancelBooking);
     }
 }
 exports.default = AgentFlightRouter;

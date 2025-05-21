@@ -70,6 +70,7 @@ export interface IGetSingleFlightBookingData {
     source_type: SourceType;
     source_id: number | null;
     source_name: string;
+    source_logo: string | null;
     gds_pnr: string | null;
     total_passenger: number;
     status: BookingStatus;
@@ -103,6 +104,7 @@ export interface IUpdateFlightBookingPayload {
     issued_by_type?: ActionUserType;
     issued_by_user_id?: number;
     issued_at?: Date;
+    api?: string;
 }
 
 interface IBookingCheckPassenger {

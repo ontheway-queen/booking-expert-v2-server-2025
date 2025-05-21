@@ -243,7 +243,7 @@ class AuthB2CService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { token } = req.body;
                 const B2CUserModel = this.Model.B2CUserModel(trx);
-                const parsedToken = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent);
+                const parsedToken = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_USER + constants_1.OTP_TYPES.register_b2c);
                 if (!parsedToken) {
                     return {
                         success: false,

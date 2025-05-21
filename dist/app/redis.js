@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.redisFlush = exports.deleteRedis = exports.getRedis = exports.setRedis = void 0;
+exports.redisFlush = exports.deleteRedis = exports.getRedisTTL = exports.getRedis = exports.setRedis = void 0;
 const redis_1 = require("redis");
 const redis_url = 'redis://localhost';
 const client = (0, redis_1.createClient)({ url: redis_url });
@@ -29,6 +29,11 @@ const getRedis = (key) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getRedis = getRedis;
+const getRedisTTL = (key) => __awaiter(void 0, void 0, void 0, function* () {
+    const ttl = yield client.ttl(key);
+    return ttl;
+});
+exports.getRedisTTL = getRedisTTL;
 const deleteRedis = (key) => __awaiter(void 0, void 0, void 0, function* () {
     yield client.del(key);
 });

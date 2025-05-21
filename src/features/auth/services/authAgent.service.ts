@@ -263,13 +263,20 @@ export default class AuthAgentService extends AbstractServices {
         agency_logo,
         agency_name,
         is_main_user,
-        ref_id
+        ref_id,
+        allow_api,
+        civil_aviation,
+        kam_id,
+        national_id,
+        trade_license,
+        address
       } = checkUserAgency;
 
       if (
         agency_status === 'Inactive' ||
         agency_status === 'Incomplete' ||
-        agency_status === 'Rejected'
+        agency_status === 'Rejected' ||
+        agency_status === 'Pending'
       ) {
         return {
           success: false,
@@ -352,7 +359,9 @@ export default class AuthAgentService extends AbstractServices {
         is_main_user,
         phone_number,
         photo,
-        ref_id
+        ref_id,
+        address,
+        agency_logo
       };
 
       const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
@@ -384,6 +393,11 @@ export default class AuthAgentService extends AbstractServices {
             agency_status,
             phone_number: agency_phone_number,
             agency_logo,
+            allow_api,
+            civil_aviation,
+            kam_id,
+            national_id,
+            trade_license
           },
           role,
           white_label,
@@ -432,7 +446,8 @@ export default class AuthAgentService extends AbstractServices {
         agency_logo,
         agency_name,
         is_main_user,
-        ref_id
+        ref_id,
+        address,
       } = checkAgencyUser;
 
       if (!status) {
@@ -493,7 +508,9 @@ export default class AuthAgentService extends AbstractServices {
         phone_number,
         is_main_user,
         photo,
-        ref_id
+        ref_id,
+        address,
+        agency_logo
       };
 
       const authToken = Lib.createToken(

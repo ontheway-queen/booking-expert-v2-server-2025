@@ -1,12 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PAYMENT_GATEWAYS = exports.GENERATE_AUTO_UNIQUE_ID = exports.WHITE_LABEL_PERMISSIONS_MODULES = exports.DEPOSIT_STATUS_CANCELLED = exports.DEPOSIT_STATUS_REJECTED = exports.DEPOSIT_STATUS_APPROVED = exports.DEPOSIT_STATUS_PENDING = exports.SLUG_TYPE_BLOG = exports.SLUG_TYPE_UMRAH = exports.SLUG_TYPE_HOLIDAY = exports.SOURCE_ADMIN = exports.SOURCE_EXTERNAL = exports.SOURCE_B2C = exports.SOURCE_AGENT_B2C = exports.SOURCE_SUB_AGENT = exports.SOURCE_AGENT = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.MARKUP_SET_TYPE_HOTEL = exports.MARKUP_SET_TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL = exports.PROJECT_LINK = exports.PROJECT_ICON = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
+exports.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = exports.INVOICE_REF_TYPES = exports.INVOICE_TYPES = exports.PAYMENT_GATEWAYS = exports.GENERATE_AUTO_UNIQUE_ID = exports.WHITE_LABEL_PERMISSIONS_MODULES = exports.DEPOSIT_STATUS_CANCELLED = exports.DEPOSIT_STATUS_REJECTED = exports.DEPOSIT_STATUS_APPROVED = exports.DEPOSIT_STATUS_PENDING = exports.SLUG_TYPE_BLOG = exports.SLUG_TYPE_UMRAH = exports.SLUG_TYPE_HOLIDAY = exports.SOURCE_ADMIN = exports.SOURCE_EXTERNAL = exports.SOURCE_B2C = exports.SOURCE_AGENT_B2C = exports.SOURCE_SUB_AGENT = exports.SOURCE_AGENT = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.MARKUP_SET_TYPE_HOTEL = exports.MARKUP_SET_TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.PROJECT_ADDRESS = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL = exports.B2C_PROJECT_LINK = exports.AGENT_PROJECT_LINK = exports.PROJECT_ICON = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.OTP_TYPES = exports.origin = void 0;
 exports.origin = [
     'http://localhost:3000',
     'http://localhost:5000',
     'http://10.10.220.47:5000',
     'http://10.10.220.31:3000',
     'http://10.10.220.31:3000',
+    'http://10.10.220.42:3000',
+    'http://10.10.220.42:6565'
 ];
 // OTP types constants
 exports.OTP_TYPES = {
@@ -26,8 +28,10 @@ exports.OTP_TYPES = {
 exports.PROJECT_NAME = 'Booking Expert V2';
 exports.PROJECT_LOGO = 'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_logo.png';
 exports.PROJECT_ICON = 'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_icon.png';
-exports.PROJECT_LINK = 'http://10.10.220.31:3000';
-exports.PROJECT_EMAIL = 'sup.m360ict@gmail.com';
+exports.AGENT_PROJECT_LINK = 'http://10.10.220.42:3000';
+exports.B2C_PROJECT_LINK = '';
+// export const PROJECT_EMAIL = 'sup.m360ict@gmail.com';
+exports.PROJECT_EMAIL = 'shakeeb.m360ict@gmail.com';
 exports.PROJECT_NUMBER = '+8801958398339';
 exports.PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 // Email subject
@@ -78,9 +82,26 @@ exports.GENERATE_AUTO_UNIQUE_ID = {
     user_holiday: 'User_Tour',
     user_umrah: 'User_Umrah',
     user_supportTicket: 'User_SupportTicket',
-    adm_management: 'ADM_Management'
+    adm_management: 'ADM_Management',
+    money_receipt: 'Money_Receipt',
+    invoice: 'Invoice',
 };
 //payment gateways
 exports.PAYMENT_GATEWAYS = {
     'SSL': 'SSL'
 };
+//invoice type
+exports.INVOICE_TYPES = {
+    'SALE': 'SALE',
+    'REFUND': 'REFUND',
+    'REISSUE': 'REISSUE'
+};
+//invoice ref type
+exports.INVOICE_REF_TYPES = {
+    'agent_flight_booking': 'agent_flight_booking',
+    'b2c_flight_booking': 'b2c_flight_booking',
+    'external_flight_booking': 'external_flight_booking',
+    'agent_b2c_flight_booking': 'agent_b2c_flight_booking',
+};
+//frontend endpoints
+exports.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = '/dashboard/flights/';

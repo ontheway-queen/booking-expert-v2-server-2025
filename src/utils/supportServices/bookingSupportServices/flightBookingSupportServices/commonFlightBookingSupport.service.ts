@@ -1,11 +1,21 @@
 import { Knex } from "knex";
 import AbstractServices from "../../../../abstract/abstract.service";
-import { FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_BOOKING_ON_HOLD, FLIGHT_BOOKING_REQUEST, FLIGHT_TICKET_IN_PROCESS, FLIGHT_TICKET_ISSUE, MARKUP_MODE_DECREASE, MARKUP_MODE_INCREASE, TRAVELER_FILE_TYPE_PASSPORT, TRAVELER_FILE_TYPE_VISA } from "../../../miscellaneous/flightConstent";
-import { ICheckBookingEligibilityPayload, ICheckDirectBookingPermissionPayload, IInsertFlightBookingDataPayload } from "../../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes";
+import { CUSTOM_API, FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_BOOKING_ON_HOLD, FLIGHT_BOOKING_REQUEST, FLIGHT_TICKET_IN_PROCESS, FLIGHT_TICKET_ISSUE, MARKUP_MODE_DECREASE, MARKUP_MODE_INCREASE, PARTIAL_PAYMENT_DEPARTURE_DATE, PARTIAL_PAYMENT_PERCENTAGE, PAYMENT_TYPE_FULL, PAYMENT_TYPE_PARTIAL, TRAVELER_FILE_TYPE_PASSPORT, TRAVELER_FILE_TYPE_VISA } from "../../../miscellaneous/flightConstent";
+import { ICheckBookingEligibilityPayload, ICheckDirectBookingPermissionPayload, IGetPaymentInformationReqBody, IInsertFlightBookingDataPayload, ISendFlightBookingCancelEmailPayload, ISendFlightBookingEmailPayload, ISendFlightTicketIssueEmailPayload, IUpdateDataAfterFlightBookingCancelPayload } from "../../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes";
 import Lib from "../../../lib/lib";
 import FlightUtils from "../../../lib/flight/flightUtils";
-import { MarkupType } from "../../../modelTypes/flightModelTypes/flightBookingModelTypes";
+import { IGetSingleFlightBookingData, MarkupType } from "../../../modelTypes/flightModelTypes/flightBookingModelTypes";
 import { IInsertFlightBookingTrackingPayload } from "../../../modelTypes/flightModelTypes/flightBookingTrackingModelTypes";
+import { GENERATE_AUTO_UNIQUE_ID, INVOICE_REF_TYPES, INVOICE_TYPES, SOURCE_AGENT, SOURCE_AGENT_B2C, SOURCE_B2C, SOURCE_SUB_AGENT } from "../../../miscellaneous/constants";
+import EmailSendLib from "../../../lib/emailSendLib";
+import { IGetFlightBookingTravelerData } from "../../../modelTypes/flightModelTypes/flightBookingTravelerModelTypes";
+import { flightTicketIssueBodyTemplate, flightTicketIssuePdfTemplate } from "../../../templates/flightTicketIssueTemplate";
+import { IGetFlightBookingPriceBreakdownData } from "../../../modelTypes/flightModelTypes/flightBookingPriceBreakdownModelTypes";
+import { IGetFlightBookingSegmentData } from "../../../modelTypes/flightModelTypes/flightBookingSegmentModelType";
+import { flightBookingPdfTemplate, flightBookingBodyTemplate } from "../../../templates/flightBookingTemplate";
+import { FILE_STORAGE_HOST } from "../../../../middleware/uploader/uploaderConstants";
+import { flightBookingCancelBodyTemplate } from "../../../templates/flightBookingCancelTemplate";
+
 
 export class CommonFlightBookingSupportService extends AbstractServices {
     private trx: Knex.Transaction;
@@ -129,7 +139,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
         const { markup_price, markup_type } = this.getBookingMarkupDetails(payload.flight_data.fare.discount, payload.flight_data.fare.convenience_fee);
         const booking_res = await flightBookingModel.insertFlightBooking({
             booking_ref,
-            api: payload.flight_data.api,
+            api: payload.status === FLIGHT_BOOKING_IN_PROCESS ? CUSTOM_API : payload.flight_data.api,
             api_booking_ref: payload.api_booking_ref,
             refundable: payload.refundable,
             route: flightUtils.getRouteOfFlight(payload.flight_data.leg_description),
@@ -181,9 +191,9 @@ export class CommonFlightBookingSupportService extends AbstractServices {
                     class: cabin_info[ind],
                     baggage: baggage_info[ind],
                     departure_date: option.departure.date,
-                    departure_time: option.departure.time,
+                    departure_time: option.departure.time.split("+")[0],
                     arrival_date: option.arrival.date,
-                    arrival_time: option.arrival.time,
+                    arrival_time: option.arrival.time.split("+")[0],
                     aircraft: option.carrier.carrier_aircraft_name,
                     duration: flightUtils.getDuration(Number(option.elapsedTime)),
                     departure_terminal: option.departure.terminal,
@@ -241,6 +251,12 @@ export class CommonFlightBookingSupportService extends AbstractServices {
             flight_booking_id: booking_res[0].id,
             description: `Booking - ${booking_ref} has been made by ${payload.user_name}. Booking status - ${payload.status}`,
         });
+        if (payload.booking_block) {
+            tracking_data.push({
+                flight_booking_id: booking_res[0].id,
+                description: `Booking block was enabled for this booking`,
+            });
+        }
         if (payload.payable_amount) {
             tracking_data.push({
                 flight_booking_id: booking_res[0].id,
@@ -249,9 +265,28 @@ export class CommonFlightBookingSupportService extends AbstractServices {
         }
         await flightBookingTrackingModel.insertFlightBookingTracking(tracking_data);
 
+        //create invoice
+        const invoiceModel = this.Model.InvoiceModel(this.trx);
+        const invoice_res = await invoiceModel.createInvoice({
+            invoice_number: await Lib.generateNo({ trx: this.trx, type: GENERATE_AUTO_UNIQUE_ID.invoice }),
+            source_type: payload.source_type,
+            source_id: payload.source_id,
+            user_id: payload.user_id,
+            ref_id: booking_res[0].id,
+            ref_type: payload.invoice_ref_type,
+            gross_amount: payload.flight_data.fare.total_price,
+            markup_price: markup_price === 0 ? undefined : markup_type === MARKUP_MODE_INCREASE ? markup_price : -Number(markup_price),
+            coupon_code: payload.coupon_code,
+            net_amount: payload.flight_data.fare.payable,
+            due: payload.flight_data.fare.payable,
+            details: `Invoice has been created for flight booking ref no. - ${booking_ref}`,
+            type: INVOICE_TYPES.SALE
+        });
+
         return {
             booking_id: booking_res[0].id,
-            booking_ref: booking_ref
+            booking_ref: booking_ref,
+            invoice_id: invoice_res[0].id,
         }
     }
 
@@ -277,5 +312,246 @@ export class CommonFlightBookingSupportService extends AbstractServices {
         }
     }
 
+    public async getPaymentInformation(payload: IGetPaymentInformationReqBody) {
+        //check if the payment is already done or not
+        const invoiceModel = this.Model.InvoiceModel(this.trx);
+        const getInvoice = await invoiceModel.getInvoiceList({ ref_id: payload.booking_id, ref_type: INVOICE_REF_TYPES.agent_flight_booking });
+        if (!getInvoice.data.length) {
+            return {
+                success: false,
+                code: this.StatusCode.HTTP_BAD_REQUEST,
+                message: "No invoice has been found for this booking. Ticket Issue cannot be proceed!"
+            }
+        }
 
+        let price_deduction = false;
+        if (getInvoice.data[0].due > 0) {
+            price_deduction = true;
+        }
+
+        if (price_deduction) {
+            //check if the payment is eligible for partial payment
+            if (payload.payment_type === PAYMENT_TYPE_PARTIAL) {
+                //case 1: refundable
+                if (!payload.refundable) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "Partial payment is not allowed for this flight",
+                    };
+                }
+                //case 2: departure date min 10 days from current date
+                const departureDate = new Date(payload.departure_date);
+                const currentDate = new Date();
+                const timeDiff = departureDate.getTime() - currentDate.getTime();
+                const minDiffInMilliSeconds =
+                    PARTIAL_PAYMENT_DEPARTURE_DATE * 24 * 60 * 60 * 1000;
+                if (timeDiff < minDiffInMilliSeconds) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "Partial payment is not allowed for this flight",
+                    };
+                }
+            }
+
+            //check balance
+            const agencyModel = this.Model.AgencyModel(this.trx);
+            const agencyBalance = await agencyModel.getAgencyBalance(payload.agency_id);
+            let payable_amount = payload.payment_type === PAYMENT_TYPE_PARTIAL ? (payload.ticket_price * PARTIAL_PAYMENT_PERCENTAGE) / 100 : payload.ticket_price;
+            if (payable_amount > getInvoice.data[0].due) {
+                payable_amount = getInvoice.data[0].due;
+            }
+            if (payable_amount > agencyBalance) {
+                //check usable loan balance
+                const agency_details = await agencyModel.getSingleAgency(payload.agency_id);
+                const usable_loan_balance = Number(agency_details?.usable_loan);
+                if (agencyBalance + usable_loan_balance < payable_amount) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "There is insufficient balance in your account",
+                    };
+                }
+            };
+
+            //return amount
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                paid_amount: payable_amount,
+                loan_amount: (payable_amount - agencyBalance) > 0 ? (payable_amount - agencyBalance) : 0,
+                due: Number(getInvoice.data[0].due) - Number(payable_amount),
+                invoice_id: getInvoice.data[0].id,
+            };
+        } else {
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                paid_amount: 0,
+                load_amount: 0,
+                due: 0,
+                invoice_id: getInvoice.data[0].id,
+            }
+        }
+    };
+
+    public async updateDataAfterBookingCancel(payload: IUpdateDataAfterFlightBookingCancelPayload) {
+        //update booking
+        const flightBookingModel = this.Model.FlightBookingModel(this.trx);
+        await flightBookingModel.updateFlightBooking({
+            status: FLIGHT_BOOKING_CANCELLED,
+            cancelled_at: new Date(),
+            cancelled_by_type: payload.cancelled_by_type,
+            cancelled_by_user_id: payload.cancelled_by_user_id,
+        }, payload.booking_id);
+
+        //add tracking
+        const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(this.trx);
+        const tracking_data: IInsertFlightBookingTrackingPayload[] = [];
+        tracking_data.push({
+            flight_booking_id: payload.booking_id,
+            description: `Booking - ${payload.booking_ref} has been cancelled by ${payload.cancelled_by_type}. API - ${payload.api}`,
+        });
+        await flightBookingTrackingModel.insertFlightBookingTracking(tracking_data);
+
+        //delete invoice
+        const invoiceModel = this.Model.InvoiceModel(this.trx);
+        await invoiceModel.updateInvoice({
+            status: false,
+        }, payload.booking_id);
+    }
+
+    public async sendFlightBookingMail(
+        payload: ISendFlightBookingEmailPayload
+    ) {
+        const flightBookingModel = this.Model.FlightBookingModel(this.trx);
+        const bookingTravelerModel = this.Model.FlightBookingTravelerModel(this.trx);
+        const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(this.trx);
+        const flightSegmentModel = this.Model.FlightBookingSegmentModel(this.trx);
+        const booking_data = await flightBookingModel.getSingleFlightBooking({ id: payload.booking_id, booked_by: payload.booked_by });
+        const get_travelers = await bookingTravelerModel.getFlightBookingTraveler(
+            payload.booking_id
+        );
+        const price_breakdown = await flightPriceBreakdownModel.getFlightBookingPriceBreakdown(
+            payload.booking_id
+        );
+
+        const segments = await flightSegmentModel.getFlightBookingSegment(
+            payload.booking_id
+        );
+
+        if (booking_data) {
+            let source_logo = payload.agency?.photo ? `${FILE_STORAGE_HOST}${payload.agency.photo}` : undefined;
+            if (payload.agency?.photo && source_logo !== undefined) {
+                payload.agency.photo = source_logo;
+            }
+            const pdfBuffer = await EmailSendLib.generateEmailPdfBuffer(
+                flightBookingPdfTemplate({
+                    booking: booking_data,
+                    travelers: get_travelers,
+                    priceBreakdown: price_breakdown,
+                    segments: segments,
+                    agency: payload.agency,
+                })
+            );
+
+            //send email
+            await EmailSendLib.sendEmail({
+                email: payload.email,
+                emailSub: `Flight Booking Confirmation - ${booking_data.booking_ref}`,
+                emailBody: flightBookingBodyTemplate(
+                    {
+                        booking: booking_data,
+                        travelers: get_travelers,
+                        panel_link: payload.panel_link,
+                        logo: source_logo
+                    }
+                ),
+                attachments: [
+                    {
+                        filename: "flight-booking.pdf",
+                        content: pdfBuffer,
+                        contentType: "application/pdf"
+                    }
+                ]
+            });
+        }
+    }
+
+    public async sendTicketIssueMail(
+        payload: ISendFlightTicketIssueEmailPayload
+    ) {
+        const flightBookingModel = this.Model.FlightBookingModel(this.trx);
+        const bookingTravelerModel = this.Model.FlightBookingTravelerModel(this.trx);
+        const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(this.trx);
+        const flightSegmentModel = this.Model.FlightBookingSegmentModel(this.trx);
+        const booking_data = await flightBookingModel.getSingleFlightBooking({ id: payload.booking_id, booked_by: payload.booked_by });
+        const get_travelers = await bookingTravelerModel.getFlightBookingTraveler(
+            payload.booking_id
+        );
+        const price_breakdown = await flightPriceBreakdownModel.getFlightBookingPriceBreakdown(
+            payload.booking_id
+        );
+
+        const segments = await flightSegmentModel.getFlightBookingSegment(
+            payload.booking_id
+        );
+
+
+        if (booking_data) {
+            let source_logo = payload.agency?.photo ? `${FILE_STORAGE_HOST}${payload.agency.photo}` : undefined;
+            if (payload.agency?.photo && source_logo !== undefined) {
+                payload.agency.photo = source_logo;
+            }
+            const pdfBuffer = await EmailSendLib.generateEmailPdfBuffer(
+                flightTicketIssuePdfTemplate({
+                    booking: booking_data,
+                    travelers: get_travelers,
+                    priceBreakdown: price_breakdown,
+                    segments: segments,
+                    agency: payload.agency,
+                })
+            );
+
+            //send email
+            await EmailSendLib.sendEmail({
+                email: payload.email,
+                emailSub: `Flight Ticket Issue - ${booking_data.booking_ref}`,
+                emailBody: flightTicketIssueBodyTemplate(
+                    {
+                        booking: booking_data,
+                        travelers: get_travelers,
+                        panel_link: payload.panel_link,
+                        logo: source_logo,
+                        due: payload.due
+                    }
+                ),
+                attachments: [
+                    {
+                        filename: "flight-ticket.pdf",
+                        content: pdfBuffer,
+                        contentType: "application/pdf"
+                    }
+                ]
+            });
+        }
+    }
+
+    public async sendBookingCancelMail(
+        payload: ISendFlightBookingCancelEmailPayload
+    ) {
+        let source_logo = payload.agency?.photo ? `${FILE_STORAGE_HOST}${payload.agency.photo}` : undefined;
+        await EmailSendLib.sendEmail({
+            email: payload.email,
+            emailSub: `Flight Booking Cancelled - ${payload.booking_data.booking_ref}`,
+            emailBody: flightBookingCancelBodyTemplate(
+                {
+                    booking: payload.booking_data,
+                    panel_link: payload.panel_link,
+                    logo: source_logo
+                }
+            )
+        });
+    }
 }

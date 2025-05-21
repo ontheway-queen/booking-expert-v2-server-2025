@@ -38,7 +38,7 @@ export class AgentPaymentsService extends AbstractServices {
         const data = await AgencyPaymentModel.getAgencyLedger({
             agency_id,
             ...restQuery,
-        });
+        }, true);
 
         return {
             success: true,
@@ -57,7 +57,7 @@ export class AgentPaymentsService extends AbstractServices {
 
             const check_duplicate = await paymentModel.getDepositRequestList({ agency_id, status: DEPOSIT_STATUS_PENDING });
 
-            if (!check_duplicate.data.length) {
+            if (check_duplicate.data.length) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -159,7 +159,7 @@ export class AgentPaymentsService extends AbstractServices {
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
-                count: depositData.total,
+                total: depositData.total,
                 data: depositData.data
             }
         });
@@ -168,7 +168,6 @@ export class AgentPaymentsService extends AbstractServices {
     public async topUpUsingPaymentGateway(req: Request) {
         return await this.db.transaction(async (trx) => {
             const { agency_id, user_id, name, user_email, phone_number } = req.agencyUser;
-            const body = req.body;
             const { amount, currency, payment_gateway, success_page, failed_page, cancelled_page, is_app } = req.body as ITopUpUsingPaymentGatewayReqBody;
 
             const paymentService = new PaymentSupportService();

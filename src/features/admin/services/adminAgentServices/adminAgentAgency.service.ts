@@ -329,7 +329,9 @@ export default class AdminAgentAgencyService extends AbstractServices {
         agency_email,
         agency_name,
         is_main_user,
-        ref_id
+        ref_id,
+        agency_logo,
+        address
       } = checkUserAgency;
 
       if (
@@ -363,7 +365,9 @@ export default class AdminAgentAgencyService extends AbstractServices {
         is_main_user,
         phone_number,
         photo,
-        ref_id
+        ref_id,
+        address,
+        agency_logo
       };
 
       const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');

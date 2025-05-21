@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 import AbstractServices from "../../../abstract/abstract.service";
-import { getRedis } from "../../../app/redis";
+import { getRedis, getRedisTTL } from "../../../app/redis";
 import { FLIGHT_REVALIDATE_REDIS_KEY, MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET, SABRE_API } from "../../miscellaneous/flightConstent";
 import { IFormattedFlightItinerary } from "../../supportTypes/flightTypes/commonFlightTypes";
 import SabreFlightService from "./sabreFlightSupport.service";
@@ -62,7 +62,9 @@ export class CommonFlightSupportService extends AbstractServices {
         }
         revalidate_data.leg_description = retrievedData.response.leg_descriptions;
         revalidate_data.price_changed = this.checkRevalidatePriceChange({ flight_search_price: Number(foundItem?.fare.total_price), flight_revalidate_price: Number(revalidate_data?.fare.total_price) });
-        return revalidate_data;
+
+        const redis_remaining_time = await getRedisTTL(search_id);
+        return {revalidate_data, redis_remaining_time};
     }
 
 

@@ -197,6 +197,12 @@ class Lib {
       case 'User_SupportTicket':
         NoCode = 'CST';
         break;
+      case 'Money_Receipt':
+        NoCode = 'MR';
+        break;
+      case 'Invoice':
+        NoCode = 'INV';
+        break;
       default:
         break;
     }
@@ -223,5 +229,7 @@ interface IGenNoParams {
     | 'User_Tour'
     | 'User_Umrah'
     | 'User_SupportTicket'
-    |'ADM_Management';
+    |'ADM_Management'
+    |'Money_Receipt'
+    |'Invoice';
 }

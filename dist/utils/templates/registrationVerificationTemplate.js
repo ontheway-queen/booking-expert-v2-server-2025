@@ -78,7 +78,7 @@ const registrationVerificationTemplate = (name, verificationLink) => {
                     margin: 20px 0;
                   "
                 >
-                 ${constants_1.PROJECT_LINK}/${verificationLink}
+                 ${constants_1.AGENT_PROJECT_LINK}/${verificationLink}
                 </div>
               </td>
             </tr>

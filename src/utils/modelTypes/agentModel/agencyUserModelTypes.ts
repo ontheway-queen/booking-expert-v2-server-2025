@@ -67,6 +67,11 @@ export interface ICheckAgencyUserData {
   allow_api: boolean;
   is_main_user: boolean;
   white_label: boolean;
+  civil_aviation: string | null;
+  trade_license: string | null;
+  national_id: string | null;
+  kam_id: number | null;
+  address: string;
 }
 
 export interface ICreateAgencyRolePayload {

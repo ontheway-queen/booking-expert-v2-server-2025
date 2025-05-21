@@ -40,6 +40,7 @@ export interface IGetAgencyListQuery {
   filter?: string;
   status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   ref_id?: number;
+  order?: 'asc' | 'desc';
 }
 export interface IGetAgencyListWithBalanceQuery {
   limit?: string;

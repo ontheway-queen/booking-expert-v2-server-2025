@@ -20,7 +20,14 @@ export class AgentSubAgentValidator {
         filter: Joi.string(),
         status: Joi.string().valid('Pending', 'Active', 'Inactive', 'Rejected', 'Incomplete'),
         limit: Joi.number().allow(""),
-        skip: Joi.number().allow("")
+        skip: Joi.number().allow(""),
+        order: Joi.string().valid("asc", "desc"),
+    });
+
+    public getSubAgencyUsersQuerySchema = Joi.object({
+        status: Joi.boolean(),
+        limit: Joi.number().allow(""),
+        skip: Joi.number().allow(""),
     });
 
     public updateSubAgencySchema = Joi.object({

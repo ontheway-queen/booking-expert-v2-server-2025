@@ -17,7 +17,7 @@ export class B2CHolidayValidator {
         travel_date: Joi.date().required(),
         contact_email: Joi.string().email().lowercase().trim().required(),
         contact_number: Joi.string().trim().required(),
-        note_from_customer: Joi.string().optional()
+        note_from_customer: Joi.string().optional().allow(""),
     });
 
     public holidayPackageBookingListFilterQuery = Joi.object({

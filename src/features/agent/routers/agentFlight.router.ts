@@ -22,11 +22,17 @@ export default class AgentFlightRouter extends AbstractRouter {
       .get(this.controller.flightRevalidate);
 
     this.router.route('/booking')
-      .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENT_FLIGHT_BOOKING_FILES, ['visa','passport']), this.controller.flightBooking)
+      .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENT_FLIGHT_BOOKING_FILES, ['visa', 'passport']), this.controller.flightBooking)
       .get(this.controller.getAllBookingList);
 
     this.router.route('/booking/:id')
-    .get(this.controller.getSingleBooking);
+      .get(this.controller.getSingleBooking);
+
+    this.router.route('/booking/:id/issue')
+      .post(this.controller.issueTicket);
+
+    this.router.route('/booking/:id/cancel')
+      .post(this.controller.cancelBooking);
 
   }
 }

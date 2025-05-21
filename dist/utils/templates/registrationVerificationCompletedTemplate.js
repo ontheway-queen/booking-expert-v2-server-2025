@@ -104,7 +104,7 @@ const registrationVerificationCompletedTemplate = (name, creds) => {
                     margin: 20px 0;
                   "
                 >
-                 ${constants_1.PROJECT_LINK}/login
+                 ${constants_1.AGENT_PROJECT_LINK}/login
                 </div>
               </td>
             </tr>

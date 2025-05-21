@@ -77,6 +77,14 @@ class AgentFlightController extends abstract_controller_1.default {
             const _a = yield this.service.getSingleBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.issueTicket = this.asyncWrapper.wrap({ bodySchema: this.validator.issueTicketSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.issueTicket(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.cancelBooking = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.cancelBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.default = AgentFlightController;

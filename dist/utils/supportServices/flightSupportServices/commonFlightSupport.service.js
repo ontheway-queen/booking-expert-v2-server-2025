@@ -52,7 +52,8 @@ class CommonFlightSupportService extends abstract_service_1.default {
             }
             revalidate_data.leg_description = retrievedData.response.leg_descriptions;
             revalidate_data.price_changed = this.checkRevalidatePriceChange({ flight_search_price: Number(foundItem === null || foundItem === void 0 ? void 0 : foundItem.fare.total_price), flight_revalidate_price: Number(revalidate_data === null || revalidate_data === void 0 ? void 0 : revalidate_data.fare.total_price) });
-            return revalidate_data;
+            const redis_remaining_time = yield (0, redis_1.getRedisTTL)(search_id);
+            return { revalidate_data, redis_remaining_time };
         });
     }
     checkRevalidatePriceChange(payload) {

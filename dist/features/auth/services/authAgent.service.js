@@ -206,10 +206,11 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, white_label, agency_email, agency_phone_number, agency_logo, agency_name, is_main_user, ref_id } = checkUserAgency;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, white_label, agency_email, agency_phone_number, agency_logo, agency_name, is_main_user, ref_id, allow_api, civil_aviation, kam_id, national_id, trade_license, address } = checkUserAgency;
                 if (agency_status === 'Inactive' ||
                     agency_status === 'Incomplete' ||
-                    agency_status === 'Rejected') {
+                    agency_status === 'Rejected' ||
+                    agency_status === 'Pending') {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -278,7 +279,9 @@ class AuthAgentService extends abstract_service_1.default {
                     is_main_user,
                     phone_number,
                     photo,
-                    ref_id
+                    ref_id,
+                    address,
+                    agency_logo
                 };
                 const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
                 const role = yield AgentUserModel.getSingleRoleWithPermissions(role_id, agency_id);
@@ -304,6 +307,11 @@ class AuthAgentService extends abstract_service_1.default {
                             agency_status,
                             phone_number: agency_phone_number,
                             agency_logo,
+                            allow_api,
+                            civil_aviation,
+                            kam_id,
+                            national_id,
+                            trade_license
                         },
                         role,
                         white_label,
@@ -330,7 +338,7 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, phone_number, white_label, agency_phone_number, agency_email, agency_logo, agency_name, is_main_user, ref_id } = checkAgencyUser;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, phone_number, white_label, agency_phone_number, agency_email, agency_logo, agency_name, is_main_user, ref_id, address, } = checkAgencyUser;
                 if (!status) {
                     return {
                         success: false,
@@ -380,7 +388,9 @@ class AuthAgentService extends abstract_service_1.default {
                     phone_number,
                     is_main_user,
                     photo,
-                    ref_id
+                    ref_id,
+                    address,
+                    agency_logo
                 };
                 const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
                 const role = yield AgencyUserModel.getSingleRoleWithPermissions(role_id, agency_id);

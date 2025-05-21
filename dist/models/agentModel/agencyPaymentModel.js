@@ -54,6 +54,7 @@ class AgencyPaymentModel extends schema_1.default {
             let total = [];
             if (need_total) {
                 total = yield this.db('agency_ledger')
+                    .withSchema(this.AGENT_SCHEMA)
                     .count('id AS total')
                     .where((qb) => {
                     if (agency_id) {

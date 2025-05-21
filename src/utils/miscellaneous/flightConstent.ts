@@ -5,6 +5,7 @@ export const SABRE_FLIGHT_ITINS = '200ITINS';
 
 // API Name Const
 export const SABRE_API = 'SABRE';
+export const CUSTOM_API = 'CUSTOM';
 
 // airlines MARKUP const
 export const MARKUP_TYPE_PER = 'PER';
@@ -29,6 +30,12 @@ export const FLIGHT_BOOKING_REISSUED = "REISSUED";
 export const JOURNEY_TYPE_ONE_WAY = "ONE WAY";
 export const JOURNEY_TYPE_ROUND_TRIP = "ROUND TRIP";
 export const JOURNEY_TYPE_MULTI_CITY = "MULTI CITY";
+
+//ticket issue payment type
+export const PAYMENT_TYPE_FULL = 'full';
+export const PAYMENT_TYPE_PARTIAL = 'partial';
+export const PARTIAL_PAYMENT_PERCENTAGE = 30;
+export const PARTIAL_PAYMENT_DEPARTURE_DATE = 10;
 
 //booking traveler files
 export const TRAVELER_FILE_TYPE_PASSPORT = "passport";
