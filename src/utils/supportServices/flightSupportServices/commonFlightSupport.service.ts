@@ -1,9 +1,11 @@
 import { Knex } from "knex";
 import AbstractServices from "../../../abstract/abstract.service";
 import { getRedis, getRedisTTL } from "../../../app/redis";
-import { FLIGHT_REVALIDATE_REDIS_KEY, MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET, SABRE_API } from "../../miscellaneous/flightConstent";
+import { CUSTOM_API, FLIGHT_REVALIDATE_REDIS_KEY, MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET, SABRE_API, WFTT_API } from "../../miscellaneous/flightConstent";
 import { IFormattedFlightItinerary } from "../../supportTypes/flightTypes/commonFlightTypes";
 import SabreFlightService from "./sabreFlightSupport.service";
+import WfttFlightService from "./wfttFlightSupport.service";
+import CustomError from "../../lib/customError";
 
 export class CommonFlightSupportService extends AbstractServices {
     private trx: Knex.Transaction;
@@ -40,8 +42,12 @@ export class CommonFlightSupportService extends AbstractServices {
         const apiData = await this.Model.MarkupSetFlightApiModel(this.trx).getMarkupSetFlightApi({
             status: true,
             markup_set_id,
-            api_name: foundItem.api,
+            api_name: foundItem.api === CUSTOM_API ? WFTT_API : foundItem.api,
         });
+
+        if(!apiData[0]?.id){
+            throw new CustomError('Set Flight API ID not found. Contact with the support team', 500);
+        }
 
         let booking_block = foundItem.booking_block;
         let revalidate_data: IFormattedFlightItinerary;
@@ -57,14 +63,26 @@ export class CommonFlightSupportService extends AbstractServices {
                 flight_id,
                 booking_block
             );
-        } else {
+        } else if (foundItem.api === CUSTOM_API) {
+            //WFTT REVALIDATE
+            const wfttSubService = new WfttFlightService(this.trx);
+            revalidate_data = await wfttSubService.FlightRevalidate({
+                reqBody: retrievedData.reqBody,
+                set_flight_api_id: apiData[0].id,
+                revalidate_body: {
+                    flight_id: foundItem.flight_id,
+                    search_id: foundItem.api_search_id
+                }
+            })
+        }
+        else {
             return null;
         }
         revalidate_data.leg_description = retrievedData.response.leg_descriptions;
         revalidate_data.price_changed = this.checkRevalidatePriceChange({ flight_search_price: Number(foundItem?.fare.total_price), flight_revalidate_price: Number(revalidate_data?.fare.total_price) });
 
         const redis_remaining_time = await getRedisTTL(search_id);
-        return {revalidate_data, redis_remaining_time};
+        return { revalidate_data, redis_remaining_time };
     }
 
 

@@ -71,6 +71,7 @@ export interface IGetSingleFlightBookingData {
     source_id: number | null;
     source_name: string;
     source_logo: string | null;
+    source_email: string;
     gds_pnr: string | null;
     total_passenger: number;
     status: BookingStatus;
@@ -90,7 +91,8 @@ export interface IGetSingleFlightBookingData {
     travel_date: Date;
     ticket_issue_last_time: string | null;
     airline_pnr: string | null;
-    created_by: string;
+    created_by: number;
+    created_by_user_name: string;
     cancelled_at: Date | null;
     issued_at: Date | null;
     created_at: Date;
@@ -105,6 +107,9 @@ export interface IUpdateFlightBookingPayload {
     issued_by_user_id?: number;
     issued_at?: Date;
     api?: string;
+    gds_pnr?: string;
+    ticket_issue_last_time?: Date;
+    airline_pnr?: string;
 }
 
 interface IBookingCheckPassenger {

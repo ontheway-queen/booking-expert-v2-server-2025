@@ -32,6 +32,7 @@ interface ENV {
   SABRE_USERNAME: string | undefined;
   SABRE_LNIATA_CODE: string | undefined;
   SERVER_URL: string | undefined;
+  WFTT_URL: string | undefined;
 }
 
 // Config types
@@ -62,6 +63,7 @@ interface Config {
   SABRE_USERNAME: string;
   SABRE_LNIATA_CODE: string;
   SERVER_URL: string;
+  WFTT_URL: string;
 }
 
 // Loading process.env as  ENV interface
@@ -92,7 +94,8 @@ const getConfig = (): ENV => {
     SABRE_URL: process.env.SABRE_URL,
     SABRE_USERNAME: process.env.SABRE_USERNAME,
     SABRE_LNIATA_CODE: process.env.SABRE_LNIATA_CODE,
-    SERVER_URL: process.env.SERVER_URL
+    SERVER_URL: process.env.SERVER_URL,
+    WFTT_URL: process.env.WFTT_URL,
   };
 };
 

@@ -1,29 +1,29 @@
 import axios from 'axios';
 import Models from '../../../models/rootModel';
-import { SABRE_API, SABRE_TOKEN_ENV } from '../../miscellaneous/flightConstent';
+import { SABRE_API, SABRE_TOKEN_ENV, WFTT_API, WFTT_TOKEN_ENV } from '../../miscellaneous/flightConstent';
 import config from '../../../config/config';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
-const BASE_URL = config.SABRE_URL;
+const BASE_URL = config.WFTT_URL;
 
-export default class SabreRequests {
+export default class WfttRequests {
   // get request
-  public async getRequest(endpoint: string) {
+  public async getRequest(endpoint: string, requestData: { search_id: string, flight_id: string }) {
     try {
       const authModel = new Models().CommonModel();
 
-      const token = await authModel.getEnv(SABRE_TOKEN_ENV);
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      };
+      const token = await authModel.getEnv(WFTT_TOKEN_ENV);
 
-      const apiUrl = BASE_URL + endpoint;
+      let apiUrl = BASE_URL + endpoint;
 
-      const response = await axios.get(apiUrl, { headers });
+      apiUrl+= `?token=Bearer ${token}`;
+      apiUrl+=`&search_id=${requestData.search_id}`;
+      apiUrl+=`&flight_id=${requestData.flight_id}`;
+
+      const response = await axios.get(apiUrl);
 
       const data = response.data;
 
-      return { code: response.status, data };
+      return data;
     } catch (error: any) {
       console.error('Error calling API:', error.response.status);
       return { code: error.response.status, data: [] };
@@ -36,7 +36,7 @@ export default class SabreRequests {
       const apiUrl = BASE_URL + endpoint;
       const authModel = new Models().CommonModel();
 
-      const token = await authModel.getEnv(SABRE_TOKEN_ENV);
+      const token = await authModel.getEnv(WFTT_TOKEN_ENV);
       // console.log(token)
       const headers = {
         Authorization: `Bearer ${token}`,
@@ -54,11 +54,11 @@ export default class SabreRequests {
       if (response.status !== 200) {
         await new Models().ErrorLogsModel().insertErrorLogs({
           level: ERROR_LEVEL_WARNING,
-          message: `Error from Sabre`,
+          message: `Error from WFTT`,
           url: apiUrl,
           http_method: 'POST',
           metadata: {
-            api: SABRE_API,
+            api: WFTT_API,
             endpoint: apiUrl,
             payload: requestData,
             response: response.data,

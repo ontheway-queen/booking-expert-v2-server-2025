@@ -1,11 +1,13 @@
-// Sabre token env ID
+
 export const SABRE_TOKEN_ENV = 'sabre_token';
+export const WFTT_TOKEN_ENV = 'wftt_token';
 
 export const SABRE_FLIGHT_ITINS = '200ITINS';
 
 // API Name Const
 export const SABRE_API = 'SABRE';
 export const CUSTOM_API = 'CUSTOM';
+export const WFTT_API = 'WFTT';
 
 // airlines MARKUP const
 export const MARKUP_TYPE_PER = 'PER';

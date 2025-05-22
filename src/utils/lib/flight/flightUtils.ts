@@ -3,7 +3,7 @@ import {
   SABRE_CABIN_CODE,
   SABRE_MEAL_CODE,
 } from '../../miscellaneous/staticData';
-import { IFormattedFlight, IFormattedFlightOption, IMultiFlightAvailability } from '../../supportTypes/flightTypes/commonFlightTypes';
+import { IFormattedFlight, IFormattedFlightOption, IFlightAvailability } from '../../supportTypes/flightTypes/commonFlightTypes';
 import { IFormattedLegDesc, OriginDestinationInformation } from '../../supportTypes/flightTypes/sabreFlightTypes';
 
 export default class FlightUtils {
@@ -180,7 +180,7 @@ export default class FlightUtils {
   }
 
   //map flight availability
-  public mapFlightAvailability(availability: IMultiFlightAvailability[]) {
+  public mapFlightAvailability(availability: IFlightAvailability[]) {
     const baggage_info: string[] = [];
     const cabin_info: string[] = [];
     availability.map((item) => {

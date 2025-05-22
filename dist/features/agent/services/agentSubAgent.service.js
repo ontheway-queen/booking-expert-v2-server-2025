@@ -272,7 +272,9 @@ class AgentSubAgentService extends abstract_service_1.default {
                 if (payload.trade_license && checkAgency.trade_license) {
                     deleteFiles.push(checkAgency.trade_license);
                 }
-                yield AgentModel.updateAgency(payload, agency_id);
+                if (Object.keys(payload).length) {
+                    yield AgentModel.updateAgency(payload, Number(id));
+                }
                 if (deleteFiles.length) {
                     yield this.manageFile.deleteFromCloud(deleteFiles);
                 }
@@ -285,7 +287,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                         hotel_markup_type,
                         flight_markup,
                         hotel_markup
-                    }, agency_id);
+                    }, Number(id));
                 }
                 // await this.insertAdminAudit(trx, {
                 //     created_by: user_id,

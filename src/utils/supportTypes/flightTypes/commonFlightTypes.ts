@@ -24,20 +24,20 @@ export interface IAirlineCodePayload {
   Code: string;
 }
 
-export interface IMultiAPIFlightSearchReqBody {
+export interface IFlightSearchReqBody {
   JourneyType: '1' | '2' | '3';
   airline_code: IAirlineCodePayload[];
   OriginDestinationInformation: IOriginDestinationInformationPayload[];
   PassengerTypeQuantity: IPassengerTypeQuantityPayload[];
 }
 
-export interface IMultiFlightAvailability {
+export interface IFlightAvailability {
   from_airport: string;
   to_airport: string;
-  segments: IMultiFlightDataAvailabilitySegment[];
+  segments: IFlightDataAvailabilitySegment[];
 }
 
-export interface IMultiFlightDataAvailabilityPassenger {
+export interface IFlightDataAvailabilityPassenger {
   type: string;
   count: number;
   meal_type: string | undefined;
@@ -52,9 +52,9 @@ export interface IMultiFlightDataAvailabilityPassenger {
   baggage_count: string | null;
 }
 
-export interface IMultiFlightDataAvailabilitySegment {
+export interface IFlightDataAvailabilitySegment {
   name: string;
-  passenger: IMultiFlightDataAvailabilityPassenger[];
+  passenger: IFlightDataAvailabilityPassenger[];
 }
 
 // Common types for response after format==============
@@ -83,7 +83,7 @@ export interface IFormattedFlightItinerary {
   refundable: boolean;
   flights: IFormattedFlight[];
   passengers: IFormattedPassenger[];
-  availability: IMultiFlightAvailability[];
+  availability: IFlightAvailability[];
 }
 
 export interface IFormattedFlight {

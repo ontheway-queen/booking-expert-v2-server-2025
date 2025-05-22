@@ -16,7 +16,6 @@ class AdminMarkupSetRouter extends abstract_router_1.default {
         this.router.route('/flight').post(this.controller.createFlightMarkupSet);
         this.router.route('/hotel').post(this.controller.createHotelMarkupSet);
         this.router.route('/:id').delete(this.controller.deleteMarkupSet);
-        //flight routers
         this.router.route('/flight/api').get(this.controller.getAllFlightApi);
         this.router
             .route('/:id/flight')

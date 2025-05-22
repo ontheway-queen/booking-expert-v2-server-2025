@@ -10,7 +10,7 @@ import { ERROR_LEVEL_WARNING, PROJECT_EMAIL } from '../../miscellaneous/constant
 import { FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_REFUNDED, FLIGHT_BOOKING_VOID, FLIGHT_TICKET_ISSUE, MARKUP_MODE_INCREASE, MARKUP_TYPE_PER, SABRE_API, SABRE_FLIGHT_ITINS } from '../../miscellaneous/flightConstent';
 import SabreAPIEndpoints from '../../miscellaneous/sabreApiEndpoints';
 import { BD_AIRPORT } from '../../miscellaneous/staticData';
-import { IFormattedFlight, IFormattedFlightItinerary, IMultiAPIFlightSearchReqBody, IMultiFlightAvailability, IMultiFlightDataAvailabilitySegment } from '../../supportTypes/flightTypes/commonFlightTypes';
+import { IFormattedFlight, IFormattedFlightItinerary, IFlightSearchReqBody, IFlightAvailability, IFlightDataAvailabilitySegment } from '../../supportTypes/flightTypes/commonFlightTypes';
 import { IBaggageAndAvailabilityAllSeg, IBaggageAndAvailabilityAllSegSegmentDetails, IContactNumber, IFormattedArrival, IFormattedCarrier, IFormattedDeparture, IFormattedLegDesc, IFormattedScheduleDesc, ILegDescOption, ISabreNewPassenger, ISabreResponseResult, ISecureFlight, OriginDestinationInformation } from '../../supportTypes/flightTypes/sabreFlightTypes';
 import { CommonFlightSupportService } from './commonFlightSupport.service';
 import { IFlightBookingRequestBody } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
@@ -27,7 +27,7 @@ export default class SabreFlightService extends AbstractServices {
   ////////////==================FLIGHT SEARCH (START)=========================///////////
   // Flight Search Request formatter
   private async FlightReqFormatterV5(
-    body: IMultiAPIFlightSearchReqBody,
+    body: IFlightSearchReqBody,
     set_flight_api_id: number
   ) {
     const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
@@ -136,7 +136,7 @@ export default class SabreFlightService extends AbstractServices {
     reqBody,
     markup_set_id,
   }: {
-    reqBody: IMultiAPIFlightSearchReqBody;
+    reqBody: IFlightSearchReqBody;
     set_flight_api_id: number;
     markup_set_id: number;
     booking_block: boolean;
@@ -178,7 +178,7 @@ export default class SabreFlightService extends AbstractServices {
     flight_id,
   }: {
     data: ISabreResponseResult;
-    reqBody: IMultiAPIFlightSearchReqBody;
+    reqBody: IFlightSearchReqBody;
     set_flight_api_id: number;
     markup_set_id: number;
     booking_block: boolean;
@@ -559,7 +559,7 @@ export default class SabreFlightService extends AbstractServices {
         Number(new_fare.convenience_fee) -
         Number(new_fare.discount);
 
-      const availability: IMultiFlightAvailability[] = [];
+      const availability: IFlightAvailability[] = [];
 
       baggageAndAvailabilityAllSeg.forEach((item) => {
         const { segmentDetails } = item;
@@ -621,7 +621,7 @@ export default class SabreFlightService extends AbstractServices {
               }
             });
           } else {
-            const segments: IMultiFlightDataAvailabilitySegment[] = [];
+            const segments: IFlightDataAvailabilitySegment[] = [];
 
             item2.segments.forEach((item3) => {
               segments.push({
@@ -686,7 +686,7 @@ export default class SabreFlightService extends AbstractServices {
   //////==================FLIGHT REVALIDATE (START)=========================//////
   //sabre flight revalidate service
   public async SabreFlightRevalidate(
-    reqBody: IMultiAPIFlightSearchReqBody,
+    reqBody: IFlightSearchReqBody,
     retrieved_response: IFormattedFlightItinerary,
     markup_set_id: number,
     set_flight_api_id: number,
@@ -732,7 +732,7 @@ export default class SabreFlightService extends AbstractServices {
 
   // Revalidate Flight Request Formatter
   public async RevalidateFlightReqFormatter(
-    reqBody: IMultiAPIFlightSearchReqBody,
+    reqBody: IFlightSearchReqBody,
     retrieved_response: IFormattedFlightItinerary
   ) {
     let cabin = 'Y';

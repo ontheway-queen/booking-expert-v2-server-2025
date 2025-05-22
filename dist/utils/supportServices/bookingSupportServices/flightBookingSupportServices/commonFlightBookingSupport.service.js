@@ -14,15 +14,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommonFlightBookingSupportService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
-const flightConstent_1 = require("../../../miscellaneous/flightConstent");
-const lib_1 = __importDefault(require("../../../lib/lib"));
-const flightUtils_1 = __importDefault(require("../../../lib/flight/flightUtils"));
-const constants_1 = require("../../../miscellaneous/constants");
-const emailSendLib_1 = __importDefault(require("../../../lib/emailSendLib"));
-const flightTicketIssueTemplate_1 = require("../../../templates/flightTicketIssueTemplate");
-const flightBookingTemplate_1 = require("../../../templates/flightBookingTemplate");
 const uploaderConstants_1 = require("../../../../middleware/uploader/uploaderConstants");
+const emailSendLib_1 = __importDefault(require("../../../lib/emailSendLib"));
+const flightUtils_1 = __importDefault(require("../../../lib/flight/flightUtils"));
+const lib_1 = __importDefault(require("../../../lib/lib"));
+const constants_1 = require("../../../miscellaneous/constants");
+const flightConstent_1 = require("../../../miscellaneous/flightConstent");
 const flightBookingCancelTemplate_1 = require("../../../templates/flightBookingCancelTemplate");
+const flightBookingTemplate_1 = require("../../../templates/flightBookingTemplate");
+const flightTicketIssueTemplate_1 = require("../../../templates/flightTicketIssueTemplate");
 class CommonFlightBookingSupportService extends abstract_service_1.default {
     constructor(trx) {
         super();
@@ -253,6 +253,12 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                     description: `${payload.payable_amount} BDT has been paid for the booking`,
                 });
             }
+            if (payload.api === flightConstent_1.CUSTOM_API) {
+                tracking_data.push({
+                    flight_booking_id: booking_res[0].id,
+                    description: `This was a custom API`
+                });
+            }
             yield flightBookingTrackingModel.insertFlightBookingTracking(tracking_data);
             //create invoice
             const invoiceModel = this.Model.InvoiceModel(this.trx);
@@ -298,89 +304,6 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             };
         }
     }
-    getPaymentInformation(payload) {
-        return __awaiter(this, void 0, void 0, function* () {
-            //check if the payment is already done or not
-            const invoiceModel = this.Model.InvoiceModel(this.trx);
-            const getInvoice = yield invoiceModel.getInvoiceList({ ref_id: payload.booking_id, ref_type: constants_1.INVOICE_REF_TYPES.agent_flight_booking });
-            if (!getInvoice.data.length) {
-                return {
-                    success: false,
-                    code: this.StatusCode.HTTP_BAD_REQUEST,
-                    message: "No invoice has been found for this booking. Ticket Issue cannot be proceed!"
-                };
-            }
-            let price_deduction = false;
-            if (getInvoice.data[0].due > 0) {
-                price_deduction = true;
-            }
-            if (price_deduction) {
-                //check if the payment is eligible for partial payment
-                if (payload.payment_type === flightConstent_1.PAYMENT_TYPE_PARTIAL) {
-                    //case 1: refundable
-                    if (!payload.refundable) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Partial payment is not allowed for this flight",
-                        };
-                    }
-                    //case 2: departure date min 10 days from current date
-                    const departureDate = new Date(payload.departure_date);
-                    const currentDate = new Date();
-                    const timeDiff = departureDate.getTime() - currentDate.getTime();
-                    const minDiffInMilliSeconds = flightConstent_1.PARTIAL_PAYMENT_DEPARTURE_DATE * 24 * 60 * 60 * 1000;
-                    if (timeDiff < minDiffInMilliSeconds) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Partial payment is not allowed for this flight",
-                        };
-                    }
-                }
-                //check balance
-                const agencyModel = this.Model.AgencyModel(this.trx);
-                const agencyBalance = yield agencyModel.getAgencyBalance(payload.agency_id);
-                let payable_amount = payload.payment_type === flightConstent_1.PAYMENT_TYPE_PARTIAL ? (payload.ticket_price * flightConstent_1.PARTIAL_PAYMENT_PERCENTAGE) / 100 : payload.ticket_price;
-                if (payable_amount > getInvoice.data[0].due) {
-                    payable_amount = getInvoice.data[0].due;
-                }
-                if (payable_amount > agencyBalance) {
-                    //check usable loan balance
-                    const agency_details = yield agencyModel.getSingleAgency(payload.agency_id);
-                    const usable_loan_balance = Number(agency_details === null || agency_details === void 0 ? void 0 : agency_details.usable_loan);
-                    if (agencyBalance + usable_loan_balance < payable_amount) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "There is insufficient balance in your account",
-                        };
-                    }
-                }
-                ;
-                //return amount
-                return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    paid_amount: payable_amount,
-                    loan_amount: (payable_amount - agencyBalance) > 0 ? (payable_amount - agencyBalance) : 0,
-                    due: Number(getInvoice.data[0].due) - Number(payable_amount),
-                    invoice_id: getInvoice.data[0].id,
-                };
-            }
-            else {
-                return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    paid_amount: 0,
-                    load_amount: 0,
-                    due: 0,
-                    invoice_id: getInvoice.data[0].id,
-                };
-            }
-        });
-    }
-    ;
     updateDataAfterBookingCancel(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             //update booking

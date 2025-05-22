@@ -17,7 +17,7 @@ export default class AdminMarkupSetRouter extends AbstractRouter {
 
     this.router.route('/:id').delete(this.controller.deleteMarkupSet);
 
-    //flight routers
+
     this.router.route('/flight/api').get(this.controller.getAllFlightApi);
 
     this.router

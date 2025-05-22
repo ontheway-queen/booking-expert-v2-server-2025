@@ -23,6 +23,7 @@ const flightUtils_1 = __importDefault(require("../../../utils/lib/flight/flightU
 const commonFlightBookingSupport_service_1 = require("../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service");
 const constants_1 = require("../../../utils/miscellaneous/constants");
 const agentFlightBookingSupport_service_1 = require("../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service");
+const wfttFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service"));
 class AgentFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -49,12 +50,17 @@ class AgentFlightService extends abstract_service_1.default {
                 });
                 //extract API IDs
                 let sabre_set_flight_api_id = 0;
+                let wftt_set_flight_api_id = 0;
                 apiData.forEach((api) => {
                     if (api.api_name === flightConstent_1.SABRE_API) {
                         sabre_set_flight_api_id = api.id;
                     }
+                    if (api.api_name === flightConstent_1.WFTT_API) {
+                        wftt_set_flight_api_id = api.id;
+                    }
                 });
                 let sabreData = [];
+                let wfttData = [];
                 if (sabre_set_flight_api_id) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     sabreData = yield sabreSubService.FlightSearch({
@@ -62,6 +68,15 @@ class AgentFlightService extends abstract_service_1.default {
                         markup_set_id: agency_details.flight_markup_set,
                         reqBody: body,
                         set_flight_api_id: sabre_set_flight_api_id,
+                    });
+                }
+                if (wftt_set_flight_api_id) {
+                    const wfttSubService = new wfttFlightSupport_service_1.default(trx);
+                    wfttData = yield wfttSubService.FlightSearch({
+                        booking_block: false,
+                        markup_set_id: agency_details.flight_markup_set,
+                        reqBody: body,
+                        set_flight_api_id: wftt_set_flight_api_id,
                     });
                 }
                 //generate search ID
@@ -73,7 +88,7 @@ class AgentFlightService extends abstract_service_1.default {
                         arrivalLocation: OrDeInfo.DestinationLocation.LocationCode,
                     };
                 });
-                const results = [...sabreData];
+                const results = [...sabreData, ...wfttData];
                 results.sort((a, b) => a.fare.payable - b.fare.payable);
                 const responseData = {
                     search_id,
@@ -126,12 +141,15 @@ class AgentFlightService extends abstract_service_1.default {
                     status: true,
                     markup_set_id: agency_details.flight_markup_set
                 });
-                console.log({ apiData });
                 //extract API IDs
                 let sabre_set_flight_api_id = 0;
+                let wftt_set_flight_api_id = 0;
                 apiData.forEach((api) => {
                     if (api.api_name === flightConstent_1.SABRE_API) {
                         sabre_set_flight_api_id = api.id;
+                    }
+                    if (api.api_name === flightConstent_1.WFTT_API) {
+                        wftt_set_flight_api_id = api.id;
                     }
                 });
                 //generate search ID
@@ -177,6 +195,18 @@ class AgentFlightService extends abstract_service_1.default {
                             markup_set_id: agency_details.flight_markup_set,
                             reqBody: body,
                             set_flight_api_id: sabre_set_flight_api_id,
+                        });
+                    }));
+                }
+                //WFTT results
+                if (wftt_set_flight_api_id) {
+                    const wfttSubService = new wfttFlightSupport_service_1.default(trx);
+                    yield sendResults('WFTT', () => __awaiter(this, void 0, void 0, function* () {
+                        return wfttSubService.FlightSearch({
+                            booking_block: false,
+                            markup_set_id: agency_details.flight_markup_set,
+                            reqBody: body,
+                            set_flight_api_id: wftt_set_flight_api_id,
                         });
                     }));
                 }
@@ -329,6 +359,7 @@ class AgentFlightService extends abstract_service_1.default {
                 let refundable = data.refundable;
                 let gds_pnr = null;
                 let api_booking_ref = null;
+                let status = directBookingPermission.booking_block ? flightConstent_1.FLIGHT_BOOKING_IN_PROCESS : flightConstent_1.FLIGHT_BOOKING_CONFIRMED;
                 if (directBookingPermission.booking_block === false) {
                     if (data.api === flightConstent_1.SABRE_API) {
                         const sabreSubService = new sabreFlightSupport_service_1.default(trx);
@@ -343,6 +374,9 @@ class AgentFlightService extends abstract_service_1.default {
                         });
                         airline_pnr = grnData.airline_pnr;
                         refundable = grnData.refundable;
+                    }
+                    else if (data.api === flightConstent_1.CUSTOM_API) {
+                        status = flightConstent_1.FLIGHT_BOOKING_IN_PROCESS;
                     }
                 }
                 //insert the revalidate data as info log
@@ -367,7 +401,7 @@ class AgentFlightService extends abstract_service_1.default {
                 const { booking_id, booking_ref } = yield bookingSupportService.insertFlightBookingData({
                     gds_pnr,
                     airline_pnr,
-                    status: directBookingPermission.booking_block ? flightConstent_1.FLIGHT_BOOKING_IN_PROCESS : flightConstent_1.FLIGHT_BOOKING_CONFIRMED,
+                    status,
                     api_booking_ref,
                     user_id,
                     user_name: name,
@@ -382,6 +416,7 @@ class AgentFlightService extends abstract_service_1.default {
                     source_id: agency_id,
                     invoice_ref_type: constants_1.INVOICE_REF_TYPES.agent_flight_booking,
                     booking_block: directBookingPermission.booking_block,
+                    api: data.api
                 });
                 //if booking insertion is successful then delete the revalidate log
                 yield this.Model.ErrorLogsModel(trx).deleteErrorLogs(log_id[0].id);
@@ -473,8 +508,6 @@ class AgentFlightService extends abstract_service_1.default {
                 //get flight details
                 const flightBookingModel = this.Model.FlightBookingModel(trx);
                 const bookingTravelerModel = this.Model.FlightBookingTravelerModel(trx);
-                const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(trx);
-                const flightSegmentModel = this.Model.FlightBookingSegmentModel(trx);
                 const booking_data = yield flightBookingModel.getSingleFlightBooking({ id: Number(id), booked_by: constants_1.SOURCE_AGENT, agency_id });
                 if (!booking_data) {
                     return {
@@ -496,7 +529,8 @@ class AgentFlightService extends abstract_service_1.default {
                 const { payment_type } = req.body;
                 //get payment details
                 const bookingSubService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
-                const payment_data = yield bookingSubService.getPaymentInformation({
+                const agentBookingSubService = new agentFlightBookingSupport_service_1.AgentFlightBookingSupportService(trx);
+                const payment_data = yield agentBookingSubService.getPaymentInformation({
                     booking_id: Number(id),
                     payment_type: payment_type,
                     refundable: booking_data.refundable,
@@ -547,12 +581,12 @@ class AgentFlightService extends abstract_service_1.default {
                         booking_ref: booking_data.booking_ref,
                         paid_amount: Number(payment_data.paid_amount),
                         loan_amount: Number(payment_data.loan_amount),
-                        email: agency_email,
                         invoice_id: Number(payment_data.invoice_id),
                         user_id,
                         issued_by_type: constants_1.SOURCE_AGENT,
                         issued_by_user_id: user_id,
-                        issue_block: ticketIssuePermission.issue_block
+                        issue_block: ticketIssuePermission.issue_block,
+                        api: booking_data.api
                     });
                     //send email
                     yield bookingSubService.sendTicketIssueMail({
@@ -569,17 +603,22 @@ class AgentFlightService extends abstract_service_1.default {
                         panel_link: `${constants_1.AGENT_PROJECT_LINK}${constants_1.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}`,
                         due: Number(payment_data.due)
                     });
+                    return {
+                        success: true,
+                        code: this.StatusCode.HTTP_OK,
+                        message: "Ticket has been issued successfully!",
+                        data: {
+                            status,
+                            due: payment_data.due,
+                            paid_amount: payment_data.paid_amount,
+                            loan_amount: payment_data.loan_amount,
+                        }
+                    };
                 }
                 return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    message: "Ticket has been issued successfully!",
-                    data: {
-                        status,
-                        due: payment_data.due,
-                        paid_amount: payment_data.paid_amount,
-                        loan_amount: payment_data.loan_amount,
-                    }
+                    success: false,
+                    code: this.StatusCode.HTTP_BAD_REQUEST,
+                    message: "Cannot issue ticket for this booking. Contact support team."
                 };
             }));
         });
@@ -608,7 +647,6 @@ class AgentFlightService extends abstract_service_1.default {
                 let status = false;
                 if (booking_data.api === flightConstent_1.SABRE_API) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
-                    console.log("1");
                     const res = yield sabreSubService.SabreBookingCancelService({
                         pnr: String(booking_data.gds_pnr),
                     });

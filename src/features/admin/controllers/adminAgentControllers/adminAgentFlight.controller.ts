@@ -40,4 +40,54 @@ export class AdminAgentFlightController extends AbstractController {
             res.status(code).json(rest);
         }
     );
+
+    public cancelBooking = this.asyncWrapper.wrap(
+        {
+            paramSchema: this.commonValidator.singleParamNumValidator()
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...rest } = await this.service.cancelBooking(req);
+            res.status(code).json(rest);
+        }
+    );
+
+    public issueTicket = this.asyncWrapper.wrap(
+        {
+            paramSchema: this.commonValidator.singleParamNumValidator()
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...rest } = await this.service.issueTicket(req);
+            res.status(code).json(rest);
+        }
+    );
+
+    public updateBooking = this.asyncWrapper.wrap(
+        {
+            bodySchema: this.validator.updateFlightBookingSchema,
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...rest } = await this.service.updateBooking(req);
+            res.status(code).json(rest);
+        }
+    );
+
+    public updatePendingBookingManually = this.asyncWrapper.wrap(
+        {
+            bodySchema: this.validator.updatePendingBookingManuallySchema,
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...rest } = await this.service.updatePendingBookingManually(req);
+            res.status(code).json(rest);
+        }
+    );
+
+    public updateProcessingTicketManually = this.asyncWrapper.wrap(
+        {
+            bodySchema: this.validator.updateProcessingTicketSchema,
+        },
+        async (req: Request, res: Response) => {
+            const { code, ...rest } = await this.service.updateProcessingTicketManually(req);
+            res.status(code).json(rest);
+        }
+    );
 }

@@ -1,4 +1,4 @@
-import { SOURCE_AGENT, SOURCE_AGENT_B2C, SOURCE_B2C, SOURCE_SUB_AGENT } from "../../../miscellaneous/constants";
+import { SOURCE_ADMIN, SOURCE_AGENT, SOURCE_AGENT_B2C, SOURCE_B2C, SOURCE_SUB_AGENT } from "../../../miscellaneous/constants";
 import { PAYMENT_TYPE_FULL, PAYMENT_TYPE_PARTIAL } from "../../../miscellaneous/flightConstent";
 import { IGetSingleFlightBookingData, SourceType } from "../../../modelTypes/flightModelTypes/flightBookingModelTypes";
 import { IFormattedFlightItinerary } from "../../flightTypes/commonFlightTypes";
@@ -18,30 +18,30 @@ export interface ICheckDirectBookingPermissionPayload {
 }
 
 export interface IFlightBookingRequestBody {
-  search_id: string;
-  flight_id: string;
-  passengers: IFlightBookingPassengerReqBody[];
+    search_id: string;
+    flight_id: string;
+    passengers: IFlightBookingPassengerReqBody[];
 }
 
 export interface IFlightBookingPassengerReqBody {
-  key: string;
-  type: "ADT" | "C02" | "C03" | "C04" | "C05" | "C06" | "C07" | "C08" | "C09" | "C10" | "C11" | "INF";
-  reference: "Mr" | "Mrs" | "Ms" | "Miss" | "MSTR";
-  first_name: string;
-  last_name: string;
-  contact_number?: string;
-  contact_email?: string;
-  date_of_birth: string | Date;
-  gender: "Male" | "Female";
-  passport_number?: string;
-  passport_expiry_date?: string | Date;
-  nationality: number;
-  issuing_country: number;
-  frequent_flyer_airline?: string;
-  frequent_flyer_number?: string;
-  visa_file?: string;
-  passport_file?: string;
-  save_information?: boolean;
+    key: string;
+    type: "ADT" | "C02" | "C03" | "C04" | "C05" | "C06" | "C07" | "C08" | "C09" | "C10" | "C11" | "INF";
+    reference: "Mr" | "Mrs" | "Ms" | "Miss" | "MSTR";
+    first_name: string;
+    last_name: string;
+    contact_number?: string;
+    contact_email?: string;
+    date_of_birth: string | Date;
+    gender: "Male" | "Female";
+    passport_number?: string;
+    passport_expiry_date?: string | Date;
+    nationality: number;
+    issuing_country: number;
+    frequent_flyer_airline?: string;
+    frequent_flyer_number?: string;
+    visa_file?: string;
+    passport_file?: string;
+    save_information?: boolean;
 }
 
 export interface IInsertFlightBookingDataPayload {
@@ -76,22 +76,14 @@ export interface IInsertFlightBookingDataPayload {
     invoice_ref_type: string;
     coupon_code?: string;
     booking_block?: boolean;
-
+    api: string;
 }
 
-export interface IGetPaymentInformationReqBody {
-    booking_id: number,
-    payment_type: typeof PAYMENT_TYPE_FULL | typeof PAYMENT_TYPE_PARTIAL,
-    refundable: boolean,
-    departure_date: Date,
-    agency_id: number,
-    ticket_price: number
-}
 
 export interface IUpdateDataAfterFlightBookingCancelPayload {
     booking_id: number;
     booking_ref: string;
-    cancelled_by_type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT | typeof SOURCE_AGENT_B2C | typeof SOURCE_B2C;
+    cancelled_by_type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT | typeof SOURCE_AGENT_B2C | typeof SOURCE_B2C | typeof SOURCE_ADMIN;
     cancelled_by_user_id: number;
     api: string;
 }

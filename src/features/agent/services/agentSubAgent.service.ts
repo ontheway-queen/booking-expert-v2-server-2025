@@ -312,7 +312,9 @@ export default class AgentSubAgentService extends AbstractServices {
                 deleteFiles.push(checkAgency.trade_license);
             }
 
-            await AgentModel.updateAgency(payload, agency_id);
+            if(Object.keys(payload).length){
+                await AgentModel.updateAgency(payload, Number(id));
+            }
 
             if (deleteFiles.length) {
                 await this.manageFile.deleteFromCloud(deleteFiles);
@@ -328,7 +330,7 @@ export default class AgentSubAgentService extends AbstractServices {
                     flight_markup,
                     hotel_markup
                 },
-                    agency_id);
+                    Number(id));
             }
 
             // await this.insertAdminAudit(trx, {
