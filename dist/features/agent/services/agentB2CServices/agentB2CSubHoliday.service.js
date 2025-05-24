@@ -40,12 +40,16 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 const holidayPackageServiceModel = this.Model.HolidayPackageServiceModel(trx);
                 const holidayPackageItineraryModel = this.Model.HolidayPackageItineraryModel(trx);
                 //check slug
-                const slugCheck = yield holidayPackageModel.getHolidayPackageList({ slug: rest.slug, created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT, agency_id });
+                const slugCheck = yield holidayPackageModel.getHolidayPackageList({
+                    slug: rest.slug,
+                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT,
+                    agency_id,
+                });
                 if (slugCheck.data.length) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: this.ResMsg.SLUG_ALREADY_EXISTS
+                        message: this.ResMsg.SLUG_ALREADY_EXISTS,
                     };
                 }
                 //insert holiday package
@@ -53,7 +57,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 //insert city
                 const holidayPackageCityBody = city_id.map((item) => ({
                     holiday_package_id: holidayPackage[0].id,
-                    city_id: item
+                    city_id: item,
                 }));
                 yield holidayPackageCityModel.createHolidayPackageCity(holidayPackageCityBody);
                 //insert pricing
@@ -71,7 +75,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                     for (const file of files) {
                         image_body.push({
                             holiday_package_id: holidayPackage[0].id,
-                            image: file.filename
+                            image: file.filename,
                         });
                     }
                     yield holidayPackageImagesModel.insertHolidayPackageImages(image_body);
@@ -79,11 +83,11 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "Holiday package has been created successfully",
+                    message: 'Holiday package has been created successfully',
                     data: {
                         id: holidayPackage[0].id,
-                        image_body
-                    }
+                        image_body,
+                    },
                 };
             }));
         });
@@ -101,7 +105,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     total: data.total,
-                    data: data.data
+                    data: data.data,
                 };
             }));
         });
@@ -112,7 +116,11 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const { id } = req.params;
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
-                const data = yield holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT, agency_id });
+                const data = yield holidayPackageModel.getSingleHolidayPackage({
+                    id: Number(id),
+                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT,
+                    agency_id,
+                });
                 if (!data) {
                     return {
                         success: false,
@@ -123,7 +131,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    data: data
+                    data: data,
                 };
             }));
         });
@@ -142,22 +150,31 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 const holidayPackageImagesModel = this.Model.HolidayPackageImagesModel(trx);
                 const holidayPackageServiceModel = this.Model.HolidayPackageServiceModel(trx);
                 const holidayPackageItineraryModel = this.Model.HolidayPackageItineraryModel(trx);
-                const data = yield holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT, agency_id });
+                const data = yield holidayPackageModel.getSingleHolidayPackage({
+                    id: Number(id),
+                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT,
+                    agency_id,
+                });
                 if (!data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: "Holiday package not found"
+                        message: 'Holiday package not found',
                     };
                 }
                 //check slug
                 if (rest.slug) {
-                    const slugCheck = yield holidayPackageModel.getHolidayPackageList({ slug: rest.slug, created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT, agency_id });
-                    if (slugCheck.data.length && Number((_b = (_a = slugCheck.data) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.id) !== Number(id)) {
+                    const slugCheck = yield holidayPackageModel.getHolidayPackageList({
+                        slug: rest.slug,
+                        created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT,
+                        agency_id,
+                    });
+                    if (slugCheck.data.length &&
+                        Number((_b = (_a = slugCheck.data) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.id) !== Number(id)) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_CONFLICT,
-                            message: this.ResMsg.SLUG_ALREADY_EXISTS
+                            message: this.ResMsg.SLUG_ALREADY_EXISTS,
                         };
                     }
                 }
@@ -168,14 +185,14 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                     if ((_c = city.add) === null || _c === void 0 ? void 0 : _c.length) {
                         const cityInsertBody = city.add.map((item) => ({
                             holiday_package_id: Number(id),
-                            city_id: item
+                            city_id: item,
                         }));
                         yield holidayPackageCityModel.createHolidayPackageCity(cityInsertBody);
                     }
                     if ((_d = city.delete) === null || _d === void 0 ? void 0 : _d.length) {
                         const cityDeleteBody = city.delete.map((item) => ({
                             holiday_package_id: Number(id),
-                            city_id: item
+                            city_id: item,
                         }));
                         yield holidayPackageCityModel.deleteHolidayPackageCity(cityDeleteBody);
                     }
@@ -232,7 +249,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                     for (const file of files) {
                         imageBody.push({
                             holiday_package_id: Number(id),
-                            image: file.filename
+                            image: file.filename,
                         });
                     }
                     yield holidayPackageImagesModel.insertHolidayPackageImages(imageBody);
@@ -240,10 +257,10 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "Holiday package has been updated successfully",
+                    message: 'Holiday package has been updated successfully',
                     data: {
-                        imageBody
-                    }
+                        imageBody,
+                    },
                 };
             }));
         });
@@ -254,19 +271,23 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const { id } = req.params;
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
-                const data = yield holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT, agency_id });
+                const data = yield holidayPackageModel.getSingleHolidayPackage({
+                    id: Number(id),
+                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT,
+                    agency_id,
+                });
                 if (!data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: "Holiday package not found"
+                        message: 'Holiday package not found',
                     };
                 }
                 yield holidayPackageModel.updateHolidayPackage({ is_deleted: true }, Number(id));
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "Holiday package has been deleted successfully"
+                    message: 'Holiday package has been deleted successfully',
                 };
             }));
         });

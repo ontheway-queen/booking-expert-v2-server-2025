@@ -4,7 +4,7 @@ export interface IInsertHotelSearchHistoryPayload {
   check_out_date: string;
   guest_n_rooms: string;
   destination_type: 'Hotel' | 'City';
-  user_id: number;
+  user_id?: number;
   code: number;
   agency_id?: number;
   nationality?: string;
