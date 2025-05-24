@@ -71,6 +71,8 @@ export default class CTHotelRequests {
         validateStatus: () => true,
       });
 
+      console.log('Response:', response.data);
+
       if (!response.data.success) {
         await new Models().ErrorLogsModel().insertErrorLogs({
           level: ERROR_LEVEL_WARNING,

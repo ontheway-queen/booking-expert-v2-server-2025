@@ -4,15 +4,16 @@ import CTHotelRequests from '../../lib/hotel/ctHotelRequest';
 import CTHotelAPIEndpoints from '../../miscellaneous/endpoints/ctHotelApiEndpoints';
 import {
   ICTGetBalanceResponse,
+  ICTHotelRoomRecheckResponse,
   ICTHotelRoomsResponse,
   ICTHotelSearchPayload,
   ICTHotelSearchResponse,
   ICTHotelSearchResponseHotel,
+  ICancellationPolicy,
 } from '../../supportTypes/hotelTypes/ctHotelSupport.types';
 import HotelMarkupsModel from '../../../models/markupSetModel/hotelMarkupsModel';
 import {
   MARKUP_MODE_INCREASE,
-  MARKUP_TYPE_FLAT,
   MARKUP_TYPE_PER,
 } from '../../miscellaneous/constants';
 
@@ -111,6 +112,10 @@ export class CTHotelSupportService extends AbstractServices {
       });
     }
 
+    if (!modifiedHotels.length) {
+      return false;
+    }
+
     return {
       ...restData,
       hotels: modifiedHotels,
@@ -121,22 +126,185 @@ export class CTHotelSupportService extends AbstractServices {
     payload: { hcode: number; search_id: string },
     markup_set: number
   ) {
-    const response = (await this.request.postRequest(
+    const response = await this.request.postRequest(
       CTHotelAPIEndpoints.HOTEL_ROOMS,
       payload
-    )) as {
-      success: boolean;
-      message: string;
-      data: ICTHotelRoomsResponse[];
-    };
-
-    console.log({ response });
+    );
 
     if (!response.success) {
       return false;
+    } else {
+      if (response.data.success === false) {
+        return false;
+      } else {
+        const hotels = response.data as ICTHotelRoomsResponse[];
+        const hotelMarkupModel = new HotelMarkupsModel(this.trx);
+        const markupSet = await hotelMarkupModel.getHotelMarkup({
+          markup_for: 'Both',
+          set_id: markup_set,
+          status: true,
+        });
+
+        let bookMarkup: {
+          markup: number;
+          type: 'PER' | 'FLAT';
+          mode: 'INCREASE' | 'DECREASE';
+        } = {
+          markup: 0,
+          mode: MARKUP_MODE_INCREASE,
+          type: MARKUP_TYPE_PER,
+        };
+
+        let cancelMarkup: {
+          markup: number;
+          type: 'PER' | 'FLAT';
+          mode: 'INCREASE' | 'DECREASE';
+        } = {
+          markup: 0,
+          mode: MARKUP_MODE_INCREASE,
+          type: MARKUP_TYPE_PER,
+        };
+
+        for (const markup of markupSet) {
+          if (markup.markup_for === 'Book') {
+            bookMarkup = {
+              markup: Number(markup.markup),
+              mode: markup.mode,
+              type: markup.type,
+            };
+          } else if (markup.markup_for === 'Cancel') {
+            cancelMarkup = {
+              markup: Number(markup.markup),
+              mode: markup.mode,
+              type: markup.type,
+            };
+          }
+        }
+
+        return hotels.map((hotel) => {
+          const { cancellation_policy, price_details } = hotel;
+
+          const modifiedPrice = this.getMarkupPrice({
+            prices: price_details,
+            markup: bookMarkup,
+          });
+
+          hotel.price_details = modifiedPrice;
+
+          if (cancellation_policy) {
+            const modifiedCancellationPolicy = this.getCancellationMarkupPrice({
+              markup: cancelMarkup,
+              cancellation_policy,
+            });
+
+            hotel.cancellation_policy = modifiedCancellationPolicy;
+          }
+
+          return hotel;
+        });
+      }
+    }
+  }
+
+  public async HotelRecheck(
+    payload: {
+      search_id: string;
+      nights: number;
+      rooms: { rate_key: string; group_code: string }[];
+    },
+    markup_set: number
+  ) {
+    const response = await this.request.postRequest(
+      CTHotelAPIEndpoints.ROOM_RECHECK,
+      payload
+    );
+
+    if (!response) {
+      return false;
     }
 
-    return response.data;
+    const RecheckHotel = response.data as ICTHotelRoomRecheckResponse;
+
+    delete RecheckHotel.agency_fee;
+
+    const hotelMarkupModel = new HotelMarkupsModel(this.trx);
+    const markupSet = await hotelMarkupModel.getHotelMarkup({
+      markup_for: 'Both',
+      set_id: markup_set,
+      status: true,
+    });
+
+    let bookMarkup: {
+      markup: number;
+      type: 'PER' | 'FLAT';
+      mode: 'INCREASE' | 'DECREASE';
+    } = {
+      markup: 0,
+      mode: MARKUP_MODE_INCREASE,
+      type: MARKUP_TYPE_PER,
+    };
+
+    let cancelMarkup: {
+      markup: number;
+      type: 'PER' | 'FLAT';
+      mode: 'INCREASE' | 'DECREASE';
+    } = {
+      markup: 0,
+      mode: MARKUP_MODE_INCREASE,
+      type: MARKUP_TYPE_PER,
+    };
+
+    for (const markup of markupSet) {
+      if (markup.markup_for === 'Book') {
+        bookMarkup = {
+          markup: Number(markup.markup),
+          mode: markup.mode,
+          type: markup.type,
+        };
+      } else if (markup.markup_for === 'Cancel') {
+        cancelMarkup = {
+          markup: Number(markup.markup),
+          mode: markup.mode,
+          type: markup.type,
+        };
+      }
+    }
+
+    const { rates, fee, ...restData } = RecheckHotel;
+
+    const price_details = this.getMarkupPrice({
+      markup: bookMarkup,
+      prices: {
+        price: fee.fee,
+        tax: fee.total_tax,
+        total_price: fee.total_fee,
+      },
+    });
+
+    const newRates = rates.map((rate) => {
+      const newRate = this.getMarkupPrice({
+        markup: bookMarkup,
+        prices: rate.price_details,
+      });
+      delete rate.agency_price_details;
+
+      if (rate.cancellation_policy) {
+        rate.cancellation_policy = this.getCancellationMarkupPrice({
+          markup: cancelMarkup,
+          cancellation_policy: rate.cancellation_policy,
+        });
+      }
+
+      rate.price_details = newRate;
+
+      return rate;
+    });
+
+    return {
+      ...restData,
+      fee: price_details,
+      rates: newRates,
+    };
   }
 
   // get markup price func
@@ -186,6 +354,68 @@ export class CTHotelSupportService extends AbstractServices {
       price: amount,
       tax: tax,
       total_price: amount + tax,
+    };
+  }
+
+  private getCancellationMarkupPrice({
+    markup,
+    cancellation_policy,
+  }: {
+    markup: {
+      markup: number;
+      type: 'PER' | 'FLAT';
+      mode: 'INCREASE' | 'DECREASE';
+    };
+    cancellation_policy: ICancellationPolicy;
+  }) {
+    const { no_show_fee, details, ...policy } = cancellation_policy;
+
+    let modified_no_show_fee = no_show_fee;
+    if (markup.markup > 0) {
+      if (markup.type === MARKUP_TYPE_PER) {
+        if (markup.mode === MARKUP_MODE_INCREASE) {
+          modified_no_show_fee = Math.ceil((no_show_fee * markup.markup) / 100);
+          modified_no_show_fee = no_show_fee + modified_no_show_fee;
+        } else {
+          modified_no_show_fee = Math.ceil((no_show_fee * markup.markup) / 100);
+          modified_no_show_fee = no_show_fee - modified_no_show_fee;
+        }
+      } else {
+        if (markup.mode === MARKUP_MODE_INCREASE) {
+          modified_no_show_fee = no_show_fee + markup.markup;
+        } else {
+          modified_no_show_fee = no_show_fee - markup.markup;
+        }
+      }
+    }
+
+    const modifiedDetails = details.map((detail) => {
+      let modified_fee = detail.fee;
+      if (markup.markup > 0) {
+        if (markup.type === MARKUP_TYPE_PER) {
+          if (markup.mode === MARKUP_MODE_INCREASE) {
+            modified_fee = Math.ceil((detail.fee * markup.markup) / 100);
+            modified_fee = detail.fee + modified_fee;
+          } else {
+            modified_fee = Math.ceil((detail.fee * markup.markup) / 100);
+            modified_fee = detail.fee - modified_fee;
+          }
+        } else {
+          if (markup.mode === MARKUP_MODE_INCREASE) {
+            modified_fee = detail.fee + markup.markup;
+          } else {
+            modified_fee = detail.fee - markup.markup;
+          }
+        }
+      }
+
+      return { ...detail, fee: modified_fee };
+    });
+
+    return {
+      no_show_fee: modified_no_show_fee,
+      details: modifiedDetails,
+      ...policy,
     };
   }
 }

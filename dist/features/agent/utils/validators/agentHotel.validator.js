@@ -25,6 +25,17 @@ class AgentHotelValidator {
             hcode: joi_1.default.number().required(),
             search_id: joi_1.default.string().required(),
         });
+        this.hotelRoomRecheck = joi_1.default.object({
+            search_id: joi_1.default.string().required(),
+            nights: joi_1.default.number().required(),
+            rooms: joi_1.default.array()
+                .items({
+                rate_key: joi_1.default.string().required(),
+                group_code: joi_1.default.string().required(),
+            })
+                .min(1)
+                .required(),
+        });
     }
 }
 exports.default = AgentHotelValidator;

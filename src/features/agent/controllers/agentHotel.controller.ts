@@ -25,4 +25,12 @@ export default class AgentHotelController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public hotelRoomRecheck = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.hotelRoomRecheck },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.hotelRoomRecheck(req);
+      res.status(code).json(rest);
+    }
+  );
 }

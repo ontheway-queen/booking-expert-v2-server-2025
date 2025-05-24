@@ -23,4 +23,16 @@ export default class AgentHotelValidator {
     hcode: Joi.number().required(),
     search_id: Joi.string().required(),
   });
+
+  public hotelRoomRecheck = Joi.object({
+    search_id: Joi.string().required(),
+    nights: Joi.number().required(),
+    rooms: Joi.array()
+      .items({
+        rate_key: Joi.string().required(),
+        group_code: Joi.string().required(),
+      })
+      .min(1)
+      .required(),
+  });
 }

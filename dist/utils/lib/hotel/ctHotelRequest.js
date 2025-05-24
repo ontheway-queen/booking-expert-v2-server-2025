@@ -83,6 +83,7 @@ class CTHotelRequests {
                     data: requestData,
                     validateStatus: () => true,
                 });
+                console.log('Response:', response.data);
                 if (!response.data.success) {
                     yield new rootModel_1.default().ErrorLogsModel().insertErrorLogs({
                         level: constants_1.ERROR_LEVEL_WARNING,

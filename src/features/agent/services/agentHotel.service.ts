@@ -99,8 +99,6 @@ export class AgentHotelService extends AbstractServices {
         agent.hotel_markup_set
       );
 
-      console.log('result', result);
-
       if (result) {
         return {
           success: true,
@@ -114,6 +112,58 @@ export class AgentHotelService extends AbstractServices {
         success: false,
         message: this.ResMsg.HTTP_NOT_FOUND,
         code: this.StatusCode.HTTP_NOT_FOUND,
+      };
+    });
+  }
+
+  public async hotelRoomRecheck(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const ctHotelSupport = new CTHotelSupportService(trx);
+      const agencyModel = this.Model.AgencyModel(trx);
+
+      const agent = await agencyModel.checkAgency({ agency_id });
+
+      if (!agent) {
+        return {
+          success: false,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+        };
+      }
+
+      if (!agent.hotel_markup_set) {
+        return {
+          success: false,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+        };
+      }
+
+      const payload = req.body as {
+        search_id: string;
+        nights: number;
+        rooms: { rate_key: string; group_code: string }[];
+      };
+
+      const data = await ctHotelSupport.HotelRecheck(
+        payload,
+        agent.hotel_markup_set
+      );
+
+      if (!data) {
+        return {
+          success: false,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+        };
+      }
+
+      return {
+        success: true,
+        message: this.ResMsg.HTTP_OK,
+        code: this.StatusCode.HTTP_OK,
+        data: data,
       };
     });
   }

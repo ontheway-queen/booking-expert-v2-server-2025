@@ -39,6 +39,10 @@ class AgentHotelController extends abstract_controller_1.default {
             const _a = yield this.service.getHotelRooms(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.hotelRoomRecheck = this.asyncWrapper.wrap({ bodySchema: this.validator.hotelRoomRecheck }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.hotelRoomRecheck(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.default = AgentHotelController;

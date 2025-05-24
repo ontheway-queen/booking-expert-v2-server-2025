@@ -93,7 +93,6 @@ class AgentHotelService extends abstract_service_1.default {
                 }
                 const payload = req.body;
                 const result = yield ctHotelSupport.HotelRooms(payload, agent.hotel_markup_set);
-                console.log('result', result);
                 if (result) {
                     return {
                         success: true,
@@ -106,6 +105,45 @@ class AgentHotelService extends abstract_service_1.default {
                     success: false,
                     message: this.ResMsg.HTTP_NOT_FOUND,
                     code: this.StatusCode.HTTP_NOT_FOUND,
+                };
+            }));
+        });
+    }
+    hotelRoomRecheck(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
+                const agencyModel = this.Model.AgencyModel(trx);
+                const agent = yield agencyModel.checkAgency({ agency_id });
+                if (!agent) {
+                    return {
+                        success: false,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                    };
+                }
+                if (!agent.hotel_markup_set) {
+                    return {
+                        success: false,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                    };
+                }
+                const payload = req.body;
+                const data = yield ctHotelSupport.HotelRecheck(payload, agent.hotel_markup_set);
+                if (!data) {
+                    return {
+                        success: false,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                    };
+                }
+                return {
+                    success: true,
+                    message: this.ResMsg.HTTP_OK,
+                    code: this.StatusCode.HTTP_OK,
+                    data: data,
                 };
             }));
         });
