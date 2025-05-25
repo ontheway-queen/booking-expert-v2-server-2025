@@ -36,6 +36,77 @@ class AgentHotelValidator {
                 .min(1)
                 .required(),
         });
+        this.hotelBooking = joi_1.default.object({
+            search_id: joi_1.default.string().required(),
+            hotel_code: joi_1.default.number().required(),
+            group_code: joi_1.default.string().required(),
+            city_code: joi_1.default.number().required(),
+            checkin: joi_1.default.string().required(),
+            checkout: joi_1.default.string().required(),
+            booking_comments: joi_1.default.string().optional(),
+            booking_items: joi_1.default.string()
+                .custom((value, helpers) => {
+                try {
+                    const parsedValue = JSON.parse(value);
+                    const validator = joi_1.default.array()
+                        .items(joi_1.default.object({
+                        room_code: joi_1.default.string().required(),
+                        rate_key: joi_1.default.string().required(),
+                        rooms: joi_1.default.array()
+                            .items(joi_1.default.object({
+                            room_reference: joi_1.default.string().required(),
+                            paxes: joi_1.default.array()
+                                .items(joi_1.default.object({
+                                title: joi_1.default.string().required(),
+                                name: joi_1.default.string().required(),
+                                surname: joi_1.default.string().required(),
+                                type: joi_1.default.string().valid('AD', 'CH').required(),
+                            }))
+                                .min(1)
+                                .required(),
+                        }))
+                            .min(1)
+                            .required(),
+                    }))
+                        .min(1)
+                        .required();
+                    const { error } = validator.validate(parsedValue);
+                    if (error) {
+                        return helpers.message({ custom: error.message });
+                    }
+                    return parsedValue;
+                }
+                catch (_a) {
+                    return helpers.message({
+                        custom: 'Invalid JSON format in booking_items',
+                    });
+                }
+            })
+                .required(),
+            holder: joi_1.default.string().custom((value, helpers) => {
+                try {
+                    const parsedValue = JSON.parse(value);
+                    const validator = joi_1.default.object({
+                        title: joi_1.default.string().required(),
+                        name: joi_1.default.string().required(),
+                        surname: joi_1.default.string().required(),
+                        email: joi_1.default.string().email().optional(),
+                        phone_number: joi_1.default.string().optional(),
+                        client_nationality: joi_1.default.string().required(),
+                    }).required();
+                    const { error } = validator.validate(parsedValue);
+                    if (error) {
+                        return helpers.message({ custom: error.message });
+                    }
+                    return parsedValue;
+                }
+                catch (_a) {
+                    return helpers.message({
+                        custom: 'Invalid JSON format in holder',
+                    });
+                }
+            }),
+        });
     }
 }
 exports.default = AgentHotelValidator;

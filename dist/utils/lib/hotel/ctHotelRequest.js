@@ -30,8 +30,8 @@ class CTHotelRequests {
                     'Content-Type': 'application/json',
                 };
                 const response = yield axios_1.default.get(apiUrl, { headers });
-                const data = response.data;
-                if (data.success) {
+                const data = response === null || response === void 0 ? void 0 : response.data;
+                if (data === null || data === void 0 ? void 0 : data.success) {
                     return data;
                 }
                 else {
@@ -63,13 +63,14 @@ class CTHotelRequests {
                         response: error,
                     },
                 });
-                console.error('Error calling API:', error.response.status);
+                console.error('Error calling API:', error);
                 return false;
             }
         });
     }
     postRequest(endpoint, requestData) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const apiUrl = BASE_URL + endpoint;
             try {
                 const headers = {
@@ -84,7 +85,7 @@ class CTHotelRequests {
                     validateStatus: () => true,
                 });
                 console.log('Response:', response.data);
-                if (!response.data.success) {
+                if (!((_a = response === null || response === void 0 ? void 0 : response.data) === null || _a === void 0 ? void 0 : _a.success)) {
                     yield new rootModel_1.default().ErrorLogsModel().insertErrorLogs({
                         level: constants_1.ERROR_LEVEL_WARNING,
                         message: `Error from Cholo Travel API`,

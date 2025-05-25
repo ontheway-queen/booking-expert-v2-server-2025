@@ -26,12 +26,15 @@ class AgentHotelService extends abstract_service_1.default {
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const agencyModel = this.Model.AgencyModel(trx);
                 const OthersModel = this.Model.OthersModel(trx);
-                const agent = yield agencyModel.checkAgency({ agency_id });
+                const agent = yield agencyModel.checkAgency({
+                    agency_id,
+                    status: 'Active',
+                });
                 if (!agent) {
                     return {
                         success: false,
-                        message: this.ResMsg.HTTP_NOT_FOUND,
-                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
                 if (!agent.hotel_markup_set) {
@@ -76,12 +79,15 @@ class AgentHotelService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const agencyModel = this.Model.AgencyModel(trx);
-                const agent = yield agencyModel.checkAgency({ agency_id });
+                const agent = yield agencyModel.checkAgency({
+                    agency_id,
+                    status: 'Active',
+                });
                 if (!agent) {
                     return {
                         success: false,
-                        message: this.ResMsg.HTTP_NOT_FOUND,
-                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
                 if (!agent.hotel_markup_set) {
@@ -115,12 +121,15 @@ class AgentHotelService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const agencyModel = this.Model.AgencyModel(trx);
-                const agent = yield agencyModel.checkAgency({ agency_id });
+                const agent = yield agencyModel.checkAgency({
+                    agency_id,
+                    status: 'Active',
+                });
                 if (!agent) {
                     return {
                         success: false,
-                        message: this.ResMsg.HTTP_NOT_FOUND,
-                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
                 if (!agent.hotel_markup_set) {
@@ -144,6 +153,43 @@ class AgentHotelService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_OK,
                     code: this.StatusCode.HTTP_OK,
                     data: data,
+                };
+            }));
+        });
+    }
+    hotelBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id, user_id } = req.agencyUser;
+                const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
+                const agencyModel = this.Model.AgencyModel(trx);
+                const agent = yield agencyModel.checkAgency({
+                    agency_id,
+                    status: 'Active',
+                });
+                if (!agent) {
+                    return {
+                        success: false,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                    };
+                }
+                if (!agent.hotel_markup_set) {
+                    return {
+                        success: false,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                    };
+                }
+                const files = req.files || [];
+                if (files.length) {
+                }
+                const body = req.body;
+                return {
+                    success: true,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                    code: this.StatusCode.HTTP_OK,
+                    data: body,
                 };
             }));
         });

@@ -1,7 +1,10 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 import { CTHotelSupportService } from '../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service';
-import { AgentHotelSearchReqBody } from '../utils/types/agentHotel.types';
+import {
+  IAgentHotelBookingReqBody,
+  IAgentHotelSearchReqBody,
+} from '../utils/types/agentHotel.types';
 
 export class AgentHotelService extends AbstractServices {
   constructor() {
@@ -15,13 +18,16 @@ export class AgentHotelService extends AbstractServices {
       const agencyModel = this.Model.AgencyModel(trx);
       const OthersModel = this.Model.OthersModel(trx);
 
-      const agent = await agencyModel.checkAgency({ agency_id });
+      const agent = await agencyModel.checkAgency({
+        agency_id,
+        status: 'Active',
+      });
 
       if (!agent) {
         return {
           success: false,
-          message: this.ResMsg.HTTP_NOT_FOUND,
-          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
 
@@ -33,7 +39,7 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
-      const payload = req.body as AgentHotelSearchReqBody;
+      const payload = req.body as IAgentHotelSearchReqBody;
 
       await OthersModel.insertHotelSearchHistory({
         check_in_date: payload.checkin,
@@ -75,13 +81,16 @@ export class AgentHotelService extends AbstractServices {
       const ctHotelSupport = new CTHotelSupportService(trx);
       const agencyModel = this.Model.AgencyModel(trx);
 
-      const agent = await agencyModel.checkAgency({ agency_id });
+      const agent = await agencyModel.checkAgency({
+        agency_id,
+        status: 'Active',
+      });
 
       if (!agent) {
         return {
           success: false,
-          message: this.ResMsg.HTTP_NOT_FOUND,
-          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
 
@@ -122,13 +131,16 @@ export class AgentHotelService extends AbstractServices {
       const ctHotelSupport = new CTHotelSupportService(trx);
       const agencyModel = this.Model.AgencyModel(trx);
 
-      const agent = await agencyModel.checkAgency({ agency_id });
+      const agent = await agencyModel.checkAgency({
+        agency_id,
+        status: 'Active',
+      });
 
       if (!agent) {
         return {
           success: false,
-          message: this.ResMsg.HTTP_NOT_FOUND,
-          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
 
@@ -164,6 +176,49 @@ export class AgentHotelService extends AbstractServices {
         message: this.ResMsg.HTTP_OK,
         code: this.StatusCode.HTTP_OK,
         data: data,
+      };
+    });
+  }
+
+  public async hotelBooking(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id, user_id } = req.agencyUser;
+      const ctHotelSupport = new CTHotelSupportService(trx);
+      const agencyModel = this.Model.AgencyModel(trx);
+
+      const agent = await agencyModel.checkAgency({
+        agency_id,
+        status: 'Active',
+      });
+
+      if (!agent) {
+        return {
+          success: false,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+        };
+      }
+
+      if (!agent.hotel_markup_set) {
+        return {
+          success: false,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+        };
+      }
+
+      const files = req.files || ([] as Express.Multer.File[]);
+
+      if (files.length) {
+      }
+
+      const body = req.body as IAgentHotelBookingReqBody;
+
+      return {
+        success: true,
+        message: this.ResMsg.HTTP_NOT_FOUND,
+        code: this.StatusCode.HTTP_OK,
+        data: body,
       };
     });
   }

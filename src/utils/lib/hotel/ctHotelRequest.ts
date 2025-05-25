@@ -18,9 +18,8 @@ export default class CTHotelRequests {
 
       const response = await axios.get(apiUrl, { headers });
 
-      const data = response.data;
-
-      if (data.success) {
+      const data = response?.data;
+      if (data?.success) {
         return data;
       } else {
         await new Models().ErrorLogsModel().insertErrorLogs({
@@ -50,7 +49,7 @@ export default class CTHotelRequests {
           response: error,
         },
       });
-      console.error('Error calling API:', error.response.status);
+      console.error('Error calling API:', error);
       return false;
     }
   }
@@ -73,7 +72,7 @@ export default class CTHotelRequests {
 
       console.log('Response:', response.data);
 
-      if (!response.data.success) {
+      if (!response?.data?.success) {
         await new Models().ErrorLogsModel().insertErrorLogs({
           level: ERROR_LEVEL_WARNING,
           message: `Error from Cholo Travel API`,

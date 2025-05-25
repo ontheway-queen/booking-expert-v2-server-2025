@@ -41,11 +41,16 @@ class Uploader extends abstract_storatge_1.default {
                 fileFilter: function (_req, file, cb) {
                     // Check allowed extensions
                     if (types.includes(file.mimetype)) {
-                        if (fields.includes(file.fieldname)) {
-                            cb(null, true); // no errors
+                        if (fields) {
+                            if (fields.includes(file.fieldname)) {
+                                cb(null, true); // no errors
+                            }
+                            else {
+                                cb(new Error(`File fieldname '${file.fieldname}' is not allowed`));
+                            }
                         }
                         else {
-                            cb(new Error(`File fieldname '${file.fieldname}' is not allowed`));
+                            cb(null, true); // no errors
                         }
                     }
                     else {

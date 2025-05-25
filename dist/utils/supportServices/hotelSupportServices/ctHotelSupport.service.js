@@ -58,7 +58,7 @@ class CTHotelSupportService extends abstract_service_1.default {
     SearchLocation(filter) {
         return __awaiter(this, void 0, void 0, function* () {
             const response = yield this.request.getRequest(`${ctHotelApiEndpoints_1.default.SEARCH_LOCATION}?filter=${filter}`);
-            if (response.success) {
+            if (response === null || response === void 0 ? void 0 : response.success) {
                 return {
                     success: true,
                     message: response.message,
@@ -235,6 +235,9 @@ class CTHotelSupportService extends abstract_service_1.default {
             });
             return Object.assign(Object.assign({}, restData), { fee: price_details, rates: newRates });
         });
+    }
+    HotelBooking() {
+        return __awaiter(this, void 0, void 0, function* () { });
     }
     // get markup price func
     getMarkupPrice({ prices, markup, }) {

@@ -267,3 +267,36 @@ export interface ICTHotelRoomRecheckResponse {
 }
 
 // The response from the hotel room Recheck API ======END============================
+
+export interface ICTHotelBookingPayload {
+  search_id: string;
+  hotel_code: number;
+  group_code: string;
+  city_code: number;
+  checkin: string;
+  checkout: string;
+  booking_comments: string;
+  booking_items: {
+    room_code: string;
+    rate_key: string;
+    rooms: {
+      room_reference: string;
+      paxes: {
+        title: string;
+        name: string;
+        surname: string;
+        type: string;
+        passport?: string;
+      }[];
+    }[];
+  }[];
+  holder: {
+    title: string;
+    name: string;
+    surname: string;
+    email: string;
+    phone_number: string;
+    client_nationality: string;
+    passport?: string;
+  };
+}

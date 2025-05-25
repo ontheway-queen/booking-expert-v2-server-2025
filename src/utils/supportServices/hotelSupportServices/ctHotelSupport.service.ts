@@ -51,7 +51,7 @@ export class CTHotelSupportService extends AbstractServices {
       `${CTHotelAPIEndpoints.SEARCH_LOCATION}?filter=${filter}`
     );
 
-    if (response.success) {
+    if (response?.success) {
       return {
         success: true,
         message: response.message,
@@ -306,6 +306,8 @@ export class CTHotelSupportService extends AbstractServices {
       rates: newRates,
     };
   }
+
+  public async HotelBooking() {}
 
   // get markup price func
   private getMarkupPrice({

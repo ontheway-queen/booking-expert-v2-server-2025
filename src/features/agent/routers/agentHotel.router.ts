@@ -13,5 +13,13 @@ export default class AgentHotelRouter extends AbstractRouter {
     this.router.post('/search', this.controller.hotelSearch);
     this.router.post('/rooms', this.controller.hotelRooms);
     this.router.post('/room/recheck', this.controller.hotelRoomRecheck);
+    this.router
+      .route('/booking')
+      .post(
+        this.uploader.cloudUploadRaw(
+          this.fileFolders.AGENT_HOTEL_BOOKING_FILES
+        ),
+        this.controller.hotelBooking
+      );
   }
 }
