@@ -6,7 +6,9 @@ exports.origin = [
     'http://localhost:5000',
     'http://10.10.220.47:5000',
     'http://10.10.220.31:3000',
-    'http://10.10.220.31:3000',
+    'https://agent.bookingexpert.us',
+    'https://www.bookingexpert.us',
+    'https://admin.bookingexpert.us',
     'http://10.10.220.42:3000',
     'http://10.10.220.42:6565'
 ];
@@ -56,14 +58,14 @@ exports.SOURCE_B2C = 'B2C';
 exports.SOURCE_EXTERNAL = 'EXTERNAL';
 exports.SOURCE_ADMIN = 'ADMIN';
 //slug type
-exports.SLUG_TYPE_HOLIDAY = "holiday";
-exports.SLUG_TYPE_UMRAH = "umrah";
-exports.SLUG_TYPE_BLOG = "blog";
+exports.SLUG_TYPE_HOLIDAY = 'holiday';
+exports.SLUG_TYPE_UMRAH = 'umrah';
+exports.SLUG_TYPE_BLOG = 'blog';
 //deposit type
-exports.DEPOSIT_STATUS_PENDING = "PENDING";
-exports.DEPOSIT_STATUS_APPROVED = "APPROVED";
-exports.DEPOSIT_STATUS_REJECTED = "REJECTED";
-exports.DEPOSIT_STATUS_CANCELLED = "CANCELLED";
+exports.DEPOSIT_STATUS_PENDING = 'PENDING';
+exports.DEPOSIT_STATUS_APPROVED = 'APPROVED';
+exports.DEPOSIT_STATUS_REJECTED = 'REJECTED';
+exports.DEPOSIT_STATUS_CANCELLED = 'CANCELLED';
 // White label permissions modules
 exports.WHITE_LABEL_PERMISSIONS_MODULES = [];
 //generate auto unique id
@@ -88,7 +90,7 @@ exports.GENERATE_AUTO_UNIQUE_ID = {
 };
 //payment gateways
 exports.PAYMENT_GATEWAYS = {
-    'SSL': 'SSL'
+    SSL: 'SSL',
 };
 //invoice type
 exports.INVOICE_TYPES = {

@@ -8,12 +8,13 @@ import SabreRequests from '../../lib/flight/sabreRequest';
 import Lib from '../../lib/lib';
 import { ERROR_LEVEL_WARNING, PROJECT_EMAIL } from '../../miscellaneous/constants';
 import { FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_REFUNDED, FLIGHT_BOOKING_VOID, FLIGHT_TICKET_ISSUE, MARKUP_MODE_INCREASE, MARKUP_TYPE_PER, SABRE_API, SABRE_FLIGHT_ITINS } from '../../miscellaneous/flightConstent';
-import SabreAPIEndpoints from '../../miscellaneous/sabreApiEndpoints';
+
 import { BD_AIRPORT } from '../../miscellaneous/staticData';
 import { IFormattedFlight, IFormattedFlightItinerary, IFlightSearchReqBody, IFlightAvailability, IFlightDataAvailabilitySegment } from '../../supportTypes/flightTypes/commonFlightTypes';
 import { IBaggageAndAvailabilityAllSeg, IBaggageAndAvailabilityAllSegSegmentDetails, IContactNumber, IFormattedArrival, IFormattedCarrier, IFormattedDeparture, IFormattedLegDesc, IFormattedScheduleDesc, ILegDescOption, ISabreNewPassenger, ISabreResponseResult, ISecureFlight, OriginDestinationInformation } from '../../supportTypes/flightTypes/sabreFlightTypes';
 import { CommonFlightSupportService } from './commonFlightSupport.service';
 import { IFlightBookingRequestBody } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
+import SabreAPIEndpoints from '../../miscellaneous/endpoints/sabreApiEndpoints';
 export default class SabreFlightService extends AbstractServices {
   private trx: Knex.Transaction;
   private request = new SabreRequests();
@@ -135,7 +136,7 @@ export default class SabreFlightService extends AbstractServices {
     booking_block,
     reqBody,
     markup_set_id,
-    markup_amount
+    markup_amount,
   }: {
     reqBody: IFlightSearchReqBody;
     set_flight_api_id: number;
@@ -143,8 +144,8 @@ export default class SabreFlightService extends AbstractServices {
     booking_block: boolean;
     markup_amount?: {
       markup: number;
-      markup_type: "PER" | "FLAT",
-      markup_mode: "INCREASE" | "DECREASE"
+      markup_type: "PER" | "FLAT";
+      markup_mode: "INCREASE" | "DECREASE";
     }
   }) {
     const flightRequestBody = await this.FlightReqFormatterV5(
@@ -170,7 +171,6 @@ export default class SabreFlightService extends AbstractServices {
       set_flight_api_id,
       booking_block,
       markup_set_id,
-      markup_amount
     });
     return result;
   }
@@ -566,17 +566,14 @@ export default class SabreFlightService extends AbstractServices {
           }
         }
       }
-
       //add addition markup(applicable for sub agent/agent b2c)
       if (markup_amount) {
         if (markup_amount.markup_mode === 'INCREASE') {
-
           new_fare.convenience_fee += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(new_fare.total_price) * Number(markup_amount.markup)) / 100;
         } else {
           new_fare.discount += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(new_fare.total_price) * Number(markup_amount.markup)) / 100;
         }
       }
-
       new_fare.payable =
         Number(new_fare.total_price) +
         Number(new_fare.convenience_fee) -
@@ -708,30 +705,27 @@ export default class SabreFlightService extends AbstractServices {
 
   //////==================FLIGHT REVALIDATE (START)=========================//////
   //sabre flight revalidate service
-  public async SabreFlightRevalidate(
-    {
-      reqBody,
-      retrieved_response,
-      markup_set_id,
-      set_flight_api_id,
-      flight_id,
-      booking_block,
-      markup_amount
-    }:
-      {
-        reqBody: IFlightSearchReqBody;
-        retrieved_response: IFormattedFlightItinerary;
-        markup_set_id: number;
-        set_flight_api_id: number;
-        flight_id: string;
-        booking_block: boolean;
-        markup_amount?: {
-          markup: number;
-          markup_type: "PER" | "FLAT";
-          markup_mode: "INCREASE" | "DECREASE";
-        }
-      }
-  ) {
+  public async SabreFlightRevalidate({
+    reqBody,
+    retrieved_response,
+    markup_set_id,
+    set_flight_api_id,
+    flight_id,
+    booking_block,
+    markup_amount
+  }: {
+    reqBody: IFlightSearchReqBody;
+    retrieved_response: IFormattedFlightItinerary;
+    markup_set_id: number;
+    set_flight_api_id: number;
+    flight_id: string;
+    booking_block: boolean;
+    markup_amount?: {
+      markup: number;
+      markup_type: "PER" | "FLAT";
+      markup_mode: "INCREASE" | "DECREASE";
+    }
+  }) {
     const revalidate_req_body = await this.RevalidateFlightReqFormatter(
       reqBody,
       retrieved_response

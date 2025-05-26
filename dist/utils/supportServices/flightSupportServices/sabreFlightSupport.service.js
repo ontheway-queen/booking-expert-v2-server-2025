@@ -21,9 +21,9 @@ const sabreRequest_1 = __importDefault(require("../../lib/flight/sabreRequest"))
 const lib_1 = __importDefault(require("../../lib/lib"));
 const constants_1 = require("../../miscellaneous/constants");
 const flightConstent_1 = require("../../miscellaneous/flightConstent");
-const sabreApiEndpoints_1 = __importDefault(require("../../miscellaneous/sabreApiEndpoints"));
 const staticData_1 = require("../../miscellaneous/staticData");
 const commonFlightSupport_service_1 = require("./commonFlightSupport.service");
+const sabreApiEndpoints_1 = __importDefault(require("../../miscellaneous/endpoints/sabreApiEndpoints"));
 class SabreFlightService extends abstract_service_1.default {
     constructor(trx) {
         super();
@@ -128,7 +128,7 @@ class SabreFlightService extends abstract_service_1.default {
     }
     // Flight search service
     FlightSearch(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, markup_set_id, markup_amount }) {
+        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, markup_set_id, markup_amount, }) {
             const flightRequestBody = yield this.FlightReqFormatterV5(reqBody, set_flight_api_id);
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_SEARCH_ENDPOINT_V5, flightRequestBody);
             // return [response];
@@ -144,7 +144,6 @@ class SabreFlightService extends abstract_service_1.default {
                 set_flight_api_id,
                 booking_block,
                 markup_set_id,
-                markup_amount
             });
             return result;
         });

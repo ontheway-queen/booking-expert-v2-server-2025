@@ -35,8 +35,10 @@ const getConfig = () => {
         SABRE_URL: process.env.SABRE_URL,
         SABRE_USERNAME: process.env.SABRE_USERNAME,
         SABRE_LNIATA_CODE: process.env.SABRE_LNIATA_CODE,
+        CT_URL: process.env.CT_URL,
+        CT_API_KEY: process.env.CT_API_KEY,
         SERVER_URL: process.env.SERVER_URL,
-        WFTT_URL: process.env.WFTT_URL,
+        WFTT_URL: process.env.WFTT_URL
     };
 };
 const getSanitzedConfig = (config) => {

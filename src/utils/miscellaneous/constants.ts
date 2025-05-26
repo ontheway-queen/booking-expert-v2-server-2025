@@ -3,7 +3,9 @@ export const origin: string[] = [
   'http://localhost:5000',
   'http://10.10.220.47:5000',
   'http://10.10.220.31:3000',
-  'http://10.10.220.31:3000',
+  'https://agent.bookingexpert.us',
+  'https://www.bookingexpert.us',
+  'https://admin.bookingexpert.us',
   'http://10.10.220.42:3000',
   'http://10.10.220.42:6565'
 ];
@@ -63,15 +65,15 @@ export const SOURCE_EXTERNAL = 'EXTERNAL' as const;
 export const SOURCE_ADMIN = 'ADMIN' as const;
 
 //slug type
-export const SLUG_TYPE_HOLIDAY = "holiday";
-export const SLUG_TYPE_UMRAH = "umrah";
-export const SLUG_TYPE_BLOG = "blog";
+export const SLUG_TYPE_HOLIDAY = 'holiday';
+export const SLUG_TYPE_UMRAH = 'umrah';
+export const SLUG_TYPE_BLOG = 'blog';
 
 //deposit type
-export const DEPOSIT_STATUS_PENDING = "PENDING";
-export const DEPOSIT_STATUS_APPROVED = "APPROVED";
-export const DEPOSIT_STATUS_REJECTED = "REJECTED";
-export const DEPOSIT_STATUS_CANCELLED = "CANCELLED";
+export const DEPOSIT_STATUS_PENDING = 'PENDING';
+export const DEPOSIT_STATUS_APPROVED = 'APPROVED';
+export const DEPOSIT_STATUS_REJECTED = 'REJECTED';
+export const DEPOSIT_STATUS_CANCELLED = 'CANCELLED';
 
 // White label permissions modules
 export const WHITE_LABEL_PERMISSIONS_MODULES: string[] = [];
@@ -99,8 +101,9 @@ export const GENERATE_AUTO_UNIQUE_ID = {
 
 //payment gateways
 export const PAYMENT_GATEWAYS = {
-  'SSL': 'SSL'
-}
+  SSL: 'SSL',
+};
+
 
 //invoice type
 export const INVOICE_TYPES = {
