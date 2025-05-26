@@ -219,6 +219,7 @@ export default class AgentFlightValidator {
   public flightBookingSchema = Joi.object({
     search_id: Joi.string().required(),
     flight_id: Joi.string().required(),
+    booking_confirm: Joi.boolean().optional(),
     passengers: Joi.string()
       .required()
       .custom((value, helpers) => {

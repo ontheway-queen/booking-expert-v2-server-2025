@@ -243,9 +243,9 @@ export default class AuthB2CService extends AbstractServices {
         req.body as IRegisterB2CReqBody;
       const UserModel = this.Model.B2CUserModel(trx);
 
-      const checkAgentUser = await UserModel.checkUser({ email });
+      const checkB2CUser = await UserModel.checkUser({ email });
 
-      if (checkAgentUser) {
+      if (checkB2CUser) {
         return {
           success: false,
           code: this.StatusCode.HTTP_CONFLICT,

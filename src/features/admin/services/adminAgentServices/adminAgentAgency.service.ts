@@ -69,7 +69,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       if (data.white_label) {
         const wPermissions = await AgencyModel.getWhiteLabelPermission(
-          agency_id
+          { agency_id }
         );
 
         if (wPermissions) {
@@ -144,7 +144,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       if (restBody.white_label && !white_label_permissions) {
         const checkPermission = await AgentModel.getWhiteLabelPermission(
-          agency_id
+          {agency_id}
         );
 
         if (!checkPermission) {
@@ -165,7 +165,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       if (white_label_permissions) {
         const checkPermission = await AgentModel.getWhiteLabelPermission(
-          agency_id
+          {agency_id}
         );
 
         if (checkPermission && white_label_permissions) {
@@ -197,8 +197,8 @@ export default class AdminAgentAgencyService extends AbstractServices {
       if (payload.trade_license && checkAgency.trade_license) {
         deleteFiles.push(checkAgency.trade_license);
       }
-      
-      if(Object.keys(payload).length){
+
+      if (Object.keys(payload).length) {
         await AgentModel.updateAgency(payload, agency_id);
       }
 

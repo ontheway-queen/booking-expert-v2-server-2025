@@ -29,7 +29,12 @@ class CommonModel extends schema_1.default {
                 .andWhere('email', payload.email)
                 .andWhere('type', payload.type)
                 .andWhere('matched', 0)
-                .andWhereRaw(`"create_date" + interval '${constants_1.OTP_DEFAULT_EXPIRY} minutes' > NOW()`);
+                .andWhereRaw(`"create_date" + interval '${constants_1.OTP_DEFAULT_EXPIRY} minutes' > NOW()`)
+                .andWhere((qb) => {
+                if (payload.agency_id) {
+                    qb.andWhere("agency_id", payload.agency_id);
+                }
+            });
             return check;
         });
     }
@@ -47,7 +52,12 @@ class CommonModel extends schema_1.default {
             return yield this.db('email_otp')
                 .withSchema(this.DBO_SCHEMA)
                 .update(payload)
-                .where('id', where.id);
+                .where('id', where.id)
+                .andWhere((qb) => {
+                if (where.agency_id) {
+                    qb.andWhere("agency_id", where.agency_id);
+                }
+            });
         });
     }
     // Get Env Variable

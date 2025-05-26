@@ -39,6 +39,7 @@ export interface IGetFlightBookingListFilterQuery {
     skip?: number;
     source_id?: number;
     booked_by: SourceType;
+    created_by?: number;
 }
 
 export interface IGetSingleFlightBookingParams {

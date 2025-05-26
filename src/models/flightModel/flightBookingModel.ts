@@ -52,11 +52,14 @@ export default class FlightBookingModel extends Schema {
                     qb.andWhere((qbc) => {
                         qbc.whereILike("booking_ref", `${query.filter}%`)
                         qbc.orWhereILike("gds_pnr", `${query.filter}`),
-                        qbc.orWhereILike("source_name", `%${query.filter}%`)
+                            qbc.orWhereILike("source_name", `%${query.filter}%`)
                     });
                 }
                 if (query.source_id) {
                     qb.andWhere("source_id", query.source_id);
+                }
+                if (query.created_by) {
+                    qb.andWhere("created_by", query.created_by);
                 }
             })
             .orderBy("id", "desc")
@@ -85,6 +88,9 @@ export default class FlightBookingModel extends Schema {
                     if (query.source_id) {
                         qb.andWhere("source_id", query.source_id);
                     }
+                    if (query.created_by) {
+                        qb.andWhere("created_by", query.created_by);
+                    }
                 });
         }
         return {
@@ -109,7 +115,7 @@ export default class FlightBookingModel extends Schema {
                 if (agency_id) {
                     qb.andWhere("source_id", agency_id);
                 }
-                if(user_id){
+                if (user_id) {
                     qb.andWhere("created_by", user_id)
                 }
             })

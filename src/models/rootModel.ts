@@ -30,6 +30,7 @@ import SubAgentMarkupModel from './agentModel/subAgentMarkupModel';
 import ADMManagementModel from './paymentModel/admManagementModel';
 import InvoiceModel from './paymentModel/invoiceModel';
 import MoneyReceiptModel from './paymentModel/moneyReceiptModel';
+import TravelerModel from './travelerModel/travelerModel';
 
 export default class Models {
   //Common model
@@ -180,5 +181,10 @@ export default class Models {
   //Money receipt model
   public MoneyReceiptModel(trx?: Knex.Transaction) {
     return new MoneyReceiptModel(trx || db);
+  }
+
+  //Traveler model
+  public TravelerModel(trx?: Knex.Transaction) {
+    return new TravelerModel(trx || db);
   }
 }

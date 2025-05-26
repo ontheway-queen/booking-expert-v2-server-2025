@@ -34,6 +34,7 @@ const subAgentMarkupModel_1 = __importDefault(require("./agentModel/subAgentMark
 const admManagementModel_1 = __importDefault(require("./paymentModel/admManagementModel"));
 const invoiceModel_1 = __importDefault(require("./paymentModel/invoiceModel"));
 const moneyReceiptModel_1 = __importDefault(require("./paymentModel/moneyReceiptModel"));
+const travelerModel_1 = __importDefault(require("./travelerModel/travelerModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -154,6 +155,10 @@ class Models {
     //Money receipt model
     MoneyReceiptModel(trx) {
         return new moneyReceiptModel_1.default(trx || database_1.db);
+    }
+    //Traveler model
+    TravelerModel(trx) {
+        return new travelerModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

@@ -25,7 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
-class AdminProfileService extends abstract_service_1.default {
+class AgentProfileService extends abstract_service_1.default {
     constructor() {
         super();
     }
@@ -53,7 +53,7 @@ class AdminProfileService extends abstract_service_1.default {
                 blog: false,
             };
             if (user.white_label) {
-                const wPermissions = yield AgentModel.getWhiteLabelPermission(agency_id);
+                const wPermissions = yield AgentModel.getWhiteLabelPermission({ agency_id });
                 if (wPermissions) {
                     const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
                     whiteLabelPermissions = rest;
@@ -164,4 +164,4 @@ class AdminProfileService extends abstract_service_1.default {
         });
     }
 }
-exports.default = AdminProfileService;
+exports.default = AgentProfileService;

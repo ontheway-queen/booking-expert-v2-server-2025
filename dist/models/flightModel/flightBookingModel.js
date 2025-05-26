@@ -50,6 +50,9 @@ class FlightBookingModel extends schema_1.default {
                 if (query.source_id) {
                     qb.andWhere("source_id", query.source_id);
                 }
+                if (query.created_by) {
+                    qb.andWhere("created_by", query.created_by);
+                }
             })
                 .orderBy("id", "desc")
                 .limit(query.limit || 100)
@@ -75,6 +78,9 @@ class FlightBookingModel extends schema_1.default {
                     }
                     if (query.source_id) {
                         qb.andWhere("source_id", query.source_id);
+                    }
+                    if (query.created_by) {
+                        qb.andWhere("created_by", query.created_by);
                     }
                 });
             }

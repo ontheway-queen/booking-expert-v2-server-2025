@@ -21,7 +21,7 @@ export default class AgencyB2CUserModel extends Schema {
   //create user
   public async createUser(
     payload: ICreateAgentB2CUserPayload
-  ): Promise<number[]> {
+  ): Promise<{ id: number }[]> {
     return await this.db('users')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .insert(payload, 'id');
@@ -133,7 +133,7 @@ export default class AgencyB2CUserModel extends Schema {
         'status'
       )
       .andWhere('agency_id', agency_id)
-      .where((qb) => {
+      .andWhere((qb) => {
         if (username) {
           qb.orWhere('username', username);
         }
@@ -147,5 +147,17 @@ export default class AgencyB2CUserModel extends Schema {
         }
       })
       .first();
+  }
+
+  public async updateUserByEmail(
+    payload: IUpdateAgencyB2CUserPayload,
+    email: string,
+    agency_id: number
+  ) {
+    return await this.db('users')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .update(payload)
+      .andWhere('email', email)
+      .andWhere('agency_id', agency_id);
   }
 }

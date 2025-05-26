@@ -52,6 +52,18 @@ class AgentPaymentsValidator {
             cancelled_page: joi_1.default.string().required(),
             is_app: joi_1.default.boolean().optional()
         });
+        this.getInvoicesFilterQuery = joi_1.default.object({
+            from_date: joi_1.default.date(),
+            to_date: joi_1.default.date(),
+            limit: joi_1.default.number(),
+            skip: joi_1.default.number()
+        });
+        this.getPartialPaymentsFilterQuery = joi_1.default.object({
+            from_date: joi_1.default.date(),
+            to_date: joi_1.default.date(),
+            limit: joi_1.default.number(),
+            skip: joi_1.default.number()
+        });
     }
 }
 exports.AgentPaymentsValidator = AgentPaymentsValidator;

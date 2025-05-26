@@ -18,8 +18,13 @@ export class CommonFlightSupportService extends AbstractServices {
         search_id: string;
         flight_id: string;
         markup_set_id: number;
+        markup_amount?: {
+            markup: number;
+            markup_type: "PER" | "FLAT";
+            markup_mode: "INCREASE" | "DECREASE";
+        }
     }) {
-        const { search_id, flight_id, markup_set_id } = payload;
+        const { search_id, flight_id, markup_set_id, markup_amount } = payload;
         //get data from redis using the search id
         const retrievedData = await getRedis(search_id);
 
@@ -45,7 +50,7 @@ export class CommonFlightSupportService extends AbstractServices {
             api_name: foundItem.api === CUSTOM_API ? WFTT_API : foundItem.api,
         });
 
-        if(!apiData[0]?.id){
+        if (!apiData[0]?.id) {
             throw new CustomError('Set Flight API ID not found. Contact with the support team', 500);
         }
 
@@ -56,12 +61,15 @@ export class CommonFlightSupportService extends AbstractServices {
             //SABRE REVALIDATE
             const sabreSubService = new SabreFlightService(this.trx);
             revalidate_data = await sabreSubService.SabreFlightRevalidate(
-                retrievedData.reqBody,
-                foundItem,
-                markup_set_id,
-                apiData[0].id,
-                flight_id,
-                booking_block
+                {
+                    reqBody: retrievedData.reqBody,
+                    retrieved_response: foundItem,
+                    markup_set_id: markup_set_id,
+                    set_flight_api_id: apiData[0].id,
+                    flight_id: flight_id,
+                    booking_block: booking_block,
+                    markup_amount
+                }
             );
         } else if (foundItem.api === CUSTOM_API) {
             //WFTT REVALIDATE
@@ -72,7 +80,8 @@ export class CommonFlightSupportService extends AbstractServices {
                 revalidate_body: {
                     flight_id: foundItem.flight_id,
                     search_id: foundItem.api_search_id
-                }
+                },
+                markup_amount
             })
         }
         else {
@@ -101,11 +110,11 @@ export class CommonFlightSupportService extends AbstractServices {
         flight_id: string;
         booking_price: number;
     }) {
-        const retrievedData = await getRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${payload.flight_id}`) as IFormattedFlightItinerary;
+        const retrievedData = await getRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${payload.flight_id}`);
         if (!retrievedData) {
             return null;
         }
-        if (retrievedData.fare.total_price === payload.booking_price) {
+        if (retrievedData.revalidate_data.fare.total_price === payload.booking_price) {
             return false;
         } else {
             return true;

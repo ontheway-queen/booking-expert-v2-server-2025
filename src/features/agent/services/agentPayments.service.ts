@@ -214,5 +214,142 @@ export class AgentPaymentsService extends AbstractServices {
         });
     }
 
+    public async getInvoices(req: Request) {
+        const { agency_id } = req.agencyUser;
+        const invoiceModel = this.Model.InvoiceModel();
+        const query = req.query;
+        const data = await invoiceModel.getInvoiceList({
+            source_type: SOURCE_AGENT,
+            source_id: agency_id,
+            ...query
+        }, true);
+
+        return {
+            success: true,
+            code: this.StatusCode.HTTP_OK,
+            total: data.total,
+            data: data.data
+        }
+    }
+
+    public async getSingleInvoice(req: Request) {
+        return await this.db.transaction(async (trx) => {
+            const { agency_id } = req.agencyUser;
+            const invoiceModel = this.Model.InvoiceModel(trx);
+            const { id } = req.params;
+            const data = await invoiceModel.getSingleInvoice({
+                id: Number(id),
+                source_id: agency_id,
+                source_type: SOURCE_AGENT
+            });
+
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND
+                }
+            }
+
+            const MoneyReceiptModel = this.Model.MoneyReceiptModel(trx);
+            const money_receipt = await MoneyReceiptModel.getMoneyReceiptList({ invoice_id: Number(id) });
+
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                data: {
+                    ...data,
+                    money_receipt: money_receipt.data
+                }
+            }
+        });
+    }
+
+    public async clearDueOfInvoice(req: Request) {
+        return await this.db.transaction(async (trx) => {
+            const { agency_id, user_id } = req.agencyUser;
+            const invoiceModel = this.Model.InvoiceModel(trx);
+            const { id } = req.params;
+            const data = await invoiceModel.getSingleInvoice({
+                id: Number(id),
+                source_id: agency_id,
+                source_type: SOURCE_AGENT
+            });
+
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND
+                }
+            }
+
+            if (data.due <= 0) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_BAD_REQUEST,
+                    message: "No due has been found with this invoice"
+                }
+            }
+
+            let balance_trans = data.due;
+            let loan_trans = 0;
+
+            //check balance
+            const agencyModel = this.Model.AgencyModel(trx);
+            const check_balance = await agencyModel.getAgencyBalance(agency_id);
+            if (check_balance < data.due) {
+                const agency_details = await agencyModel.getSingleAgency(agency_id);
+                const usable_loan_balance = Number(agency_details?.usable_loan);
+                if ((check_balance + usable_loan_balance) < data.due) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "There is insufficient balance in your account."
+                    }
+                }
+                loan_trans = Number(usable_loan_balance) - (Number(data.due) - Number(check_balance));
+                balance_trans = check_balance;
+            }
+
+            if (loan_trans !== 0) {
+                await agencyModel.updateAgency({ usable_loan: loan_trans }, agency_id);
+            }
+            const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
+            await invoiceModel.updateInvoice({ due: 0 }, Number(id));
+            await moneyReceiptModel.createMoneyReceipt({
+                mr_number: await Lib.generateNo({ trx, type: 'Money_Receipt' }),
+                invoice_id: Number(id),
+                amount: data.due,
+                user_id,
+                details: `Due has been cleared. Balance Transaction: ${balance_trans}. Loan Transaction: ${loan_trans}`
+            });
+
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: "Due has been cleared"
+            }
+        })
+    }
+
+    public async getPartialPaymentList(req: Request) {
+        const { agency_id } = req.agencyUser;
+        const invoiceModel = this.Model.InvoiceModel();
+        const query = req.query;
+        const data = await invoiceModel.getInvoiceList({
+            source_type: SOURCE_AGENT,
+            source_id: agency_id,
+            ...query,
+            partial_payment: true
+        }, true);
+
+        return {
+            success: true,
+            code: this.StatusCode.HTTP_OK,
+            total: data.total,
+            data: data.data
+        }
+    }
 
 }

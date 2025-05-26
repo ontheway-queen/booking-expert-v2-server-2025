@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import AbstractController from '../../../abstract/abstract.controller';
-import AdminProfileService from '../services/agentProfile.service';
-import AdminProfileValidator from '../../admin/utils/validators/adminProfile.validator';
+import AgentProfileService from '../services/agentProfile.service';
+import AgentProfileValidator from '../utils/validators/agentProfile.validator';
 
 export default class AgentProfileController extends AbstractController {
-  private service = new AdminProfileService();
-  private validator = new AdminProfileValidator();
+  private service = new AgentProfileService();
+  private validator = new AgentProfileValidator();
   constructor() {
     super();
   }

@@ -56,8 +56,11 @@ export interface IGetInvoiceQueryFilter {
     user_id?: number;
     ref_id?: number;
     ref_type?: string;
+    partial_payment?: boolean;
 }
 
 export interface IGetSingleInvoiceParams {
     id: number;
+    source_type: typeof SOURCE_AGENT | typeof SOURCE_B2C | typeof SOURCE_AGENT_B2C;
+    source_id: number;
 }

@@ -33,7 +33,12 @@ class CommonModel extends Schema {
       .andWhere('matched', 0)
       .andWhereRaw(
         `"create_date" + interval '${OTP_DEFAULT_EXPIRY} minutes' > NOW()`
-      );
+      )
+      .andWhere((qb) => {
+        if (payload.agency_id) {
+          qb.andWhere("agency_id", payload.agency_id);
+        }
+      });
 
     return check;
   }
@@ -48,12 +53,17 @@ class CommonModel extends Schema {
   // update otp
   public async updateOTP(
     payload: { tried: number; matched?: number },
-    where: { id: number }
+    where: { id: number, agency_id?: number }
   ) {
     return await this.db('email_otp')
       .withSchema(this.DBO_SCHEMA)
       .update(payload)
-      .where('id', where.id);
+      .where('id', where.id)
+      .andWhere((qb)=>{
+        if(where.agency_id){
+          qb.andWhere("agency_id", where.agency_id)
+        }
+      });
   }
 
   // Get Env Variable

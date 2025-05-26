@@ -118,6 +118,7 @@ class AgentB2CSubHolidayValidator {
                     markup_type: joi_1.default.string()
                         .valid(holidayConstants_1.HOLIDAY_PRICE_MARKUP_FLAT, holidayConstants_1.HOLIDAY_PRICE_MARKUP_PER)
                         .optional(),
+                    created_at: joi_1.default.date().optional()
                 })).optional(),
             }), joi_1.default.string().custom((value, helpers) => {
                 try {
@@ -135,6 +136,7 @@ class AgentB2CSubHolidayValidator {
                     day_number: joi_1.default.number().optional(),
                     title: joi_1.default.string().optional(),
                     details: joi_1.default.string().optional(),
+                    created_at: joi_1.default.date().optional()
                 })).optional(),
             }), joi_1.default.string().custom((value, helpers) => {
                 try {
@@ -151,6 +153,7 @@ class AgentB2CSubHolidayValidator {
                     id: joi_1.default.number().required(),
                     type: joi_1.default.string().valid(holidayConstants_1.HOLIDAY_SERVICE_TYPE_INCLUDE, holidayConstants_1.HOLIDAY_SERVICE_TYPE_EXCLUDE).optional(),
                     title: joi_1.default.string().optional(),
+                    created_at: joi_1.default.date().optional()
                 })).optional(),
             }), joi_1.default.string().custom((value, helpers) => {
                 try {

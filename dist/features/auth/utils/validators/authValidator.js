@@ -34,6 +34,14 @@ class AuthValidator {
             email: joi_1.default.string().email().trim().lowercase().max(255).required(),
             gender: joi_1.default.string().valid('Male', 'Female', 'Other').required(),
         });
+        //Agent B2C register validator
+        this.agentB2CRegister = joi_1.default.object({
+            name: joi_1.default.string().trim().min(4).max(255).required(),
+            phone_number: joi_1.default.string().trim().min(10).max(14).required(),
+            email: joi_1.default.string().email().trim().lowercase().max(255).required(),
+            gender: joi_1.default.string().valid('Male', 'Female', 'Other').required(),
+            password: joi_1.default.string().min(8).max(50).required()
+        });
         //Complete Registration Validator
         this.agencyRegisterCompleteValidator = joi_1.default.object({
             token: joi_1.default.string().required().trim(),

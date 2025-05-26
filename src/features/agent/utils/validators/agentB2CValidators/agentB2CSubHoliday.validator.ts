@@ -134,6 +134,7 @@ export class AgentB2CSubHolidayValidator {
                         markup_type: Joi.string()
                             .valid(HOLIDAY_PRICE_MARKUP_FLAT, HOLIDAY_PRICE_MARKUP_PER)
                             .optional(),
+                        created_at: Joi.date().optional()
                     })
                 ).optional(),
             }),
@@ -156,6 +157,7 @@ export class AgentB2CSubHolidayValidator {
                         day_number: Joi.number().optional(),
                         title: Joi.string().optional(),
                         details: Joi.string().optional(),
+                        created_at: Joi.date().optional()
                     })
                 ).optional(),
             }),
@@ -177,6 +179,7 @@ export class AgentB2CSubHolidayValidator {
                         id: Joi.number().required(),
                         type: Joi.string().valid(HOLIDAY_SERVICE_TYPE_INCLUDE, HOLIDAY_SERVICE_TYPE_EXCLUDE).optional(),
                         title: Joi.string().optional(),
+                        created_at: Joi.date().optional()
                     })
                 ).optional(),
             }),

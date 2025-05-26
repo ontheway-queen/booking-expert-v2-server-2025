@@ -17,6 +17,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const commonModel_1 = __importDefault(require("../../models/commonModel/commonModel"));
+const agencyModel_1 = __importDefault(require("../../models/agentModel/agencyModel"));
 class Lib {
     // Create hash string
     static hashValue(password) {
@@ -184,6 +185,33 @@ class Lib {
                     break;
             }
             return 'BE' + NoCode + currYear + newId;
+        });
+    }
+    static getAgentB2CTotalMarkup(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ trx, type, agency_id }) {
+            const model = new agencyModel_1.default(trx);
+            const get_markup = yield model.getAgentB2CMarkup(agency_id);
+            if (!get_markup) {
+                return null;
+            }
+            let markup = 0;
+            let markup_type;
+            let markup_mode;
+            if (type === 'Flight') {
+                markup = get_markup.flight_markup;
+                markup_type = get_markup.flight_markup_type;
+                markup_mode = get_markup.flight_markup_mode;
+            }
+            else {
+                markup = get_markup.hotel_markup;
+                markup_type = get_markup.hotel_markup_type;
+                markup_mode = get_markup.hotel_markup_mode;
+            }
+            return {
+                markup,
+                markup_type,
+                markup_mode
+            };
         });
     }
 }

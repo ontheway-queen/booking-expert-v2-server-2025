@@ -1,19 +1,18 @@
 import { Request, Response } from "express";
-import AbstractServices from "../../../abstract/abstract.service";
-import { IAirlineCodePayload, IFormattedFlightItinerary, IFlightSearchReqBody, IOriginDestinationInformationPayload, IPassengerTypeQuantityPayload } from "../../../utils/supportTypes/flightTypes/commonFlightTypes";
-import { CUSTOM_API, FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_BOOKING_REQUEST, FLIGHT_FARE_RESPONSE, FLIGHT_REVALIDATE_REDIS_KEY, FLIGHT_TICKET_IN_PROCESS, FLIGHT_TICKET_ISSUE, SABRE_API, WFTT_API } from "../../../utils/miscellaneous/flightConstent";
 import { v4 as uuidv4 } from "uuid";
+import AbstractServices from "../../../abstract/abstract.service";
 import { getRedis, setRedis } from "../../../app/redis";
-import SabreFlightService from "../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service";
-import { CommonFlightSupportService } from "../../../utils/supportServices/flightSupportServices/commonFlightSupport.service";
 import FlightUtils from "../../../utils/lib/flight/flightUtils";
-import { CommonFlightBookingSupportService } from "../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service";
 import { AGENT_PROJECT_LINK, ERROR_LEVEL_INFO, FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT, INVOICE_REF_TYPES, SOURCE_AGENT } from "../../../utils/miscellaneous/constants";
-import { IAgentFlightTicketIssueReqBody } from "../utils/types/agentFlight.types";
+import { CUSTOM_API, FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_BOOKING_REQUEST, FLIGHT_FARE_RESPONSE, FLIGHT_REVALIDATE_REDIS_KEY, FLIGHT_TICKET_IN_PROCESS, FLIGHT_TICKET_ISSUE, SABRE_API, WFTT_API } from "../../../utils/miscellaneous/flightConstent";
 import { AgentFlightBookingSupportService } from "../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service";
-import { FILE_STORAGE_HOST } from "../../../middleware/uploader/uploaderConstants";
-import { IFlightBookingRequestBody } from "../../../utils/supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes";
+import { CommonFlightBookingSupportService } from "../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service";
+import { CommonFlightSupportService } from "../../../utils/supportServices/flightSupportServices/commonFlightSupport.service";
+import SabreFlightService from "../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service";
 import WfttFlightService from "../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service";
+import { IFlightBookingRequestBody } from "../../../utils/supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes";
+import { IAirlineCodePayload, IFlightSearchReqBody, IFormattedFlightItinerary, IOriginDestinationInformationPayload, IPassengerTypeQuantityPayload } from "../../../utils/supportTypes/flightTypes/commonFlightTypes";
+import { IAgentFlightTicketIssueReqBody } from "../utils/types/agentFlight.types";
 
 export class AgentFlightService extends AbstractServices {
   constructor() {

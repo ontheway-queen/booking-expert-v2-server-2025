@@ -4,10 +4,12 @@ export interface OTPType {
 export interface IInsertOTPPayload extends OTPType {
   hashed_otp: string;
   email?: string;
+  agency_id?: number;
 }
 
 export interface IGetOTPPayload extends OTPType {
   email: string;
+  agency_id?: number;
 }
 
 export interface ICreateAirportPayload {

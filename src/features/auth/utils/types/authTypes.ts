@@ -30,6 +30,14 @@ export interface IRegisterB2CReqBody {
   gender: string;
 }
 
+export interface IRegisterAgentB2CReqBody {
+  name: string;
+  gender: 'Male' | 'Female' | 'Other';
+  email: string;
+  phone_number: string;
+  password: string;
+}
+
 export interface ICompleteAgencyRegisterParsedTokenData extends jwt.JwtPayload {
   email: string;
   agency_name: string;

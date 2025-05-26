@@ -51,7 +51,7 @@ export default class RootRouter {
     );
 
     // Agent B2C Routes
-    this.v2Router.use('/agent-b2c', this.agentB2CRootRouter.Router);
+    this.v2Router.use('/agent-b2c', this.authChecker.whiteLabelAuthChecker, this.agentB2CRootRouter.Router);
 
     // External Routes
     this.v2Router.use('/external', this.externalRootRouter.Router);

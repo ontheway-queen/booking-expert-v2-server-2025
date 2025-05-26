@@ -8,6 +8,7 @@ import AgentB2CSupportTicketRouter from './routers/agentB2CSupportTicket.router'
 import AgentB2CTravelerRouter from './routers/agentB2CTraveler.router';
 import AgentB2CUmrahRouter from './routers/agentB2CUmrah.router';
 import AgentB2CVisaRouter from './routers/agentB2CVisa.router';
+import AuthChecker from '../../middleware/authChecker/authChecker';
 
 export default class AgentB2CRootRouter {
   public Router = Router();
@@ -32,7 +33,7 @@ export default class AgentB2CRootRouter {
     this.Router.use('/flight', this.flightRouter.router);
     this.Router.use('/holiday', this.holidayRouter.router);
     this.Router.use('/hotel', this.hotelRouter.router);
-    this.Router.use('/profile', this.profileRouter.router);
+    this.Router.use('/profile', new AuthChecker().agencyB2CUserAuthChecker, this.profileRouter.router);
     this.Router.use('/support-ticket', this.supportTicketRouter.router);
     this.Router.use('/traveler', this.travelerRouter.router);
     this.Router.use('/umrah', this.umrahRouter.router);

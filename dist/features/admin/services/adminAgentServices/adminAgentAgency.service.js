@@ -74,7 +74,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     token: '',
                 };
                 if (data.white_label) {
-                    const wPermissions = yield AgencyModel.getWhiteLabelPermission(agency_id);
+                    const wPermissions = yield AgencyModel.getWhiteLabelPermission({ agency_id });
                     if (wPermissions) {
                         whiteLabelPermissions = wPermissions;
                     }
@@ -128,7 +128,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     }
                 });
                 if (restBody.white_label && !white_label_permissions) {
-                    const checkPermission = yield AgentModel.getWhiteLabelPermission(agency_id);
+                    const checkPermission = yield AgentModel.getWhiteLabelPermission({ agency_id });
                     if (!checkPermission) {
                         const uuid = (0, uuid_1.v4)();
                         yield AgentModel.createWhiteLabelPermission({
@@ -145,7 +145,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     }
                 }
                 if (white_label_permissions) {
-                    const checkPermission = yield AgentModel.getWhiteLabelPermission(agency_id);
+                    const checkPermission = yield AgentModel.getWhiteLabelPermission({ agency_id });
                     if (checkPermission && white_label_permissions) {
                         yield AgentModel.updateWhiteLabelPermission(white_label_permissions, agency_id);
                     }

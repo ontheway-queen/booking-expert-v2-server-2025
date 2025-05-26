@@ -39,7 +39,7 @@ class WfttFlightService extends abstract_service_1.default {
     }
     // Flight search service
     FlightSearch(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, markup_set_id, }) {
+        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, markup_set_id, markup_amount }) {
             const response = yield this.request.postRequest(wfttApiEndpoints_1.default.FLIGHT_SEARCH_ENDPOINT, reqBody);
             // return [response];
             if (!response) {
@@ -52,14 +52,15 @@ class WfttFlightService extends abstract_service_1.default {
                 data: response.data.results,
                 reqBody: reqBody,
                 set_flight_api_id,
-                search_id: response.data.search_id
+                search_id: response.data.search_id,
+                markup_amount
             });
             return result;
         });
     }
     // Flight search response formatter
     FlightSearchResFormatter(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ data, reqBody, set_flight_api_id, search_id }) {
+        return __awaiter(this, arguments, void 0, function* ({ data, reqBody, set_flight_api_id, search_id, markup_amount }) {
             // const result: IFormattedFlightItinerary[] = [];
             const airports = [];
             const OriginDest = reqBody.OriginDestinationInformation;
@@ -153,6 +154,15 @@ class WfttFlightService extends abstract_service_1.default {
                         }
                     }
                 }
+                //add addition markup(applicable for sub agent/agent b2c)
+                if (markup_amount) {
+                    if (markup_amount.markup_mode === 'INCREASE') {
+                        fare.convenience_fee += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(fare.total_price) * Number(markup_amount.markup)) / 100;
+                    }
+                    else {
+                        fare.discount += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(fare.total_price) * Number(markup_amount.markup)) / 100;
+                    }
+                }
                 fare.payable =
                     Number(fare.total_price) +
                         Number(fare.convenience_fee) -
@@ -165,7 +175,7 @@ class WfttFlightService extends abstract_service_1.default {
     }
     //Revalidate service
     FlightRevalidate(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ reqBody, revalidate_body, set_flight_api_id }) {
+        return __awaiter(this, arguments, void 0, function* ({ reqBody, revalidate_body, set_flight_api_id, markup_amount }) {
             const response = yield this.request.getRequest(wfttApiEndpoints_1.default.FLIGHT_REVALIDATE_ENDPOINT, revalidate_body);
             if (!response) {
                 lib_1.default.writeJsonFile('wftt_revalidate_request', revalidate_body);
@@ -184,7 +194,8 @@ class WfttFlightService extends abstract_service_1.default {
                 data: [response.data],
                 reqBody: reqBody,
                 set_flight_api_id,
-                search_id: ""
+                search_id: "",
+                markup_amount
             });
             return result[0];
         });

@@ -11,7 +11,7 @@ export default class AgentSubAgentRouter extends AbstractRouter {
   private callRouter() {
 
     this.router.route('/')
-      .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENT_SUB_AGENT_FILES, [
+      .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_FILES, [
         'agency_logo',
         'civil_aviation',
         'trade_license',
@@ -21,7 +21,7 @@ export default class AgentSubAgentRouter extends AbstractRouter {
 
     this.router.route('/:id')
       .get(this.controller.getSingleSubAgency)
-      .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENT_SUB_AGENT_FILES, [
+      .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_FILES, [
         'agency_logo',
         'civil_aviation',
         'trade_license',

@@ -12,6 +12,8 @@ import { ICheckBookingEligibilityPayload, ICheckDirectBookingPermissionPayload, 
 import { flightBookingCancelBodyTemplate } from "../../../templates/flightBookingCancelTemplate";
 import { flightBookingBodyTemplate, flightBookingPdfTemplate } from "../../../templates/flightBookingTemplate";
 import { flightTicketIssueBodyTemplate, flightTicketIssuePdfTemplate } from "../../../templates/flightTicketIssueTemplate";
+import { IInsertTravelerPayload } from "../../../modelTypes/travelerModelTypes/travelerModelTypes";
+import TravelerModel from "../../../../models/travelerModel/travelerModel";
 
 
 export class CommonFlightBookingSupportService extends AbstractServices {
@@ -200,6 +202,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
         });
 
         //insert flight booking traveler data
+        const save_travelers: IInsertTravelerPayload[] = [];
         const flightBookingTravelerData = payload.traveler_data.map((traveler) => {
             //get visa and passport file
             let visa_file = traveler.visa_file;
@@ -218,6 +221,16 @@ export class CommonFlightBookingSupportService extends AbstractServices {
                         passport_file = file.filename;
                     }
                 }
+            }
+            if (traveler.save_information) {
+                save_travelers.push({
+                    ...traveler,
+                    visa_file,
+                    passport_file,
+                    created_by: payload.user_id,
+                    source_id: payload.source_id,
+                    source_type: payload.source_type
+                });
             }
             return {
                 flight_booking_id: booking_res[0].id,
@@ -241,6 +254,9 @@ export class CommonFlightBookingSupportService extends AbstractServices {
         });
 
         await flightBookingTravelerModel.insertFlightBookingTraveler(flightBookingTravelerData);
+        if(save_travelers.length){
+            await new TravelerModel(this.trx).insertTraveler(save_travelers);
+        }
 
         //insert flight booking tracking data
         const tracking_data: IInsertFlightBookingTrackingPayload[] = [];
@@ -260,7 +276,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
                 description: `${payload.payable_amount} BDT has been paid for the booking`,
             });
         }
-        if(payload.api === CUSTOM_API){
+        if (payload.api === CUSTOM_API) {
             tracking_data.push({
                 flight_booking_id: booking_res[0].id,
                 description: `This was a custom API`

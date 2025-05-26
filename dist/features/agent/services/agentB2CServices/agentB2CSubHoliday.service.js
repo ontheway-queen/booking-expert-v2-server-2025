@@ -162,7 +162,9 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                     }
                 }
                 //update holiday package
-                yield holidayPackageModel.updateHolidayPackage(rest, Number(id));
+                if (Object.keys(rest).length) {
+                    yield holidayPackageModel.updateHolidayPackage(rest, Number(id));
+                }
                 //update city
                 if (city) {
                     if ((_c = city.add) === null || _c === void 0 ? void 0 : _c.length) {

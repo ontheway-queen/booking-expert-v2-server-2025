@@ -8,6 +8,7 @@ const authAgent_router_1 = __importDefault(require("./routers/authAgent.router")
 const authB2C_router_1 = __importDefault(require("./routers/authB2C.router"));
 const authAdmin_router_1 = __importDefault(require("./routers/authAdmin.router"));
 const authAgentB2C_router_1 = __importDefault(require("./routers/authAgentB2C.router"));
+const authChecker_1 = __importDefault(require("../../middleware/authChecker/authChecker"));
 class AuthRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
@@ -26,7 +27,7 @@ class AuthRootRouter {
         // Admin auth routes
         this.Router.use('/admin', this.authAdminRouter.router);
         // Agent B2C auth routes
-        this.Router.use('/agent-b2c', this.authAgentB2CRouter.router);
+        this.Router.use('/agent-b2c', new authChecker_1.default().whiteLabelAuthChecker, this.authAgentB2CRouter.router);
     }
 }
 exports.default = AuthRootRouter;

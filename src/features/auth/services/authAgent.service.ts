@@ -339,7 +339,7 @@ export default class AuthAgentService extends AbstractServices {
 
       if (white_label) {
         const wPermissions = await AgentModel.getWhiteLabelPermission(
-          agency_id
+          {agency_id}
         );
 
         if (wPermissions) {
@@ -488,7 +488,7 @@ export default class AuthAgentService extends AbstractServices {
 
       if (white_label) {
         const wPermissions = await AgencyModel.getWhiteLabelPermission(
-          agency_id
+          {agency_id}
         );
 
         if (wPermissions) {

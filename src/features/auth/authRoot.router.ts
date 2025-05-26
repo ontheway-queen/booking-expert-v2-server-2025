@@ -3,6 +3,7 @@ import AuthAgentRouter from './routers/authAgent.router';
 import AuthB2CRouter from './routers/authB2C.router';
 import AuthAdminRouter from './routers/authAdmin.router';
 import AuthAgentB2CRouter from './routers/authAgentB2C.router';
+import AuthChecker from '../../middleware/authChecker/authChecker';
 
 export default class AuthRootRouter {
   public Router = Router();
@@ -27,6 +28,6 @@ export default class AuthRootRouter {
     this.Router.use('/admin', this.authAdminRouter.router);
 
     // Agent B2C auth routes
-    this.Router.use('/agent-b2c', this.authAgentB2CRouter.router);
+    this.Router.use('/agent-b2c', new AuthChecker().whiteLabelAuthChecker, this.authAgentB2CRouter.router);
   }
 }

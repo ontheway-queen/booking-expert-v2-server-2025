@@ -206,6 +206,7 @@ class AgentFlightValidator {
         this.flightBookingSchema = joi_1.default.object({
             search_id: joi_1.default.string().required(),
             flight_id: joi_1.default.string().required(),
+            booking_confirm: joi_1.default.boolean().optional(),
             passengers: joi_1.default.string()
                 .required()
                 .custom((value, helpers) => {

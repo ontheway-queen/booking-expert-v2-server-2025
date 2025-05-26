@@ -13,6 +13,7 @@ const agentB2CSupportTicket_router_1 = __importDefault(require("./routers/agentB
 const agentB2CTraveler_router_1 = __importDefault(require("./routers/agentB2CTraveler.router"));
 const agentB2CUmrah_router_1 = __importDefault(require("./routers/agentB2CUmrah.router"));
 const agentB2CVisa_router_1 = __importDefault(require("./routers/agentB2CVisa.router"));
+const authChecker_1 = __importDefault(require("../../middleware/authChecker/authChecker"));
 class AgentB2CRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
@@ -33,7 +34,7 @@ class AgentB2CRootRouter {
         this.Router.use('/flight', this.flightRouter.router);
         this.Router.use('/holiday', this.holidayRouter.router);
         this.Router.use('/hotel', this.hotelRouter.router);
-        this.Router.use('/profile', this.profileRouter.router);
+        this.Router.use('/profile', new authChecker_1.default().agencyB2CUserAuthChecker, this.profileRouter.router);
         this.Router.use('/support-ticket', this.supportTicketRouter.router);
         this.Router.use('/traveler', this.travelerRouter.router);
         this.Router.use('/umrah', this.umrahRouter.router);

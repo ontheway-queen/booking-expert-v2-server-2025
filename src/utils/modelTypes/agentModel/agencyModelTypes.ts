@@ -1,3 +1,5 @@
+type markup_type = "PER" | "FLAT";
+type markup_mode = "INCREASE" | "DECREASE";
 export interface ICreateAgencyPayload {
   agency_logo: string;
   agent_no: string;
@@ -127,6 +129,7 @@ export interface ICheckAgencyData {
   flight_markup_set: number;
   hotel_markup_set: number;
   usable_loan: number;
+  address: string;
 }
 
 export interface ICreateWhiteLabelPermissionPayload {
@@ -152,7 +155,37 @@ export interface IUpdateWhiteLabelPermissionPayload {
   token?: string;
 }
 
+export interface ICreateAgentB2CMarkupPayload {
+  agency_id: number;
+  flight_markup_type: markup_type;
+  hotel_markup_type: markup_type;
+  flight_markup_mode: markup_mode;
+  hotel_markup_mode: markup_mode;
+  flight_markup: number;
+  hotel_markup: number;
+}
+
+export interface IUpdateAgentB2CMarkupPayload {
+  flight_markup_type?: markup_type;
+  hotel_markup_type?: markup_type;
+  flight_markup_mode?: markup_mode;
+  hotel_markup_mode?: markup_mode;
+  flight_markup?: number;
+  hotel_markup?: number;
+}
+
+export interface IGetAgentB2CMarkupData {
+  agency_id: number;
+  flight_markup_type: markup_type;
+  hotel_markup_type: markup_type;
+  flight_markup_mode: markup_mode;
+  hotel_markup_mode: markup_mode;
+  flight_markup: number;
+  hotel_markup: number;
+}
+
 export interface IGetWhiteLabelPermissionData {
+  agency_id: number;
   token: string;
   flight: boolean;
   hotel: boolean;

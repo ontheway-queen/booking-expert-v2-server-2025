@@ -27,7 +27,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
     FlightRevalidate(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            const { search_id, flight_id, markup_set_id } = payload;
+            const { search_id, flight_id, markup_set_id, markup_amount } = payload;
             //get data from redis using the search id
             const retrievedData = yield (0, redis_1.getRedis)(search_id);
             if (!retrievedData) {
@@ -51,7 +51,15 @@ class CommonFlightSupportService extends abstract_service_1.default {
             if (foundItem.api === flightConstent_1.SABRE_API) {
                 //SABRE REVALIDATE
                 const sabreSubService = new sabreFlightSupport_service_1.default(this.trx);
-                revalidate_data = yield sabreSubService.SabreFlightRevalidate(retrievedData.reqBody, foundItem, markup_set_id, apiData[0].id, flight_id, booking_block);
+                revalidate_data = yield sabreSubService.SabreFlightRevalidate({
+                    reqBody: retrievedData.reqBody,
+                    retrieved_response: foundItem,
+                    markup_set_id: markup_set_id,
+                    set_flight_api_id: apiData[0].id,
+                    flight_id: flight_id,
+                    booking_block: booking_block,
+                    markup_amount
+                });
             }
             else if (foundItem.api === flightConstent_1.CUSTOM_API) {
                 //WFTT REVALIDATE
@@ -62,7 +70,8 @@ class CommonFlightSupportService extends abstract_service_1.default {
                     revalidate_body: {
                         flight_id: foundItem.flight_id,
                         search_id: foundItem.api_search_id
-                    }
+                    },
+                    markup_amount
                 });
             }
             else {
@@ -88,7 +97,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
             if (!retrievedData) {
                 return null;
             }
-            if (retrievedData.fare.total_price === payload.booking_price) {
+            if (retrievedData.revalidate_data.fare.total_price === payload.booking_price) {
                 return false;
             }
             else {

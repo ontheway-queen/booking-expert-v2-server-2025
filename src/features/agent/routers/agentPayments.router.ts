@@ -29,5 +29,15 @@ export default class AgentPaymentsRouter extends AbstractRouter {
 
     this.router.route('/top-up')
       .post(this.controller.topUpUsingPaymentGateway);
+
+    this.router.route('/invoice')
+      .get(this.controller.getInvoices);
+
+    this.router.route('/invoice/:id')
+      .get(this.controller.getSingleInvoice)
+      .post(this.controller.clearDueOfInvoice);
+
+    this.router.route('/partial')
+      .get(this.controller.getPartialPaymentList);
   }
 }

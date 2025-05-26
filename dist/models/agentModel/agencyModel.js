@@ -95,7 +95,7 @@ class AgencyModel extends schema_1.default {
         return __awaiter(this, arguments, void 0, function* ({ agency_id, email, name, agent_no, ref_id }) {
             return yield this.db('agency')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('id', 'email', 'phone', 'agency_logo', 'agency_name', 'agent_no', 'status', 'white_label', 'allow_api', 'civil_aviation', 'trade_license', 'national_id', 'usable_loan', 'flight_markup_set', 'hotel_markup_set')
+                .select('id', 'email', 'phone', 'agency_logo', 'agency_name', 'agent_no', 'status', 'white_label', 'allow_api', 'civil_aviation', 'trade_license', 'national_id', 'usable_loan', 'flight_markup_set', 'hotel_markup_set', 'address')
                 .where((qb) => {
                 if (agency_id) {
                     qb.where('id', agency_id);
@@ -228,12 +228,43 @@ class AgencyModel extends schema_1.default {
         });
     }
     // get white label permission
-    getWhiteLabelPermission(agency_id) {
+    getWhiteLabelPermission(query) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('white_label_permissions')
                 .withSchema(this.AGENT_SCHEMA)
                 .select('agency_id', 'token', 'flight', 'hotel', 'visa', 'holiday', 'group_fare', 'umrah', 'blog')
-                .where('agency_id', agency_id)
+                .where((qb) => {
+                if (query.agency_id) {
+                    qb.where('agency_id', query.agency_id);
+                }
+                if (query.token) {
+                    qb.where('token', query.token);
+                }
+            })
+                .first();
+        });
+    }
+    createAgentB2CMarkup(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('agent_b2c_markup')
+                .withSchema(this.AGENT_SCHEMA)
+                .insert(payload);
+        });
+    }
+    updateAgentB2CMarkup(payload, agency_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('agent_b2c_markup')
+                .withSchema(this.AGENT_SCHEMA)
+                .update(payload)
+                .where('agency_id', agency_id);
+        });
+    }
+    getAgentB2CMarkup(agency_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db("agent_b2c_markup")
+                .withSchema(this.AGENT_SCHEMA)
+                .select("*")
+                .where({ agency_id })
                 .first();
         });
     }

@@ -74,4 +74,36 @@ export default class AgentPaymentsController extends AbstractController {
     }
   );
 
+  public getInvoices = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.getInvoicesFilterQuery },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getInvoices(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public getSingleInvoice = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getSingleInvoice(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public clearDueOfInvoice = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.clearDueOfInvoice(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public getPartialPaymentList = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.getPartialPaymentsFilterQuery },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getPartialPaymentList(req);
+      res.status(code).json(rest);
+    }
+  );
+
 }

@@ -196,5 +196,124 @@ class AgentPaymentsService extends abstract_service_1.default {
             }));
         });
     }
+    getInvoices(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const invoiceModel = this.Model.InvoiceModel();
+            const query = req.query;
+            const data = yield invoiceModel.getInvoiceList(Object.assign({ source_type: constants_1.SOURCE_AGENT, source_id: agency_id }, query), true);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                total: data.total,
+                data: data.data
+            };
+        });
+    }
+    getSingleInvoice(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const invoiceModel = this.Model.InvoiceModel(trx);
+                const { id } = req.params;
+                const data = yield invoiceModel.getSingleInvoice({
+                    id: Number(id),
+                    source_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT
+                });
+                if (!data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND
+                    };
+                }
+                const MoneyReceiptModel = this.Model.MoneyReceiptModel(trx);
+                const money_receipt = yield MoneyReceiptModel.getMoneyReceiptList({ invoice_id: Number(id) });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    data: Object.assign(Object.assign({}, data), { money_receipt: money_receipt.data })
+                };
+            }));
+        });
+    }
+    clearDueOfInvoice(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id, user_id } = req.agencyUser;
+                const invoiceModel = this.Model.InvoiceModel(trx);
+                const { id } = req.params;
+                const data = yield invoiceModel.getSingleInvoice({
+                    id: Number(id),
+                    source_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT
+                });
+                if (!data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND
+                    };
+                }
+                if (data.due <= 0) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "No due has been found with this invoice"
+                    };
+                }
+                let balance_trans = data.due;
+                let loan_trans = 0;
+                //check balance
+                const agencyModel = this.Model.AgencyModel(trx);
+                const check_balance = yield agencyModel.getAgencyBalance(agency_id);
+                if (check_balance < data.due) {
+                    const agency_details = yield agencyModel.getSingleAgency(agency_id);
+                    const usable_loan_balance = Number(agency_details === null || agency_details === void 0 ? void 0 : agency_details.usable_loan);
+                    if ((check_balance + usable_loan_balance) < data.due) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: "There is insufficient balance in your account."
+                        };
+                    }
+                    loan_trans = Number(usable_loan_balance) - (Number(data.due) - Number(check_balance));
+                    balance_trans = check_balance;
+                }
+                if (loan_trans !== 0) {
+                    yield agencyModel.updateAgency({ usable_loan: loan_trans }, agency_id);
+                }
+                const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
+                yield invoiceModel.updateInvoice({ due: 0 }, Number(id));
+                yield moneyReceiptModel.createMoneyReceipt({
+                    mr_number: yield lib_1.default.generateNo({ trx, type: 'Money_Receipt' }),
+                    invoice_id: Number(id),
+                    amount: data.due,
+                    user_id,
+                    details: `Due has been cleared. Balance Transaction: ${balance_trans}. Loan Transaction: ${loan_trans}`
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: "Due has been cleared"
+                };
+            }));
+        });
+    }
+    getPartialPaymentList(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const invoiceModel = this.Model.InvoiceModel();
+            const query = req.query;
+            const data = yield invoiceModel.getInvoiceList(Object.assign(Object.assign({ source_type: constants_1.SOURCE_AGENT, source_id: agency_id }, query), { partial_payment: true }), true);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                total: data.total,
+                data: data.data
+            };
+        });
+    }
 }
 exports.AgentPaymentsService = AgentPaymentsService;

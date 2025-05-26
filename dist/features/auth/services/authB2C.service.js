@@ -197,8 +197,8 @@ class AuthB2CService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { email, name, phone_number, gender } = req.body;
                 const UserModel = this.Model.B2CUserModel(trx);
-                const checkAgentUser = yield UserModel.checkUser({ email });
-                if (checkAgentUser) {
+                const checkB2CUser = yield UserModel.checkUser({ email });
+                if (checkB2CUser) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,

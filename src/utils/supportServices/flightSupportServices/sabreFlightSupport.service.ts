@@ -135,11 +135,17 @@ export default class SabreFlightService extends AbstractServices {
     booking_block,
     reqBody,
     markup_set_id,
+    markup_amount
   }: {
     reqBody: IFlightSearchReqBody;
     set_flight_api_id: number;
     markup_set_id: number;
     booking_block: boolean;
+    markup_amount?: {
+      markup: number;
+      markup_type: "PER" | "FLAT",
+      markup_mode: "INCREASE" | "DECREASE"
+    }
   }) {
     const flightRequestBody = await this.FlightReqFormatterV5(
       reqBody,
@@ -164,6 +170,7 @@ export default class SabreFlightService extends AbstractServices {
       set_flight_api_id,
       booking_block,
       markup_set_id,
+      markup_amount
     });
     return result;
   }
@@ -176,6 +183,7 @@ export default class SabreFlightService extends AbstractServices {
     reqBody,
     markup_set_id,
     flight_id,
+    markup_amount
   }: {
     data: ISabreResponseResult;
     reqBody: IFlightSearchReqBody;
@@ -183,6 +191,11 @@ export default class SabreFlightService extends AbstractServices {
     markup_set_id: number;
     booking_block: boolean;
     flight_id?: string;
+    markup_amount?: {
+      markup: number;
+      markup_type: "PER" | "FLAT";
+      markup_mode: "INCREASE" | "DECREASE";
+    }
   }) {
     const commonModel = this.Model.CommonModel(this.trx);
     const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
@@ -554,6 +567,16 @@ export default class SabreFlightService extends AbstractServices {
         }
       }
 
+      //add addition markup(applicable for sub agent/agent b2c)
+      if (markup_amount) {
+        if (markup_amount.markup_mode === 'INCREASE') {
+
+          new_fare.convenience_fee += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(new_fare.total_price) * Number(markup_amount.markup)) / 100;
+        } else {
+          new_fare.discount += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(new_fare.total_price) * Number(markup_amount.markup)) / 100;
+        }
+      }
+
       new_fare.payable =
         Number(new_fare.total_price) +
         Number(new_fare.convenience_fee) -
@@ -686,12 +709,28 @@ export default class SabreFlightService extends AbstractServices {
   //////==================FLIGHT REVALIDATE (START)=========================//////
   //sabre flight revalidate service
   public async SabreFlightRevalidate(
-    reqBody: IFlightSearchReqBody,
-    retrieved_response: IFormattedFlightItinerary,
-    markup_set_id: number,
-    set_flight_api_id: number,
-    flight_id: string,
-    booking_block: boolean
+    {
+      reqBody,
+      retrieved_response,
+      markup_set_id,
+      set_flight_api_id,
+      flight_id,
+      booking_block,
+      markup_amount
+    }:
+      {
+        reqBody: IFlightSearchReqBody;
+        retrieved_response: IFormattedFlightItinerary;
+        markup_set_id: number;
+        set_flight_api_id: number;
+        flight_id: string;
+        booking_block: boolean;
+        markup_amount?: {
+          markup: number;
+          markup_type: "PER" | "FLAT";
+          markup_mode: "INCREASE" | "DECREASE";
+        }
+      }
   ) {
     const revalidate_req_body = await this.RevalidateFlightReqFormatter(
       reqBody,
@@ -725,6 +764,7 @@ export default class SabreFlightService extends AbstractServices {
       data: response.groupedItineraryResponse,
       markup_set_id,
       flight_id,
+      markup_amount
     });
 
     return data[0];

@@ -96,7 +96,7 @@ class AgencyB2CUserModel extends schema_1.default {
                 .withSchema(this.AGENT_B2C_SCHEMA)
                 .select('id', 'password_hash', 'phone_number', 'gender', 'photo', 'username', 'name', 'email', 'status')
                 .andWhere('agency_id', agency_id)
-                .where((qb) => {
+                .andWhere((qb) => {
                 if (username) {
                     qb.orWhere('username', username);
                 }
@@ -108,6 +108,15 @@ class AgencyB2CUserModel extends schema_1.default {
                 }
             })
                 .first();
+        });
+    }
+    updateUserByEmail(payload, email, agency_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('users')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .update(payload)
+                .andWhere('email', email)
+                .andWhere('agency_id', agency_id);
         });
     }
 }

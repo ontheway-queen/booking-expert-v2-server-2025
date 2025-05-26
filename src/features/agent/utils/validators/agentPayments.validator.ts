@@ -35,7 +35,7 @@ export class AgentPaymentsValidator {
         skip: Joi.number()
     });
 
-    public getLedger= Joi.object({
+    public getLedger = Joi.object({
         type: Joi.string().valid('Debit', 'Credit'),
         from_date: Joi.date(),
         to_date: Joi.date(),
@@ -51,5 +51,19 @@ export class AgentPaymentsValidator {
         failed_page: Joi.string().required(),
         cancelled_page: Joi.string().required(),
         is_app: Joi.boolean().optional()
+    });
+
+    public getInvoicesFilterQuery = Joi.object({
+        from_date: Joi.date(),
+        to_date: Joi.date(),
+        limit: Joi.number(),
+        skip: Joi.number()
+    });
+
+    public getPartialPaymentsFilterQuery = Joi.object({
+        from_date: Joi.date(),
+        to_date: Joi.date(),
+        limit: Joi.number(),
+        skip: Joi.number()
     });
 }

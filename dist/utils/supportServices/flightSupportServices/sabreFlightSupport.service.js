@@ -128,7 +128,7 @@ class SabreFlightService extends abstract_service_1.default {
     }
     // Flight search service
     FlightSearch(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, markup_set_id, }) {
+        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, markup_set_id, markup_amount }) {
             const flightRequestBody = yield this.FlightReqFormatterV5(reqBody, set_flight_api_id);
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_SEARCH_ENDPOINT_V5, flightRequestBody);
             // return [response];
@@ -144,13 +144,14 @@ class SabreFlightService extends abstract_service_1.default {
                 set_flight_api_id,
                 booking_block,
                 markup_set_id,
+                markup_amount
             });
             return result;
         });
     }
     // Flight search Response formatter
     FlightSearchResFormatter(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, data, reqBody, markup_set_id, flight_id, }) {
+        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, data, reqBody, markup_set_id, flight_id, markup_amount }) {
             var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v;
             const commonModel = this.Model.CommonModel(this.trx);
             const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
@@ -447,6 +448,15 @@ class SabreFlightService extends abstract_service_1.default {
                         }
                     }
                 }
+                //add addition markup(applicable for sub agent/agent b2c)
+                if (markup_amount) {
+                    if (markup_amount.markup_mode === 'INCREASE') {
+                        new_fare.convenience_fee += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(new_fare.total_price) * Number(markup_amount.markup)) / 100;
+                    }
+                    else {
+                        new_fare.discount += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(new_fare.total_price) * Number(markup_amount.markup)) / 100;
+                    }
+                }
                 new_fare.payable =
                     Number(new_fare.total_price) +
                         Number(new_fare.convenience_fee) -
@@ -563,9 +573,9 @@ class SabreFlightService extends abstract_service_1.default {
     ///==================FLIGHT SEARCH (END)=========================///
     //////==================FLIGHT REVALIDATE (START)=========================//////
     //sabre flight revalidate service
-    SabreFlightRevalidate(reqBody, retrieved_response, markup_set_id, set_flight_api_id, flight_id, booking_block) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var _a;
+    SabreFlightRevalidate(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ reqBody, retrieved_response, markup_set_id, set_flight_api_id, flight_id, booking_block, markup_amount }) {
+            var _b;
             const revalidate_req_body = yield this.RevalidateFlightReqFormatter(reqBody, retrieved_response);
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_REVALIDATE_ENDPOINT, revalidate_req_body);
             if (!response) {
@@ -573,7 +583,7 @@ class SabreFlightService extends abstract_service_1.default {
                 lib_1.default.writeJsonFile('sabre_revalidate_response', response);
                 throw new customError_1.default('External API Error', 500);
             }
-            if (((_a = response.groupedItineraryResponse) === null || _a === void 0 ? void 0 : _a.statistics.itineraryCount) === 0) {
+            if (((_b = response.groupedItineraryResponse) === null || _b === void 0 ? void 0 : _b.statistics.itineraryCount) === 0) {
                 lib_1.default.writeJsonFile('sabre_revalidate_request', revalidate_req_body);
                 lib_1.default.writeJsonFile('sabre_revalidate_response', response);
                 throw new customError_1.default(`Cannot revalidate flight with this flight id`, 400);
@@ -585,6 +595,7 @@ class SabreFlightService extends abstract_service_1.default {
                 data: response.groupedItineraryResponse,
                 markup_set_id,
                 flight_id,
+                markup_amount
             });
             return data[0];
         });

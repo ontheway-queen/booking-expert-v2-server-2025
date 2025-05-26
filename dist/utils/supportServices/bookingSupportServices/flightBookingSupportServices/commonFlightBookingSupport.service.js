@@ -23,6 +23,7 @@ const flightConstent_1 = require("../../../miscellaneous/flightConstent");
 const flightBookingCancelTemplate_1 = require("../../../templates/flightBookingCancelTemplate");
 const flightBookingTemplate_1 = require("../../../templates/flightBookingTemplate");
 const flightTicketIssueTemplate_1 = require("../../../templates/flightTicketIssueTemplate");
+const travelerModel_1 = __importDefault(require("../../../../models/travelerModel/travelerModel"));
 class CommonFlightBookingSupportService extends abstract_service_1.default {
     constructor(trx) {
         super();
@@ -197,6 +198,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 }));
             }));
             //insert flight booking traveler data
+            const save_travelers = [];
             const flightBookingTravelerData = payload.traveler_data.map((traveler) => {
                 var _a, _b, _c, _d, _e;
                 //get visa and passport file
@@ -213,6 +215,10 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                             passport_file = file.filename;
                         }
                     }
+                }
+                if (traveler.save_information) {
+                    save_travelers.push(Object.assign(Object.assign({}, traveler), { visa_file,
+                        passport_file, created_by: payload.user_id, source_id: payload.source_id, source_type: payload.source_type }));
                 }
                 return {
                     flight_booking_id: booking_res[0].id,
@@ -235,6 +241,9 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 };
             });
             yield flightBookingTravelerModel.insertFlightBookingTraveler(flightBookingTravelerData);
+            if (save_travelers.length) {
+                yield new travelerModel_1.default(this.trx).insertTraveler(save_travelers);
+            }
             //insert flight booking tracking data
             const tracking_data = [];
             tracking_data.push({

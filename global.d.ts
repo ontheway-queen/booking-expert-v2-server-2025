@@ -4,6 +4,7 @@ import {
   ITokenParseAdmin,
   ITokenParseAgency,
   ITokenParseAgencyB2CUser,
+  ITokenParseAgencyB2CWhiteLabel,
   ITokenParseAgencyUser,
   ITokenParseUser,
   IValidateAPIAgencyData,
@@ -16,6 +17,7 @@ declare global {
       user: ITokenParseUser;
       admin: ITokenParseAdmin;
       agencyB2CUser: ITokenParseAgencyB2CUser;
+      agencyB2CWhiteLabel: ITokenParseAgencyB2CWhiteLabel;
       agentAPI: IValidateAPIAgencyData;
       external: IValidateAPIExternalData;
       upFiles: string[];

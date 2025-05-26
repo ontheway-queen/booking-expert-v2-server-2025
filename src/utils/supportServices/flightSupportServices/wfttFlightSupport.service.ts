@@ -24,11 +24,17 @@ export default class WfttFlightService extends AbstractServices {
         booking_block,
         reqBody,
         markup_set_id,
+        markup_amount
     }: {
         reqBody: IFlightSearchReqBody;
         set_flight_api_id: number;
         markup_set_id: number;
         booking_block: boolean;
+        markup_amount?: {
+            markup: number;
+            markup_type: "PER" | "FLAT";
+            markup_mode: "INCREASE" | "DECREASE";
+        }
     }) {
         const response: IWFTTFlightSearchResBody | undefined = await this.request.postRequest(
             WfttAPIEndpoints.FLIGHT_SEARCH_ENDPOINT,
@@ -47,7 +53,8 @@ export default class WfttFlightService extends AbstractServices {
             data: response.data.results,
             reqBody: reqBody,
             set_flight_api_id,
-            search_id: response.data.search_id
+            search_id: response.data.search_id,
+            markup_amount
         });
         return result;
     }
@@ -57,12 +64,18 @@ export default class WfttFlightService extends AbstractServices {
         data,
         reqBody,
         set_flight_api_id,
-        search_id
+        search_id,
+        markup_amount
     }: {
         data: IWFTTFlightSearchResults[];
         reqBody: IFlightSearchReqBody;
         set_flight_api_id: number;
         search_id: string;
+        markup_amount?: {
+            markup: number;
+            markup_type: "PER" | "FLAT";
+            markup_mode: "INCREASE" | "DECREASE";
+        }
     }) {
         // const result: IFormattedFlightItinerary[] = [];
         const airports: string[] = [];
@@ -172,6 +185,15 @@ export default class WfttFlightService extends AbstractServices {
                 }
             }
 
+            //add addition markup(applicable for sub agent/agent b2c)
+            if (markup_amount) {
+                if (markup_amount.markup_mode === 'INCREASE') {
+                    fare.convenience_fee +=  markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(fare.total_price) * Number(markup_amount.markup)) / 100;
+                } else {
+                    fare.discount += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(fare.total_price) * Number(markup_amount.markup)) / 100;
+                }
+            }
+
             fare.payable =
                 Number(fare.total_price) +
                 Number(fare.convenience_fee) -
@@ -194,17 +216,23 @@ export default class WfttFlightService extends AbstractServices {
     public async FlightRevalidate({
         reqBody,
         revalidate_body,
-        set_flight_api_id
+        set_flight_api_id,
+        markup_amount
     }: {
         revalidate_body: IWFTTFlightRevalidateRequestBody;
         reqBody: IFlightSearchReqBody;
         set_flight_api_id: number;
+        markup_amount?: {
+            markup: number;
+            markup_type: "PER" | "FLAT";
+            markup_mode: "INCREASE" | "DECREASE";
+        }
     }) {
         const response: IWFTTFlightRevalidateResponse = await this.request.getRequest(
             WfttAPIEndpoints.FLIGHT_REVALIDATE_ENDPOINT,
             revalidate_body
         );
-        
+
         if (!response) {
             Lib.writeJsonFile('wftt_revalidate_request', revalidate_body);
             Lib.writeJsonFile('wftt_revalidate_response', response);
@@ -228,7 +256,8 @@ export default class WfttFlightService extends AbstractServices {
             data: [response.data],
             reqBody: reqBody,
             set_flight_api_id,
-            search_id: ""
+            search_id: "",
+            markup_amount
         });
         return result[0];
     }

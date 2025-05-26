@@ -7,7 +7,7 @@ import {
 } from '../utils/types/agentProfile.types';
 import { IUpdateAgencyUserPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
 
-export default class AdminProfileService extends AbstractServices {
+export default class AgentProfileService extends AbstractServices {
   constructor() {
     super();
   }
@@ -43,7 +43,7 @@ export default class AdminProfileService extends AbstractServices {
     };
 
     if (user.white_label) {
-      const wPermissions = await AgentModel.getWhiteLabelPermission(agency_id);
+      const wPermissions = await AgentModel.getWhiteLabelPermission({agency_id});
 
       if (wPermissions) {
         const { token, ...rest } = wPermissions;

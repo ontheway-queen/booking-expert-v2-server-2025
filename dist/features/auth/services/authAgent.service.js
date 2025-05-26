@@ -262,7 +262,7 @@ class AuthAgentService extends abstract_service_1.default {
                     blog: false,
                 };
                 if (white_label) {
-                    const wPermissions = yield AgentModel.getWhiteLabelPermission(agency_id);
+                    const wPermissions = yield AgentModel.getWhiteLabelPermission({ agency_id });
                     if (wPermissions) {
                         const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
                         whiteLabelPermissions = rest;
@@ -371,7 +371,7 @@ class AuthAgentService extends abstract_service_1.default {
                     blog: false,
                 };
                 if (white_label) {
-                    const wPermissions = yield AgencyModel.getWhiteLabelPermission(agency_id);
+                    const wPermissions = yield AgencyModel.getWhiteLabelPermission({ agency_id });
                     if (wPermissions) {
                         const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
                         whiteLabelPermissions = rest;

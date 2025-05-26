@@ -162,7 +162,9 @@ export class AgentB2CSubHolidayService extends AbstractServices {
             }
 
             //update holiday package
-            await holidayPackageModel.updateHolidayPackage(rest, Number(id));
+            if (Object.keys(rest).length) {
+                await holidayPackageModel.updateHolidayPackage(rest, Number(id));
+            }
 
             //update city
             if (city) {
@@ -264,7 +266,7 @@ export class AgentB2CSubHolidayService extends AbstractServices {
 
     public async deleteHolidayPackage(req: Request) {
         return await this.db.transaction(async (trx) => {
-            const {agency_id} = req.agencyUser;
+            const { agency_id } = req.agencyUser;
             const { id } = req.params;
             const holidayPackageModel = this.Model.HolidayPackageModel(trx);
             const data = await holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: HOLIDAY_CREATED_BY_AGENT, agency_id });

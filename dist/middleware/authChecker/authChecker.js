@@ -20,6 +20,8 @@ const adminModel_1 = __importDefault(require("../../models/adminModel/adminModel
 const database_1 = require("../../app/database");
 const agencyUserModel_1 = __importDefault(require("../../models/agentModel/agencyUserModel"));
 const b2cUserModel_1 = __importDefault(require("../../models/b2cModel/b2cUserModel"));
+const agencyModel_1 = __importDefault(require("../../models/agentModel/agencyModel"));
+const agencyB2CUserModel_1 = __importDefault(require("../../models/agencyB2CModel/agencyB2CUserModel"));
 class AuthChecker {
     constructor() {
         // admin auth checker
@@ -202,31 +204,119 @@ class AuthChecker {
         this.agencyB2CUserAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { authorization } = req.headers;
             if (!authorization) {
-                return res
+                res
                     .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                return;
             }
             const authSplit = authorization.split(' ');
             if (authSplit.length !== 2) {
-                return res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
                     success: false,
                     message: responseMessage_1.default.HTTP_UNAUTHORIZED,
                 });
+                return;
             }
-            const verify = lib_1.default.verifyToken(authSplit[1], config_1.default.JWT_SECRET_USER);
+            const verify = lib_1.default.verifyToken(authSplit[1], config_1.default.JWT_SECRET_AGENT_B2C);
             if (!verify) {
-                return res
+                res
                     .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                return;
             }
             else {
-                req.agencyB2CUser = verify;
-                console.log({ user: req.user });
+                const { agency_id, user_email, user_id } = verify;
+                const agencyModel = new agencyModel_1.default(database_1.db);
+                const agentB2CUserModel = new agencyB2CUserModel_1.default(database_1.db);
+                const check_agency = yield agencyModel.checkAgency({
+                    agency_id
+                });
+                if (!check_agency || check_agency.status !== 'Active') {
+                    res
+                        .status(statusCode_1.default.HTTP_UNAUTHORIZED)
+                        .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                    return;
+                }
+                const check_agent_b2c = yield agentB2CUserModel.checkUser({
+                    email: user_email,
+                    agency_id
+                });
+                if (!check_agent_b2c || check_agent_b2c.status === false) {
+                    res
+                        .status(statusCode_1.default.HTTP_UNAUTHORIZED)
+                        .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                    return;
+                }
+                req.agencyB2CUser = {
+                    agency_id,
+                    agency_name: String(check_agency === null || check_agency === void 0 ? void 0 : check_agency.agency_name),
+                    agency_email: String(check_agency === null || check_agency === void 0 ? void 0 : check_agency.email),
+                    agency_logo: String(check_agency === null || check_agency === void 0 ? void 0 : check_agency.agency_logo),
+                    agency_address: String(check_agency === null || check_agency === void 0 ? void 0 : check_agency.address),
+                    agency_number: String(check_agency === null || check_agency === void 0 ? void 0 : check_agency.phone),
+                    user_id: user_id,
+                    photo: String(check_agent_b2c === null || check_agent_b2c === void 0 ? void 0 : check_agent_b2c.photo),
+                    user_email: String(user_email),
+                    username: String(check_agent_b2c === null || check_agent_b2c === void 0 ? void 0 : check_agent_b2c.username),
+                    name: String(check_agent_b2c === null || check_agent_b2c === void 0 ? void 0 : check_agent_b2c.name),
+                    phone_number: String(check_agent_b2c === null || check_agent_b2c === void 0 ? void 0 : check_agent_b2c.phone_number)
+                };
                 next();
             }
         });
         // Agency B2C White label Auth Checker
-        this.whiteLabelAuthChecker = () => __awaiter(this, void 0, void 0, function* () { });
+        this.whiteLabelAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            let { token } = req.headers;
+            if (!token)
+                token = req.query.agencyToken;
+            if (!token) {
+                res
+                    .status(statusCode_1.default.HTTP_UNAUTHORIZED)
+                    .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                return;
+            }
+            else {
+                const agencyModel = new agencyModel_1.default(database_1.db);
+                const check_token = yield agencyModel.getWhiteLabelPermission({
+                    token: token
+                });
+                if (!check_token) {
+                    res
+                        .status(statusCode_1.default.HTTP_UNAUTHORIZED)
+                        .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                    return;
+                }
+                const check_agency = yield agencyModel.checkAgency({
+                    agency_id: check_token === null || check_token === void 0 ? void 0 : check_token.agency_id
+                });
+                if (!check_agency || check_agency.status !== 'Active') {
+                    res
+                        .status(statusCode_1.default.HTTP_UNAUTHORIZED)
+                        .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                    return;
+                }
+                const module = req.originalUrl.split('/')[4] || '';
+                req.agencyB2CWhiteLabel = {
+                    agency_id: Number(check_token === null || check_token === void 0 ? void 0 : check_token.agency_id),
+                    flight: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.flight),
+                    hotel: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.hotel),
+                    visa: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.visa),
+                    holiday: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.holiday),
+                    umrah: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.umrah),
+                    group_fare: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.group_fare),
+                    blog: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.blog)
+                };
+                const endpoint = module;
+                const hasPermission = endpoint in req.agencyB2CWhiteLabel && req.agencyB2CWhiteLabel[endpoint] === true;
+                if (!hasPermission) {
+                    res
+                        .status(statusCode_1.default.HTTP_UNAUTHORIZED)
+                        .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                    return;
+                }
+                next();
+            }
+        });
         // Agency B2C API Authorizer
         this.agencyB2CAPIAccessChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             req.agentAPI = { agency_email: '', agency_id: 1, agency_name: '' };

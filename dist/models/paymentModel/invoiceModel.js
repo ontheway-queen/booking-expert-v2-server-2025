@@ -62,6 +62,10 @@ class InvoiceModel extends schema_1.default {
                 if (query.user_id) {
                     qb.andWhere("user_id", query.user_id);
                 }
+                if (query.partial_payment) {
+                    qb.andWhere("due", ">", 0)
+                        .andWhere("due", "!=", this.db.ref("net_amount"));
+                }
             })
                 .orderBy("id", "desc")
                 .limit(query.limit || 100)
@@ -94,6 +98,10 @@ class InvoiceModel extends schema_1.default {
                     if (query.user_id) {
                         qb.andWhere("user_id", query.user_id);
                     }
+                    if (query.partial_payment) {
+                        qb.andWhere("due", ">", 0)
+                            .andWhere("due", "!=", this.db.ref("net_amount"));
+                    }
                 });
             }
             return {
@@ -108,6 +116,14 @@ class InvoiceModel extends schema_1.default {
                 .withSchema(this.DBO_SCHEMA)
                 .select("*")
                 .where({ id: params.id })
+                .andWhere((qb) => {
+                if (params.source_id) {
+                    qb.andWhere("source_id", params.source_id);
+                }
+                if (params.source_type) {
+                    qb.andWhere("source_type", params.source_type);
+                }
+            })
                 .first();
         });
     }

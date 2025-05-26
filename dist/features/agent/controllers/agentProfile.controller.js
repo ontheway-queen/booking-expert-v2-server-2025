@@ -25,12 +25,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_controller_1 = __importDefault(require("../../../abstract/abstract.controller"));
 const agentProfile_service_1 = __importDefault(require("../services/agentProfile.service"));
-const adminProfile_validator_1 = __importDefault(require("../../admin/utils/validators/adminProfile.validator"));
+const agentProfile_validator_1 = __importDefault(require("../utils/validators/agentProfile.validator"));
 class AgentProfileController extends abstract_controller_1.default {
     constructor() {
         super();
         this.service = new agentProfile_service_1.default();
-        this.validator = new adminProfile_validator_1.default();
+        this.validator = new agentProfile_validator_1.default();
         //get profile
         this.getProfile = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getProfile(req), { code } = _a, data = __rest(_a, ["code"]);
