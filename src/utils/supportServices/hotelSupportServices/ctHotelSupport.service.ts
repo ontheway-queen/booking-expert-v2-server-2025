@@ -4,8 +4,13 @@ import CTHotelRequests from '../../lib/hotel/ctHotelRequest';
 import CTHotelAPIEndpoints from '../../miscellaneous/endpoints/ctHotelApiEndpoints';
 import {
   ICTGetBalanceResponse,
+  ICTHotelBookingPayload,
+  ICTHotelGetBalanceData,
+  ICTHotelRoomRecheckData,
   ICTHotelRoomRecheckResponse,
   ICTHotelRoomsResponse,
+  ICTHotelSearchData,
+  ICTHotelSearchLocationData,
   ICTHotelSearchPayload,
   ICTHotelSearchResponse,
   ICTHotelSearchResponseHotel,
@@ -16,6 +21,7 @@ import {
   MARKUP_MODE_INCREASE,
   MARKUP_TYPE_PER,
 } from '../../miscellaneous/constants';
+import DateTimeLib from '../../lib/dateTimeLib';
 
 export class CTHotelSupportService extends AbstractServices {
   private trx: Knex.Transaction;
@@ -26,7 +32,7 @@ export class CTHotelSupportService extends AbstractServices {
   }
 
   // Get Balance
-  public async GetBalance() {
+  public async GetBalance(): Promise<ICTHotelGetBalanceData> {
     const response = (await this.request.getRequest(
       CTHotelAPIEndpoints.GET_BALANCE
     )) as { success: boolean; message: string; data: ICTGetBalanceResponse };
@@ -46,7 +52,9 @@ export class CTHotelSupportService extends AbstractServices {
   }
 
   // Search Location
-  public async SearchLocation(filter: string) {
+  public async SearchLocation(
+    filter: string
+  ): Promise<ICTHotelSearchLocationData> {
     const response = await this.request.getRequest(
       `${CTHotelAPIEndpoints.SEARCH_LOCATION}?filter=${filter}`
     );
@@ -66,7 +74,10 @@ export class CTHotelSupportService extends AbstractServices {
   }
 
   // Hotel Search
-  public async HotelSearch(payload: ICTHotelSearchPayload, markup_set: number) {
+  public async HotelSearch(
+    payload: ICTHotelSearchPayload,
+    markup_set: number
+  ): Promise<false | ICTHotelSearchData> {
     const { code, destination, ...restBody } = payload;
 
     const response = (await this.request.postRequest(
@@ -99,6 +110,10 @@ export class CTHotelSupportService extends AbstractServices {
 
     const { hotels, ...restData } = response.data;
 
+    if (!hotels) {
+      return false;
+    }
+
     const modifiedHotels: ICTHotelSearchResponseHotel[] = [];
 
     const { markup, mode, type } = markupSet[0];
@@ -125,7 +140,7 @@ export class CTHotelSupportService extends AbstractServices {
   public async HotelRooms(
     payload: { hcode: number; search_id: string },
     markup_set: number
-  ) {
+  ): Promise<ICTHotelRoomsResponse[] | false> {
     const response = await this.request.postRequest(
       CTHotelAPIEndpoints.HOTEL_ROOMS,
       payload
@@ -213,7 +228,7 @@ export class CTHotelSupportService extends AbstractServices {
       rooms: { rate_key: string; group_code: string }[];
     },
     markup_set: number
-  ) {
+  ): Promise<ICTHotelRoomRecheckData | false> {
     const response = await this.request.postRequest(
       CTHotelAPIEndpoints.ROOM_RECHECK,
       payload
@@ -304,10 +319,72 @@ export class CTHotelSupportService extends AbstractServices {
       ...restData,
       fee: price_details,
       rates: newRates,
+      supplier_fee: {
+        price: fee.fee,
+        tax: fee.total_tax,
+        total_price: fee.total_fee,
+      },
+      supplier_rates: rates,
     };
   }
 
-  public async HotelBooking() {}
+  public async HotelBooking(
+    payload: ICTHotelBookingPayload,
+    markup_set: number
+  ) {
+    const recheckRoomsPayload = payload.booking_items.map((item) => {
+      return {
+        rate_key: item.rate_key,
+        group_code: payload.group_code,
+      };
+    });
+
+    const nights = DateTimeLib.nightsCount(payload.checkin, payload.checkout);
+
+    const recheck = await this.HotelRecheck(
+      {
+        search_id: payload.search_id,
+        rooms: recheckRoomsPayload,
+        nights: nights,
+      },
+      markup_set
+    );
+
+    if (!recheck) {
+      return false;
+    }
+
+    const response = await this.request.postRequest(
+      CTHotelAPIEndpoints.HOTEL_BOOK,
+      payload
+    );
+
+    if (!response.success) {
+      return false;
+    }
+
+    const bookingData = response.data;
+
+    const hotelMarkupModel = new HotelMarkupsModel(this.trx);
+    const markupSet = await hotelMarkupModel.getHotelMarkup({
+      markup_for: 'Book',
+      set_id: markup_set,
+      status: true,
+    });
+
+    if (!markupSet.length || markupSet[0].set_status === false) {
+      return bookingData;
+    }
+
+    const { markup, mode, type } = markupSet[0];
+
+    bookingData.price_details = this.getMarkupPrice({
+      prices: bookingData.price_details,
+      markup: { markup: Number(markup), mode, type },
+    });
+
+    return bookingData;
+  }
 
   // get markup price func
   private getMarkupPrice({

@@ -8,4 +8,5 @@ export interface IInsertHotelSearchHistoryPayload {
   code: number;
   agency_id?: number;
   nationality?: string;
+  name?: string;
 }

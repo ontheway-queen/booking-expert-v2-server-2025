@@ -45,7 +45,12 @@ class AgentHotelController extends abstract_controller_1.default {
         }));
         this.hotelBooking = this.asyncWrapper.wrap({ bodySchema: this.validator.hotelBooking }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.hotelBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
         }));
     }
 }

@@ -13,7 +13,7 @@ export default class B2CHotelService extends AbstractServices {
       const ctHotelSupport = new CTHotelSupportService(trx);
       const OthersModel = this.Model.OthersModel(trx);
 
-      const payload = req.body as IB2CHotelSearchReqBody;
+      const { name, ...payload } = req.body as IB2CHotelSearchReqBody;
 
       await OthersModel.insertHotelSearchHistory({
         check_in_date: payload.checkin,
@@ -23,6 +23,7 @@ export default class B2CHotelService extends AbstractServices {
         nationality: payload.client_nationality,
         user_type: 'B2C',
         code: payload.code,
+        name: name,
       });
 
       const configMarkup = this.Model.B2CMarkupConfigModel(trx);

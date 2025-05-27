@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -40,11 +51,11 @@ class AgentHotelService extends abstract_service_1.default {
                 if (!agent.hotel_markup_set) {
                     return {
                         success: false,
-                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        message: 'Hotel markup set is not configured for this agency.',
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                const payload = req.body;
+                const _a = req.body, { name } = _a, payload = __rest(_a, ["name"]);
                 yield OthersModel.insertHotelSearchHistory({
                     check_in_date: payload.checkin,
                     check_out_date: payload.checkout,
@@ -55,6 +66,7 @@ class AgentHotelService extends abstract_service_1.default {
                     user_type: 'Agent',
                     agency_id,
                     code: payload.code,
+                    name: name,
                 });
                 const result = yield ctHotelSupport.HotelSearch(payload, agent.hotel_markup_set);
                 if (result) {
@@ -93,7 +105,7 @@ class AgentHotelService extends abstract_service_1.default {
                 if (!agent.hotel_markup_set) {
                     return {
                         success: false,
-                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        message: 'Hotel markup set is not configured for this agency.',
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
@@ -135,7 +147,7 @@ class AgentHotelService extends abstract_service_1.default {
                 if (!agent.hotel_markup_set) {
                     return {
                         success: false,
-                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        message: 'Hotel markup set is not configured for this agency.',
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
@@ -148,11 +160,12 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_NOT_FOUND,
                     };
                 }
+                const { supplier_fee, supplier_rates } = data, restData = __rest(data, ["supplier_fee", "supplier_rates"]);
                 return {
                     success: true,
                     message: this.ResMsg.HTTP_OK,
                     code: this.StatusCode.HTTP_OK,
-                    data: data,
+                    data: restData,
                 };
             }));
         });
@@ -177,14 +190,29 @@ class AgentHotelService extends abstract_service_1.default {
                 if (!agent.hotel_markup_set) {
                     return {
                         success: false,
-                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        message: 'Hotel markup set is not configured for this agency.',
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                const files = req.files || [];
-                if (files.length) {
-                }
+                // const files = (req.files as Express.Multer.File[]) || [];
                 const body = req.body;
+                const payload = req.body;
+                // if (payload.booking_items.length < files.length) {
+                //   return {
+                //     success: false,
+                //     message:
+                //       'Number of files does not match the number of booking items.',
+                //     code: this.StatusCode.HTTP_BAD_REQUEST,
+                //   };
+                // }
+                // if (files.length) {
+                //   files.forEach((file) => {
+                //     if (file.fieldname === 'lead_passport') {
+                //       payload.booking_items = file.filename;
+                //     }
+                //   });
+                // }
+                const booking = yield ctHotelSupport.HotelBooking(body, agent.hotel_markup_set);
                 return {
                     success: true,
                     message: this.ResMsg.HTTP_NOT_FOUND,

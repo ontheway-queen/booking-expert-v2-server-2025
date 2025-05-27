@@ -5,6 +5,7 @@ import {
   IAgentHotelBookingReqBody,
   IAgentHotelSearchReqBody,
 } from '../utils/types/agentHotel.types';
+import { ICTHotelBookingPayload } from '../../../utils/supportTypes/hotelTypes/ctHotelSupport.types';
 
 export class AgentHotelService extends AbstractServices {
   constructor() {
@@ -34,12 +35,12 @@ export class AgentHotelService extends AbstractServices {
       if (!agent.hotel_markup_set) {
         return {
           success: false,
-          message: this.ResMsg.HTTP_BAD_REQUEST,
+          message: 'Hotel markup set is not configured for this agency.',
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
 
-      const payload = req.body as IAgentHotelSearchReqBody;
+      const { name, ...payload } = req.body as IAgentHotelSearchReqBody;
 
       await OthersModel.insertHotelSearchHistory({
         check_in_date: payload.checkin,
@@ -51,6 +52,7 @@ export class AgentHotelService extends AbstractServices {
         user_type: 'Agent',
         agency_id,
         code: payload.code,
+        name: name,
       });
 
       const result = await ctHotelSupport.HotelSearch(
@@ -97,7 +99,7 @@ export class AgentHotelService extends AbstractServices {
       if (!agent.hotel_markup_set) {
         return {
           success: false,
-          message: this.ResMsg.HTTP_BAD_REQUEST,
+          message: 'Hotel markup set is not configured for this agency.',
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
@@ -147,7 +149,7 @@ export class AgentHotelService extends AbstractServices {
       if (!agent.hotel_markup_set) {
         return {
           success: false,
-          message: this.ResMsg.HTTP_BAD_REQUEST,
+          message: 'Hotel markup set is not configured for this agency.',
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
@@ -171,11 +173,13 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
+      const { supplier_fee, supplier_rates, ...restData } = data;
+
       return {
         success: true,
         message: this.ResMsg.HTTP_OK,
         code: this.StatusCode.HTTP_OK,
-        data: data,
+        data: restData,
       };
     });
   }
@@ -202,17 +206,38 @@ export class AgentHotelService extends AbstractServices {
       if (!agent.hotel_markup_set) {
         return {
           success: false,
-          message: this.ResMsg.HTTP_BAD_REQUEST,
+          message: 'Hotel markup set is not configured for this agency.',
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
 
-      const files = req.files || ([] as Express.Multer.File[]);
-
-      if (files.length) {
-      }
+      // const files = (req.files as Express.Multer.File[]) || [];
 
       const body = req.body as IAgentHotelBookingReqBody;
+
+      const payload: ICTHotelBookingPayload = req.body;
+
+      // if (payload.booking_items.length < files.length) {
+      //   return {
+      //     success: false,
+      //     message:
+      //       'Number of files does not match the number of booking items.',
+      //     code: this.StatusCode.HTTP_BAD_REQUEST,
+      //   };
+      // }
+
+      // if (files.length) {
+      //   files.forEach((file) => {
+      //     if (file.fieldname === 'lead_passport') {
+      //       payload.booking_items = file.filename;
+      //     }
+      //   });
+      // }
+
+      const booking = await ctHotelSupport.HotelBooking(
+        body,
+        agent.hotel_markup_set
+      );
 
       return {
         success: true,

@@ -29,6 +29,7 @@ const ctHotelRequest_1 = __importDefault(require("../../lib/hotel/ctHotelRequest
 const ctHotelApiEndpoints_1 = __importDefault(require("../../miscellaneous/endpoints/ctHotelApiEndpoints"));
 const hotelMarkupsModel_1 = __importDefault(require("../../../models/markupSetModel/hotelMarkupsModel"));
 const constants_1 = require("../../miscellaneous/constants");
+const dateTimeLib_1 = __importDefault(require("../../lib/dateTimeLib"));
 class CTHotelSupportService extends abstract_service_1.default {
     constructor(trx) {
         super();
@@ -91,6 +92,9 @@ class CTHotelSupportService extends abstract_service_1.default {
                 return response.data;
             }
             const _a = response.data, { hotels } = _a, restData = __rest(_a, ["hotels"]);
+            if (!hotels) {
+                return false;
+            }
             const modifiedHotels = [];
             const { markup, mode, type } = markupSet[0];
             for (const hotel of hotels) {
@@ -233,11 +237,51 @@ class CTHotelSupportService extends abstract_service_1.default {
                 rate.price_details = newRate;
                 return rate;
             });
-            return Object.assign(Object.assign({}, restData), { fee: price_details, rates: newRates });
+            return Object.assign(Object.assign({}, restData), { fee: price_details, rates: newRates, supplier_fee: {
+                    price: fee.fee,
+                    tax: fee.total_tax,
+                    total_price: fee.total_fee,
+                }, supplier_rates: rates });
         });
     }
-    HotelBooking() {
-        return __awaiter(this, void 0, void 0, function* () { });
+    HotelBooking(payload, markup_set) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const recheckRoomsPayload = payload.booking_items.map((item) => {
+                return {
+                    rate_key: item.rate_key,
+                    group_code: payload.group_code,
+                };
+            });
+            const nights = dateTimeLib_1.default.nightsCount(payload.checkin, payload.checkout);
+            const recheck = yield this.HotelRecheck({
+                search_id: payload.search_id,
+                rooms: recheckRoomsPayload,
+                nights: nights,
+            }, markup_set);
+            if (!recheck) {
+                return false;
+            }
+            const response = yield this.request.postRequest(ctHotelApiEndpoints_1.default.HOTEL_BOOK, payload);
+            if (!response.success) {
+                return false;
+            }
+            const bookingData = response.data;
+            const hotelMarkupModel = new hotelMarkupsModel_1.default(this.trx);
+            const markupSet = yield hotelMarkupModel.getHotelMarkup({
+                markup_for: 'Book',
+                set_id: markup_set,
+                status: true,
+            });
+            if (!markupSet.length || markupSet[0].set_status === false) {
+                return bookingData;
+            }
+            const { markup, mode, type } = markupSet[0];
+            bookingData.price_details = this.getMarkupPrice({
+                prices: bookingData.price_details,
+                markup: { markup: Number(markup), mode, type },
+            });
+            return bookingData;
+        });
     }
     // get markup price func
     getMarkupPrice({ prices, markup, }) {

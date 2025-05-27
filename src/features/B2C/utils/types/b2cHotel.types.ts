@@ -4,5 +4,6 @@ export interface IB2CHotelSearchReqBody {
   checkout: string;
   destination: 'City' | 'Hotel';
   code: number;
+  name: string;
   rooms: { adults: number; children_ages: number[] }[];
 }

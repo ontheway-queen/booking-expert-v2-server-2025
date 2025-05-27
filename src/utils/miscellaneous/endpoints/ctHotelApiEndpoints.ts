@@ -4,4 +4,5 @@ export default class CTHotelAPIEndpoints {
   static readonly HOTEL_SEARCH = '/api/v1/external/hotel/search';
   static readonly HOTEL_ROOMS = '/api/v1/external/hotel/rooms';
   static readonly ROOM_RECHECK = '/api/v1/external/hotel/recheck';
+  static readonly HOTEL_BOOK = '/api/v1/external/hotel/booking';
 }

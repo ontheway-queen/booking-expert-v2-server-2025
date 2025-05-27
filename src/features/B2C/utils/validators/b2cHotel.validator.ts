@@ -6,6 +6,7 @@ export class B2CHotelValidator {
     client_nationality: Joi.string().required(),
     destination: Joi.string().valid('City', 'Hotel').required(),
     code: Joi.number().required(),
+    name: Joi.string().required(),
     rooms: Joi.array()
       .items(
         Joi.object({

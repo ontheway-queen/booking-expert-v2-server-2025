@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -23,7 +34,7 @@ class B2CHotelService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const OthersModel = this.Model.OthersModel(trx);
-                const payload = req.body;
+                const _a = req.body, { name } = _a, payload = __rest(_a, ["name"]);
                 yield OthersModel.insertHotelSearchHistory({
                     check_in_date: payload.checkin,
                     check_out_date: payload.checkout,
@@ -32,6 +43,7 @@ class B2CHotelService extends abstract_service_1.default {
                     nationality: payload.client_nationality,
                     user_type: 'B2C',
                     code: payload.code,
+                    name: name,
                 });
                 const configMarkup = this.Model.B2CMarkupConfigModel(trx);
                 const markup = yield configMarkup.getB2CMarkupConfigData('Hotel');

@@ -59,4 +59,23 @@ export default class DateTimeLib {
       mins > 0 ? mins + ' minute' + (mins > 1 ? 's' : '') : ''
     }`.trim();
   }
+
+  public static nightsCount(from_date: string, to_date: string) {
+    const fromDate = new Date(from_date);
+    const toDate = new Date(to_date);
+
+    // Ensure the dates are valid
+    if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+      return 0;
+    }
+
+    // Calculate the difference in time
+    const timeDifference = toDate.getTime() - fromDate.getTime();
+
+    // Convert time difference from milliseconds to days
+    const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+    // Return the number of nights (days - 1)
+    return daysDifference > 0 ? daysDifference - 1 : 0;
+  }
 }

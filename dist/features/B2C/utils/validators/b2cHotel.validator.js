@@ -12,6 +12,7 @@ class B2CHotelValidator {
             client_nationality: joi_1.default.string().required(),
             destination: joi_1.default.string().valid('City', 'Hotel').required(),
             code: joi_1.default.number().required(),
+            name: joi_1.default.string().required(),
             rooms: joi_1.default.array()
                 .items(joi_1.default.object({
                 adults: joi_1.default.number().required(),
