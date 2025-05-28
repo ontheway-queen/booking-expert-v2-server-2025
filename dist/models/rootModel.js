@@ -35,6 +35,7 @@ const admManagementModel_1 = __importDefault(require("./paymentModel/admManageme
 const invoiceModel_1 = __importDefault(require("./paymentModel/invoiceModel"));
 const moneyReceiptModel_1 = __importDefault(require("./paymentModel/moneyReceiptModel"));
 const travelerModel_1 = __importDefault(require("./travelerModel/travelerModel"));
+const othersModel_1 = __importDefault(require("./othersModel/othersModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -159,6 +160,10 @@ class Models {
     //Traveler model
     TravelerModel(trx) {
         return new travelerModel_1.default(trx || database_1.db);
+    }
+    //ADM management model
+    OthersModel(trx) {
+        return new othersModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

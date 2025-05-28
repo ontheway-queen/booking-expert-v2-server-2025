@@ -18,12 +18,17 @@ class B2CMarkupConfigModel extends schema_1.default {
         super();
         this.db = db;
     }
-    getB2CMarkupConfigData() {
+    getB2CMarkupConfigData(type) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('b2c_markup_config')
                 .withSchema(this.DBO_SCHEMA)
                 .select('b2c_markup_config.id', 'b2c_markup_config.markup_set_id', 'markup_set.name')
-                .join('markup_set', 'markup_set.id', 'b2c_markup_config.markup_set_id');
+                .leftJoin('markup_set', 'markup_set.id', 'b2c_markup_config.markup_set_id')
+                .where((qb) => {
+                if (type && type !== 'Both') {
+                    qb.where('markup_set.type', type);
+                }
+            });
         });
     }
     upsertB2CMarkupConfig(payload) {

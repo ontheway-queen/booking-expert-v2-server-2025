@@ -5,6 +5,7 @@ import config from '../../../config/config';
 import SabreAPIEndpoints from '../../../utils/miscellaneous/endpoints/sabreApiEndpoints';
 import { SABRE_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstent';
 import { Request } from 'express';
+import { CTHotelSupportService } from '../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service';
 
 export default class PublicCommonService extends AbstractServices {
   constructor() {
@@ -95,5 +96,22 @@ export default class PublicCommonService extends AbstractServices {
       message: this.ResMsg.HTTP_OK,
       data: get_airlines.data,
     };
+  }
+
+  //get all airport
+  public async getLocationHotel(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const CTHotelSupport = new CTHotelSupportService(trx);
+
+      const { filter } = req.query as { filter: string };
+      const get_airport = await CTHotelSupport.SearchLocation(filter);
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: get_airport.success ? get_airport.data : [],
+      };
+    });
   }
 }

@@ -121,7 +121,7 @@ export default class AgencyModel extends Schema {
     email,
     name,
     agent_no,
-    ref_id
+    ref_id,
   }: ICheckAgencyQuery): Promise<ICheckAgencyData | undefined> {
     return await this.db('agency')
       .withSchema(this.AGENT_SCHEMA)
@@ -297,7 +297,7 @@ export default class AgencyModel extends Schema {
       .where('ag.id', id)
       .andWhere((qb) => {
         if (ref_id) {
-          qb.andWhere("ag.ref_id", ref_id);
+          qb.andWhere('ag.ref_id', ref_id);
         }
       })
       .first();

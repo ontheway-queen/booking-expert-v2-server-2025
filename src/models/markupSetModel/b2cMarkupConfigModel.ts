@@ -13,7 +13,9 @@ export default class B2CMarkupConfigModel extends Schema {
     this.db = db;
   }
 
-  public async getB2CMarkupConfigData(): Promise<IGetB2CMarkupConfigData[]> {
+  public async getB2CMarkupConfigData(
+    type?: 'Flight' | 'Hotel' | 'Both'
+  ): Promise<IGetB2CMarkupConfigData[]> {
     return await this.db('b2c_markup_config')
       .withSchema(this.DBO_SCHEMA)
       .select(
@@ -21,7 +23,16 @@ export default class B2CMarkupConfigModel extends Schema {
         'b2c_markup_config.markup_set_id',
         'markup_set.name'
       )
-      .join('markup_set', 'markup_set.id', 'b2c_markup_config.markup_set_id');
+      .leftJoin(
+        'markup_set',
+        'markup_set.id',
+        'b2c_markup_config.markup_set_id'
+      )
+      .where((qb) => {
+        if (type && type !== 'Both') {
+          qb.where('markup_set.type', type);
+        }
+      });
   }
 
   public async upsertB2CMarkupConfig(payload: IUpsertB2CMarkupConfigPayload) {

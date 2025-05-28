@@ -5,8 +5,12 @@ import EmailSendLib from "../../../lib/emailSendLib";
 import FlightUtils from "../../../lib/flight/flightUtils";
 import Lib from "../../../lib/lib";
 import { GENERATE_AUTO_UNIQUE_ID, INVOICE_TYPES } from "../../../miscellaneous/constants";
-import { CUSTOM_API, FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_BOOKING_ON_HOLD, FLIGHT_BOOKING_REQUEST, FLIGHT_TICKET_IN_PROCESS, FLIGHT_TICKET_ISSUE, MARKUP_MODE_DECREASE, MARKUP_MODE_INCREASE, TRAVELER_FILE_TYPE_PASSPORT, TRAVELER_FILE_TYPE_VISA } from "../../../miscellaneous/flightConstent";
+import { CUSTOM_API, FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_CONFIRMED, FLIGHT_BOOKING_IN_PROCESS, FLIGHT_BOOKING_ON_HOLD, FLIGHT_BOOKING_REQUEST, FLIGHT_TICKET_IN_PROCESS, FLIGHT_TICKET_ISSUE, TRAVELER_FILE_TYPE_PASSPORT, TRAVELER_FILE_TYPE_VISA } from "../../../miscellaneous/flightConstent";
 import { MarkupType } from "../../../modelTypes/flightModelTypes/flightBookingModelTypes";
+import {
+  MARKUP_MODE_DECREASE,
+  MARKUP_MODE_INCREASE,
+} from '../../../miscellaneous/constants';
 import { IInsertFlightBookingTrackingPayload } from "../../../modelTypes/flightModelTypes/flightBookingTrackingModelTypes";
 import { ICheckBookingEligibilityPayload, ICheckDirectBookingPermissionPayload, IInsertFlightBookingDataPayload, ISendFlightBookingCancelEmailPayload, ISendFlightBookingEmailPayload, ISendFlightTicketIssueEmailPayload, IUpdateDataAfterFlightBookingCancelPayload } from "../../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes";
 import { flightBookingCancelBodyTemplate } from "../../../templates/flightBookingCancelTemplate";

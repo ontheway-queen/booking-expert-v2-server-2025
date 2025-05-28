@@ -84,6 +84,11 @@ export default class PublicCommonValidator {
     skip: Joi.number(),
   });
 
+  //location Hotel get filter
+  public getLocationHotelSchema = Joi.object({
+    filter: Joi.string().optional(),
+  });
+
   // get country
   public getCountry = Joi.object({
     name: Joi.string().optional(),

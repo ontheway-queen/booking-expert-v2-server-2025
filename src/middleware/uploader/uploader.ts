@@ -15,7 +15,7 @@ class Uploader extends CommonAbstractStorage {
   // cloud upload raw
   public cloudUploadRaw(
     folder: string,
-    fields: string[],
+    fields?: string[],
     types: string[] = allowAllFileTypes
   ) {
     return (req: Request, res: Response, next: NextFunction): void => {
@@ -45,7 +45,7 @@ class Uploader extends CommonAbstractStorage {
         fileFilter: function (_req, file, cb) {
           // Check allowed extensions
           if (types.includes(file.mimetype)) {
-            if (fields.includes(file.fieldname.split("-")[0])) {
+            if (fields && fields.includes(file.fieldname.split("-")[0])) {
               cb(null, true); // no errors
             } else {
               cb(

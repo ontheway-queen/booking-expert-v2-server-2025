@@ -6,6 +6,7 @@ import {
   IUpdateAdminProfileReqBody,
 } from '../utils/types/adminProfile.types';
 import { IUpdateAdminPayload } from '../../../utils/modelTypes/adminModelTypes/adminModel.types';
+import { CTHotelSupportService } from '../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service';
 
 export default class AdminProfileService extends AbstractServices {
   constructor() {
@@ -131,5 +132,32 @@ export default class AdminProfileService extends AbstractServices {
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.PASSWORD_CHANGED,
     };
+  }
+
+  public async getBalance(_req: Request) {
+    return this.db.transaction(async (trx) => {
+      const CTHotelModel = new CTHotelSupportService(trx);
+
+      const response = await CTHotelModel.GetBalance();
+
+      const CTHotelBalance = {
+        balance: '0.00',
+        emergency_credit: '0.00',
+      };
+
+      if (response.data) {
+        CTHotelBalance.balance = response.data.balance;
+        CTHotelBalance.emergency_credit = response.data.lend_balance;
+      }
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: {
+          CTHotelBalance,
+        },
+      };
+    });
   }
 }

@@ -29,8 +29,9 @@ const wfttApiEndpoints_1 = __importDefault(require("../../miscellaneous/wfttApiE
 const staticData_1 = require("../../miscellaneous/staticData");
 const flightConstent_1 = require("../../miscellaneous/flightConstent");
 const lib_1 = __importDefault(require("../../lib/lib"));
-const customError_1 = __importDefault(require("../../lib/customError"));
 const constants_1 = require("../../miscellaneous/constants");
+const customError_1 = __importDefault(require("../../lib/customError"));
+const constants_2 = require("../../miscellaneous/constants");
 class WfttFlightService extends abstract_service_1.default {
     constructor(trx) {
         super();
@@ -136,9 +137,9 @@ class WfttFlightService extends abstract_service_1.default {
                 }
                 // Set Markup to fare
                 if (finalMarkup && finalMarkupMode && finalMarkupType) {
-                    if (finalMarkupType === flightConstent_1.MARKUP_TYPE_PER) {
+                    if (finalMarkupType === constants_1.MARKUP_TYPE_PER) {
                         const markupAmount = (Number(fare.base_fare) * Number(finalMarkup)) / 100;
-                        if (finalMarkupMode === flightConstent_1.MARKUP_MODE_INCREASE) {
+                        if (finalMarkupMode === constants_1.MARKUP_MODE_INCREASE) {
                             fare.convenience_fee += Number(markupAmount);
                         }
                         else {
@@ -146,7 +147,7 @@ class WfttFlightService extends abstract_service_1.default {
                         }
                     }
                     else {
-                        if (finalMarkupMode === flightConstent_1.MARKUP_MODE_INCREASE) {
+                        if (finalMarkupMode === constants_1.MARKUP_MODE_INCREASE) {
                             fare.convenience_fee += Number(finalMarkup);
                         }
                         else {
@@ -180,7 +181,7 @@ class WfttFlightService extends abstract_service_1.default {
             if (!response) {
                 lib_1.default.writeJsonFile('wftt_revalidate_request', revalidate_body);
                 lib_1.default.writeJsonFile('wftt_revalidate_response', response);
-                throw new customError_1.default('External API Error', 500, constants_1.ERROR_LEVEL_WARNING, {
+                throw new customError_1.default('External API Error', 500, constants_2.ERROR_LEVEL_WARNING, {
                     api: flightConstent_1.WFTT_API,
                     endpoint: wfttApiEndpoints_1.default.FLIGHT_REVALIDATE_ENDPOINT,
                     payload: revalidate_body,

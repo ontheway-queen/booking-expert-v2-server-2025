@@ -6,15 +6,21 @@ import CustomError from '../../lib/customError';
 import FlightUtils from '../../lib/flight/flightUtils';
 import SabreRequests from '../../lib/flight/sabreRequest';
 import Lib from '../../lib/lib';
-import { ERROR_LEVEL_WARNING, PROJECT_EMAIL } from '../../miscellaneous/constants';
-import { FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_REFUNDED, FLIGHT_BOOKING_VOID, FLIGHT_TICKET_ISSUE, MARKUP_MODE_INCREASE, MARKUP_TYPE_PER, SABRE_API, SABRE_FLIGHT_ITINS } from '../../miscellaneous/flightConstent';
 
+import { FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_REFUNDED, FLIGHT_BOOKING_VOID, FLIGHT_TICKET_ISSUE, SABRE_API, SABRE_FLIGHT_ITINS } from '../../miscellaneous/flightConstent';
+
+import {
+  ERROR_LEVEL_WARNING,
+  MARKUP_MODE_INCREASE,
+  MARKUP_TYPE_PER,
+  PROJECT_EMAIL,
+} from '../../miscellaneous/constants';
+import SabreAPIEndpoints from '../../miscellaneous/endpoints/sabreApiEndpoints';
 import { BD_AIRPORT } from '../../miscellaneous/staticData';
 import { IFormattedFlight, IFormattedFlightItinerary, IFlightSearchReqBody, IFlightAvailability, IFlightDataAvailabilitySegment } from '../../supportTypes/flightTypes/commonFlightTypes';
 import { IBaggageAndAvailabilityAllSeg, IBaggageAndAvailabilityAllSegSegmentDetails, IContactNumber, IFormattedArrival, IFormattedCarrier, IFormattedDeparture, IFormattedLegDesc, IFormattedScheduleDesc, ILegDescOption, ISabreNewPassenger, ISabreResponseResult, ISecureFlight, OriginDestinationInformation } from '../../supportTypes/flightTypes/sabreFlightTypes';
 import { CommonFlightSupportService } from './commonFlightSupport.service';
 import { IFlightBookingRequestBody } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
-import SabreAPIEndpoints from '../../miscellaneous/endpoints/sabreApiEndpoints';
 export default class SabreFlightService extends AbstractServices {
   private trx: Knex.Transaction;
   private request = new SabreRequests();

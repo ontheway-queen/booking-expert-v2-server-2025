@@ -18,6 +18,7 @@ const abstract_service_1 = __importDefault(require("../../../abstract/abstract.s
 const config_1 = __importDefault(require("../../../config/config"));
 const sabreApiEndpoints_1 = __importDefault(require("../../../utils/miscellaneous/endpoints/sabreApiEndpoints"));
 const flightConstent_1 = require("../../../utils/miscellaneous/flightConstent");
+const ctHotelSupport_service_1 = require("../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service");
 class PublicCommonService extends abstract_service_1.default {
     constructor() {
         super();
@@ -107,6 +108,22 @@ class PublicCommonService extends abstract_service_1.default {
                 message: this.ResMsg.HTTP_OK,
                 data: get_airlines.data,
             };
+        });
+    }
+    //get all airport
+    getLocationHotel(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const CTHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
+                const { filter } = req.query;
+                const get_airport = yield CTHotelSupport.SearchLocation(filter);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: get_airport.success ? get_airport.data : [],
+                };
+            }));
         });
     }
 }

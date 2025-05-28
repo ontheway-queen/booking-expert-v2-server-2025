@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
+const ctHotelSupport_service_1 = require("../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service");
 class AdminProfileService extends abstract_service_1.default {
     constructor() {
         super();
@@ -121,6 +122,30 @@ class AdminProfileService extends abstract_service_1.default {
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.PASSWORD_CHANGED,
             };
+        });
+    }
+    getBalance(_req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const CTHotelModel = new ctHotelSupport_service_1.CTHotelSupportService(trx);
+                const response = yield CTHotelModel.GetBalance();
+                const CTHotelBalance = {
+                    balance: '0.00',
+                    emergency_credit: '0.00',
+                };
+                if (response.data) {
+                    CTHotelBalance.balance = response.data.balance;
+                    CTHotelBalance.emergency_credit = response.data.lend_balance;
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: {
+                        CTHotelBalance,
+                    },
+                };
+            }));
         });
     }
 }

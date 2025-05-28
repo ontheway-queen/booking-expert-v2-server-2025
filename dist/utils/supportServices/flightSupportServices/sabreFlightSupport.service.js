@@ -19,11 +19,11 @@ const customError_1 = __importDefault(require("../../lib/customError"));
 const flightUtils_1 = __importDefault(require("../../lib/flight/flightUtils"));
 const sabreRequest_1 = __importDefault(require("../../lib/flight/sabreRequest"));
 const lib_1 = __importDefault(require("../../lib/lib"));
-const constants_1 = require("../../miscellaneous/constants");
 const flightConstent_1 = require("../../miscellaneous/flightConstent");
+const constants_1 = require("../../miscellaneous/constants");
+const sabreApiEndpoints_1 = __importDefault(require("../../miscellaneous/endpoints/sabreApiEndpoints"));
 const staticData_1 = require("../../miscellaneous/staticData");
 const commonFlightSupport_service_1 = require("./commonFlightSupport.service");
-const sabreApiEndpoints_1 = __importDefault(require("../../miscellaneous/endpoints/sabreApiEndpoints"));
 class SabreFlightService extends abstract_service_1.default {
     constructor(trx) {
         super();
@@ -429,9 +429,9 @@ class SabreFlightService extends abstract_service_1.default {
                 };
                 // Set Markup to fare
                 if (finalMarkup && finalMarkupMode && finalMarkupType) {
-                    if (finalMarkupType === flightConstent_1.MARKUP_TYPE_PER) {
+                    if (finalMarkupType === constants_1.MARKUP_TYPE_PER) {
                         const markupAmount = (Number(new_fare.base_fare) * Number(finalMarkup)) / 100;
-                        if (finalMarkupMode === flightConstent_1.MARKUP_MODE_INCREASE) {
+                        if (finalMarkupMode === constants_1.MARKUP_MODE_INCREASE) {
                             new_fare.convenience_fee += Number(markupAmount);
                         }
                         else {
@@ -439,7 +439,7 @@ class SabreFlightService extends abstract_service_1.default {
                         }
                     }
                     else {
-                        if (finalMarkupMode === flightConstent_1.MARKUP_MODE_INCREASE) {
+                        if (finalMarkupMode === constants_1.MARKUP_MODE_INCREASE) {
                             new_fare.convenience_fee += Number(finalMarkup);
                         }
                         else {

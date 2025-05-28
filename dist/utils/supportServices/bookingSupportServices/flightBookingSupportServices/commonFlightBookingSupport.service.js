@@ -20,6 +20,7 @@ const flightUtils_1 = __importDefault(require("../../../lib/flight/flightUtils")
 const lib_1 = __importDefault(require("../../../lib/lib"));
 const constants_1 = require("../../../miscellaneous/constants");
 const flightConstent_1 = require("../../../miscellaneous/flightConstent");
+const constants_2 = require("../../../miscellaneous/constants");
 const flightBookingCancelTemplate_1 = require("../../../templates/flightBookingCancelTemplate");
 const flightBookingTemplate_1 = require("../../../templates/flightBookingTemplate");
 const flightTicketIssueTemplate_1 = require("../../../templates/flightTicketIssueTemplate");
@@ -279,7 +280,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 ref_id: booking_res[0].id,
                 ref_type: payload.invoice_ref_type,
                 gross_amount: payload.flight_data.fare.total_price,
-                markup_price: markup_price === 0 ? undefined : markup_type === flightConstent_1.MARKUP_MODE_INCREASE ? markup_price : -Number(markup_price),
+                markup_price: markup_price === 0 ? undefined : markup_type === constants_2.MARKUP_MODE_INCREASE ? markup_price : -Number(markup_price),
                 coupon_code: payload.coupon_code,
                 net_amount: payload.flight_data.fare.payable,
                 due: payload.flight_data.fare.payable,
@@ -297,13 +298,13 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
         if (discount > 0) {
             return {
                 markup_price: discount,
-                markup_type: flightConstent_1.MARKUP_MODE_DECREASE
+                markup_type: constants_2.MARKUP_MODE_DECREASE
             };
         }
         else if (convenience_fee > 0) {
             return {
                 markup_price: convenience_fee,
-                markup_type: flightConstent_1.MARKUP_MODE_INCREASE
+                markup_type: constants_2.MARKUP_MODE_INCREASE
             };
         }
         else {

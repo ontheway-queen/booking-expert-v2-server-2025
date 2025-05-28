@@ -21,5 +21,6 @@ FileFolder.SPECIAL_OFFER = 'special-offer';
 FileFolder.BANK_INVOICE_FILES = 'bank-invoice-files';
 FileFolder.AGENT_FLIGHT_BOOKING_FILES = 'agent/flight-booking-files';
 FileFolder.AGENT_B2C_FLIGHT_BOOKING_FILES = 'agent-b2c/flight-booking-files';
+FileFolder.AGENT_HOTEL_BOOKING_FILES = 'agent/hotel-booking-files';
 FileFolder.AGENCY_REGISTRATION_REQUEST = 'agency-registration-request';
 exports.default = FileFolder;

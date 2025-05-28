@@ -17,6 +17,7 @@ class AdminProfileRouter extends abstract_router_1.default {
             .get(this.controller.getProfile)
             .patch(this.uploader.cloudUploadRaw(this.fileFolders.ADMIN_FILES, ['photo']), this.controller.updateProfile);
         this.router.route('/change-password').post(this.controller.changePassword);
+        this.router.route('/balance').get(this.controller.getBalance);
     }
 }
 exports.default = AdminProfileRouter;

@@ -5,8 +5,12 @@ import { IFormattedFlightItinerary, IFlightSearchReqBody } from "../../supportTy
 import WfttAPIEndpoints from "../../miscellaneous/wfttApiEndpoints";
 import { IWFTTFlightRevalidateRequestBody, IWFTTFlightRevalidateResponse, IWFTTFlightSearchResBody, IWFTTFlightSearchResults } from "../../supportTypes/flightTypes/wfttFlightTypes";
 import { BD_AIRPORT } from "../../miscellaneous/staticData";
-import { CUSTOM_API, MARKUP_MODE_INCREASE, MARKUP_TYPE_PER, WFTT_API } from "../../miscellaneous/flightConstent";
+import { CUSTOM_API, WFTT_API } from "../../miscellaneous/flightConstent";
 import Lib from "../../lib/lib";
+import {
+  MARKUP_MODE_INCREASE,
+  MARKUP_TYPE_PER
+} from '../../miscellaneous/constants';
 import CustomError from "../../lib/customError";
 import { ERROR_LEVEL_WARNING } from "../../miscellaneous/constants";
 

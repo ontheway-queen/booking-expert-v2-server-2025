@@ -50,6 +50,10 @@ class AdminProfileController extends abstract_controller_1.default {
             const _a = yield this.service.changePassword(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
+        this.getBalance = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getBalance(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
     }
 }
 exports.default = AdminProfileController;
