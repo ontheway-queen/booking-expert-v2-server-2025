@@ -58,7 +58,9 @@ class AgentHotelValidator {
                             room_reference: joi_1.default.string().required(),
                             paxes: joi_1.default.array()
                                 .items(joi_1.default.object({
-                                title: joi_1.default.string().required(),
+                                title: joi_1.default.string()
+                                    .valid('Mr.', 'Ms.', 'Mrs.', 'Mstr.')
+                                    .required(),
                                 name: joi_1.default.string().required(),
                                 surname: joi_1.default.string().required(),
                                 type: joi_1.default.string().valid('AD', 'CH').required(),

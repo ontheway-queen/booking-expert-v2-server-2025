@@ -62,7 +62,9 @@ export default class AgentHotelValidator {
                       paxes: Joi.array()
                         .items(
                           Joi.object({
-                            title: Joi.string().required(),
+                            title: Joi.string()
+                              .valid('Mr.', 'Ms.', 'Mrs.', 'Mstr.')
+                              .required(),
                             name: Joi.string().required(),
                             surname: Joi.string().required(),
                             type: Joi.string().valid('AD', 'CH').required(),

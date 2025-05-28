@@ -1,0 +1,128 @@
+{
+  "additional_info": {},
+  "booking_comment": "Test booking",
+  "booking_date": "2025-05-28T06:01:18.763419",
+  "booking_id": "CT-SB-202505-1078405",
+  "booking_reference": "CFJCttOjOZD-FMXJ",
+  "checkin": "2025-06-03",
+  "checkout": "2025-06-05",
+  "currency": "AED",
+  "holder": {
+    "client_nationality": "BD",
+    "email": "ruiyan@yopmail.com",
+    "name": "James",
+    "phone_number": "6614565589",
+    "surname": "Patrick",
+    "title": "Mr."
+  },
+  "hotel": {
+    "address": "House 31/B Road 35/A Gulshan 2 Dhaka 1212  Road 35/A",
+    "booking_items": [
+      {
+        "boarding_details": ["Bed and Breakfast"],
+        "currency": "AED",
+        "includes_boarding": true,
+        "non_refundable": true,
+        "price": 389,
+        "rate_comments": {
+          "pax_comments": "For this rate the infants will be converted to children with age 1."
+        },
+        "rate_key": "4phfnmjw4quc5fstusmwehoq4dl6hjxe66y6lht23bab56xpl23rr6ppl53gleeqs5fez57tx52rqebuxczwq5m72pobjl6hsgusxruf4kpu5h2nz57donawfazo64jt7ggsvxsuaqbdsqwdrtalqrml4c3mow7ha2gtbo277vdi5wp6byssvay4t2gwlddtbhggijymabisipw4xkahnqzhvlgefy6ubpjdp4p2aom5u5gnhofqiiy",
+        "room_code": "4dhflkrq5ircppzs2a",
+        "rooms": [
+          {
+            "description": "Panorama Lake View Twin Deluxe",
+            "no_of_adults": 2,
+            "no_of_children": 0,
+            "no_of_rooms": 1,
+            "room_type": "Panorama Lake View Twin Deluxe",
+            "paxs": [
+              {
+                "name": "Moon",
+                "pax_id": 1,
+                "surname": "Patrick",
+                "title": "Mrs.",
+                "type": "AD"
+              },
+              {
+                "name": "Moon",
+                "pax_id": 1,
+                "surname": "Patrick",
+                "title": "Mrs.",
+                "type": "AD"
+              }
+            ]
+          }
+        ],
+        "status": "confirmed"
+      }
+    ],
+    "category": 3,
+    "city_code": "121096",
+    "city_name": "Dhaka",
+    "country_code": "BD",
+    "country_name": "Bangladesh",
+    "description": "Property Location When you stay at Tropical Daisy in Dhaka, you'll be near the airport and close to Gulshan South Paka Market D.N.C.C. and Jatiyo Sangshad Bhaban.  This hotel is within close proximity of Gulshan Circle 1 and Gulshan Ladies Park.Rooms Make yourself at home in one of the 28 air-conditioned rooms featuring refrigerators and microwaves. Prepare your meals in the shared/communal kitchen. 26-inch LCD televisions with cable programming provide entertainment, while complimentary wireless Internet access keeps you connected. Private bathrooms with shower/tub combinations feature deep soaking bathtubs and complimentary toiletries.Amenities Take advantage of recreation opportunities such as a fitness center, or other amenities including complimentary wireless Internet access and concierge services. Getting to nearby attractions is a breeze with the area shuttle (surcharge).Dining Enjoy a meal at a restaurant or in a coffee shop/cafÃ©. Or stay in and take advantage of the hotel's 24-hour room service.Business, Other Amenities Featured amenities include a 24-hour business center, complimentary newspapers in the lobby, and dry cleaning/laundry services. A roundtrip airport shuttle is provided for a surcharge (available 24 hours).",
+    "geolocation": {
+      "latitude": 23.7823,
+      "longitude": 90.4078
+    },
+    "hotel_code": "1052426",
+    "name": "Tropical Daisy",
+    "paxes": [
+      {
+        "name": "Moon",
+        "pax_id": 1,
+        "surname": "Patrick",
+        "title": "Mrs.",
+        "type": "AD"
+      },
+      {
+        "name": "Henry",
+        "pax_id": 1,
+        "surname": "Patrick",
+        "title": "Mr.",
+        "type": "AD"
+      }
+    ],
+    "safe2stay": {
+      "covid_19_safe_to_stay": "Y",
+      "covid_19_safety_protocol": "This property advises that enhanced cleaning and guest safety measures are currently in place.<br>Property is officially certified under regional sanitization guidelines.<br>"
+    }
+  },
+  "non_refundable": true,
+  "payment_status": "paid",
+  "payment_type": "AT_WEB",
+  "price": {
+    "breakdown": {
+      "net": [
+        {
+          "amount": 0,
+          "amount_type": "value",
+          "currency": "AED",
+          "included": true,
+          "name": "VAT"
+        },
+        {
+          "amount": 388.56,
+          "amount_type": "value",
+          "currency": "AED",
+          "included": true,
+          "name": "SupplierPrice"
+        },
+        {
+          "amount": 388.56,
+          "amount_type": "value",
+          "currency": "AED",
+          "included": true,
+          "name": "Total"
+        }
+      ]
+    },
+    "total": 389
+  },
+  "status": "confirmed",
+  "supports_amendment": false,
+  "supports_cancellation": true,
+  "search_id": "lgzicfmo663fepijdtbhc3j3ga"
+}

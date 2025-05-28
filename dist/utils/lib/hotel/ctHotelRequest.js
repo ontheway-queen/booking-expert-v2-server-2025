@@ -120,5 +120,57 @@ class CTHotelRequests {
             }
         });
     }
+    postRequestFormData(endpoint, requestData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            const apiUrl = BASE_URL + endpoint;
+            try {
+                const headers = {
+                    Authorization: `Bearer ${API_KEY}`,
+                    'Content-Type': 'multipart/form-data',
+                };
+                const response = yield axios_1.default.request({
+                    method: 'post',
+                    url: apiUrl,
+                    headers: headers,
+                    data: requestData,
+                    validateStatus: () => true,
+                });
+                console.log('Response:', response.data);
+                if (!((_a = response === null || response === void 0 ? void 0 : response.data) === null || _a === void 0 ? void 0 : _a.success)) {
+                    yield new rootModel_1.default().ErrorLogsModel().insertErrorLogs({
+                        level: constants_1.ERROR_LEVEL_WARNING,
+                        message: `Error from Cholo Travel API`,
+                        url: apiUrl,
+                        http_method: 'POST',
+                        metadata: {
+                            api: flightConstent_1.CT_API,
+                            endpoint: apiUrl,
+                            payload: requestData,
+                            response: response.data,
+                        },
+                    });
+                    return false;
+                }
+                return response.data;
+            }
+            catch (error) {
+                yield new rootModel_1.default().ErrorLogsModel().insertErrorLogs({
+                    level: constants_1.ERROR_LEVEL_WARNING,
+                    message: `Error from Cholo Travel API`,
+                    url: apiUrl,
+                    http_method: 'POST',
+                    metadata: {
+                        api: flightConstent_1.CT_API,
+                        endpoint: apiUrl,
+                        payload: requestData,
+                        response: error,
+                    },
+                });
+                console.log(error);
+                return false;
+            }
+        });
+    }
 }
 exports.default = CTHotelRequests;

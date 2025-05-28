@@ -6,6 +6,8 @@ import {
   IAgentHotelSearchReqBody,
 } from '../utils/types/agentHotel.types';
 import { ICTHotelBookingPayload } from '../../../utils/supportTypes/hotelTypes/ctHotelSupport.types';
+import CustomError from '../../../utils/lib/customError';
+import DateTimeLib from '../../../utils/lib/dateTimeLib';
 
 export class AgentHotelService extends AbstractServices {
   constructor() {
@@ -211,39 +213,110 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
-      // const files = (req.files as Express.Multer.File[]) || [];
+      const files = (req.files as Express.Multer.File[]) || [];
 
       const body = req.body as IAgentHotelBookingReqBody;
 
-      const payload: ICTHotelBookingPayload = req.body;
+      const payload: ICTHotelBookingPayload = body;
 
-      // if (payload.booking_items.length < files.length) {
-      //   return {
-      //     success: false,
-      //     message:
-      //       'Number of files does not match the number of booking items.',
-      //     code: this.StatusCode.HTTP_BAD_REQUEST,
-      //   };
-      // }
+      if (payload.booking_items.length < files.length) {
+        return {
+          success: false,
+          message:
+            'Number of files does not match the number of booking items.',
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+        };
+      }
 
-      // if (files.length) {
-      //   files.forEach((file) => {
-      //     if (file.fieldname === 'lead_passport') {
-      //       payload.booking_items = file.filename;
-      //     }
-      //   });
-      // }
+      if (files.length) {
+        let totalPax = 0;
+
+        payload.booking_items.forEach((item) => {
+          item.rooms.forEach((room) => {
+            totalPax += room.paxes.length;
+          });
+        });
+
+        if (totalPax < files.length) {
+          return {
+            success: false,
+            message:
+              'Number of files does not match the total number of paxes.',
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+          };
+        }
+
+        files.forEach((file) => {
+          const splitName = file.fieldname.split('_');
+
+          if (splitName.length !== 4) {
+            throw new CustomError(
+              'Invalid file field name format.',
+              this.StatusCode.HTTP_BAD_REQUEST
+            );
+          }
+
+          if (
+            !payload.booking_items[0]?.rooms[Number(splitName[1]) - 1]?.paxes[
+              Number(splitName[3]) - 1
+            ]
+          ) {
+            throw new CustomError(
+              `Room no or room pax no does not match with passport/id filename. Filename example: room_1_pax_1 - room_1(Room Number)_pax_1(Pax number)`,
+              this.StatusCode.HTTP_BAD_REQUEST
+            );
+          }
+
+          payload.booking_items[0].rooms[Number(splitName[1]) - 1].paxes[
+            Number(splitName[3]) - 1
+          ].id_file = file.filename;
+        });
+      }
+
+      const recheckRoomsPayload = payload.booking_items.map((item) => {
+        return {
+          rate_key: item.rate_key,
+          group_code: payload.group_code,
+        };
+      });
+
+      const nights = DateTimeLib.nightsCount(payload.checkin, payload.checkout);
+
+      const recheck = await ctHotelSupport.HotelRecheck(
+        {
+          search_id: payload.search_id,
+          rooms: recheckRoomsPayload,
+          nights: nights,
+        },
+        agent.hotel_markup_set
+      );
+
+      if (!recheck) {
+        return {
+          success: false,
+          message: 'Booking failed. Please try again with another room.',
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+        };
+      }
 
       const booking = await ctHotelSupport.HotelBooking(
         body,
         agent.hotel_markup_set
       );
 
+      if (!booking) {
+        return {
+          success: false,
+          message: 'Booking failed. Please try again with another room.',
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+        };
+      }
+
       return {
         success: true,
-        message: this.ResMsg.HTTP_NOT_FOUND,
-        code: this.StatusCode.HTTP_OK,
-        data: body,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        data: booking,
       };
     });
   }

@@ -105,4 +105,54 @@ export default class CTHotelRequests {
       return false;
     }
   }
+
+  public async postRequestFormData(endpoint: string, requestData: any) {
+    const apiUrl = BASE_URL + endpoint;
+    try {
+      const headers = {
+        Authorization: `Bearer ${API_KEY}`,
+        'Content-Type': 'multipart/form-data',
+      };
+      const response = await axios.request({
+        method: 'post',
+        url: apiUrl,
+        headers: headers,
+        data: requestData,
+        validateStatus: () => true,
+      });
+      console.log('Response:', response.data);
+
+      if (!response?.data?.success) {
+        await new Models().ErrorLogsModel().insertErrorLogs({
+          level: ERROR_LEVEL_WARNING,
+          message: `Error from Cholo Travel API`,
+          url: apiUrl,
+          http_method: 'POST',
+          metadata: {
+            api: CT_API,
+            endpoint: apiUrl,
+            payload: requestData,
+            response: response.data,
+          },
+        });
+        return false;
+      }
+      return response.data;
+    } catch (error: any) {
+      await new Models().ErrorLogsModel().insertErrorLogs({
+        level: ERROR_LEVEL_WARNING,
+        message: `Error from Cholo Travel API`,
+        url: apiUrl,
+        http_method: 'POST',
+        metadata: {
+          api: CT_API,
+          endpoint: apiUrl,
+          payload: requestData,
+          response: error,
+        },
+      });
+      console.log(error);
+      return false;
+    }
+  }
 }

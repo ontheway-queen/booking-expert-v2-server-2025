@@ -332,31 +332,24 @@ export class CTHotelSupportService extends AbstractServices {
     payload: ICTHotelBookingPayload,
     markup_set: number
   ) {
-    const recheckRoomsPayload = payload.booking_items.map((item) => {
-      return {
-        rate_key: item.rate_key,
-        group_code: payload.group_code,
-      };
+    const formData = new FormData();
+
+    Object.keys(payload).forEach((key) => {
+      if (key === 'booking_items') {
+        formData.append(key, JSON.stringify(payload[key]));
+      } else if (key === 'holder') {
+        formData.append(key, JSON.stringify(payload[key]));
+      } else {
+        formData.append(
+          key,
+          payload[key as keyof ICTHotelBookingPayload] as any
+        );
+      }
     });
 
-    const nights = DateTimeLib.nightsCount(payload.checkin, payload.checkout);
-
-    const recheck = await this.HotelRecheck(
-      {
-        search_id: payload.search_id,
-        rooms: recheckRoomsPayload,
-        nights: nights,
-      },
-      markup_set
-    );
-
-    if (!recheck) {
-      return false;
-    }
-
-    const response = await this.request.postRequest(
+    const response = await this.request.postRequestFormData(
       CTHotelAPIEndpoints.HOTEL_BOOK,
-      payload
+      formData
     );
 
     if (!response.success) {
@@ -364,24 +357,6 @@ export class CTHotelSupportService extends AbstractServices {
     }
 
     const bookingData = response.data;
-
-    const hotelMarkupModel = new HotelMarkupsModel(this.trx);
-    const markupSet = await hotelMarkupModel.getHotelMarkup({
-      markup_for: 'Book',
-      set_id: markup_set,
-      status: true,
-    });
-
-    if (!markupSet.length || markupSet[0].set_status === false) {
-      return bookingData;
-    }
-
-    const { markup, mode, type } = markupSet[0];
-
-    bookingData.price_details = this.getMarkupPrice({
-      prices: bookingData.price_details,
-      markup: { markup: Number(markup), mode, type },
-    });
 
     return bookingData;
   }

@@ -491,6 +491,7 @@ export interface ICTHotelBookingPayload {
         name: string;
         surname: string;
         type: string;
+        id_file?: string;
       }[];
     }[];
   }[];
