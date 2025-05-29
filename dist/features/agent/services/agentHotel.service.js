@@ -87,6 +87,20 @@ class AgentHotelService extends abstract_service_1.default {
             }));
         });
     }
+    hotelSearchHistory(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const query = req.query;
+            const OthersModel = this.Model.OthersModel();
+            const data = yield OthersModel.getHotelSearchHistory(Object.assign({ agency_id, user_type: 'Agent' }, query));
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data,
+            };
+        });
+    }
     getHotelRooms(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
@@ -198,14 +212,34 @@ class AgentHotelService extends abstract_service_1.default {
                 }
                 const files = req.files || [];
                 const body = req.body;
-                const payload = body;
-                if (payload.booking_items.length < files.length) {
+                const recheckRoomsPayload = body.booking_items.map((item) => {
+                    return {
+                        rate_key: item.rate_key,
+                        group_code: body.group_code,
+                    };
+                });
+                const nights = dateTimeLib_1.default.nightsCount(body.checkin, body.checkout);
+                const recheck = yield ctHotelSupport.HotelRecheck({
+                    search_id: body.search_id,
+                    rooms: recheckRoomsPayload,
+                    nights: nights,
+                }, agent.hotel_markup_set);
+                if (!recheck) {
                     return {
                         success: false,
-                        message: 'Number of files does not match the number of booking items.',
+                        message: 'Booking failed. Please try again with another room.',
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
+                const booking = yield ctHotelSupport.HotelBooking(body, agent.hotel_markup_set);
+                if (!booking) {
+                    return {
+                        success: false,
+                        message: 'Booking failed. Please try again with another room.',
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                    };
+                }
+                const payload = body;
                 if (files.length) {
                     let totalPax = 0;
                     payload.booking_items.forEach((item) => {
@@ -227,37 +261,10 @@ class AgentHotelService extends abstract_service_1.default {
                             throw new customError_1.default('Invalid file field name format.', this.StatusCode.HTTP_BAD_REQUEST);
                         }
                         if (!((_b = (_a = payload.booking_items[0]) === null || _a === void 0 ? void 0 : _a.rooms[Number(splitName[1]) - 1]) === null || _b === void 0 ? void 0 : _b.paxes[Number(splitName[3]) - 1])) {
-                            throw new customError_1.default(`Room no or room pax no does not match with passport/id filename. Filename example: room_1_pax_1 - room_1(Room Number)_pax_1(Pax number)`, this.StatusCode.HTTP_BAD_REQUEST);
+                            throw new customError_1.default(`Room no or room pax no(${file.fieldname}) does not match with passport/id filename. Filename example: room_1_pax_1 - room_1(Room Number)_pax_1(Pax number)`, this.StatusCode.HTTP_BAD_REQUEST);
                         }
                         payload.booking_items[0].rooms[Number(splitName[1]) - 1].paxes[Number(splitName[3]) - 1].id_file = file.filename;
                     });
-                }
-                const recheckRoomsPayload = payload.booking_items.map((item) => {
-                    return {
-                        rate_key: item.rate_key,
-                        group_code: payload.group_code,
-                    };
-                });
-                const nights = dateTimeLib_1.default.nightsCount(payload.checkin, payload.checkout);
-                const recheck = yield ctHotelSupport.HotelRecheck({
-                    search_id: payload.search_id,
-                    rooms: recheckRoomsPayload,
-                    nights: nights,
-                }, agent.hotel_markup_set);
-                if (!recheck) {
-                    return {
-                        success: false,
-                        message: 'Booking failed. Please try again with another room.',
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                    };
-                }
-                const booking = yield ctHotelSupport.HotelBooking(body, agent.hotel_markup_set);
-                if (!booking) {
-                    return {
-                        success: false,
-                        message: 'Booking failed. Please try again with another room.',
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                    };
                 }
                 return {
                     success: true,

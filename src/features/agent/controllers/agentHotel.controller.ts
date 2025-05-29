@@ -18,6 +18,14 @@ export default class AgentHotelController extends AbstractController {
     }
   );
 
+  public hotelSearchHistory = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.getHotelSearchHistoryValidator },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.hotelSearchHistory(req);
+      res.status(code).json(rest);
+    }
+  );
+
   public hotelRooms = this.asyncWrapper.wrap(
     { bodySchema: this.validator.getHotelRoomsValidator },
     async (req: Request, res: Response) => {

@@ -11,6 +11,7 @@ export default class AgentHotelRouter extends AbstractRouter {
 
   private callRouter() {
     this.router.post('/search', this.controller.hotelSearch);
+    this.router.get('/search/history', this.controller.hotelSearchHistory);
     this.router.post('/rooms', this.controller.hotelRooms);
     this.router.post('/room/recheck', this.controller.hotelRoomRecheck);
     this.router

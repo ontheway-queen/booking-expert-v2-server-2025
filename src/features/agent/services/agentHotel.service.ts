@@ -2,6 +2,7 @@ import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 import { CTHotelSupportService } from '../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service';
 import {
+  IAgencyGetHotelSearchHistoryReqQuery,
   IAgentHotelBookingReqBody,
   IAgentHotelSearchReqBody,
 } from '../utils/types/agentHotel.types';
@@ -77,6 +78,25 @@ export class AgentHotelService extends AbstractServices {
         code: this.StatusCode.HTTP_NOT_FOUND,
       };
     });
+  }
+
+  public async hotelSearchHistory(req: Request) {
+    const { agency_id } = req.agencyUser;
+    const query = req.query as IAgencyGetHotelSearchHistoryReqQuery;
+    const OthersModel = this.Model.OthersModel();
+
+    const data = await OthersModel.getHotelSearchHistory({
+      agency_id,
+      user_type: 'Agent',
+      ...query,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data,
+    };
   }
 
   public async getHotelRooms(req: Request) {
@@ -217,16 +237,46 @@ export class AgentHotelService extends AbstractServices {
 
       const body = req.body as IAgentHotelBookingReqBody;
 
-      const payload: ICTHotelBookingPayload = body;
+      const recheckRoomsPayload = body.booking_items.map((item) => {
+        return {
+          rate_key: item.rate_key,
+          group_code: body.group_code,
+        };
+      });
 
-      if (payload.booking_items.length < files.length) {
+      const nights = DateTimeLib.nightsCount(body.checkin, body.checkout);
+
+      const recheck = await ctHotelSupport.HotelRecheck(
+        {
+          search_id: body.search_id,
+          rooms: recheckRoomsPayload,
+          nights: nights,
+        },
+        agent.hotel_markup_set
+      );
+
+      if (!recheck) {
         return {
           success: false,
-          message:
-            'Number of files does not match the number of booking items.',
+          message: 'Booking failed. Please try again with another room.',
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
+
+      const booking = await ctHotelSupport.HotelBooking(
+        body,
+        agent.hotel_markup_set
+      );
+
+      if (!booking) {
+        return {
+          success: false,
+          message: 'Booking failed. Please try again with another room.',
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+        };
+      }
+
+      const payload: ICTHotelBookingPayload = body;
 
       if (files.length) {
         let totalPax = 0;
@@ -262,7 +312,7 @@ export class AgentHotelService extends AbstractServices {
             ]
           ) {
             throw new CustomError(
-              `Room no or room pax no does not match with passport/id filename. Filename example: room_1_pax_1 - room_1(Room Number)_pax_1(Pax number)`,
+              `Room no or room pax no(${file.fieldname}) does not match with passport/id filename. Filename example: room_1_pax_1 - room_1(Room Number)_pax_1(Pax number)`,
               this.StatusCode.HTTP_BAD_REQUEST
             );
           }
@@ -271,45 +321,6 @@ export class AgentHotelService extends AbstractServices {
             Number(splitName[3]) - 1
           ].id_file = file.filename;
         });
-      }
-
-      const recheckRoomsPayload = payload.booking_items.map((item) => {
-        return {
-          rate_key: item.rate_key,
-          group_code: payload.group_code,
-        };
-      });
-
-      const nights = DateTimeLib.nightsCount(payload.checkin, payload.checkout);
-
-      const recheck = await ctHotelSupport.HotelRecheck(
-        {
-          search_id: payload.search_id,
-          rooms: recheckRoomsPayload,
-          nights: nights,
-        },
-        agent.hotel_markup_set
-      );
-
-      if (!recheck) {
-        return {
-          success: false,
-          message: 'Booking failed. Please try again with another room.',
-          code: this.StatusCode.HTTP_BAD_REQUEST,
-        };
-      }
-
-      const booking = await ctHotelSupport.HotelBooking(
-        body,
-        agent.hotel_markup_set
-      );
-
-      if (!booking) {
-        return {
-          success: false,
-          message: 'Booking failed. Please try again with another room.',
-          code: this.StatusCode.HTTP_BAD_REQUEST,
-        };
       }
 
       return {

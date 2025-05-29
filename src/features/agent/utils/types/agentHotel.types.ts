@@ -38,3 +38,10 @@ export interface IAgentHotelBookingReqBody {
     client_nationality: string;
   };
 }
+
+export interface IAgencyGetHotelSearchHistoryReqQuery {
+  limit?: string;
+  skip?: string;
+  from_date?: string;
+  to_date?: string;
+}
