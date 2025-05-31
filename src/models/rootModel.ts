@@ -32,6 +32,7 @@ import InvoiceModel from './paymentModel/invoiceModel';
 import MoneyReceiptModel from './paymentModel/moneyReceiptModel';
 import TravelerModel from './travelerModel/travelerModel';
 import OthersModel from './othersModel/othersModel';
+import HotelBookingModel from './hotelModel/hotelBookingModel';
 
 export default class Models {
   //Common model
@@ -188,8 +189,13 @@ export default class Models {
   public TravelerModel(trx?: Knex.Transaction) {
     return new TravelerModel(trx || db);
   }
-  //ADM management model
+
+  //Others management model
   public OthersModel(trx?: Knex.Transaction) {
     return new OthersModel(trx || db);
+  }
+  //Hotel Booking model
+  public HotelBookingModel(trx?: Knex.Transaction) {
+    return new HotelBookingModel(trx || db);
   }
 }

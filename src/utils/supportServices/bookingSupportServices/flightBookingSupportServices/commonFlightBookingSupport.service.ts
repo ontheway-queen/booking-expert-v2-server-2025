@@ -366,8 +366,9 @@ export class CommonFlightBookingSupportService extends AbstractServices {
 
     //create invoice
     const invoiceModel = this.Model.InvoiceModel(this.trx);
+
     const invoice_res = await invoiceModel.createInvoice({
-      invoice_number: await Lib.generateNo({
+      invoice_no: await Lib.generateNo({
         trx: this.trx,
         type: GENERATE_AUTO_UNIQUE_ID.invoice,
       }),
@@ -376,15 +377,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       user_id: payload.user_id,
       ref_id: booking_res[0].id,
       ref_type: payload.invoice_ref_type,
-      gross_amount: payload.flight_data.fare.total_price,
-      markup_price:
-        markup_price === 0
-          ? undefined
-          : markup_type === MARKUP_MODE_INCREASE
-          ? markup_price
-          : -Number(markup_price),
-      coupon_code: payload.coupon_code,
-      net_amount: payload.flight_data.fare.payable,
+      total_amount: payload.flight_data.fare.payable,
       due: payload.flight_data.fare.payable,
       details: `Invoice has been created for flight booking ref no. - ${booking_ref}`,
       type: INVOICE_TYPES.SALE,

@@ -7,7 +7,7 @@ export const origin: string[] = [
   'https://www.bookingexpert.us',
   'https://admin.bookingexpert.us',
   'http://10.10.220.42:3000',
-  'http://10.10.220.42:6565'
+  'http://10.10.220.42:6565',
 ];
 
 // OTP types constants
@@ -112,18 +112,19 @@ export const MARKUP_MODE_DECREASE = 'DECREASE';
 
 //invoice type
 export const INVOICE_TYPES = {
-  'SALE': 'SALE',
-  'REFUND': 'REFUND',
-  'REISSUE': 'REISSUE'
-}
+  SALE: 'SALE',
+  REFUND: 'REFUND',
+  REISSUE: 'REISSUE',
+};
 
 //invoice ref type
 export const INVOICE_REF_TYPES = {
-  'agent_flight_booking': 'agent_flight_booking',
-  'b2c_flight_booking': 'b2c_flight_booking',
-  'external_flight_booking': 'external_flight_booking',
-  'agent_b2c_flight_booking': 'agent_b2c_flight_booking',
-}
+  agent_flight_booking: 'agent_flight_booking',
+  agent_hotel_booking: 'agent_hotel_booking',
+  b2c_flight_booking: 'b2c_flight_booking',
+  external_flight_booking: 'external_flight_booking',
+  agent_b2c_flight_booking: 'agent_b2c_flight_booking',
+};
 
 //frontend endpoints
 export const FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = '/dashboard/flights/';

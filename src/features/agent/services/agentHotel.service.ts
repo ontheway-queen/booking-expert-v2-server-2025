@@ -9,6 +9,15 @@ import {
 import { ICTHotelBookingPayload } from '../../../utils/supportTypes/hotelTypes/ctHotelSupport.types';
 import CustomError from '../../../utils/lib/customError';
 import DateTimeLib from '../../../utils/lib/dateTimeLib';
+import BalanceLib from '../../../utils/lib/balanceLib';
+import Lib from '../../../utils/lib/lib';
+import {
+  GENERATE_AUTO_UNIQUE_ID,
+  INVOICE_TYPES,
+  INVOICE_REF_TYPES,
+  SOURCE_AGENT,
+} from '../../../utils/miscellaneous/constants';
+import { IInsertHotelBookingTravelerPayload } from '../../../utils/modelTypes/hotelModelTypes/hotelBookingModelTypes';
 
 export class AgentHotelService extends AbstractServices {
   constructor() {
@@ -211,7 +220,10 @@ export class AgentHotelService extends AbstractServices {
       const { agency_id, user_id } = req.agencyUser;
       const ctHotelSupport = new CTHotelSupportService(trx);
       const agencyModel = this.Model.AgencyModel(trx);
+      const hotelBookingModel = this.Model.HotelBookingModel(trx);
+      const balanceLib = new BalanceLib(trx);
 
+      // Check agent and markup set
       const agent = await agencyModel.checkAgency({
         agency_id,
         status: 'Active',
@@ -244,6 +256,7 @@ export class AgentHotelService extends AbstractServices {
         };
       });
 
+      // Calculate nights and recheck Hotel
       const nights = DateTimeLib.nightsCount(body.checkin, body.checkout);
 
       const recheck = await ctHotelSupport.HotelRecheck(
@@ -263,6 +276,22 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
+      // Check Balance availability for book
+      const BalanceAvailability =
+        await balanceLib.AgencyBalanceAvailabilityCheck({
+          agency_id,
+          price: recheck.fee.total_price,
+        });
+
+      if (!BalanceAvailability.availability) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Insufficient credit. Please add funds to continue.',
+        };
+      }
+
+      // Hotel Book
       const booking = await ctHotelSupport.HotelBooking(
         body,
         agent.hotel_markup_set
@@ -278,6 +307,7 @@ export class AgentHotelService extends AbstractServices {
 
       const payload: ICTHotelBookingPayload = body;
 
+      // Handle room wise paxes files
       if (files.length) {
         let totalPax = 0;
 
@@ -322,6 +352,104 @@ export class AgentHotelService extends AbstractServices {
           ].id_file = file.filename;
         });
       }
+
+      // Crate Reference no and insert Hotel Booking to database
+      const booking_ref = await Lib.generateNo({
+        trx,
+        type: GENERATE_AUTO_UNIQUE_ID.agent_hotel,
+      });
+
+      const hotelBooking = await hotelBookingModel.insertHotelBooking({
+        booking_ref,
+        checkin_date: payload.checkin,
+        checkout_date: payload.checkout,
+        hotel_code: payload.hotel_code,
+        city_code: payload.city_code,
+        city_country_name: 'City',
+        created_by: user_id,
+        refundable: recheck.rates[0].refundable,
+        holder: JSON.stringify(payload.holder),
+        supplier: 'CT',
+        hotel_name: recheck.name,
+        source_id: agency_id,
+        supplier_price: JSON.stringify(recheck.supplier_fee),
+        sell_price: JSON.stringify(recheck.fee),
+        supplier_cancellation_data: JSON.stringify(
+          recheck.rates[0].cancellation_policy
+        ),
+        hotel_data: JSON.stringify({
+          name: recheck.name,
+          hotel_code: recheck.hotel_code,
+          category: recheck.category,
+          geolocation: recheck.geolocation,
+          contact_details: recheck.contact_details,
+          images: recheck.images,
+          facilities: recheck.facilities,
+        }),
+        search_id: payload.search_id,
+        hotel_extra_charges: JSON.stringify(recheck.hotel_extra_charges),
+        free_cancellation: recheck.rates[0].supports_cancellation,
+        source_type: SOURCE_AGENT,
+        status: 'Booked',
+        supplier_ref: '',
+        paxes: '',
+      });
+
+      const travelerPayload: IInsertHotelBookingTravelerPayload[] = [];
+
+      let roomCount = 1;
+      for (let room of payload.booking_items[0].rooms) {
+        const { paxes } = room;
+
+        for (const pax of paxes) {
+          travelerPayload.push({
+            booking_id: hotelBooking[0].id,
+            title: pax.name,
+            surname: pax.surname,
+            id_file: pax.id_file,
+            type: pax.type,
+            room: roomCount,
+          });
+        }
+
+        roomCount++;
+      }
+
+      await hotelBookingModel.insertHotelBookingTraveler(travelerPayload);
+
+      //create invoice
+      const invoiceModel = this.Model.InvoiceModel(trx);
+      const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
+
+      const invoice_no = await Lib.generateNo({
+        trx: trx,
+        type: GENERATE_AUTO_UNIQUE_ID.invoice,
+      });
+
+      const invoice_res = await invoiceModel.createInvoice({
+        invoice_no,
+        source_type: SOURCE_AGENT,
+        source_id: agency_id,
+        user_id: user_id,
+        ref_id: hotelBooking[0].id,
+        ref_type: INVOICE_REF_TYPES.agent_hotel_booking,
+        total_amount: recheck.fee.total_price,
+        due: 0,
+        details: `Auto invoice has been created for flight booking ref no. - ${booking_ref}`,
+        type: INVOICE_TYPES.SALE,
+      });
+
+      // Create money receipt
+      await moneyReceiptModel.createMoneyReceipt({
+        amount: recheck.fee.total_price,
+        invoice_id: invoice_res[0].id,
+        mr_no: await Lib.generateNo({
+          trx: trx,
+          type: GENERATE_AUTO_UNIQUE_ID.money_receipt,
+        }),
+        user_id,
+        details: `Auto money receipt has been created for Invoice no: ${invoice_no}`,
+      });
 
       return {
         success: true,

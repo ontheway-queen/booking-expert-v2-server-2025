@@ -127,7 +127,6 @@ class Lib {
     }
   }
 
-
   public static generateUsername(full_name: string) {
     const newName = full_name.split(' ').join('');
     return newName.toLowerCase();
@@ -211,7 +210,15 @@ class Lib {
     return 'BE' + NoCode + currYear + newId;
   }
 
-  public static async getAgentB2CTotalMarkup({ trx, type, agency_id }: { trx: TDB, type: 'Hotel' | 'Flight', agency_id: number }) {
+  public static async getAgentB2CTotalMarkup({
+    trx,
+    type,
+    agency_id,
+  }: {
+    trx: TDB;
+    type: 'Hotel' | 'Flight';
+    agency_id: number;
+  }) {
     const model = new AgencyModel(trx);
     const get_markup = await model.getAgentB2CMarkup(agency_id);
     if (!get_markup) {
@@ -219,8 +226,8 @@ class Lib {
     }
 
     let markup = 0;
-    let markup_type: "FLAT" | "PER";
-    let markup_mode: "INCREASE" | "DECREASE";
+    let markup_type: 'FLAT' | 'PER';
+    let markup_mode: 'INCREASE' | 'DECREASE';
     if (type === 'Flight') {
       markup = get_markup.flight_markup;
       markup_type = get_markup.flight_markup_type;
@@ -233,8 +240,8 @@ class Lib {
     return {
       markup,
       markup_type,
-      markup_mode
-    }
+      markup_mode,
+    };
   }
 }
 export default Lib;
@@ -242,21 +249,21 @@ export default Lib;
 interface IGenNoParams {
   trx: TDB;
   type:
-  | 'Agent'
-  | 'Agent_Flight'
-  | 'Agent_Visa'
-  | 'Agent_Tour'
-  | 'Agent_Umrah'
-  | 'Agent_GroupFare'
-  | 'Agent_SupportTicket'
-  | 'Agent_Hotel'
-  | 'Agent_Deposit_Request'
-  | 'User_Flight'
-  | 'User_Visa'
-  | 'User_Tour'
-  | 'User_Umrah'
-  | 'User_SupportTicket'
-  | 'ADM_Management'
-  | 'Money_Receipt'
-  | 'Invoice';
+    | 'Agent'
+    | 'Agent_Flight'
+    | 'Agent_Visa'
+    | 'Agent_Tour'
+    | 'Agent_Umrah'
+    | 'Agent_GroupFare'
+    | 'Agent_SupportTicket'
+    | 'Agent_Hotel'
+    | 'Agent_Deposit_Request'
+    | 'User_Flight'
+    | 'User_Visa'
+    | 'User_Tour'
+    | 'User_Umrah'
+    | 'User_SupportTicket'
+    | 'ADM_Management'
+    | 'Money_Receipt'
+    | 'Invoice';
 }

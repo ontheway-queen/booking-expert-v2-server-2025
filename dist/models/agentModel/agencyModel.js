@@ -42,16 +42,7 @@ class AgencyModel extends schema_1.default {
             var _a;
             const data = yield this.db('agency AS ag')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.phone', 'ag.status', 'ag.white_label', 'ag.allow_api', this.db.raw(`
-          (
-            SELECT 
-              COALESCE(SUM(CASE WHEN ad.type = 'Credit' THEN amount ELSE 0 END), 0) - 
-              COALESCE(SUM(CASE WHEN ad.type = 'Debit' THEN amount ELSE 0 END), 0) 
-            AS balance 
-            FROM agent.agency_ledger as ad
-            WHERE ag.id = ad.agency_id
-          ) AS balance
-          `))
+                .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.phone', 'ag.status', 'ag.white_label', 'ag.allow_api')
                 .where((qb) => {
                 if (query.filter) {
                     qb.where('ag.agency_name', 'like', `%${query.filter}%`)
@@ -181,7 +172,7 @@ class AgencyModel extends schema_1.default {
 `))
                 .where('ag.id', agency_id)
                 .first();
-            return (data === null || data === void 0 ? void 0 : data.balance) || 0;
+            return Number(data === null || data === void 0 ? void 0 : data.balance) || 0;
         });
     }
     // get single agency
@@ -261,9 +252,9 @@ class AgencyModel extends schema_1.default {
     }
     getAgentB2CMarkup(agency_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("agent_b2c_markup")
+            return yield this.db('agent_b2c_markup')
                 .withSchema(this.AGENT_SCHEMA)
-                .select("*")
+                .select('*')
                 .where({ agency_id })
                 .first();
         });

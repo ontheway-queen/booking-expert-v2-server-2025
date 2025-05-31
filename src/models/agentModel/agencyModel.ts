@@ -63,17 +63,7 @@ export default class AgencyModel extends Schema {
         'ag.phone',
         'ag.status',
         'ag.white_label',
-        'ag.allow_api',
-        this.db.raw(`
-          (
-            SELECT 
-              COALESCE(SUM(CASE WHEN ad.type = 'Credit' THEN amount ELSE 0 END), 0) - 
-              COALESCE(SUM(CASE WHEN ad.type = 'Debit' THEN amount ELSE 0 END), 0) 
-            AS balance 
-            FROM agent.agency_ledger as ad
-            WHERE ag.id = ad.agency_id
-          ) AS balance
-          `)
+        'ag.allow_api'
       )
       .where((qb) => {
         if (query.filter) {
@@ -248,7 +238,7 @@ export default class AgencyModel extends Schema {
       .where('ag.id', agency_id)
       .first();
 
-    return data?.balance || 0;
+    return Number(data?.balance) || 0;
   }
 
   // get single agency
@@ -323,12 +313,10 @@ export default class AgencyModel extends Schema {
   }
 
   // get white label permission
-  public async getWhiteLabelPermission(
-    query: {
-      agency_id?: number;
-      token?: string;
-    }
-  ): Promise<IGetWhiteLabelPermissionData | null> {
+  public async getWhiteLabelPermission(query: {
+    agency_id?: number;
+    token?: string;
+  }): Promise<IGetWhiteLabelPermissionData | null> {
     return await this.db('white_label_permissions')
       .withSchema(this.AGENT_SCHEMA)
       .select(
@@ -346,7 +334,7 @@ export default class AgencyModel extends Schema {
         if (query.agency_id) {
           qb.where('agency_id', query.agency_id);
         }
-        if(query.token){
+        if (query.token) {
           qb.where('token', query.token);
         }
       })
@@ -359,18 +347,22 @@ export default class AgencyModel extends Schema {
       .insert(payload);
   }
 
-
-  public async updateAgentB2CMarkup(payload: IUpdateAgentB2CMarkupPayload, agency_id: number) {
+  public async updateAgentB2CMarkup(
+    payload: IUpdateAgentB2CMarkupPayload,
+    agency_id: number
+  ) {
     return await this.db('agent_b2c_markup')
       .withSchema(this.AGENT_SCHEMA)
       .update(payload)
       .where('agency_id', agency_id);
   }
 
-  public async getAgentB2CMarkup(agency_id: number): Promise<IGetAgentB2CMarkupData | null> {
-    return await this.db("agent_b2c_markup")
+  public async getAgentB2CMarkup(
+    agency_id: number
+  ): Promise<IGetAgentB2CMarkupData | null> {
+    return await this.db('agent_b2c_markup')
       .withSchema(this.AGENT_SCHEMA)
-      .select("*")
+      .select('*')
       .where({ agency_id })
       .first();
   }

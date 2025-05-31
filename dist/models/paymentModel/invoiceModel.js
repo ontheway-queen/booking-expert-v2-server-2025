@@ -20,14 +20,14 @@ class InvoiceModel extends schema_1.default {
     }
     createInvoice(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("invoice")
+            return yield this.db('invoice')
                 .withSchema(this.DBO_SCHEMA)
-                .insert(payload, "id");
+                .insert(payload, 'id');
         });
     }
     updateInvoice(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("invoice")
+            return yield this.db('invoice')
                 .withSchema(this.DBO_SCHEMA)
                 .update(payload)
                 .where({ id });
@@ -36,71 +36,71 @@ class InvoiceModel extends schema_1.default {
     getInvoiceList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, is_total = false) {
             var _a;
-            const data = yield this.db("invoice")
+            const data = yield this.db('invoice')
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
+                .select('*')
                 .where((qb) => {
                 if (query.from_date && query.to_date) {
-                    qb.andWhereBetween("created_at", [query.from_date, query.to_date]);
+                    qb.andWhereBetween('created_at', [query.from_date, query.to_date]);
                 }
                 if (query.filter) {
                     qb.andWhere((qbc) => {
-                        qbc.whereILike("invoice_number", `${query.filter}%`)
-                            .orWhereILike("ref_type", `%${query.filter}%`)
-                            .orWhereILike("coupon_code", `%${query.filter}%`);
+                        qbc
+                            .whereILike('invoice_no', `${query.filter}%`)
+                            .orWhereILike('ref_type', `%${query.filter}%`)
+                            .orWhereILike('coupon_code', `%${query.filter}%`);
                     });
                 }
                 if (query.invoice_type) {
-                    qb.andWhere("type", query.invoice_type);
+                    qb.andWhere('type', query.invoice_type);
                 }
                 if (query.source_type) {
-                    qb.andWhere("source_type", query.source_type);
+                    qb.andWhere('source_type', query.source_type);
                 }
                 if (query.source_id) {
-                    qb.andWhere("source_id", query.source_id);
+                    qb.andWhere('source_id', query.source_id);
                 }
                 if (query.user_id) {
-                    qb.andWhere("user_id", query.user_id);
+                    qb.andWhere('user_id', query.user_id);
                 }
                 if (query.partial_payment) {
-                    qb.andWhere("due", ">", 0)
-                        .andWhere("due", "!=", this.db.ref("net_amount"));
+                    qb.andWhere('due', '>', 0).andWhere('due', '!=', this.db.ref('net_amount'));
                 }
             })
-                .orderBy("id", "desc")
+                .orderBy('id', 'desc')
                 .limit(query.limit || 100)
                 .offset(query.skip || 0);
             let total = [];
             if (is_total) {
-                total = yield this.db("invoice")
+                total = yield this.db('invoice')
                     .withSchema(this.DBO_SCHEMA)
-                    .count("id as total")
+                    .count('id as total')
                     .where((qb) => {
                     if (query.from_date && query.to_date) {
-                        qb.andWhereBetween("created_at", [query.from_date, query.to_date]);
+                        qb.andWhereBetween('created_at', [query.from_date, query.to_date]);
                     }
                     if (query.filter) {
                         qb.andWhere((qbc) => {
-                            qbc.whereILike("invoice_number", `${query.filter}%`)
-                                .orWhereILike("ref_type", `%${query.filter}%`)
-                                .orWhereILike("coupon_code", `%${query.filter}%`);
+                            qbc
+                                .whereILike('invoice_no', `${query.filter}%`)
+                                .orWhereILike('ref_type', `%${query.filter}%`)
+                                .orWhereILike('coupon_code', `%${query.filter}%`);
                         });
                     }
                     if (query.invoice_type) {
-                        qb.andWhere("type", query.invoice_type);
+                        qb.andWhere('type', query.invoice_type);
                     }
                     if (query.source_type) {
-                        qb.andWhere("source_type", query.source_type);
+                        qb.andWhere('source_type', query.source_type);
                     }
                     if (query.source_id) {
-                        qb.andWhere("source_id", query.source_id);
+                        qb.andWhere('source_id', query.source_id);
                     }
                     if (query.user_id) {
-                        qb.andWhere("user_id", query.user_id);
+                        qb.andWhere('user_id', query.user_id);
                     }
                     if (query.partial_payment) {
-                        qb.andWhere("due", ">", 0)
-                            .andWhere("due", "!=", this.db.ref("net_amount"));
+                        qb.andWhere('due', '>', 0).andWhere('due', '!=', this.db.ref('net_amount'));
                     }
                 });
             }
@@ -112,16 +112,16 @@ class InvoiceModel extends schema_1.default {
     }
     getSingleInvoice(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("invoice")
+            return yield this.db('invoice')
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
+                .select('*')
                 .where({ id: params.id })
                 .andWhere((qb) => {
                 if (params.source_id) {
-                    qb.andWhere("source_id", params.source_id);
+                    qb.andWhere('source_id', params.source_id);
                 }
                 if (params.source_type) {
-                    qb.andWhere("source_type", params.source_type);
+                    qb.andWhere('source_type', params.source_type);
                 }
             })
                 .first();
