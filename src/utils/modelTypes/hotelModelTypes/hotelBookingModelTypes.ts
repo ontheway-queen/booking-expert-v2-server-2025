@@ -1,3 +1,11 @@
+import {
+  SOURCE_AGENT,
+  SOURCE_AGENT_B2C,
+  SOURCE_B2C,
+  SOURCE_EXTERNAL,
+  SOURCE_SUB_AGENT,
+} from '../../miscellaneous/constants';
+
 export interface IInsertHotelBookingPayload {
   booking_ref: string;
   search_id: string;
@@ -41,4 +49,35 @@ export interface IInsertHotelBookingTravelerPayload {
   title: string;
   surname: string;
   id_file?: string;
+}
+
+export interface IGetBookingModelQuery {
+  from_date?: string;
+  to_date?: string;
+  filter?: string;
+  limit?: string;
+  skip?: string;
+  source_type:
+    | typeof SOURCE_AGENT
+    | typeof SOURCE_B2C
+    | typeof SOURCE_EXTERNAL
+    | typeof SOURCE_SUB_AGENT
+    | typeof SOURCE_AGENT_B2C
+    | 'ALL';
+  source_id?: number;
+  user_id?: number;
+}
+export interface IGetBookingModelData {
+  data: {
+    id: number;
+    booking_ref: string;
+    hotel_code: number;
+    sell_price: string;
+    checkin_date: string;
+    checkout_date: string;
+    status: string;
+    finalized: boolean;
+    created_at: string;
+  }[];
+  total?: number;
 }

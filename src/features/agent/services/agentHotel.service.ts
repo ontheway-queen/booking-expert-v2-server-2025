@@ -451,6 +451,15 @@ export class AgentHotelService extends AbstractServices {
         details: `Auto money receipt has been created for Invoice no: ${invoice_no}`,
       });
 
+      await balanceLib.AgencyDeductBalance({
+        balance: BalanceAvailability.balance,
+        agency_id,
+        deduct: BalanceAvailability.deduct,
+        loan: BalanceAvailability.loan,
+        voucher_no: invoice_no,
+        remark: `Amount ${recheck.fee.total_price}/- is debited for hotel booking ${booking_ref}.`,
+      });
+
       return {
         success: true,
         message: this.ResMsg.HTTP_SUCCESSFUL,
@@ -459,4 +468,6 @@ export class AgentHotelService extends AbstractServices {
       };
     });
   }
+
+  public async getHotelBooking(req: Request) {}
 }
