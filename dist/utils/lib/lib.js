@@ -188,7 +188,7 @@ class Lib {
         });
     }
     static getAgentB2CTotalMarkup(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ trx, type, agency_id }) {
+        return __awaiter(this, arguments, void 0, function* ({ trx, type, agency_id, }) {
             const model = new agencyModel_1.default(trx);
             const get_markup = yield model.getAgentB2CMarkup(agency_id);
             if (!get_markup) {
@@ -210,7 +210,7 @@ class Lib {
             return {
                 markup,
                 markup_type,
-                markup_mode
+                markup_mode,
             };
         });
     }

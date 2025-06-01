@@ -22,6 +22,12 @@ class AgentHotelValidator {
             checkin: joi_1.default.string().required(),
             checkout: joi_1.default.string().required(),
         });
+        this.getHotelSearchHistoryValidator = joi_1.default.object({
+            from_date: joi_1.default.date().optional(),
+            to_date: joi_1.default.date().optional(),
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
+        });
         this.getHotelRoomsValidator = joi_1.default.object({
             hcode: joi_1.default.number().required(),
             search_id: joi_1.default.string().required(),

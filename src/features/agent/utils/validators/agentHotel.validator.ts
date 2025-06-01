@@ -20,6 +20,13 @@ export default class AgentHotelValidator {
     checkout: Joi.string().required(),
   });
 
+  public getHotelSearchHistoryValidator = Joi.object({
+    from_date: Joi.date().optional(),
+    to_date: Joi.date().optional(),
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+  });
+
   public getHotelRoomsValidator = Joi.object({
     hcode: Joi.number().required(),
     search_id: Joi.string().required(),

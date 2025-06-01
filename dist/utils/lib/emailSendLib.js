@@ -115,10 +115,10 @@ class EmailSendLib {
             const browser = yield puppeteer_extra_1.default.launch({
                 headless: true,
                 args: [
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--window-size=1920,1080",
-                    "--disable-infobars",
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--window-size=1920,1080',
+                    '--disable-infobars',
                 ],
             });
             const page = yield browser.newPage();

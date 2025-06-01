@@ -20,14 +20,14 @@ class MoneyReceiptModel extends schema_1.default {
     }
     createMoneyReceipt(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("money_receipt")
+            return yield this.db('money_receipt')
                 .withSchema(this.DBO_SCHEMA)
-                .insert(payload, "id");
+                .insert(payload, 'id');
         });
     }
     updateMoneyReceipt(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("money_receipt")
+            return yield this.db('money_receipt')
                 .withSchema(this.DBO_SCHEMA)
                 .update(payload)
                 .where({ id });
@@ -36,51 +36,56 @@ class MoneyReceiptModel extends schema_1.default {
     getMoneyReceiptList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, is_total = false) {
             var _a;
-            const data = yield this.db("money_receipt")
+            const data = yield this.db('money_receipt')
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
+                .select('*')
                 .where((qb) => {
                 if (query.from_date && query.to_date) {
-                    qb.andWhereBetween("payment_time", [query.from_date, query.to_date]);
+                    qb.andWhereBetween('payment_time', [query.from_date, query.to_date]);
                 }
                 if (query.filter) {
                     qb.andWhere((qbc) => {
-                        qbc.whereILike("mr_number", `${query.filter}%`)
-                            .orWhereILike("payment_type", `%${query.filter}%`)
-                            .orWhereILike("transaction_id", `%${query.filter}%`);
+                        qbc
+                            .whereILike('mr_no', `${query.filter}%`)
+                            .orWhereILike('payment_type', `%${query.filter}%`)
+                            .orWhereILike('transaction_id', `%${query.filter}%`);
                     });
                 }
                 if (query.invoice_id) {
-                    qb.andWhere("invoice_id", query.invoice_id);
+                    qb.andWhere('invoice_id', query.invoice_id);
                 }
                 if (query.user_id) {
-                    qb.andWhere("user_id", query.user_id);
+                    qb.andWhere('user_id', query.user_id);
                 }
             })
-                .orderBy("id", "desc")
+                .orderBy('id', 'desc')
                 .limit(query.limit || 100)
                 .offset(query.skip || 0);
             let total = [];
             if (is_total) {
-                total = yield this.db("money_receipt")
+                total = yield this.db('money_receipt')
                     .withSchema(this.DBO_SCHEMA)
-                    .count("id as total")
+                    .count('id as total')
                     .where((qb) => {
                     if (query.from_date && query.to_date) {
-                        qb.andWhereBetween("payment_time", [query.from_date, query.to_date]);
+                        qb.andWhereBetween('payment_time', [
+                            query.from_date,
+                            query.to_date,
+                        ]);
                     }
                     if (query.filter) {
                         qb.andWhere((qbc) => {
-                            qbc.whereILike("mr_number", `${query.filter}%`)
-                                .orWhereILike("payment_type", `%${query.filter}%`)
-                                .orWhereILike("transaction_id", `%${query.filter}%`);
+                            qbc
+                                .whereILike('mr_no', `${query.filter}%`)
+                                .orWhereILike('payment_type', `%${query.filter}%`)
+                                .orWhereILike('transaction_id', `%${query.filter}%`);
                         });
                     }
                     if (query.invoice_id) {
-                        qb.andWhere("invoice_id", query.invoice_id);
+                        qb.andWhere('invoice_id', query.invoice_id);
                     }
                     if (query.user_id) {
-                        qb.andWhere("user_id", query.user_id);
+                        qb.andWhere('user_id', query.user_id);
                     }
                 });
             }
@@ -92,9 +97,9 @@ class MoneyReceiptModel extends schema_1.default {
     }
     getSingleMoneyReceipt(params) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("money_receipt")
+            return yield this.db('money_receipt')
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
+                .select('*')
                 .where({ id: params.id })
                 .first();
         });

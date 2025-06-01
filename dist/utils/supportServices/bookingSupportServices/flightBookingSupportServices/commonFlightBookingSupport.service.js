@@ -34,22 +34,22 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             //check if passport has provided for international flight
             if (payload.domestic_flight === false) {
-                const passport_number = !payload.passenger.some(p => p.passport_number == null);
+                const passport_number = !payload.passenger.some((p) => p.passport_number == null);
                 if (!passport_number) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
-                        message: "Passport number is required for international flight"
+                        message: 'Passport number is required for international flight',
                     };
                 }
             }
             // Get all passengers' first names, last names, passports, email, phone
-            const passengers = payload.passenger.map(p => ({
+            const passengers = payload.passenger.map((p) => ({
                 first_name: p.first_name,
                 last_name: p.last_name,
                 passport: p.passport_number,
                 email: p.contact_email,
-                phone: p.contact_number
+                phone: p.contact_number,
             }));
             // Batch check if any passenger already booked this flight(DUPLICATE BOOKING)
             const flightModel = this.Model.FlightBookingModel(this.trx);
@@ -58,13 +58,20 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 departure_date: payload.departure_date,
                 flight_number: payload.flight_number,
                 passengers,
-                status: [flightConstent_1.FLIGHT_BOOKING_REQUEST, flightConstent_1.FLIGHT_BOOKING_CONFIRMED, flightConstent_1.FLIGHT_BOOKING_IN_PROCESS, flightConstent_1.FLIGHT_TICKET_IN_PROCESS, flightConstent_1.FLIGHT_BOOKING_ON_HOLD, flightConstent_1.FLIGHT_TICKET_ISSUE]
+                status: [
+                    flightConstent_1.FLIGHT_BOOKING_REQUEST,
+                    flightConstent_1.FLIGHT_BOOKING_CONFIRMED,
+                    flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
+                    flightConstent_1.FLIGHT_TICKET_IN_PROCESS,
+                    flightConstent_1.FLIGHT_BOOKING_ON_HOLD,
+                    flightConstent_1.FLIGHT_TICKET_ISSUE,
+                ],
             });
             if (existingBooking > 0) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_BAD_REQUEST,
-                    message: this.ResMsg.DUPLICATE_BOOKING
+                    message: this.ResMsg.DUPLICATE_BOOKING,
                 };
             }
             //check if there is already two cancelled bookings with the same passenger info
@@ -73,18 +80,18 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 departure_date: payload.departure_date,
                 flight_number: payload.flight_number,
                 passengers,
-                status: [flightConstent_1.FLIGHT_BOOKING_CANCELLED]
+                status: [flightConstent_1.FLIGHT_BOOKING_CANCELLED],
             });
             if (cancelledBooking >= 2) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_BAD_REQUEST,
-                    message: this.ResMsg.BOOKING_CANCELLED_MORE_THAN_TWO_TIMES
+                    message: this.ResMsg.BOOKING_CANCELLED_MORE_THAN_TWO_TIMES,
                 };
             }
             return {
                 success: true,
-                code: this.StatusCode.HTTP_OK
+                code: this.StatusCode.HTTP_OK,
             };
         });
     }
@@ -93,35 +100,35 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(this.trx);
             const set_flight_api = yield markupSetFlightApiModel.getMarkupSetFlightApi({
                 markup_set_id: payload.markup_set_id,
-                api_name: payload.api_name
+                api_name: payload.api_name,
             });
             if (!set_flight_api.length) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_NOT_FOUND,
-                    message: this.ResMsg.SET_FLIGHT_API_ID_NOT_FOUND
+                    message: this.ResMsg.SET_FLIGHT_API_ID_NOT_FOUND,
                 };
             }
             const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
             const flightMarkupData = yield flightMarkupsModel.getAllFlightMarkups({
                 markup_set_flight_api_id: set_flight_api[0].id,
-                airline: payload.airline
+                airline: payload.airline,
             });
             if (!flightMarkupData.data.length) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_NOT_FOUND,
-                    message: this.ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP
+                    message: this.ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP,
                 };
             }
             if (flightMarkupData.data[0].booking_block) {
                 return {
-                    booking_block: true
+                    booking_block: true,
                 };
             }
             else {
                 return {
-                    booking_block: false
+                    booking_block: false,
                 };
             }
         });
@@ -135,11 +142,16 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(this.trx);
             const flightUtils = new flightUtils_1.default();
             //insert flight booking data
-            const booking_ref = yield lib_1.default.generateNo({ trx: this.trx, type: payload.type });
+            const booking_ref = yield lib_1.default.generateNo({
+                trx: this.trx,
+                type: payload.type,
+            });
             const { markup_price, markup_type } = this.getBookingMarkupDetails(payload.flight_data.fare.discount, payload.flight_data.fare.convenience_fee);
             const booking_res = yield flightBookingModel.insertFlightBooking({
                 booking_ref,
-                api: payload.status === flightConstent_1.FLIGHT_BOOKING_IN_PROCESS ? flightConstent_1.CUSTOM_API : payload.flight_data.api,
+                api: payload.status === flightConstent_1.FLIGHT_BOOKING_IN_PROCESS
+                    ? flightConstent_1.CUSTOM_API
+                    : payload.flight_data.api,
                 api_booking_ref: payload.api_booking_ref,
                 refundable: payload.refundable,
                 route: flightUtils.getRouteOfFlight(payload.flight_data.leg_description),
@@ -159,7 +171,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 travel_date: payload.flight_data.flights[0].options[0].departure.date,
                 ticket_issue_last_time: payload.last_time,
                 airline_pnr: payload.airline_pnr,
-                created_by: payload.user_id
+                created_by: payload.user_id,
             });
             //insert flight booking price breakdown data
             const passenger_fare = payload.flight_data.passengers.map((passenger) => {
@@ -188,13 +200,13 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                         class: cabin_info[ind],
                         baggage: baggage_info[ind],
                         departure_date: option.departure.date,
-                        departure_time: option.departure.time.split("+")[0],
+                        departure_time: option.departure.time.split('+')[0],
                         arrival_date: option.arrival.date,
-                        arrival_time: option.arrival.time.split("+")[0],
+                        arrival_time: option.arrival.time.split('+')[0],
                         aircraft: option.carrier.carrier_aircraft_name,
                         duration: flightUtils.getDuration(Number(option.elapsedTime)),
                         departure_terminal: option.departure.terminal,
-                        arrival_terminal: option.arrival.terminal
+                        arrival_terminal: option.arrival.terminal,
                     });
                 }));
             }));
@@ -207,12 +219,12 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 let passport_file = traveler.passport_file;
                 if ((_a = payload.files) === null || _a === void 0 ? void 0 : _a.length) {
                     for (const file of payload.files) {
-                        if (((_b = file.fieldname) === null || _b === void 0 ? void 0 : _b.split("-")[0]) === flightConstent_1.TRAVELER_FILE_TYPE_VISA &&
-                            ((_c = file.fieldname) === null || _c === void 0 ? void 0 : _c.split("-")[1]) == traveler.key) {
+                        if (((_b = file.fieldname) === null || _b === void 0 ? void 0 : _b.split('-')[0]) === flightConstent_1.TRAVELER_FILE_TYPE_VISA &&
+                            ((_c = file.fieldname) === null || _c === void 0 ? void 0 : _c.split('-')[1]) == traveler.key) {
                             visa_file = file.filename;
                         }
-                        else if (((_d = file.fieldname) === null || _d === void 0 ? void 0 : _d.split("-")[0]) === flightConstent_1.TRAVELER_FILE_TYPE_PASSPORT &&
-                            ((_e = file.fieldname) === null || _e === void 0 ? void 0 : _e.split("-")[1]) == traveler.key) {
+                        else if (((_d = file.fieldname) === null || _d === void 0 ? void 0 : _d.split('-')[0]) === flightConstent_1.TRAVELER_FILE_TYPE_PASSPORT &&
+                            ((_e = file.fieldname) === null || _e === void 0 ? void 0 : _e.split('-')[1]) == traveler.key) {
                             passport_file = file.filename;
                         }
                     }
@@ -238,7 +250,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                     frequent_flyer_number: traveler.frequent_flyer_number,
                     frequent_flyer_airline: traveler.frequent_flyer_airline,
                     visa_file,
-                    passport_file
+                    passport_file,
                 };
             });
             yield flightBookingTravelerModel.insertFlightBookingTraveler(flightBookingTravelerData);
@@ -266,26 +278,26 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             if (payload.api === flightConstent_1.CUSTOM_API) {
                 tracking_data.push({
                     flight_booking_id: booking_res[0].id,
-                    description: `This was a custom API`
+                    description: `This was a custom API`,
                 });
             }
             yield flightBookingTrackingModel.insertFlightBookingTracking(tracking_data);
             //create invoice
             const invoiceModel = this.Model.InvoiceModel(this.trx);
             const invoice_res = yield invoiceModel.createInvoice({
-                invoice_number: yield lib_1.default.generateNo({ trx: this.trx, type: constants_1.GENERATE_AUTO_UNIQUE_ID.invoice }),
+                invoice_no: yield lib_1.default.generateNo({
+                    trx: this.trx,
+                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.invoice,
+                }),
                 source_type: payload.source_type,
                 source_id: payload.source_id,
                 user_id: payload.user_id,
                 ref_id: booking_res[0].id,
                 ref_type: payload.invoice_ref_type,
-                gross_amount: payload.flight_data.fare.total_price,
-                markup_price: markup_price === 0 ? undefined : markup_type === constants_2.MARKUP_MODE_INCREASE ? markup_price : -Number(markup_price),
-                coupon_code: payload.coupon_code,
-                net_amount: payload.flight_data.fare.payable,
+                total_amount: payload.flight_data.fare.payable,
                 due: payload.flight_data.fare.payable,
                 details: `Invoice has been created for flight booking ref no. - ${booking_ref}`,
-                type: constants_1.INVOICE_TYPES.SALE
+                type: constants_1.INVOICE_TYPES.SALE,
             });
             return {
                 booking_id: booking_res[0].id,
@@ -298,19 +310,19 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
         if (discount > 0) {
             return {
                 markup_price: discount,
-                markup_type: constants_2.MARKUP_MODE_DECREASE
+                markup_type: constants_2.MARKUP_MODE_DECREASE,
             };
         }
         else if (convenience_fee > 0) {
             return {
                 markup_price: convenience_fee,
-                markup_type: constants_2.MARKUP_MODE_INCREASE
+                markup_type: constants_2.MARKUP_MODE_INCREASE,
             };
         }
         else {
             return {
                 markup_price: undefined,
-                markup_type: undefined
+                markup_type: undefined,
             };
         }
     }
@@ -346,12 +358,17 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             const bookingTravelerModel = this.Model.FlightBookingTravelerModel(this.trx);
             const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(this.trx);
             const flightSegmentModel = this.Model.FlightBookingSegmentModel(this.trx);
-            const booking_data = yield flightBookingModel.getSingleFlightBooking({ id: payload.booking_id, booked_by: payload.booked_by });
+            const booking_data = yield flightBookingModel.getSingleFlightBooking({
+                id: payload.booking_id,
+                booked_by: payload.booked_by,
+            });
             const get_travelers = yield bookingTravelerModel.getFlightBookingTraveler(payload.booking_id);
             const price_breakdown = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(payload.booking_id);
             const segments = yield flightSegmentModel.getFlightBookingSegment(payload.booking_id);
             if (booking_data) {
-                let source_logo = ((_a = payload.agency) === null || _a === void 0 ? void 0 : _a.photo) ? `${uploaderConstants_1.FILE_STORAGE_HOST}${payload.agency.photo}` : undefined;
+                let source_logo = ((_a = payload.agency) === null || _a === void 0 ? void 0 : _a.photo)
+                    ? `${uploaderConstants_1.FILE_STORAGE_HOST}${payload.agency.photo}`
+                    : undefined;
                 if (((_b = payload.agency) === null || _b === void 0 ? void 0 : _b.photo) && source_logo !== undefined) {
                     payload.agency.photo = source_logo;
                 }
@@ -370,15 +387,15 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                         booking: booking_data,
                         travelers: get_travelers,
                         panel_link: payload.panel_link,
-                        logo: source_logo
+                        logo: source_logo,
                     }),
                     attachments: [
                         {
-                            filename: "flight-booking.pdf",
+                            filename: 'flight-booking.pdf',
                             content: pdfBuffer,
-                            contentType: "application/pdf"
-                        }
-                    ]
+                            contentType: 'application/pdf',
+                        },
+                    ],
                 });
             }
         });
@@ -390,12 +407,17 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             const bookingTravelerModel = this.Model.FlightBookingTravelerModel(this.trx);
             const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(this.trx);
             const flightSegmentModel = this.Model.FlightBookingSegmentModel(this.trx);
-            const booking_data = yield flightBookingModel.getSingleFlightBooking({ id: payload.booking_id, booked_by: payload.booked_by });
+            const booking_data = yield flightBookingModel.getSingleFlightBooking({
+                id: payload.booking_id,
+                booked_by: payload.booked_by,
+            });
             const get_travelers = yield bookingTravelerModel.getFlightBookingTraveler(payload.booking_id);
             const price_breakdown = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(payload.booking_id);
             const segments = yield flightSegmentModel.getFlightBookingSegment(payload.booking_id);
             if (booking_data) {
-                let source_logo = ((_a = payload.agency) === null || _a === void 0 ? void 0 : _a.photo) ? `${uploaderConstants_1.FILE_STORAGE_HOST}${payload.agency.photo}` : undefined;
+                let source_logo = ((_a = payload.agency) === null || _a === void 0 ? void 0 : _a.photo)
+                    ? `${uploaderConstants_1.FILE_STORAGE_HOST}${payload.agency.photo}`
+                    : undefined;
                 if (((_b = payload.agency) === null || _b === void 0 ? void 0 : _b.photo) && source_logo !== undefined) {
                     payload.agency.photo = source_logo;
                 }
@@ -415,15 +437,15 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                         travelers: get_travelers,
                         panel_link: payload.panel_link,
                         logo: source_logo,
-                        due: payload.due
+                        due: payload.due,
                     }),
                     attachments: [
                         {
-                            filename: "flight-ticket.pdf",
+                            filename: 'flight-ticket.pdf',
                             content: pdfBuffer,
-                            contentType: "application/pdf"
-                        }
-                    ]
+                            contentType: 'application/pdf',
+                        },
+                    ],
                 });
             }
         });
@@ -431,15 +453,17 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
     sendBookingCancelMail(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            let source_logo = ((_a = payload.agency) === null || _a === void 0 ? void 0 : _a.photo) ? `${uploaderConstants_1.FILE_STORAGE_HOST}${payload.agency.photo}` : undefined;
+            let source_logo = ((_a = payload.agency) === null || _a === void 0 ? void 0 : _a.photo)
+                ? `${uploaderConstants_1.FILE_STORAGE_HOST}${payload.agency.photo}`
+                : undefined;
             yield emailSendLib_1.default.sendEmail({
                 email: payload.email,
                 emailSub: `Flight Booking Cancelled - ${payload.booking_data.booking_ref}`,
                 emailBody: (0, flightBookingCancelTemplate_1.flightBookingCancelBodyTemplate)({
                     booking: payload.booking_data,
                     panel_link: payload.panel_link,
-                    logo: source_logo
-                })
+                    logo: source_logo,
+                }),
             });
         });
     }
