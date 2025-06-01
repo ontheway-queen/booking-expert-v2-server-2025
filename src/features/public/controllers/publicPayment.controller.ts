@@ -13,7 +13,11 @@ export class PublicPaymentController extends AbstractController {
         null,
         async (req: Request, res: Response) => {
             const { code, ...rest } = await this.service.transactionUsingSSL(req);
-            res.status(code).json(rest);
+            if(rest.redirect_url){
+                res.status(code).redirect(rest.redirect_url)
+            }else{
+                res.status(code).json(rest);
+            }
         }
     );
 }

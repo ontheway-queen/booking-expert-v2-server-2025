@@ -192,11 +192,11 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                 if (payable_amount > getInvoice.data[0].due) {
                     payable_amount = getInvoice.data[0].due;
                 }
-                if (payable_amount > agencyBalance) {
+                if (Number(payable_amount) > Number(agencyBalance)) {
                     //check usable loan balance
                     const agency_details = yield agencyModel.getSingleAgency(payload.agency_id);
                     const usable_loan_balance = Number(agency_details === null || agency_details === void 0 ? void 0 : agency_details.usable_loan);
-                    if (agencyBalance + usable_loan_balance < payable_amount) {
+                    if (Number(agencyBalance) + Number(usable_loan_balance) < Number(payable_amount)) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,

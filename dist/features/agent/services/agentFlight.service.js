@@ -517,13 +517,13 @@ class AgentFlightService extends abstract_service_1.default {
                     };
                 }
                 ;
-                if (booking_data.status !== flightConstent_1.FLIGHT_BOOKING_CONFIRMED) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "Issue is not allowed for this booking. Contact support team."
-                    };
-                }
+                // if (booking_data.status !== FLIGHT_BOOKING_CONFIRMED) {
+                //   return {
+                //     success: false,
+                //     code: this.StatusCode.HTTP_BAD_REQUEST,
+                //     message: "Issue is not allowed for this booking. Contact support team."
+                //   }
+                // }
                 //get other information
                 const get_travelers = yield bookingTravelerModel.getFlightBookingTraveler(Number(id));
                 const { payment_type } = req.body;
@@ -555,6 +555,9 @@ class AgentFlightService extends abstract_service_1.default {
                 }
                 let status = null;
                 if (ticketIssuePermission.issue_block === true) {
+                    status = flightConstent_1.FLIGHT_TICKET_IN_PROCESS;
+                }
+                else if (booking_data.api === flightConstent_1.CUSTOM_API) {
                     status = flightConstent_1.FLIGHT_TICKET_IN_PROCESS;
                 }
                 else {
