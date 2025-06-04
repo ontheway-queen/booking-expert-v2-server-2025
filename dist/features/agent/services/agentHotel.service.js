@@ -192,6 +192,7 @@ class AgentHotelService extends abstract_service_1.default {
     hotelBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                var _a, _b, _c;
                 const { agency_id, user_id } = req.agencyUser;
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const agencyModel = this.Model.AgencyModel(trx);
@@ -319,12 +320,23 @@ class AgentHotelService extends abstract_service_1.default {
                     }),
                     search_id: payload.search_id,
                     hotel_extra_charges: JSON.stringify(recheck.hotel_extra_charges),
-                    free_cancellation: recheck.rates[0].supports_cancellation,
+                    free_cancellation: (_a = recheck.rates[0].cancellation_policy) === null || _a === void 0 ? void 0 : _a.free_cancellation,
                     source_type: constants_1.SOURCE_AGENT,
                     status: 'Booked',
-                    supplier_ref: '',
-                    paxes: '',
+                    free_cancellation_last_date: (_b = recheck.rates[0].cancellation_policy) === null || _b === void 0 ? void 0 : _b.free_cancellation_last_date,
+                    supplier_ref: booking.booking_id,
+                    rooms: JSON.stringify(recheck),
                 });
+                if ((_c = recheck.rates[0].cancellation_policy) === null || _c === void 0 ? void 0 : _c.details.length) {
+                    const cancellationPayload = recheck.rates[0].cancellation_policy.details.map((item) => {
+                        return {
+                            booking_id: hotelBooking[0].id,
+                            fee: item.fee,
+                            from_date: item.from_date,
+                        };
+                    });
+                    yield hotelBookingModel.insertHotelBookingCancellation(cancellationPayload);
+                }
                 const travelerPayload = [];
                 let roomCount = 1;
                 for (let room of payload.booking_items[0].rooms) {

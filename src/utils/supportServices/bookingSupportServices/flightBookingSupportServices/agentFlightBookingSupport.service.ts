@@ -160,6 +160,7 @@ export class AgentFlightBookingSupportService extends AbstractServices {
 
       //create transaction
       const transactionModel = this.Model.AgencyPaymentModel(this.trx);
+
       await transactionModel.insertAgencyLedger({
         agency_id: payload.agency_id,
         type: 'Debit',

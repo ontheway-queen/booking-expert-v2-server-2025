@@ -4,6 +4,7 @@ import Schema from '../../utils/miscellaneous/schema';
 import {
   IGetBookingModelData,
   IGetBookingModelQuery,
+  IInsertHotelBookingCancellationPayload,
   IInsertHotelBookingPayload,
   IInsertHotelBookingTravelerPayload,
 } from '../../utils/modelTypes/hotelModelTypes/hotelBookingModelTypes';
@@ -26,6 +27,16 @@ export default class HotelBookingModel extends Schema {
     payload: IInsertHotelBookingTravelerPayload[]
   ) {
     return await this.db('hotel_booking_traveler')
+      .withSchema(this.DBO_SCHEMA)
+      .insert(payload);
+  }
+
+  public async insertHotelBookingCancellation(
+    payload:
+      | IInsertHotelBookingCancellationPayload
+      | IInsertHotelBookingCancellationPayload[]
+  ) {
+    return await this.db('hotel_booking_cancellation_charge')
       .withSchema(this.DBO_SCHEMA)
       .insert(payload);
   }

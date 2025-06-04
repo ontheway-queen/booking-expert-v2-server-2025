@@ -30,16 +30,16 @@ export interface IInsertHotelBookingPayload {
   confirmation_no?: string;
   supplier_ref: string;
   refundable: boolean;
-  free_cancellation: boolean;
+  free_cancellation?: boolean;
   free_cancellation_last_date?: string;
   agent_sell_price?: string;
   hotel_extra_charges?: string;
-  paxes: string;
   status: string;
   hotel_data: string;
   city_code: number;
   city_country_name: string;
   finalized?: boolean;
+  rooms?: string;
 }
 
 export interface IInsertHotelBookingTravelerPayload {
@@ -80,4 +80,10 @@ export interface IGetBookingModelData {
     created_at: string;
   }[];
   total?: number;
+}
+
+export interface IInsertHotelBookingCancellationPayload {
+  booking_id: number;
+  from_date: string;
+  fee: number;
 }

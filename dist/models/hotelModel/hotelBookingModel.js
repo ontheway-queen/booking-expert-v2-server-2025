@@ -33,6 +33,13 @@ class HotelBookingModel extends schema_1.default {
                 .insert(payload);
         });
     }
+    insertHotelBookingCancellation(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('hotel_booking_cancellation_charge')
+                .withSchema(this.DBO_SCHEMA)
+                .insert(payload);
+        });
+    }
     getHotelBooking(_a) {
         return __awaiter(this, arguments, void 0, function* ({ source_type, filter, from_date, source_id, to_date, limit, skip, user_id, }, need_total = false) {
             const data = yield this.db('hotel_booking AS hb')

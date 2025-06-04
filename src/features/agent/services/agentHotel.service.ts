@@ -17,7 +17,10 @@ import {
   INVOICE_REF_TYPES,
   SOURCE_AGENT,
 } from '../../../utils/miscellaneous/constants';
-import { IInsertHotelBookingTravelerPayload } from '../../../utils/modelTypes/hotelModelTypes/hotelBookingModelTypes';
+import {
+  IInsertHotelBookingCancellationPayload,
+  IInsertHotelBookingTravelerPayload,
+} from '../../../utils/modelTypes/hotelModelTypes/hotelBookingModelTypes';
 
 export class AgentHotelService extends AbstractServices {
   constructor() {
@@ -388,12 +391,30 @@ export class AgentHotelService extends AbstractServices {
         }),
         search_id: payload.search_id,
         hotel_extra_charges: JSON.stringify(recheck.hotel_extra_charges),
-        free_cancellation: recheck.rates[0].supports_cancellation,
+        free_cancellation:
+          recheck.rates[0].cancellation_policy?.free_cancellation,
         source_type: SOURCE_AGENT,
         status: 'Booked',
-        supplier_ref: '',
-        paxes: '',
+        free_cancellation_last_date:
+          recheck.rates[0].cancellation_policy?.free_cancellation_last_date,
+        supplier_ref: booking.booking_id,
+        rooms: JSON.stringify(recheck),
       });
+
+      if (recheck.rates[0].cancellation_policy?.details.length) {
+        const cancellationPayload: IInsertHotelBookingCancellationPayload[] =
+          recheck.rates[0].cancellation_policy.details.map((item) => {
+            return {
+              booking_id: hotelBooking[0].id,
+              fee: item.fee,
+              from_date: item.from_date,
+            };
+          });
+
+        await hotelBookingModel.insertHotelBookingCancellation(
+          cancellationPayload
+        );
+      }
 
       const travelerPayload: IInsertHotelBookingTravelerPayload[] = [];
 
