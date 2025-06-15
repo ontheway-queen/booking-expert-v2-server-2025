@@ -25,6 +25,7 @@ import {
 import EmailSendLib from '../../../lib/emailSendLib';
 import { flightTicketIssueBodyTemplate } from '../../../templates/flightTicketIssueTemplate';
 import { IInsertFlightBookingTrackingPayload } from '../../../modelTypes/flightModelTypes/flightBookingTrackingModelTypes';
+import BalanceLib from '../../../lib/balanceLib';
 
 export class AgentFlightBookingSupportService extends AbstractServices {
   private trx: Knex.Transaction;
@@ -113,11 +114,10 @@ export class AgentFlightBookingSupportService extends AbstractServices {
     const tracking_data: IInsertFlightBookingTrackingPayload[] = [];
     tracking_data.push({
       flight_booking_id: payload.booking_id,
-      description: `Ticket ${
-        payload.status === FLIGHT_TICKET_IN_PROCESS
-          ? 'has been issued'
-          : 'is in process'
-      }. Issued by ${payload.issued_by_type}`,
+      description: `Ticket ${payload.status === FLIGHT_TICKET_IN_PROCESS
+        ? 'has been issued'
+        : 'is in process'
+        }. Issued by ${payload.issued_by_type}`,
     });
     if (payload.issue_block) {
       tracking_data.push({
@@ -128,13 +128,10 @@ export class AgentFlightBookingSupportService extends AbstractServices {
     if (payload.due > 0) {
       tracking_data.push({
         flight_booking_id: payload.booking_id,
-        description: `${
-          payload.paid_amount
-        } amount has been paid for the booking (loan amount - ${
-          payload.loan_amount
-        }, balance amount - ${
-          payload.paid_amount - payload.loan_amount
-        }). Due amount is ${payload.due}`,
+        description: `${payload.paid_amount
+          } amount has been paid for the booking (loan amount - ${payload.loan_amount
+          }, balance amount - ${payload.paid_amount - payload.loan_amount
+          }). Due amount is ${payload.due}`,
       });
     }
     if (payload.api === CUSTOM_API) {
@@ -156,25 +153,14 @@ export class AgentFlightBookingSupportService extends AbstractServices {
         payload.invoice_id
       );
 
-      const transaction_amount = payload.paid_amount - payload.loan_amount;
-
-      //create transaction
-      const transactionModel = this.Model.AgencyPaymentModel(this.trx);
-      await transactionModel.insertAgencyLedger({
-        agency_id: payload.agency_id,
-        type: 'Debit',
-        amount: transaction_amount,
-        details: `Transaction has been debited for flight booking ref - ${payload.booking_ref}. Due: ${payload.due}`,
-        voucher_no: `FLIGHT_BOOKING_${payload.booking_ref}`,
-      });
-
       //create money receipt
       const moneyReceiptModel = this.Model.MoneyReceiptModel(this.trx);
+      const money_receipt_number = await Lib.generateNo({
+        trx: this.trx,
+        type: GENERATE_AUTO_UNIQUE_ID.money_receipt,
+      });
       await moneyReceiptModel.createMoneyReceipt({
-        mr_no: await Lib.generateNo({
-          trx: this.trx,
-          type: GENERATE_AUTO_UNIQUE_ID.money_receipt,
-        }),
+        mr_no: money_receipt_number,
         amount: payload.paid_amount,
         details: `Auto Money Receipt has been generated for flight booking ref - ${payload.booking_ref}`,
         invoice_id: payload.invoice_id,
@@ -182,21 +168,15 @@ export class AgentFlightBookingSupportService extends AbstractServices {
         payment_time: new Date(),
       });
 
-      //update usable loan amount
-      if (payload.loan_amount > 0) {
-        const agencyModel = this.Model.AgencyModel(this.trx);
-        const agency_details = await agencyModel.getSingleAgency(
-          payload.agency_id
-        );
-        const usable_loan_balance = Number(agency_details?.usable_loan);
-        await agencyModel.updateAgency(
-          {
-            usable_loan:
-              Number(usable_loan_balance) - Number(payload.loan_amount),
-          },
-          payload.agency_id
-        );
-      }
+      const balanceLib = new BalanceLib(this.trx);
+      await balanceLib.AgencyDeductBalance({
+        agency_id: payload.agency_id,
+        balance: payload.paid_amount,
+        loan: payload.loan_amount,
+        voucher_no: money_receipt_number,
+        remark: `Transaction has been debited for flight booking ref - ${payload.booking_ref}. Due: ${payload.due}`,
+        deduct: payload.deduct_amount_from
+      });
     }
   }
 
@@ -247,39 +227,27 @@ export class AgentFlightBookingSupportService extends AbstractServices {
         }
       }
 
-            //check balance
-            const agencyModel = this.Model.AgencyModel(this.trx);
-            const agencyBalance = await agencyModel.getAgencyBalance(payload.agency_id);
-            let payable_amount = payload.payment_type === PAYMENT_TYPE_PARTIAL ? (payload.ticket_price * PARTIAL_PAYMENT_PERCENTAGE) / 100 : payload.ticket_price;
-            if (payable_amount > getInvoice.data[0].due) {
-                payable_amount = getInvoice.data[0].due;
-            }
-
-            if (Number(payable_amount) > Number(agencyBalance)) {
-                //check usable loan balance
-                const agency_details = await agencyModel.getSingleAgency(payload.agency_id);
-                const usable_loan_balance = Number(agency_details?.usable_loan);
-                if (Number(agencyBalance) + Number(usable_loan_balance) < Number(payable_amount)) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "There is insufficient balance in your account",
-                    };
-                }
-            };
-
-      //return amount
-      return {
-        success: true,
-        code: this.StatusCode.HTTP_OK,
-        paid_amount: payable_amount,
-        loan_amount:
-          payable_amount - agencyBalance > 0
-            ? payable_amount - agencyBalance
-            : 0,
-        due: Number(getInvoice.data[0].due) - Number(payable_amount),
-        invoice_id: getInvoice.data[0].id,
-      };
+      //check balance
+      let payable_amount = payload.payment_type === PAYMENT_TYPE_PARTIAL ? (payload.ticket_price * PARTIAL_PAYMENT_PERCENTAGE) / 100 : payload.ticket_price;
+      const balanceLib = new BalanceLib(this.trx);
+      const check_balance = await balanceLib.AgencyBalanceAvailabilityCheck({ agency_id: payload.agency_id, price: payable_amount });
+      if (check_balance.availability === false) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: "There is insufficient balance in your account",
+        };
+      } else {
+        return {
+          success: true,
+          code: this.StatusCode.HTTP_OK,
+          deduct_amount_from: check_balance.deduct,
+          paid_amount: check_balance.balance,
+          loan_amount: check_balance.loan,
+          due: Number(getInvoice.data[0].due) - Number(payable_amount),
+          invoice_id: getInvoice.data[0].id
+        }
+      }
     } else {
       return {
         success: true,

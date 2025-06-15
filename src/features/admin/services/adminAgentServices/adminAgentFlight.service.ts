@@ -326,6 +326,7 @@ export class AdminAgentFlightService extends AbstractServices {
           due: Number(payment_data.due),
           agency_id: Number(booking_data.source_id),
           booking_ref: booking_data.booking_ref,
+          deduct_amount_from: payment_data.deduct_amount_from as "Both" | "Loan" | "Balance",
           paid_amount: Number(payment_data.paid_amount),
           loan_amount: Number(payment_data.loan_amount),
           invoice_id: Number(payment_data.invoice_id),

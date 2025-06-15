@@ -23,6 +23,7 @@ export interface IAgentUpdateDataAfterTicketIssue {
     due: number;
     agency_id: number;
     booking_ref: string;
+    deduct_amount_from: 'Both' | 'Loan' | 'Balance';
     paid_amount: number;
     loan_amount: number;
     invoice_id: number;

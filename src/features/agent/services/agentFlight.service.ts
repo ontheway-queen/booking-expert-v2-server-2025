@@ -36,6 +36,7 @@ import {
   IPassengerTypeQuantityPayload,
 } from '../../../utils/supportTypes/flightTypes/commonFlightTypes';
 import { IAgentFlightTicketIssueReqBody } from '../utils/types/agentFlight.types';
+import Lib from '../../../utils/lib/lib';
 
 export class AgentFlightService extends AbstractServices {
   constructor() {
@@ -44,11 +45,11 @@ export class AgentFlightService extends AbstractServices {
 
   public async flightSearch(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id, ref_id } = req.agencyUser;
       const body = req.body as IFlightSearchReqBody;
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
-      const agency_details = await agencyModel.checkAgency({ agency_id });
+      const agency_details = await agencyModel.checkAgency({ agency_id: ref_id || agency_id });
       if (!agency_details?.flight_markup_set) {
         return {
           success: false,
@@ -56,6 +57,20 @@ export class AgentFlightService extends AbstractServices {
           message: 'No commission set has been found for the agency',
         };
       }
+
+      //get sub agent markup
+      let markup_amount = undefined;
+      if (ref_id) {
+        markup_amount = await Lib.getSubAgentTotalMarkup({ trx, type: 'Flight', agency_id });
+        if (!markup_amount) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: "Markup information is empty. Contact with the authority"
+          }
+        }
+      }
+
       const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
       const apiData = await markupSetFlightApiModel.getMarkupSetFlightApi({
         status: true,
@@ -85,6 +100,7 @@ export class AgentFlightService extends AbstractServices {
           markup_set_id: agency_details.flight_markup_set,
           reqBody: body,
           set_flight_api_id: sabre_set_flight_api_id,
+          markup_amount
         });
       }
       if (wftt_set_flight_api_id) {
@@ -94,6 +110,7 @@ export class AgentFlightService extends AbstractServices {
           markup_set_id: agency_details.flight_markup_set,
           reqBody: body,
           set_flight_api_id: wftt_set_flight_api_id,
+          markup_amount
         });
       }
 
@@ -140,7 +157,7 @@ export class AgentFlightService extends AbstractServices {
 
   public async flightSearchSSE(req: Request, res: Response) {
     return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id, ref_id } = req.agencyUser;
       const JourneyType = req.query.JourneyType as string;
       const OriginDestinationInformation = req.query
         .OriginDestinationInformation as unknown as IOriginDestinationInformationPayload[];
@@ -158,13 +175,26 @@ export class AgentFlightService extends AbstractServices {
 
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
-      const agency_details = await agencyModel.checkAgency({ agency_id });
+      const agency_details = await agencyModel.checkAgency({ agency_id: ref_id || agency_id });
       if (!agency_details?.flight_markup_set) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
           message: 'No commission set has been found for the agency',
         };
+      }
+
+      //get sub agent markup
+      let markup_amount = undefined;
+      if (ref_id) {
+        markup_amount = await Lib.getSubAgentTotalMarkup({ trx, type: 'Flight', agency_id });
+        if (!markup_amount) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: "Markup information is empty. Contact with the authority"
+          }
+        }
       }
 
       const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
@@ -249,6 +279,7 @@ export class AgentFlightService extends AbstractServices {
             markup_set_id: agency_details.flight_markup_set,
             reqBody: body,
             set_flight_api_id: sabre_set_flight_api_id,
+            markup_amount
           })
         );
       }
@@ -261,6 +292,7 @@ export class AgentFlightService extends AbstractServices {
             markup_set_id: agency_details.flight_markup_set,
             reqBody: body,
             set_flight_api_id: wftt_set_flight_api_id,
+            markup_amount
           })
         );
       }
@@ -310,14 +342,14 @@ export class AgentFlightService extends AbstractServices {
 
   public async flightRevalidate(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id, ref_id } = req.agencyUser;
       const { flight_id, search_id } = req.query as {
         flight_id: string;
         search_id: string;
       };
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
-      const agency_details = await agencyModel.checkAgency({ agency_id });
+      const agency_details = await agencyModel.checkAgency({ agency_id: ref_id || agency_id });
       if (!agency_details?.flight_markup_set) {
         return {
           success: false,
@@ -325,6 +357,21 @@ export class AgentFlightService extends AbstractServices {
           message: 'No commission set has been found for the agency',
         };
       }
+
+      //get sub agent markup
+      let markup_amount = undefined;
+      if (ref_id) {
+        markup_amount = await Lib.getSubAgentTotalMarkup({ trx, type: 'Flight', agency_id });
+        if (!markup_amount) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: "Markup information is empty. Contact with the authority"
+          }
+        }
+      }
+
+
       //revalidate using the flight support service
       const flightSupportService = new CommonFlightSupportService(trx);
       const data: {
@@ -334,6 +381,7 @@ export class AgentFlightService extends AbstractServices {
         search_id,
         flight_id,
         markup_set_id: agency_details.flight_markup_set,
+        markup_amount
       });
 
       if (data?.revalidate_data) {
@@ -361,6 +409,7 @@ export class AgentFlightService extends AbstractServices {
     return await this.db.transaction(async (trx) => {
       const {
         agency_id,
+        ref_id,
         user_id,
         user_email,
         name,
@@ -375,13 +424,26 @@ export class AgentFlightService extends AbstractServices {
       const booking_confirm = req.query.booking_confirm;
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
-      const agency_details = await agencyModel.checkAgency({ agency_id });
+      const agency_details = await agencyModel.checkAgency({ agency_id: ref_id || agency_id });
       if (!agency_details?.flight_markup_set) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
           message: 'No markup set has been found for the agency',
         };
+      }
+
+      //get sub agent markup
+      let markup_amount = undefined;
+      if (ref_id) {
+        markup_amount = await Lib.getSubAgentTotalMarkup({ trx, type: 'Flight', agency_id });
+        if (!markup_amount) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: "Markup information is empty. Contact with the authority"
+          }
+        }
       }
 
       //revalidate
@@ -394,6 +456,7 @@ export class AgentFlightService extends AbstractServices {
         search_id: body.search_id,
         flight_id: body.flight_id,
         markup_set_id: agency_details.flight_markup_set,
+        markup_amount
       });
 
       if (!rev_data?.revalidate_data) {
@@ -510,7 +573,7 @@ export class AgentFlightService extends AbstractServices {
         },
       });
 
-      //insert booking data
+      //insert booking data with invoice
       const { booking_id, booking_ref } =
         await bookingSupportService.insertFlightBookingData({
           gds_pnr,
@@ -747,6 +810,7 @@ export class AgentFlightService extends AbstractServices {
           due: Number(payment_data.due),
           agency_id: agency_id,
           booking_ref: booking_data.booking_ref,
+          deduct_amount_from: payment_data.deduct_amount_from as "Both" | "Loan" | "Balance",
           paid_amount: Number(payment_data.paid_amount),
           loan_amount: Number(payment_data.loan_amount),
           invoice_id: Number(payment_data.invoice_id),
