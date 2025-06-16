@@ -324,5 +324,23 @@ class AgentPaymentsService extends abstract_service_1.default {
             };
         });
     }
+    getAgentBalance(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const model = this.Model.AgencyModel(trx);
+                const available_balance = yield model.getAgencyBalance(agency_id);
+                const usable_loan = yield model.checkAgency({ agency_id });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    data: {
+                        available_balance,
+                        usable_load: usable_loan === null || usable_loan === void 0 ? void 0 : usable_loan.usable_loan
+                    }
+                };
+            }));
+        });
+    }
 }
 exports.AgentPaymentsService = AgentPaymentsService;

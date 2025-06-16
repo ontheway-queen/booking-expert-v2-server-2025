@@ -404,4 +404,21 @@ export class AgentPaymentsService extends AbstractServices {
       data: data.data,
     };
   }
+
+  public async getAgentBalance(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const model = this.Model.AgencyModel(trx);
+      const available_balance = await model.getAgencyBalance(agency_id);
+      const usable_loan = await model.checkAgency({ agency_id });
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        data: {
+          available_balance,
+          usable_load: usable_loan?.usable_loan
+        }
+      }
+    });
+  }
 }

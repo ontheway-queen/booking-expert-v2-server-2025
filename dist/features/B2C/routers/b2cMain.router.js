@@ -9,6 +9,16 @@ class B2CMainRouter extends abstract_router_1.default {
         super();
         this.callRouter();
     }
-    callRouter() { }
+    callRouter() {
+        this.router.route('/banners');
+        this.router.route('/offers');
+        this.router.route('/offers/:id');
+        this.router.route('/blog');
+        this.router.route('/blog/:slug');
+        this.router.route('/announcement');
+        this.router.route('/pop-up');
+        this.router.route('/popular-routes');
+        this.router.route('/popular-airlines');
+    }
 }
 exports.default = B2CMainRouter;

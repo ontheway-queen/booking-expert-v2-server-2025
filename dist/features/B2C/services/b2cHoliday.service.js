@@ -29,7 +29,7 @@ class B2CHolidayService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     total: data.total,
-                    data: data.data
+                    data: data.data,
                 };
             }));
         });
@@ -40,23 +40,27 @@ class B2CHolidayService extends abstract_service_1.default {
                 const { slug } = req.params;
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
                 console.log({ slug });
-                const get_holiday_data = yield holidayPackageModel.getSingleHolidayPackage({ slug, created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN, holiday_for: constants_1.SOURCE_B2C, status: true });
+                const get_holiday_data = yield holidayPackageModel.getSingleHolidayPackage({
+                    slug,
+                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN,
+                    holiday_for: constants_1.SOURCE_B2C,
+                    status: true,
+                });
                 console.log({ get_holiday_data });
                 if (!get_holiday_data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 else {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        data: get_holiday_data
+                        data: get_holiday_data,
                     };
                 }
-                ;
             }));
         });
     }
@@ -67,27 +71,35 @@ class B2CHolidayService extends abstract_service_1.default {
                 const body = req.body;
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
-                const get_holiday_data = yield holidayPackageModel.getSingleHolidayPackage({ id: body.holiday_package_id, created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN, holiday_for: constants_1.SOURCE_B2C });
+                const get_holiday_data = yield holidayPackageModel.getSingleHolidayPackage({
+                    id: body.holiday_package_id,
+                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN,
+                    holiday_for: constants_1.SOURCE_B2C,
+                });
                 if (!get_holiday_data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                ;
                 //check duplicate booking
                 const check_duplicate_booking = yield holidayPackageBookingModel.getHolidayBookingList({
                     holiday_package_id: body.holiday_package_id,
                     booked_by: constants_1.SOURCE_B2C,
                     user_id,
-                    status: [holidayConstants_1.HOLIDAY_BOOKING_STATUS.PENDING, holidayConstants_1.HOLIDAY_BOOKING_STATUS.CONFIRMED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.IN_PROGRESS, holidayConstants_1.HOLIDAY_BOOKING_STATUS.COMPLETED]
+                    status: [
+                        holidayConstants_1.HOLIDAY_BOOKING_STATUS.PENDING,
+                        holidayConstants_1.HOLIDAY_BOOKING_STATUS.CONFIRMED,
+                        holidayConstants_1.HOLIDAY_BOOKING_STATUS.IN_PROGRESS,
+                        holidayConstants_1.HOLIDAY_BOOKING_STATUS.COMPLETED,
+                    ],
                 });
                 if (check_duplicate_booking.data.length) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: this.ResMsg.HOLIDAY_PACKAGE_ALREADY_BOOKED
+                        message: this.ResMsg.HOLIDAY_PACKAGE_ALREADY_BOOKED,
                     };
                 }
                 //calculate the price
@@ -96,7 +108,7 @@ class B2CHolidayService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: this.ResMsg.PRICE_NOT_FOUND
+                        message: this.ResMsg.PRICE_NOT_FOUND,
                     };
                 }
                 const total_adult_price = Number(price_details.adult_price) * body.total_adult;
@@ -104,10 +116,16 @@ class B2CHolidayService extends abstract_service_1.default {
                 let total_price = total_adult_price + total_child_price;
                 let total_markup = 0;
                 if (price_details.markup_type) {
-                    total_markup = price_details.markup_type === 'FLAT' ? Number(price_details.markup_price) : Number(total_price) * (Number(price_details.markup_price) / 100);
+                    total_markup =
+                        price_details.markup_type === 'FLAT'
+                            ? Number(price_details.markup_price)
+                            : Number(total_price) * (Number(price_details.markup_price) / 100);
                     total_price -= total_markup;
                 }
-                const booking_ref = yield lib_1.default.generateNo({ trx, type: constants_1.GENERATE_AUTO_UNIQUE_ID.user_holiday });
+                const booking_ref = yield lib_1.default.generateNo({
+                    trx,
+                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.user_holiday,
+                });
                 const booking_body = Object.assign(Object.assign({}, body), { booking_ref, source_type: constants_1.SOURCE_B2C, user_id,
                     total_adult_price,
                     total_child_price,
@@ -118,21 +136,20 @@ class B2CHolidayService extends abstract_service_1.default {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_SUCCESSFUL,
-                        message: "Holiday package has been booked successfully",
+                        message: 'Holiday package has been booked successfully',
                         data: {
                             id: booking_res[0].id,
                             booking_ref,
                             total_adult_price,
                             total_child_price,
                             total_markup,
-                            total_price
-                        }
+                            total_price,
+                        },
                     };
                 }
                 else {
-                    throw new customError_1.default("An error occurred while booking the holiday package", this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
+                    throw new customError_1.default('An error occurred while booking the holiday package', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
                 }
-                ;
             }));
         });
     }
@@ -147,7 +164,7 @@ class B2CHolidayService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     total: getBookingList.total,
-                    data: getBookingList.data
+                    data: getBookingList.data,
                 };
             }));
         });
@@ -161,23 +178,22 @@ class B2CHolidayService extends abstract_service_1.default {
                 const get_booking = yield holidayPackageBookingModel.getSingleHolidayBooking({
                     id,
                     booked_by: constants_1.SOURCE_B2C,
-                    user_id
+                    user_id,
                 });
                 if (!get_booking) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 else {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        data: get_booking
+                        data: get_booking,
                     };
                 }
-                ;
             }));
         });
     }
@@ -190,34 +206,43 @@ class B2CHolidayService extends abstract_service_1.default {
                 const get_booking = yield holidayPackageBookingModel.getSingleHolidayBooking({
                     id,
                     booked_by: constants_1.SOURCE_B2C,
-                    user_id
+                    user_id,
                 });
                 if (!get_booking) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                if ([holidayConstants_1.HOLIDAY_BOOKING_STATUS.CONFIRMED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.CANCELLED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.REJECTED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.COMPLETED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.REFUNDED].includes(get_booking.status)) {
+                if ([
+                    holidayConstants_1.HOLIDAY_BOOKING_STATUS.CONFIRMED,
+                    holidayConstants_1.HOLIDAY_BOOKING_STATUS.CANCELLED,
+                    holidayConstants_1.HOLIDAY_BOOKING_STATUS.REJECTED,
+                    holidayConstants_1.HOLIDAY_BOOKING_STATUS.COMPLETED,
+                    holidayConstants_1.HOLIDAY_BOOKING_STATUS.REFUNDED,
+                ].includes(get_booking.status)) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: this.ResMsg.BOOKING_CANCELLATION_NOT_ALLOWED
+                        message: this.ResMsg.BOOKING_CANCELLATION_NOT_ALLOWED,
                     };
                 }
-                const cancel_res = yield holidayPackageBookingModel.updateHolidayBooking({ status: holidayConstants_1.HOLIDAY_BOOKING_STATUS.CANCELLED, cancelled_by: user_id, cancelled_at: new Date() }, id);
+                const cancel_res = yield holidayPackageBookingModel.updateHolidayBooking({
+                    status: holidayConstants_1.HOLIDAY_BOOKING_STATUS.CANCELLED,
+                    cancelled_by: user_id,
+                    cancelled_at: new Date(),
+                }, id);
                 if (cancel_res) {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        message: "Booking has been cancelled successfully"
+                        message: 'Booking has been cancelled successfully',
                     };
                 }
                 else {
-                    throw new customError_1.default("Something went wrong while cancelling the holiday package booking", this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
+                    throw new customError_1.default('Something went wrong while cancelling the holiday package booking', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
                 }
-                ;
             }));
         });
     }

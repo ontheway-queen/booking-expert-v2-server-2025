@@ -24,6 +24,7 @@ const commonFlightBookingSupport_service_1 = require("../../../utils/supportServ
 const commonFlightSupport_service_1 = require("../../../utils/supportServices/flightSupportServices/commonFlightSupport.service");
 const sabreFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service"));
 const wfttFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service"));
+const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 class AgentFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -31,17 +32,35 @@ class AgentFlightService extends abstract_service_1.default {
     flightSearch(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id, ref_id } = req.agencyUser;
                 const body = req.body;
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
-                const agency_details = yield agencyModel.checkAgency({ agency_id });
+                const agency_details = yield agencyModel.checkAgency({
+                    agency_id: ref_id || agency_id,
+                });
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                         message: 'No commission set has been found for the agency',
                     };
+                }
+                //get sub agent markup
+                let markup_amount = undefined;
+                if (ref_id) {
+                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
+                        trx,
+                        type: 'Flight',
+                        agency_id,
+                    });
+                    if (!markup_amount) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Markup information is empty. Contact with the authority',
+                        };
+                    }
                 }
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
                 const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
@@ -68,6 +87,7 @@ class AgentFlightService extends abstract_service_1.default {
                         markup_set_id: agency_details.flight_markup_set,
                         reqBody: body,
                         set_flight_api_id: sabre_set_flight_api_id,
+                        markup_amount,
                     });
                 }
                 if (wftt_set_flight_api_id) {
@@ -77,6 +97,7 @@ class AgentFlightService extends abstract_service_1.default {
                         markup_set_id: agency_details.flight_markup_set,
                         reqBody: body,
                         set_flight_api_id: wftt_set_flight_api_id,
+                        markup_amount,
                     });
                 }
                 //generate search ID
@@ -115,7 +136,7 @@ class AgentFlightService extends abstract_service_1.default {
     flightSearchSSE(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id, ref_id } = req.agencyUser;
                 const JourneyType = req.query.JourneyType;
                 const OriginDestinationInformation = req.query
                     .OriginDestinationInformation;
@@ -131,13 +152,31 @@ class AgentFlightService extends abstract_service_1.default {
                 };
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
-                const agency_details = yield agencyModel.checkAgency({ agency_id });
+                const agency_details = yield agencyModel.checkAgency({
+                    agency_id: ref_id || agency_id,
+                });
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                         message: 'No commission set has been found for the agency',
                     };
+                }
+                //get sub agent markup
+                let markup_amount = undefined;
+                if (ref_id) {
+                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
+                        trx,
+                        type: 'Flight',
+                        agency_id,
+                    });
+                    if (!markup_amount) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Markup information is empty. Contact with the authority',
+                        };
+                    }
                 }
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
                 const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
@@ -201,6 +240,7 @@ class AgentFlightService extends abstract_service_1.default {
                             markup_set_id: agency_details.flight_markup_set,
                             reqBody: body,
                             set_flight_api_id: sabre_set_flight_api_id,
+                            markup_amount,
                         });
                     }));
                 }
@@ -213,6 +253,7 @@ class AgentFlightService extends abstract_service_1.default {
                             markup_set_id: agency_details.flight_markup_set,
                             reqBody: body,
                             set_flight_api_id: wftt_set_flight_api_id,
+                            markup_amount,
                         });
                     }));
                 }
@@ -254,11 +295,13 @@ class AgentFlightService extends abstract_service_1.default {
     flightRevalidate(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id, ref_id } = req.agencyUser;
                 const { flight_id, search_id } = req.query;
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
-                const agency_details = yield agencyModel.checkAgency({ agency_id });
+                const agency_details = yield agencyModel.checkAgency({
+                    agency_id: ref_id || agency_id,
+                });
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
                         success: false,
@@ -266,12 +309,29 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'No commission set has been found for the agency',
                     };
                 }
+                //get sub agent markup
+                let markup_amount = undefined;
+                if (ref_id) {
+                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
+                        trx,
+                        type: 'Flight',
+                        agency_id,
+                    });
+                    if (!markup_amount) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Markup information is empty. Contact with the authority',
+                        };
+                    }
+                }
                 //revalidate using the flight support service
                 const flightSupportService = new commonFlightSupport_service_1.CommonFlightSupportService(trx);
                 const data = yield flightSupportService.FlightRevalidate({
                     search_id,
                     flight_id,
                     markup_set_id: agency_details.flight_markup_set,
+                    markup_amount,
                 });
                 if (data === null || data === void 0 ? void 0 : data.revalidate_data) {
                     yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
@@ -293,12 +353,14 @@ class AgentFlightService extends abstract_service_1.default {
     flightBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
+                const { agency_id, ref_id, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
                 const body = req.body;
                 const booking_confirm = req.query.booking_confirm;
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
-                const agency_details = yield agencyModel.checkAgency({ agency_id });
+                const agency_details = yield agencyModel.checkAgency({
+                    agency_id: ref_id || agency_id,
+                });
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
                         success: false,
@@ -306,12 +368,29 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'No markup set has been found for the agency',
                     };
                 }
+                //get sub agent markup
+                let markup_amount = undefined;
+                if (ref_id) {
+                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
+                        trx,
+                        type: 'Flight',
+                        agency_id,
+                    });
+                    if (!markup_amount) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Markup information is empty. Contact with the authority',
+                        };
+                    }
+                }
                 //revalidate
                 const flightSupportService = new commonFlightSupport_service_1.CommonFlightSupportService(trx);
                 let rev_data = yield flightSupportService.FlightRevalidate({
                     search_id: body.search_id,
                     flight_id: body.flight_id,
                     markup_set_id: agency_details.flight_markup_set,
+                    markup_amount,
                 });
                 if (!(rev_data === null || rev_data === void 0 ? void 0 : rev_data.revalidate_data)) {
                     return {
@@ -413,7 +492,7 @@ class AgentFlightService extends abstract_service_1.default {
                         response: data,
                     },
                 });
-                //insert booking data
+                //insert booking data with invoice
                 const { booking_id, booking_ref } = yield bookingSupportService.insertFlightBookingData({
                     gds_pnr,
                     airline_pnr,
@@ -537,13 +616,13 @@ class AgentFlightService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                if (booking_data.status !== flightConstent_1.FLIGHT_BOOKING_CONFIRMED) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: 'Issue is not allowed for this booking. Contact support team.',
-                    };
-                }
+                // if (booking_data.status !== FLIGHT_BOOKING_CONFIRMED) {
+                //   return {
+                //     success: false,
+                //     code: this.StatusCode.HTTP_BAD_REQUEST,
+                //     message: "Issue is not allowed for this booking. Contact support team."
+                //   }
+                // }
                 //get other information
                 const get_travelers = yield bookingTravelerModel.getFlightBookingTraveler(Number(id));
                 const { payment_type } = req.body;
@@ -577,6 +656,9 @@ class AgentFlightService extends abstract_service_1.default {
                 if (ticketIssuePermission.issue_block === true) {
                     status = flightConstent_1.FLIGHT_TICKET_IN_PROCESS;
                 }
+                else if (booking_data.api === flightConstent_1.CUSTOM_API) {
+                    status = flightConstent_1.FLIGHT_TICKET_IN_PROCESS;
+                }
                 else {
                     //issue ticket using API
                     if (booking_data.api === flightConstent_1.SABRE_API) {
@@ -599,6 +681,7 @@ class AgentFlightService extends abstract_service_1.default {
                         due: Number(payment_data.due),
                         agency_id: agency_id,
                         booking_ref: booking_data.booking_ref,
+                        deduct_amount_from: payment_data.deduct_amount_from,
                         paid_amount: Number(payment_data.paid_amount),
                         loan_amount: Number(payment_data.loan_amount),
                         invoice_id: Number(payment_data.invoice_id),

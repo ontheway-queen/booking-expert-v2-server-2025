@@ -79,6 +79,10 @@ class AgentPaymentsController extends abstract_controller_1.default {
             const _a = yield this.service.getPartialPaymentList(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.getAgentBalance = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getAgentBalance(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.default = AgentPaymentsController;

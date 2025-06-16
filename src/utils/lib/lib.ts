@@ -5,6 +5,7 @@ import path from 'path';
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import CommonModel from '../../models/commonModel/commonModel';
 import AgencyModel from '../../models/agentModel/agencyModel';
+import SubAgentMarkupModel from '../../models/agentModel/subAgentMarkupModel';
 
 class Lib {
   // Create hash string
@@ -269,6 +270,39 @@ class Lib {
 
     return false;
   };
+  public static async getSubAgentTotalMarkup({
+    trx,
+    type,
+    agency_id,
+  }: {
+    trx: TDB;
+    type: 'Hotel' | 'Flight';
+    agency_id: number;
+  }) {
+    const model = new SubAgentMarkupModel(trx);
+    const get_markup = await model.getSubAgentMarkup(agency_id);
+    if (!get_markup) {
+      return null;
+    }
+
+    let markup = 0;
+    let markup_type: 'FLAT' | 'PER';
+    let markup_mode: 'INCREASE' | 'DECREASE';
+    if (type === 'Flight') {
+      markup = get_markup.flight_markup;
+      markup_type = get_markup.flight_markup_type;
+      markup_mode = get_markup.flight_markup_mode;
+    } else {
+      markup = get_markup.hotel_markup;
+      markup_type = get_markup.hotel_markup_type;
+      markup_mode = get_markup.hotel_markup_mode;
+    }
+    return {
+      markup,
+      markup_type,
+      markup_mode,
+    };
+  }
 }
 export default Lib;
 

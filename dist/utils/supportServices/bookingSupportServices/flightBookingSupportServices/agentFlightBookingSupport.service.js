@@ -17,6 +17,7 @@ const abstract_service_1 = __importDefault(require("../../../../abstract/abstrac
 const flightConstent_1 = require("../../../miscellaneous/flightConstent");
 const lib_1 = __importDefault(require("../../../lib/lib"));
 const constants_1 = require("../../../miscellaneous/constants");
+const balanceLib_1 = __importDefault(require("../../../lib/balanceLib"));
 class AgentFlightBookingSupportService extends abstract_service_1.default {
     constructor(trx) {
         super();
@@ -117,38 +118,29 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                 yield invoiceModel.updateInvoice({
                     due: payload.due,
                 }, payload.invoice_id);
-                const transaction_amount = payload.paid_amount - payload.loan_amount;
-                //create transaction
-                const transactionModel = this.Model.AgencyPaymentModel(this.trx);
-                yield transactionModel.insertAgencyLedger({
-                    agency_id: payload.agency_id,
-                    type: 'Debit',
-                    amount: transaction_amount,
-                    details: `Transaction has been debited for flight booking ref - ${payload.booking_ref}. Due: ${payload.due}`,
-                    voucher_no: `FLIGHT_BOOKING_${payload.booking_ref}`,
-                });
                 //create money receipt
                 const moneyReceiptModel = this.Model.MoneyReceiptModel(this.trx);
+                const money_receipt_number = yield lib_1.default.generateNo({
+                    trx: this.trx,
+                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.money_receipt,
+                });
                 yield moneyReceiptModel.createMoneyReceipt({
-                    mr_no: yield lib_1.default.generateNo({
-                        trx: this.trx,
-                        type: constants_1.GENERATE_AUTO_UNIQUE_ID.money_receipt,
-                    }),
+                    mr_no: money_receipt_number,
                     amount: payload.paid_amount,
                     details: `Auto Money Receipt has been generated for flight booking ref - ${payload.booking_ref}`,
                     invoice_id: payload.invoice_id,
                     user_id: payload.user_id,
                     payment_time: new Date(),
                 });
-                //update usable loan amount
-                if (payload.loan_amount > 0) {
-                    const agencyModel = this.Model.AgencyModel(this.trx);
-                    const agency_details = yield agencyModel.getSingleAgency(payload.agency_id);
-                    const usable_loan_balance = Number(agency_details === null || agency_details === void 0 ? void 0 : agency_details.usable_loan);
-                    yield agencyModel.updateAgency({
-                        usable_loan: Number(usable_loan_balance) - Number(payload.loan_amount),
-                    }, payload.agency_id);
-                }
+                const balanceLib = new balanceLib_1.default(this.trx);
+                yield balanceLib.AgencyDeductBalance({
+                    agency_id: payload.agency_id,
+                    balance: payload.paid_amount,
+                    loan: payload.loan_amount,
+                    voucher_no: money_receipt_number,
+                    remark: `Transaction has been debited for flight booking ref - ${payload.booking_ref}. Due: ${payload.due}`,
+                    deduct: payload.deduct_amount_from,
+                });
             }
         });
     }
@@ -196,37 +188,32 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                     }
                 }
                 //check balance
-                const agencyModel = this.Model.AgencyModel(this.trx);
-                const agencyBalance = yield agencyModel.getAgencyBalance(payload.agency_id);
                 let payable_amount = payload.payment_type === flightConstent_1.PAYMENT_TYPE_PARTIAL
                     ? (payload.ticket_price * flightConstent_1.PARTIAL_PAYMENT_PERCENTAGE) / 100
                     : payload.ticket_price;
-                if (payable_amount > getInvoice.data[0].due) {
-                    payable_amount = getInvoice.data[0].due;
+                const balanceLib = new balanceLib_1.default(this.trx);
+                const check_balance = yield balanceLib.AgencyBalanceAvailabilityCheck({
+                    agency_id: payload.agency_id,
+                    price: payable_amount,
+                });
+                if (check_balance.availability === false) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'There is insufficient balance in your account',
+                    };
                 }
-                if (payable_amount > agencyBalance) {
-                    //check usable loan balance
-                    const agency_details = yield agencyModel.getSingleAgency(payload.agency_id);
-                    const usable_loan_balance = Number(agency_details === null || agency_details === void 0 ? void 0 : agency_details.usable_loan);
-                    if (agencyBalance + usable_loan_balance < payable_amount) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: 'There is insufficient balance in your account',
-                        };
-                    }
+                else {
+                    return {
+                        success: true,
+                        code: this.StatusCode.HTTP_OK,
+                        deduct_amount_from: check_balance.deduct,
+                        paid_amount: check_balance.balance,
+                        loan_amount: check_balance.loan,
+                        due: Number(getInvoice.data[0].due) - Number(payable_amount),
+                        invoice_id: getInvoice.data[0].id,
+                    };
                 }
-                //return amount
-                return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    paid_amount: payable_amount,
-                    loan_amount: payable_amount - agencyBalance > 0
-                        ? payable_amount - agencyBalance
-                        : 0,
-                    due: Number(getInvoice.data[0].due) - Number(payable_amount),
-                    invoice_id: getInvoice.data[0].id,
-                };
             }
             else {
                 return {

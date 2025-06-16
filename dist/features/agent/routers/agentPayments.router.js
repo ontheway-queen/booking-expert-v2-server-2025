@@ -33,6 +33,8 @@ class AgentPaymentsRouter extends abstract_router_1.default {
             .post(this.controller.clearDueOfInvoice);
         this.router.route('/partial')
             .get(this.controller.getPartialPaymentList);
+        this.router.route('/balance')
+            .get(this.controller.getAgentBalance);
     }
 }
 exports.default = AgentPaymentsRouter;

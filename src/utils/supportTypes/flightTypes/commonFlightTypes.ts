@@ -65,7 +65,7 @@ export interface ILegDescription {
   arrivalLocation: string;
 }
 export interface IFormattedFlightItinerary {
-  journey_type: "1" | "2" | "3";
+  journey_type: '1' | '2' | '3';
   leg_description: ILegDescription[];
   domestic_flight: boolean;
   price_changed: boolean;

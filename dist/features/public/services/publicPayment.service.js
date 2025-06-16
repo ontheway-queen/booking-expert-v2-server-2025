@@ -69,7 +69,7 @@ class PublicPaymentService extends abstract_service_1.default {
                                 success: true,
                                 code: this.StatusCode.HTTP_OK,
                                 message: "Payment success",
-                                redirect_url: `${decodeURIComponent(s_page)}?date=${session.data.tran_date}&amount=${session.data.store_amount}&currency=${session.data.currency}&transaction_id=${session.data.bank_tran_id}&payment_method=${session.data.card_issuer}&card_type=${session.data.card_type}&card_brand=${session.data.card_brand}`
+                                redirect_url: `${decodeURIComponent(s_page)}&date=${session.data.tran_date}&amount=${session.data.store_amount}&currency=${session.data.currency}&transaction_id=${session.data.bank_tran_id}&payment_method=${session.data.card_issuer}&card_type=${session.data.card_type}&card_brand=${session.data.card_brand}`
                             };
                         }
                     case 'failed':
