@@ -1,4 +1,5 @@
 class FileFolder {
+  static readonly AIRLINES_FILES = 'airlines';
   static readonly PROMOTIONAL_FILES = 'promotional-files';
   static readonly ARTICLE_FILES = 'article-files';
   static readonly ADMIN_FILES = 'admin/admin-files';
@@ -17,7 +18,8 @@ class FileFolder {
   static readonly SPECIAL_OFFER = 'special-offer';
   static readonly BANK_INVOICE_FILES = 'bank-invoice-files';
   static readonly AGENT_FLIGHT_BOOKING_FILES = 'agent/flight-booking-files';
-  static readonly AGENT_B2C_FLIGHT_BOOKING_FILES = 'agent-b2c/flight-booking-files';
+  static readonly AGENT_B2C_FLIGHT_BOOKING_FILES =
+    'agent-b2c/flight-booking-files';
   static readonly AGENT_HOTEL_BOOKING_FILES = 'agent/hotel-booking-files';
   static readonly AGENCY_REGISTRATION_REQUEST = 'agency-registration-request';
 }

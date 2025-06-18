@@ -36,7 +36,7 @@ class CommonModel extends Schema {
       )
       .andWhere((qb) => {
         if (payload.agency_id) {
-          qb.andWhere("agency_id", payload.agency_id);
+          qb.andWhere('agency_id', payload.agency_id);
         }
       });
 
@@ -53,15 +53,15 @@ class CommonModel extends Schema {
   // update otp
   public async updateOTP(
     payload: { tried: number; matched?: number },
-    where: { id: number, agency_id?: number }
+    where: { id: number; agency_id?: number }
   ) {
     return await this.db('email_otp')
       .withSchema(this.DBO_SCHEMA)
       .update(payload)
       .where('id', where.id)
-      .andWhere((qb)=>{
-        if(where.agency_id){
-          qb.andWhere("agency_id", where.agency_id)
+      .andWhere((qb) => {
+        if (where.agency_id) {
+          qb.andWhere('agency_id', where.agency_id);
         }
       });
   }
@@ -111,15 +111,18 @@ class CommonModel extends Schema {
   }
 
   // Get airlines
-  public async getAirlineByCode(airlineCode: string) {
-    const [airline] = await this.db('airlines')
+  public async getAirlineByCode(
+    airlineCode: string
+  ): Promise<{ name: string; logo: string }> {
+    const airline = await this.db('airlines')
       .withSchema(this.PUBLIC_SCHEMA)
       .select('name', 'logo')
       .where((qb) => {
         if (airlineCode) {
           qb.andWhere('code', airlineCode);
         }
-      });
+      })
+      .first();
     if (airline) {
       return airline;
     } else {
@@ -128,6 +131,17 @@ class CommonModel extends Schema {
         logo: 'Not available',
       };
     }
+  }
+
+  // Get airlines
+  public async getAirlineById(
+    id: number
+  ): Promise<{ id: number; name: string; logo: string } | null> {
+    return await this.db('airlines')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .select('id', 'name', 'logo')
+      .where('id', id)
+      .first();
   }
 
   // Aircraft details by code
@@ -164,17 +178,15 @@ class CommonModel extends Schema {
   //get all city
   public async getCity({
     country_id,
-    city_id,
     limit,
     skip,
-    name,
+    filter,
     code,
   }: {
     country_id?: number;
-    city_id?: number;
     limit?: number;
     skip?: number;
-    name?: string;
+    filter?: string;
     code?: string;
   }) {
     return await this.db('city AS c')
@@ -185,14 +197,16 @@ class CommonModel extends Schema {
         if (country_id) {
           qb.andWhere('c.country_id', country_id);
         }
-        if (name) {
-          qb.andWhere('c.name', 'ilike', `%${name}%`);
-        }
+
         if (code) {
-          qb.andWhere('c.code', code);
+          qb.orWhere('c.code', code);
         }
-        if (city_id) {
-          qb.andWhere('c.id', city_id);
+
+        if (filter) {
+          qb.andWhere((qqb) => {
+            qqb.orWhere('c.name', 'ilike', `%${filter}%`);
+            qqb.orWhere('c.code', filter);
+          });
         }
       })
       .orderBy('c.name', 'asc')
@@ -205,10 +219,37 @@ class CommonModel extends Schema {
     country_id: number;
     name: string;
     code?: string;
+    lat?: string;
+    lng?: string;
   }) {
     return await this.db('city')
       .withSchema(this.PUBLIC_SCHEMA)
       .insert(payload, 'id');
+  }
+
+  // update city
+  public async updateCity(
+    payload: {
+      country_id?: number;
+      name?: string;
+      code?: string;
+      lat?: string;
+      lng?: string;
+    },
+    id: number
+  ) {
+    return await this.db('city')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .update(payload)
+      .where('id', id);
+  }
+
+  // delete city
+  public async deleteCity(id: number) {
+    return await this.db('city')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .delete()
+      .where('id', id);
   }
 
   //insert airport
@@ -223,9 +264,9 @@ class CommonModel extends Schema {
     params: {
       country_id?: number;
       name?: string;
+      code?: string;
       limit?: number;
       skip?: number;
-      code?: string;
     },
     total: boolean = false
   ) {
@@ -246,15 +287,20 @@ class CommonModel extends Schema {
         if (params.country_id) {
           qb.where('air.country_id', params.country_id);
         }
-        if (params.name) {
-          qb.orWhere('air.iata_code', params.name.toUpperCase());
-          qb.orWhereILike('air.name', `${params.name}%`);
-          qb.orWhereILike('cou.name', `${params.name}%`);
-          qb.orWhereILike('ct.name', `${params.name}%`);
-        }
         if (params.code) {
-          qb.where('air.iata_code', params.code);
+          qb.orWhere('air.iata_code', params.code);
         }
+        qb.andWhere((qqb) => {
+          if (params.name) {
+            qqb.orWhere('air.iata_code', params.name.toUpperCase());
+
+            qqb.orWhereILike('air.name', `${params.name}%`);
+
+            qqb.orWhereILike('cou.name', `${params.name}%`);
+
+            qqb.orWhereILike('ct.name', `${params.name}%`);
+          }
+        });
       })
       .orderByRaw(
         `ARRAY_POSITION(ARRAY[${PRIORITY_AIRPORTS.map(() => '?').join(
@@ -267,6 +313,7 @@ class CommonModel extends Schema {
       .orderBy('air.id', 'asc');
 
     let count: any[] = [];
+
     if (total) {
       count = await this.db('airport as air')
         .withSchema(this.PUBLIC_SCHEMA)
@@ -276,11 +323,22 @@ class CommonModel extends Schema {
           if (params.country_id) {
             qb.where('air.country_id', params.country_id);
           }
-          if (params.name) {
-            qb.orWhere('air.iata_code', params.name.toUpperCase());
-            qb.orWhereILike('air.name', `${params.name}%`);
-            qb.orWhereILike('cou.name', `${params.name}%`);
+
+          if (params.code) {
+            qb.orWhere('air.iata_code', params.code);
           }
+
+          qb.andWhere((qqb) => {
+            if (params.name) {
+              qqb.orWhere('air.iata_code', params.name.toUpperCase());
+
+              qqb.orWhereILike('air.name', `${params.name}%`);
+
+              qqb.orWhereILike('cou.name', `${params.name}%`);
+
+              qqb.orWhereILike('ct.name', `${params.name}%`);
+            }
+          });
         });
     }
     return { data, total: count[0]?.total };
@@ -321,13 +379,15 @@ class CommonModel extends Schema {
         if (params.code) {
           qb.where('air.code', params.code);
         }
-        if (params.name) {
-          if (params.name.length === 2) {
-            qb.andWhere('air.code', params.name);
-          } else {
-            qb.andWhere('air.name', 'ilike', `%${params.name}%`);
+        qb.andWhere((qqb) => {
+          if (params.name) {
+            if (params.name.length === 2) {
+              qqb.andWhere('air.code', params.name);
+            } else {
+              qqb.andWhere('air.name', 'ilike', `%${params.name}%`);
+            }
           }
-        }
+        });
       })
       .limit(params.limit ? params.limit : 100)
       .offset(params.skip ? params.skip : 0)
@@ -342,10 +402,16 @@ class CommonModel extends Schema {
           if (params.code) {
             qb.where('air.code', params.code);
           }
-          if (params.name) {
-            qb.andWhere('air.name', 'ilike', `%${params.name}%`);
-            qb.orWhere('air.code', params.name);
-          }
+
+          qb.andWhere((qqb) => {
+            if (params.name) {
+              if (params.name.length === 2) {
+                qqb.andWhere('air.code', params.name);
+              } else {
+                qqb.andWhere('air.name', 'ilike', `%${params.name}%`);
+              }
+            }
+          });
         });
     }
     return { data, total: count[0]?.total };

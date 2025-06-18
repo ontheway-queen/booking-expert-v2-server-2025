@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class FileFolder {
 }
+FileFolder.AIRLINES_FILES = 'airlines';
 FileFolder.PROMOTIONAL_FILES = 'promotional-files';
 FileFolder.ARTICLE_FILES = 'article-files';
 FileFolder.ADMIN_FILES = 'admin/admin-files';

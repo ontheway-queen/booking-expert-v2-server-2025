@@ -7,6 +7,32 @@ const joi_1 = __importDefault(require("joi"));
 const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AdminConfigValidator {
     constructor() {
+        this.getAllCity = joi_1.default.object({
+            country_id: joi_1.default.number().optional(),
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
+            filter: joi_1.default.string().optional(),
+        });
+        this.createCity = joi_1.default.object({
+            country_id: joi_1.default.number().required(),
+            name: joi_1.default.number().required(),
+            code: joi_1.default.string().optional(),
+            lat: joi_1.default.string().optional(),
+            lng: joi_1.default.string().optional(),
+        });
+        this.updateCity = joi_1.default.object({
+            country_id: joi_1.default.number().optional(),
+            name: joi_1.default.number().optional(),
+            code: joi_1.default.string().optional(),
+            lat: joi_1.default.string().optional(),
+            lng: joi_1.default.string().optional(),
+        });
+        this.getAllAirport = joi_1.default.object({
+            country_id: joi_1.default.number().optional(),
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
+            name: joi_1.default.string().optional(),
+        });
         //Create airport schema
         this.createAirportSchema = joi_1.default.object({
             country_id: joi_1.default.number().required(),
@@ -34,7 +60,19 @@ class AdminConfigValidator {
         //check slug
         this.checkSlugSchema = joi_1.default.object({
             slug: joi_1.default.string().required().trim().lowercase(),
-            type: joi_1.default.string().valid(constants_1.SLUG_TYPE_HOLIDAY, constants_1.SLUG_TYPE_UMRAH, constants_1.SLUG_TYPE_BLOG).valid().required()
+            type: joi_1.default.string()
+                .valid(constants_1.SLUG_TYPE_HOLIDAY, constants_1.SLUG_TYPE_UMRAH, constants_1.SLUG_TYPE_BLOG)
+                .valid()
+                .required(),
+        });
+        this.getAllAirlines = joi_1.default.object({
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
+            name: joi_1.default.string().optional(),
+        });
+        this.createAirlines = joi_1.default.object({
+            name: joi_1.default.string().required(),
+            code: joi_1.default.string().required(),
         });
     }
 }

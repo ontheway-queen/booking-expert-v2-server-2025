@@ -1,7 +1,41 @@
 import Joi from 'joi';
-import { SLUG_TYPE_BLOG, SLUG_TYPE_HOLIDAY, SLUG_TYPE_UMRAH } from '../../../../utils/miscellaneous/constants';
+import {
+  SLUG_TYPE_BLOG,
+  SLUG_TYPE_HOLIDAY,
+  SLUG_TYPE_UMRAH,
+} from '../../../../utils/miscellaneous/constants';
 
 export default class AdminConfigValidator {
+  public getAllCity = Joi.object({
+    country_id: Joi.number().optional(),
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+    filter: Joi.string().optional(),
+  });
+
+  public createCity = Joi.object({
+    country_id: Joi.number().required(),
+    name: Joi.number().required(),
+    code: Joi.string().optional(),
+    lat: Joi.string().optional(),
+    lng: Joi.string().optional(),
+  });
+
+  public updateCity = Joi.object({
+    country_id: Joi.number().optional(),
+    name: Joi.number().optional(),
+    code: Joi.string().optional(),
+    lat: Joi.string().optional(),
+    lng: Joi.string().optional(),
+  });
+
+  public getAllAirport = Joi.object({
+    country_id: Joi.number().optional(),
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+    name: Joi.string().optional(),
+  });
+
   //Create airport schema
   public createAirportSchema = Joi.object({
     country_id: Joi.number().required(),
@@ -33,6 +67,20 @@ export default class AdminConfigValidator {
   //check slug
   public checkSlugSchema = Joi.object({
     slug: Joi.string().required().trim().lowercase(),
-    type: Joi.string().valid(SLUG_TYPE_HOLIDAY, SLUG_TYPE_UMRAH, SLUG_TYPE_BLOG).valid().required()
+    type: Joi.string()
+      .valid(SLUG_TYPE_HOLIDAY, SLUG_TYPE_UMRAH, SLUG_TYPE_BLOG)
+      .valid()
+      .required(),
+  });
+
+  public getAllAirlines = Joi.object({
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+    name: Joi.string().optional(),
+  });
+
+  public createAirlines = Joi.object({
+    name: Joi.string().required(),
+    code: Joi.string().required(),
   });
 }

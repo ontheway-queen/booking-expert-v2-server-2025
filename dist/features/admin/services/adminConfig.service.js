@@ -25,13 +25,13 @@ class AdminConfigService extends abstract_service_1.default {
                     const holidayModel = this.Model.HolidayPackageModel(trx);
                     const check_slug = yield holidayModel.getHolidayPackageList({
                         slug,
-                        created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN
+                        created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN,
                     });
                     if (check_slug.data.length) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_CONFLICT,
-                            message: this.ResMsg.SLUG_ALREADY_EXISTS
+                            message: this.ResMsg.SLUG_ALREADY_EXISTS,
                         };
                     }
                 }
@@ -39,15 +39,233 @@ class AdminConfigService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: this.ResMsg.AVAILABLE_SLUG
+                    message: this.ResMsg.AVAILABLE_SLUG,
                 };
             }));
+        });
+    }
+    //get all city
+    getAllCity(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.CommonModel();
+            const city_list = yield model.getCity(req.query);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: city_list,
+            };
+        });
+    }
+    createCity(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = req.body;
+            const model = this.Model.CommonModel();
+            yield model.insertCity(body);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_SUCCESSFUL,
+                message: this.ResMsg.HTTP_SUCCESSFUL,
+            };
+        });
+    }
+    updateCity(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = req.body;
+            const id = req.params.id;
+            const model = this.Model.CommonModel();
+            yield model.updateCity(body, Number(id));
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_SUCCESSFUL,
+                message: this.ResMsg.HTTP_SUCCESSFUL,
+            };
+        });
+    }
+    deleteCity(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            const model = this.Model.CommonModel();
+            yield model.deleteCity(Number(id));
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+            };
+        });
+    }
+    //get all airport
+    getAllAirport(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.CommonModel();
+            const get_airport = yield model.getAirport(req.query);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: get_airport.data,
+            };
+        });
+    }
+    createAirport(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = req.body;
+            const model = this.Model.CommonModel();
+            const checkAirport = yield model.getAirlineByCode(body.iata_code);
+            if (checkAirport.name !== 'Not available') {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_CONFLICT,
+                    message: 'Airport code already exist.',
+                };
+            }
+            yield model.insertAirport(body);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_SUCCESSFUL,
+                message: this.ResMsg.HTTP_SUCCESSFUL,
+            };
+        });
+    }
+    //update airport
+    updateAirport(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const airport_id = req.params.id;
+            const body = req.body;
+            const model = this.Model.CommonModel();
+            const update_airport = yield model.updateAirport(body, Number(airport_id));
+            if (update_airport > 0) {
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }
+            else {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+        });
+    }
+    //delete airport
+    deleteAirport(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const airport_id = req.params.id;
+            const model = this.Model.CommonModel();
+            const del_airport = yield model.deleteAirport(Number(airport_id));
+            if (del_airport > 0) {
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }
+            else {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+        });
+    }
+    getAllAirlines(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.CommonModel();
+            const get_airlines = yield model.getAirlines(req.query, false);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: get_airlines.data,
+            };
+        });
+    }
+    createAirlines(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const files = req.files || [];
+            const model = this.Model.CommonModel();
+            const body = req.body;
+            const check = yield model.getAirlineByCode(body.code);
+            if (check.name !== 'Not available') {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_CONFLICT,
+                    message: 'Airlines code already exist.',
+                };
+            }
+            const payload = Object.assign(Object.assign({}, req.body), { logo: '' });
+            if (files === null || files === void 0 ? void 0 : files.length) {
+                payload.logo = files[0].filename;
+            }
+            yield model.insertAirline(payload);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_SUCCESSFUL,
+                message: this.ResMsg.HTTP_SUCCESSFUL,
+            };
+        });
+    }
+    //update airline
+    updateAirlines(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const airlines_id = req.params.id;
+            const model = this.Model.CommonModel();
+            const check = yield model.getAirlineById(Number(airlines_id));
+            if (!check) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            const files = req.files || [];
+            const body = Object.assign({}, req.body);
+            if (files === null || files === void 0 ? void 0 : files.length) {
+                body.logo = files[0].filename;
+            }
+            yield model.updateAirlines(body, Number(airlines_id));
+            if (check.logo && body.logo) {
+                yield this.manageFile.deleteFromCloud([check.logo]);
+            }
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+            };
+        });
+    }
+    //delete airline
+    deleteAirlines(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const airlines_id = req.params.id;
+            const model = this.Model.CommonModel();
+            const check = yield model.getAirlineById(Number(airlines_id));
+            if (!check) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            yield model.deleteAirlines(Number(airlines_id));
+            if (check.logo) {
+                yield this.manageFile.deleteFromCloud([check.logo]);
+            }
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+            };
         });
     }
 }

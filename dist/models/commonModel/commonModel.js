@@ -32,7 +32,7 @@ class CommonModel extends schema_1.default {
                 .andWhereRaw(`"create_date" + interval '${constants_1.OTP_DEFAULT_EXPIRY} minutes' > NOW()`)
                 .andWhere((qb) => {
                 if (payload.agency_id) {
-                    qb.andWhere("agency_id", payload.agency_id);
+                    qb.andWhere('agency_id', payload.agency_id);
                 }
             });
             return check;
@@ -55,7 +55,7 @@ class CommonModel extends schema_1.default {
                 .where('id', where.id)
                 .andWhere((qb) => {
                 if (where.agency_id) {
-                    qb.andWhere("agency_id", where.agency_id);
+                    qb.andWhere('agency_id', where.agency_id);
                 }
             });
         });
@@ -111,14 +111,15 @@ class CommonModel extends schema_1.default {
     // Get airlines
     getAirlineByCode(airlineCode) {
         return __awaiter(this, void 0, void 0, function* () {
-            const [airline] = yield this.db('airlines')
+            const airline = yield this.db('airlines')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .select('name', 'logo')
                 .where((qb) => {
                 if (airlineCode) {
                     qb.andWhere('code', airlineCode);
                 }
-            });
+            })
+                .first();
             if (airline) {
                 return airline;
             }
@@ -128,6 +129,16 @@ class CommonModel extends schema_1.default {
                     logo: 'Not available',
                 };
             }
+        });
+    }
+    // Get airlines
+    getAirlineById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('airlines')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .select('id', 'name', 'logo')
+                .where('id', id)
+                .first();
         });
     }
     // Aircraft details by code
@@ -165,7 +176,7 @@ class CommonModel extends schema_1.default {
     }
     //get all city
     getCity(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ country_id, city_id, limit, skip, name, code, }) {
+        return __awaiter(this, arguments, void 0, function* ({ country_id, limit, skip, filter, code, }) {
             return yield this.db('city AS c')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .select('c.id', 'c.name', 'co.name AS country_name')
@@ -174,14 +185,14 @@ class CommonModel extends schema_1.default {
                 if (country_id) {
                     qb.andWhere('c.country_id', country_id);
                 }
-                if (name) {
-                    qb.andWhere('c.name', 'ilike', `%${name}%`);
-                }
                 if (code) {
-                    qb.andWhere('c.code', code);
+                    qb.orWhere('c.code', code);
                 }
-                if (city_id) {
-                    qb.andWhere('c.id', city_id);
+                if (filter) {
+                    qb.andWhere((qqb) => {
+                        qqb.orWhere('c.name', 'ilike', `%${filter}%`);
+                        qqb.orWhere('c.code', filter);
+                    });
                 }
             })
                 .orderBy('c.name', 'asc')
@@ -195,6 +206,24 @@ class CommonModel extends schema_1.default {
             return yield this.db('city')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .insert(payload, 'id');
+        });
+    }
+    // update city
+    updateCity(payload, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('city')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .update(payload)
+                .where('id', id);
+        });
+    }
+    // delete city
+    deleteCity(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('city')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .delete()
+                .where('id', id);
         });
     }
     //insert airport
@@ -218,15 +247,17 @@ class CommonModel extends schema_1.default {
                 if (params.country_id) {
                     qb.where('air.country_id', params.country_id);
                 }
-                if (params.name) {
-                    qb.orWhere('air.iata_code', params.name.toUpperCase());
-                    qb.orWhereILike('air.name', `${params.name}%`);
-                    qb.orWhereILike('cou.name', `${params.name}%`);
-                    qb.orWhereILike('ct.name', `${params.name}%`);
-                }
                 if (params.code) {
-                    qb.where('air.iata_code', params.code);
+                    qb.orWhere('air.iata_code', params.code);
                 }
+                qb.andWhere((qqb) => {
+                    if (params.name) {
+                        qqb.orWhere('air.iata_code', params.name.toUpperCase());
+                        qqb.orWhereILike('air.name', `${params.name}%`);
+                        qqb.orWhereILike('cou.name', `${params.name}%`);
+                        qqb.orWhereILike('ct.name', `${params.name}%`);
+                    }
+                });
             })
                 .orderByRaw(`ARRAY_POSITION(ARRAY[${flightConstent_1.PRIORITY_AIRPORTS.map(() => '?').join(', ')}]::TEXT[], air.iata_code) ASC NULLS LAST, air.id ASC`, flightConstent_1.PRIORITY_AIRPORTS)
                 .limit(params.limit ? params.limit : 100)
@@ -242,11 +273,17 @@ class CommonModel extends schema_1.default {
                     if (params.country_id) {
                         qb.where('air.country_id', params.country_id);
                     }
-                    if (params.name) {
-                        qb.orWhere('air.iata_code', params.name.toUpperCase());
-                        qb.orWhereILike('air.name', `${params.name}%`);
-                        qb.orWhereILike('cou.name', `${params.name}%`);
+                    if (params.code) {
+                        qb.orWhere('air.iata_code', params.code);
                     }
+                    qb.andWhere((qqb) => {
+                        if (params.name) {
+                            qqb.orWhere('air.iata_code', params.name.toUpperCase());
+                            qqb.orWhereILike('air.name', `${params.name}%`);
+                            qqb.orWhereILike('cou.name', `${params.name}%`);
+                            qqb.orWhereILike('ct.name', `${params.name}%`);
+                        }
+                    });
                 });
             }
             return { data, total: (_a = count[0]) === null || _a === void 0 ? void 0 : _a.total };
@@ -289,14 +326,16 @@ class CommonModel extends schema_1.default {
                 if (params.code) {
                     qb.where('air.code', params.code);
                 }
-                if (params.name) {
-                    if (params.name.length === 2) {
-                        qb.andWhere('air.code', params.name);
+                qb.andWhere((qqb) => {
+                    if (params.name) {
+                        if (params.name.length === 2) {
+                            qqb.andWhere('air.code', params.name);
+                        }
+                        else {
+                            qqb.andWhere('air.name', 'ilike', `%${params.name}%`);
+                        }
                     }
-                    else {
-                        qb.andWhere('air.name', 'ilike', `%${params.name}%`);
-                    }
-                }
+                });
             })
                 .limit(params.limit ? params.limit : 100)
                 .offset(params.skip ? params.skip : 0)
@@ -310,10 +349,16 @@ class CommonModel extends schema_1.default {
                     if (params.code) {
                         qb.where('air.code', params.code);
                     }
-                    if (params.name) {
-                        qb.andWhere('air.name', 'ilike', `%${params.name}%`);
-                        qb.orWhere('air.code', params.name);
-                    }
+                    qb.andWhere((qqb) => {
+                        if (params.name) {
+                            if (params.name.length === 2) {
+                                qqb.andWhere('air.code', params.name);
+                            }
+                            else {
+                                qqb.andWhere('air.name', 'ilike', `%${params.name}%`);
+                            }
+                        }
+                    });
                 });
             }
             return { data, total: (_a = count[0]) === null || _a === void 0 ? void 0 : _a.total };

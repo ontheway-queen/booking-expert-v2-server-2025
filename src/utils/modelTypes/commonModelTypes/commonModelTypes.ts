@@ -18,6 +18,7 @@ export interface ICreateAirportPayload {
   iata_code: string;
   city?: number;
 }
+
 export interface IUpdateAirportPayload {
   country_id?: number;
   name?: string;
@@ -62,9 +63,9 @@ export interface IInsertLastNoPayload {
     | 'User_Tour'
     | 'User_Umrah'
     | 'User_SupportTicket'
-    |'ADM_Management'
-    |'Money_Receipt'
-    |'Invoice';
+    | 'ADM_Management'
+    | 'Money_Receipt'
+    | 'Invoice';
   last_updated: Date;
 }
 
@@ -83,15 +84,15 @@ export interface IGetLastIdParams {
     | 'Agent_GroupFare'
     | 'Agent_SupportTicket'
     | 'Agent_Hotel'
-    |'Agent_Deposit_Request'
+    | 'Agent_Deposit_Request'
     | 'User_Flight'
     | 'User_Visa'
     | 'User_Tour'
     | 'User_Umrah'
     | 'User_SupportTicket'
-    |'ADM_Management'
-    |'Money_Receipt'
-    |'Invoice';
+    | 'ADM_Management'
+    | 'Money_Receipt'
+    | 'Invoice';
 }
 
 export interface IGetLastIdData {
