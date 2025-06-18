@@ -35,7 +35,10 @@ import {
   IOriginDestinationInformationPayload,
   IPassengerTypeQuantityPayload,
 } from '../../../utils/supportTypes/flightTypes/commonFlightTypes';
-import { IAgentFlightTicketIssueReqBody } from '../utils/types/agentFlight.types';
+import {
+  IAgentFlightTicketIssueReqBody,
+  IAgentGetFlightBookingReqQuery,
+} from '../utils/types/agentFlight.types';
 import Lib from '../../../utils/lib/lib';
 
 export class AgentFlightService extends AbstractServices {
@@ -659,7 +662,8 @@ export class AgentFlightService extends AbstractServices {
     return await this.db.transaction(async (trx) => {
       const { agency_id } = req.agencyUser;
       const flightBookingModel = this.Model.FlightBookingModel(trx);
-      const query = req.query;
+      const query = req.query as IAgentGetFlightBookingReqQuery;
+
       const data = await flightBookingModel.getFlightBookingList(
         { ...query, source_id: agency_id, booked_by: SOURCE_AGENT },
         true

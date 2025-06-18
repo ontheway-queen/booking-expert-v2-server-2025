@@ -20,6 +20,8 @@ const wfttFlightSupport_service_1 = __importDefault(require("../../../utils/supp
 const uuid_1 = require("uuid");
 const redis_1 = require("../../../app/redis");
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
+const commonFlightSupport_service_1 = require("../../../utils/supportServices/flightSupportServices/commonFlightSupport.service");
+const constants_1 = require("../../../utils/miscellaneous/constants");
 class B2CFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -232,6 +234,123 @@ class B2CFlightService extends abstract_service_1.default {
                         });
                     }));
                 }
+            }));
+        });
+    }
+    getFlightFareRule(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { flight_id, search_id } = req.query;
+                //get data from redis using the search id
+                const retrievedData = yield (0, redis_1.getRedis)(search_id);
+                if (!retrievedData) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const retrieveResponse = retrievedData.response;
+                const foundItem = retrieveResponse.results.find((item) => item.flight_id === flight_id);
+                if (!foundItem) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                let res = false;
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: res ? res : flightConstent_1.FLIGHT_FARE_RESPONSE,
+                };
+            }));
+        });
+    }
+    flightRevalidate(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { flight_id, search_id } = req.query;
+                const b2cMarkupConfigModel = this.Model.B2CMarkupConfigModel(trx);
+                const markup_set = yield b2cMarkupConfigModel.getB2CMarkupConfigData('Flight');
+                if (!markup_set.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'No commission set has been found for the agency',
+                    };
+                }
+                const flight_markup_set = markup_set[0].markup_set_id;
+                //revalidate using the flight support service
+                const flightSupportService = new commonFlightSupport_service_1.CommonFlightSupportService(trx);
+                const data = yield flightSupportService.FlightRevalidate({
+                    search_id,
+                    flight_id,
+                    markup_set_id: flight_markup_set,
+                });
+                if (data === null || data === void 0 ? void 0 : data.revalidate_data) {
+                    yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
+                    return {
+                        success: true,
+                        message: 'Ticket has been revalidated successfully!',
+                        data: Object.assign(Object.assign({}, data.revalidate_data), { remaining_time: data.redis_remaining_time }),
+                        code: this.StatusCode.HTTP_OK,
+                    };
+                }
+                return {
+                    success: false,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                };
+            }));
+        });
+    }
+    getAllBookingList(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const flightBookingModel = this.Model.FlightBookingModel(trx);
+                const query = req.query;
+                const data = yield flightBookingModel.getFlightBookingList(Object.assign(Object.assign({}, query), { booked_by: constants_1.SOURCE_B2C }), true);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    total: data.total,
+                    data: data.data,
+                };
+            }));
+        });
+    }
+    getSingleBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { id } = req.params;
+                const flightBookingModel = this.Model.FlightBookingModel(trx);
+                const flightSegmentModel = this.Model.FlightBookingSegmentModel(trx);
+                const flightTravelerModel = this.Model.FlightBookingTravelerModel(trx);
+                const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(trx);
+                const booking_data = yield flightBookingModel.getSingleFlightBooking({
+                    id: Number(id),
+                    booked_by: constants_1.SOURCE_B2C,
+                });
+                if (!booking_data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const price_breakdown_data = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(Number(id));
+                const segment_data = yield flightSegmentModel.getFlightBookingSegment(Number(id));
+                const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(Number(id));
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    data: Object.assign(Object.assign({}, booking_data), { price_breakdown_data,
+                        segment_data,
+                        traveler_data }),
+                };
             }));
         });
     }

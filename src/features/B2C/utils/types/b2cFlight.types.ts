@@ -10,15 +10,9 @@ import {
   FLIGHT_BOOKING_VOID,
   FLIGHT_TICKET_IN_PROCESS,
   FLIGHT_TICKET_ISSUE,
-  PAYMENT_TYPE_FULL,
-  PAYMENT_TYPE_PARTIAL,
 } from '../../../../utils/miscellaneous/flightConstent';
 
-export interface IAgentFlightTicketIssueReqBody {
-  payment_type: typeof PAYMENT_TYPE_FULL | typeof PAYMENT_TYPE_PARTIAL;
-}
-
-export interface IAgentGetFlightBookingReqQuery {
+export interface IB2CGetFlightBookingReqQuery {
   status?:
     | typeof FLIGHT_BOOKING_REQUEST
     | typeof FLIGHT_BOOKING_CONFIRMED

@@ -3,18 +3,24 @@ import AbstractServices from '../../../abstract/abstract.service';
 import {
   IAirlineCodePayload,
   IFlightSearchReqBody,
+  IFormattedFlightItinerary,
   IOriginDestinationInformationPayload,
   IPassengerTypeQuantityPayload,
 } from '../../../utils/supportTypes/flightTypes/commonFlightTypes';
 import {
+  FLIGHT_FARE_RESPONSE,
+  FLIGHT_REVALIDATE_REDIS_KEY,
   SABRE_API,
   WFTT_API,
 } from '../../../utils/miscellaneous/flightConstent';
 import SabreFlightService from '../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service';
 import WfttFlightService from '../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service';
 import { v4 as uuidv4 } from 'uuid';
-import { setRedis } from '../../../app/redis';
+import { getRedis, setRedis } from '../../../app/redis';
 import Lib from '../../../utils/lib/lib';
+import { CommonFlightSupportService } from '../../../utils/supportServices/flightSupportServices/commonFlightSupport.service';
+import { SOURCE_B2C } from '../../../utils/miscellaneous/constants';
+import { IB2CGetFlightBookingReqQuery } from '../utils/types/b2cFlight.types';
 
 export class B2CFlightService extends AbstractServices {
   constructor() {
@@ -267,6 +273,166 @@ export class B2CFlightService extends AbstractServices {
           })
         );
       }
+    });
+  }
+
+  public async getFlightFareRule(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { flight_id, search_id } = req.query as {
+        flight_id: string;
+        search_id: string;
+      };
+      //get data from redis using the search id
+      const retrievedData = await getRedis(search_id);
+      if (!retrievedData) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      const retrieveResponse = retrievedData.response as {
+        results: IFormattedFlightItinerary[];
+      };
+      const foundItem = retrieveResponse.results.find(
+        (item) => item.flight_id === flight_id
+      );
+
+      if (!foundItem) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      let res: string | false = false;
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: res ? res : FLIGHT_FARE_RESPONSE,
+      };
+    });
+  }
+
+  public async flightRevalidate(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { flight_id, search_id } = req.query as {
+        flight_id: string;
+        search_id: string;
+      };
+
+      const b2cMarkupConfigModel = this.Model.B2CMarkupConfigModel(trx);
+      const markup_set = await b2cMarkupConfigModel.getB2CMarkupConfigData(
+        'Flight'
+      );
+
+      if (!markup_set.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'No commission set has been found for the agency',
+        };
+      }
+
+      const flight_markup_set = markup_set[0].markup_set_id;
+
+      //revalidate using the flight support service
+      const flightSupportService = new CommonFlightSupportService(trx);
+      const data: {
+        revalidate_data: IFormattedFlightItinerary | null;
+        redis_remaining_time: number;
+      } | null = await flightSupportService.FlightRevalidate({
+        search_id,
+        flight_id,
+        markup_set_id: flight_markup_set,
+      });
+
+      if (data?.revalidate_data) {
+        await setRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
+        return {
+          success: true,
+          message: 'Ticket has been revalidated successfully!',
+          data: {
+            ...data.revalidate_data,
+            remaining_time: data.redis_remaining_time,
+          },
+          code: this.StatusCode.HTTP_OK,
+        };
+      }
+
+      return {
+        success: false,
+        message: this.ResMsg.HTTP_NOT_FOUND,
+        code: this.StatusCode.HTTP_NOT_FOUND,
+      };
+    });
+  }
+
+  public async getAllBookingList(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const flightBookingModel = this.Model.FlightBookingModel(trx);
+      const query = req.query as IB2CGetFlightBookingReqQuery;
+      const data = await flightBookingModel.getFlightBookingList(
+        { ...query, booked_by: SOURCE_B2C },
+        true
+      );
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        total: data.total,
+        data: data.data,
+      };
+    });
+  }
+
+  public async getSingleBooking(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { id } = req.params;
+      const flightBookingModel = this.Model.FlightBookingModel(trx);
+      const flightSegmentModel = this.Model.FlightBookingSegmentModel(trx);
+      const flightTravelerModel = this.Model.FlightBookingTravelerModel(trx);
+      const flightPriceBreakdownModel =
+        this.Model.FlightBookingPriceBreakdownModel(trx);
+
+      const booking_data = await flightBookingModel.getSingleFlightBooking({
+        id: Number(id),
+        booked_by: SOURCE_B2C,
+      });
+
+      if (!booking_data) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      const price_breakdown_data =
+        await flightPriceBreakdownModel.getFlightBookingPriceBreakdown(
+          Number(id)
+        );
+      const segment_data = await flightSegmentModel.getFlightBookingSegment(
+        Number(id)
+      );
+      const traveler_data = await flightTravelerModel.getFlightBookingTraveler(
+        Number(id)
+      );
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        data: {
+          ...booking_data,
+          price_breakdown_data,
+          segment_data,
+          traveler_data,
+        },
+      };
     });
   }
 }

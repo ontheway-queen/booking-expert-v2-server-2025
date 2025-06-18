@@ -14,7 +14,7 @@ export default class B2CMarkupConfigModel extends Schema {
   }
 
   public async getB2CMarkupConfigData(
-    type?: 'Flight' | 'Hotel' | 'Both'
+    type: 'Flight' | 'Hotel' | 'Both'
   ): Promise<IGetB2CMarkupConfigData[]> {
     return await this.db('b2c_markup_config')
       .withSchema(this.DBO_SCHEMA)
@@ -29,7 +29,7 @@ export default class B2CMarkupConfigModel extends Schema {
         'b2c_markup_config.markup_set_id'
       )
       .where((qb) => {
-        if (type && type !== 'Both') {
+        if (type !== 'Both') {
           qb.where('markup_set.type', type);
         }
       });

@@ -25,7 +25,7 @@ class B2CMarkupConfigModel extends schema_1.default {
                 .select('b2c_markup_config.id', 'b2c_markup_config.markup_set_id', 'markup_set.name')
                 .leftJoin('markup_set', 'markup_set.id', 'b2c_markup_config.markup_set_id')
                 .where((qb) => {
-                if (type && type !== 'Both') {
+                if (type !== 'Both') {
                     qb.where('markup_set.type', type);
                 }
             });
