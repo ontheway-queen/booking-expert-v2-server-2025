@@ -129,4 +129,12 @@ export default class AgentHotelValidator {
       }
     }),
   });
+
+  public getHotelBooking = Joi.object({
+    filter: Joi.string().optional(),
+    from_date: Joi.date().optional(),
+    to_date: Joi.date().optional(),
+    limit: Joi.string().optional(),
+    skip: Joi.string().optional(),
+  });
 }

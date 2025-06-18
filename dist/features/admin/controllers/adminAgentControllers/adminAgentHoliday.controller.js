@@ -33,20 +33,20 @@ class AdminAgentHolidayController extends abstract_controller_1.default {
         this.service = new adminAgentHoliday_service_1.AdminAgentHolidayService();
         this.validator = new adminAgentHoliday_validator_1.AdminAgentHolidayValidator();
         this.getHolidayPackageBookingList = this.asyncWrapper.wrap({
-            querySchema: this.validator.holidayPackageBookingListFilterQuery
+            querySchema: this.validator.holidayPackageBookingListFilterQuery,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getHolidayPackageBookingList(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.getSingleHolidayPackageBooking = this.asyncWrapper.wrap({
-            paramSchema: this.commonValidator.singleParamNumValidator()
+            paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getSingleHolidayPackageBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.updateHolidayPackageBooking = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),
-            bodySchema: this.validator.holidayPackageUpdateSchema
+            bodySchema: this.validator.holidayPackageUpdateSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.updateHolidayPackageBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);

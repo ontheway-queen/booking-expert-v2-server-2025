@@ -336,8 +336,8 @@ class AgentPaymentsService extends abstract_service_1.default {
                     code: this.StatusCode.HTTP_OK,
                     data: {
                         available_balance,
-                        usable_load: usable_loan === null || usable_loan === void 0 ? void 0 : usable_loan.usable_loan
-                    }
+                        usable_load: usable_loan === null || usable_loan === void 0 ? void 0 : usable_loan.usable_loan,
+                    },
                 };
             }));
         });

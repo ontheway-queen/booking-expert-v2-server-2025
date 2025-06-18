@@ -21,6 +21,7 @@ export default class AgentHotelRouter extends AbstractRouter {
           this.fileFolders.AGENT_HOTEL_BOOKING_FILES
         ),
         this.controller.hotelBooking
-      );
+      )
+      .get(this.controller.getHotelBooking);
   }
 }

@@ -1,5 +1,5 @@
-type markup_type = "PER" | "FLAT";
-type markup_mode = "INCREASE" | "DECREASE";
+type markup_type = 'PER' | 'FLAT';
+type markup_mode = 'INCREASE' | 'DECREASE';
 export interface ICreateAgencyPayload {
   agency_logo: string;
   agent_no: string;
@@ -129,6 +129,7 @@ export interface ICheckAgencyData {
   flight_markup_set: number;
   hotel_markup_set: number;
   usable_loan: number;
+  kam_id?: number;
   address: string;
 }
 

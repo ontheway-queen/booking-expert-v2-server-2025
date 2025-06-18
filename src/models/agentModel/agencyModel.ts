@@ -123,6 +123,7 @@ export default class AgencyModel extends Schema {
         'agency_name',
         'agent_no',
         'status',
+        'kam_id',
         'white_label',
         'allow_api',
         'civil_aviation',

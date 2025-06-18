@@ -54,4 +54,28 @@ export default class AgentHotelController extends AbstractController {
       }
     }
   );
+  public getHotelBooking = this.asyncWrapper.wrap(
+    { querySchema: this.validator.getHotelBooking },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getHotelBooking(req);
+
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
+    }
+  );
+  public getSingleHotelBooking = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getHotelBooking(req);
+
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
+    }
+  );
 }

@@ -116,6 +116,13 @@ class AgentHotelValidator {
                 }
             }),
         });
+        this.getHotelBooking = joi_1.default.object({
+            filter: joi_1.default.string().optional(),
+            from_date: joi_1.default.date().optional(),
+            to_date: joi_1.default.date().optional(),
+            limit: joi_1.default.string().optional(),
+            skip: joi_1.default.string().optional(),
+        });
     }
 }
 exports.default = AgentHotelValidator;

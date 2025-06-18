@@ -43,7 +43,9 @@ export default class AgentProfileService extends AbstractServices {
     };
 
     if (user.white_label) {
-      const wPermissions = await AgentModel.getWhiteLabelPermission({agency_id});
+      const wPermissions = await AgentModel.getWhiteLabelPermission({
+        agency_id,
+      });
 
       if (wPermissions) {
         const { token, ...rest } = wPermissions;
@@ -169,6 +171,47 @@ export default class AgentProfileService extends AbstractServices {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.PASSWORD_CHANGED,
+    };
+  }
+
+  public async getDashboardData(req: Request) {
+    const { agency_id } = req.agencyUser;
+    const agencyModel = this.Model.AgencyModel();
+
+    const agency = await agencyModel.checkAgency({ agency_id });
+
+    const balance = await agencyModel.getAgencyBalance(agency_id);
+
+    const kam = {
+      name: 'Not available',
+      phone: 'Not available',
+      email: 'Not available',
+    };
+
+    if (agency?.kam_id) {
+      const adminModel = this.Model.AdminModel();
+
+      const admin = await adminModel.getSingleAdmin({ id: agency.kam_id });
+
+      if (admin) {
+        kam.email = admin.email;
+        kam.name = admin.name;
+        kam.phone = admin.phone_number;
+      }
+    }
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: {
+        balance: {
+          balance,
+          usable_loan: agency?.usable_loan,
+        },
+        kam,
+        dashboard: {},
+      },
     };
   }
 }

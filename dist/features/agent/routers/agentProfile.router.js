@@ -19,6 +19,7 @@ class AgentProfileRouter extends abstract_router_1.default {
             .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_USER, ['photo']), this.controller.updateProfile);
         // Change Password
         this.router.route('/change-password').post(this.controller.changePassword);
+        this.router.route('/dashboard').get(this.controller.getDashboardData);
     }
 }
 exports.default = AgentProfileRouter;

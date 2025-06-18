@@ -53,7 +53,9 @@ class AgentProfileService extends abstract_service_1.default {
                 blog: false,
             };
             if (user.white_label) {
-                const wPermissions = yield AgentModel.getWhiteLabelPermission({ agency_id });
+                const wPermissions = yield AgentModel.getWhiteLabelPermission({
+                    agency_id,
+                });
                 if (wPermissions) {
                     const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
                     whiteLabelPermissions = rest;
@@ -160,6 +162,41 @@ class AgentProfileService extends abstract_service_1.default {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.PASSWORD_CHANGED,
+            };
+        });
+    }
+    getDashboardData(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const agencyModel = this.Model.AgencyModel();
+            const agency = yield agencyModel.checkAgency({ agency_id });
+            const balance = yield agencyModel.getAgencyBalance(agency_id);
+            const kam = {
+                name: 'Not available',
+                phone: 'Not available',
+                email: 'Not available',
+            };
+            if (agency === null || agency === void 0 ? void 0 : agency.kam_id) {
+                const adminModel = this.Model.AdminModel();
+                const admin = yield adminModel.getSingleAdmin({ id: agency.kam_id });
+                if (admin) {
+                    kam.email = admin.email;
+                    kam.name = admin.name;
+                    kam.phone = admin.phone_number;
+                }
+            }
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: {
+                    balance: {
+                        balance,
+                        usable_loan: agency === null || agency === void 0 ? void 0 : agency.usable_loan,
+                    },
+                    kam,
+                    dashboard: {},
+                },
             };
         });
     }

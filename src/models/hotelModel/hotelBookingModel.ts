@@ -4,6 +4,8 @@ import Schema from '../../utils/miscellaneous/schema';
 import {
   IGetBookingModelData,
   IGetBookingModelQuery,
+  IGetSingleBookingModelData,
+  IGetSingleBookingModelParams,
   IInsertHotelBookingCancellationPayload,
   IInsertHotelBookingPayload,
   IInsertHotelBookingTravelerPayload,
@@ -139,5 +141,31 @@ export default class HotelBookingModel extends Schema {
     };
   }
 
-  public async getSingleBooking() {}
+  public async getSingleBooking({
+    source_type,
+    booking_id,
+  }: IGetSingleBookingModelParams): Promise<IGetSingleBookingModelData | null> {
+    return await this.db('hotel_booking AS hb')
+      .withSchema(this.DBO_SCHEMA)
+      .select(
+        'hb.id',
+        'hb.booking_ref',
+        'hb.hotel_code',
+        'hb.hotel_name',
+        'hb.sell_price',
+        'hb.checkin_date',
+        'hb.checkout_date',
+        'hb.status',
+        'hb.finalized',
+        'hb.created_at'
+      )
+      .where((qb) => {
+        if (source_type !== 'ALL') {
+          qb.andWhere('hb.source_type', source_type);
+        }
+
+        qb.andWhere('hb.id', booking_id);
+      })
+      .first();
+  }
 }

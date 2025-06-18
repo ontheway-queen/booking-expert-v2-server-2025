@@ -39,4 +39,12 @@ export default class AgentProfileController extends AbstractController {
       res.status(code).json(data);
     }
   );
+
+  public getDashboardData = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getDashboardData(req);
+      res.status(code).json(data);
+    }
+  );
 }

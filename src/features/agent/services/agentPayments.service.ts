@@ -416,9 +416,9 @@ export class AgentPaymentsService extends AbstractServices {
         code: this.StatusCode.HTTP_OK,
         data: {
           available_balance,
-          usable_load: usable_loan?.usable_loan
-        }
-      }
+          usable_load: usable_loan?.usable_loan,
+        },
+      };
     });
   }
 }

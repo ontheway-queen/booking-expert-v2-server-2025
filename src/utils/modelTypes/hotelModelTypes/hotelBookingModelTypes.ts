@@ -82,8 +82,31 @@ export interface IGetBookingModelData {
   total?: number;
 }
 
+export interface IGetSingleBookingModelData {
+  id: number;
+  booking_ref: string;
+  hotel_code: number;
+  sell_price: string;
+  checkin_date: string;
+  checkout_date: string;
+  status: string;
+  finalized: boolean;
+  created_at: string;
+}
+
 export interface IInsertHotelBookingCancellationPayload {
   booking_id: number;
   from_date: string;
   fee: number;
+}
+
+export interface IGetSingleBookingModelParams {
+  source_type:
+    | typeof SOURCE_AGENT
+    | typeof SOURCE_B2C
+    | typeof SOURCE_EXTERNAL
+    | typeof SOURCE_SUB_AGENT
+    | typeof SOURCE_AGENT_B2C
+    | 'ALL';
+  booking_id: number;
 }

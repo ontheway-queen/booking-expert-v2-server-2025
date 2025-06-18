@@ -45,3 +45,11 @@ export interface IAgencyGetHotelSearchHistoryReqQuery {
   from_date?: string;
   to_date?: string;
 }
+
+export interface IAgencyGetHotelBookingQuery {
+  limit?: string;
+  skip?: string;
+  filter?: string;
+  from_date?: string;
+  to_date?: string;
+}
