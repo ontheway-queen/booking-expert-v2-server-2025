@@ -20,13 +20,18 @@ class AgentFlightRouter extends abstract_router_1.default {
         this.router.route('/revalidate').get(this.controller.flightRevalidate);
         this.router
             .route('/booking')
-            .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENT_FLIGHT_BOOKING_FILES), this.controller.flightBooking)
+            // .post(
+            //   this.uploader.cloudUploadRaw(
+            //     this.fileFolders.AGENT_FLIGHT_BOOKING_FILES
+            //   ),
+            //   this.controller.flightBooking
+            // )
             .get(this.controller.getAllBookingList);
         this.router.route('/booking/:id').get(this.controller.getSingleBooking);
-        this.router.route('/booking/:id/issue').post(this.controller.issueTicket);
-        this.router
-            .route('/booking/:id/cancel')
-            .post(this.controller.cancelBooking);
+        // this.router.route('/booking/:id/issue').post(this.controller.issueTicket);
+        // this.router
+        //   .route('/booking/:id/cancel')
+        //   .post(this.controller.cancelBooking);
     }
 }
 exports.default = AgentFlightRouter;
