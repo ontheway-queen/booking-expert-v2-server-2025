@@ -12,7 +12,9 @@ class AdminAgentAgencyRouter extends abstract_router_1.default {
         this.callRouter();
     }
     callRouter() {
-        this.router.route('/').get(this.controller.getAgency)
+        this.router
+            .route('/')
+            .get(this.controller.getAgency)
             .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_FILES, [
             'agency_logo',
             'civil_aviation',

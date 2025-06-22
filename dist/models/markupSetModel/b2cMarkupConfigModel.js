@@ -22,7 +22,7 @@ class B2CMarkupConfigModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('b2c_markup_config')
                 .withSchema(this.DBO_SCHEMA)
-                .select('b2c_markup_config.id', 'b2c_markup_config.markup_set_id', 'markup_set.name')
+                .select('b2c_markup_config.id', 'b2c_markup_config.markup_set_id', 'b2c_markup_config.type', 'markup_set.name')
                 .leftJoin('markup_set', 'markup_set.id', 'b2c_markup_config.markup_set_id')
                 .where((qb) => {
                 if (type !== 'Both') {
@@ -36,8 +36,8 @@ class B2CMarkupConfigModel extends schema_1.default {
             //update
             const res = yield this.db('b2c_markup_config')
                 .withSchema(this.DBO_SCHEMA)
-                .update(payload.markup_set_id)
-                .where('name', payload.name);
+                .update('markup_set_id', payload.markup_set_id)
+                .where('type', payload.type);
             //if update is not successful then insert
             if (!res) {
                 yield this.db('b2c_markup_config')

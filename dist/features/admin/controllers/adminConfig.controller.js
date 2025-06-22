@@ -102,6 +102,14 @@ class AdminConfigController extends abstract_controller_1.default {
             const _a = yield this.service.deleteAirlines(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
+        this.getB2CMarkupSet = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getB2CMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.updateB2CMarkupSet = this.asyncWrapper.wrap({ bodySchema: this.validator.updateB2CMarkupSet }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.updateB2CMarkupConfig(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
     }
 }
 exports.default = AdminConfigController;

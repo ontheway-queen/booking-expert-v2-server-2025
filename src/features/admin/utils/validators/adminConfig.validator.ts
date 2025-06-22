@@ -15,7 +15,7 @@ export default class AdminConfigValidator {
 
   public createCity = Joi.object({
     country_id: Joi.number().required(),
-    name: Joi.number().required(),
+    name: Joi.string().required(),
     code: Joi.string().optional(),
     lat: Joi.string().optional(),
     lng: Joi.string().optional(),
@@ -23,7 +23,7 @@ export default class AdminConfigValidator {
 
   public updateCity = Joi.object({
     country_id: Joi.number().optional(),
-    name: Joi.number().optional(),
+    name: Joi.string().optional(),
     code: Joi.string().optional(),
     lat: Joi.string().optional(),
     lng: Joi.string().optional(),
@@ -82,5 +82,10 @@ export default class AdminConfigValidator {
   public createAirlines = Joi.object({
     name: Joi.string().required(),
     code: Joi.string().required(),
+  });
+
+  public updateB2CMarkupSet = Joi.object({
+    flight_set_id: Joi.number().optional(),
+    hotel_set_id: Joi.number().optional(),
   });
 }

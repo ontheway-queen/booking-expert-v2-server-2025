@@ -12,6 +12,7 @@ import {
   ICreateAirlinesPayload,
   IUpdateAirlinesPayload,
 } from '../../../utils/modelTypes/commonModelTypes/commonModelTypes';
+import { get } from 'http';
 
 export class AdminConfigService extends AbstractServices {
   public async checkSlug(req: Request) {
@@ -50,12 +51,13 @@ export class AdminConfigService extends AbstractServices {
   //get all city
   public async getAllCity(req: Request) {
     const model = this.Model.CommonModel();
-    const city_list = await model.getCity(req.query);
+    const city_list = await model.getCity(req.query, true);
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: city_list,
+      data: city_list.data,
+      total: city_list.total,
     };
   }
 
@@ -109,13 +111,14 @@ export class AdminConfigService extends AbstractServices {
   //get all airport
   public async getAllAirport(req: Request) {
     const model = this.Model.CommonModel();
-    const get_airport = await model.getAirport(req.query);
+    const get_airport = await model.getAirport(req.query, true);
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
       data: get_airport.data,
+      total: get_airport.total,
     };
   }
 
@@ -187,13 +190,14 @@ export class AdminConfigService extends AbstractServices {
 
   public async getAllAirlines(req: Request) {
     const model = this.Model.CommonModel();
-    const get_airlines = await model.getAirlines(req.query, false);
+    const get_airlines = await model.getAirlines(req.query, true);
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
       data: get_airlines.data,
+      total: get_airlines.total,
     };
   }
 
@@ -281,6 +285,87 @@ export class AdminConfigService extends AbstractServices {
     if (check.logo) {
       await this.manageFile.deleteFromCloud([check.logo]);
     }
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+    };
+  }
+
+  // get b2c markup
+  public async getB2CMarkupSet(_req: Request) {
+    const model = this.Model.B2CMarkupConfigModel();
+    const b2c_markup = await model.getB2CMarkupConfigData('Both');
+
+    const data: any = {};
+
+    b2c_markup.forEach((markup) => {
+      if (markup.type === 'Flight') {
+        data.flight_markup_set = { ...markup };
+      }
+      if (markup.type === 'Hotel') {
+        data.hotel_markup_set = { ...markup };
+      }
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data,
+    };
+  }
+
+  // UPDATE B2C MARKUP
+  public async updateB2CMarkupConfig(req: Request) {
+    const body = req.body as {
+      flight_set_id?: number;
+      hotel_set_id?: number;
+    };
+
+    const B2CMarkupConfigModel = this.Model.B2CMarkupConfigModel();
+    const markupSetModel = this.Model.MarkupSetModel();
+
+    if (body.flight_set_id) {
+      // Check if the markup set exists
+      const existingFlightMarkupSet = await markupSetModel.getSingleMarkupSet({
+        id: body.flight_set_id,
+      });
+
+      if (!existingFlightMarkupSet) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: 'Flight markup set not found.',
+        };
+      }
+
+      await B2CMarkupConfigModel.upsertB2CMarkupConfig({
+        type: 'Flight',
+        markup_set_id: body.flight_set_id,
+      });
+    }
+
+    if (body.hotel_set_id) {
+      // Check if the markup set exists
+      const existingHotelMarkupSet = await markupSetModel.getSingleMarkupSet({
+        id: body.hotel_set_id,
+      });
+
+      if (!existingHotelMarkupSet) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: 'Hotel markup set not found.',
+        };
+      }
+
+      await B2CMarkupConfigModel.upsertB2CMarkupConfig({
+        type: 'Hotel',
+        markup_set_id: body.hotel_set_id,
+      });
+    }
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,

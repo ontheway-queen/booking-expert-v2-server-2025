@@ -129,4 +129,20 @@ export default class AdminConfigController extends AbstractController {
       res.status(code).json(data);
     }
   );
+
+  public getB2CMarkupSet = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getB2CMarkupSet(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public updateB2CMarkupSet = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.updateB2CMarkupSet },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.updateB2CMarkupConfig(req);
+      res.status(code).json(data);
+    }
+  );
 }

@@ -7,7 +7,14 @@ import FlightUtils from '../../lib/flight/flightUtils';
 import SabreRequests from '../../lib/flight/sabreRequest';
 import Lib from '../../lib/lib';
 
-import { FLIGHT_BOOKING_CANCELLED, FLIGHT_BOOKING_REFUNDED, FLIGHT_BOOKING_VOID, FLIGHT_TICKET_ISSUE, SABRE_API, SABRE_FLIGHT_ITINS } from '../../miscellaneous/flightConstent';
+import {
+  FLIGHT_BOOKING_CANCELLED,
+  FLIGHT_BOOKING_REFUNDED,
+  FLIGHT_BOOKING_VOID,
+  FLIGHT_TICKET_ISSUE,
+  SABRE_API,
+  SABRE_FLIGHT_ITINS,
+} from '../../miscellaneous/flightConstent';
 
 import {
   ERROR_LEVEL_WARNING,
@@ -17,8 +24,28 @@ import {
 } from '../../miscellaneous/constants';
 import SabreAPIEndpoints from '../../miscellaneous/endpoints/sabreApiEndpoints';
 import { BD_AIRPORT } from '../../miscellaneous/staticData';
-import { IFormattedFlight, IFormattedFlightItinerary, IFlightSearchReqBody, IFlightAvailability, IFlightDataAvailabilitySegment } from '../../supportTypes/flightTypes/commonFlightTypes';
-import { IBaggageAndAvailabilityAllSeg, IBaggageAndAvailabilityAllSegSegmentDetails, IContactNumber, IFormattedArrival, IFormattedCarrier, IFormattedDeparture, IFormattedLegDesc, IFormattedScheduleDesc, ILegDescOption, ISabreNewPassenger, ISabreResponseResult, ISecureFlight, OriginDestinationInformation } from '../../supportTypes/flightTypes/sabreFlightTypes';
+import {
+  IFormattedFlight,
+  IFormattedFlightItinerary,
+  IFlightSearchReqBody,
+  IFlightAvailability,
+  IFlightDataAvailabilitySegment,
+} from '../../supportTypes/flightTypes/commonFlightTypes';
+import {
+  IBaggageAndAvailabilityAllSeg,
+  IBaggageAndAvailabilityAllSegSegmentDetails,
+  IContactNumber,
+  IFormattedArrival,
+  IFormattedCarrier,
+  IFormattedDeparture,
+  IFormattedLegDesc,
+  IFormattedScheduleDesc,
+  ILegDescOption,
+  ISabreNewPassenger,
+  ISabreResponseResult,
+  ISecureFlight,
+  OriginDestinationInformation,
+} from '../../supportTypes/flightTypes/sabreFlightTypes';
 import { CommonFlightSupportService } from './commonFlightSupport.service';
 import { IFlightBookingRequestBody } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
 export default class SabreFlightService extends AbstractServices {
@@ -29,7 +56,6 @@ export default class SabreFlightService extends AbstractServices {
     super();
     this.trx = trx;
   }
-
 
   ////////////==================FLIGHT SEARCH (START)=========================///////////
   // Flight Search Request formatter
@@ -150,9 +176,9 @@ export default class SabreFlightService extends AbstractServices {
     booking_block: boolean;
     markup_amount?: {
       markup: number;
-      markup_type: "PER" | "FLAT";
-      markup_mode: "INCREASE" | "DECREASE";
-    }
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
   }) {
     const flightRequestBody = await this.FlightReqFormatterV5(
       reqBody,
@@ -189,7 +215,7 @@ export default class SabreFlightService extends AbstractServices {
     reqBody,
     markup_set_id,
     flight_id,
-    markup_amount
+    markup_amount,
   }: {
     data: ISabreResponseResult;
     reqBody: IFlightSearchReqBody;
@@ -199,9 +225,9 @@ export default class SabreFlightService extends AbstractServices {
     flight_id?: string;
     markup_amount?: {
       markup: number;
-      markup_type: "PER" | "FLAT";
-      markup_mode: "INCREASE" | "DECREASE";
-    }
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
   }) {
     const commonModel = this.Model.CommonModel(this.trx);
     const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
@@ -221,12 +247,17 @@ export default class SabreFlightService extends AbstractServices {
     const scheduleDesc: IFormattedScheduleDesc[] = [];
 
     for (const item of data.scheduleDescs) {
-      const dAirport = await commonModel.getAirport({ code: item.departure.airport });
-      const AAirport = await commonModel.getAirport({ code: item.arrival.airport });
+      const dAirport = await commonModel.getAirport({
+        code: item.departure.airport,
+      });
+      const AAirport = await commonModel.getAirport({
+        code: item.arrival.airport,
+      });
       const DCity = await commonModel.getCity({ code: item.departure.city });
       const ACity = await commonModel.getCity({ code: item.arrival.city });
       const marketing_airline = await commonModel.getAirlines(
-        { code: item.carrier.marketing }, false
+        { code: item.carrier.marketing },
+        false
       );
       const aircraft = await commonModel.getAircraft(
         item.carrier.equipment.code
@@ -235,15 +266,16 @@ export default class SabreFlightService extends AbstractServices {
 
       if (item.carrier.marketing !== item.carrier.operating) {
         operating_airline = await commonModel.getAirlines(
-          { code: item.carrier.operating }, false
+          { code: item.carrier.operating },
+          false
         );
       }
 
       const departure: IFormattedDeparture = {
         airport_code: item.departure.airport,
         city_code: item.departure.city,
-        airport: dAirport.data?.[0]?.name || "-",
-        city: DCity?.[0]?.name || "-",
+        airport: dAirport.data?.[0]?.name || '-',
+        city: DCity.data?.[0]?.name || '-',
         country: item.departure.country,
         terminal: item.departure.terminal,
         time: item.departure.time,
@@ -252,8 +284,8 @@ export default class SabreFlightService extends AbstractServices {
       };
 
       const arrival: IFormattedArrival = {
-        airport: AAirport.data?.[0]?.name || "-",
-        city: ACity?.[0]?.name || "-",
+        airport: AAirport.data?.[0]?.name || '-',
+        city: ACity.data?.[0]?.name || '-',
         airport_code: item.arrival.airport,
         city_code: item.arrival.city,
         country: item.arrival.country,
@@ -265,13 +297,17 @@ export default class SabreFlightService extends AbstractServices {
 
       const carrier: IFormattedCarrier = {
         carrier_marketing_code: item.carrier.marketing,
-        carrier_marketing_airline: marketing_airline.data?.[0]?.name || "-",
-        carrier_marketing_logo: marketing_airline.data?.[0]?.logo || "-",
-        carrier_marketing_flight_number: String(item.carrier.marketingFlightNumber),
+        carrier_marketing_airline: marketing_airline.data?.[0]?.name || '-',
+        carrier_marketing_logo: marketing_airline.data?.[0]?.logo || '-',
+        carrier_marketing_flight_number: String(
+          item.carrier.marketingFlightNumber
+        ),
         carrier_operating_code: item.carrier.operating,
-        carrier_operating_airline: operating_airline.data?.[0]?.name || "-",
-        carrier_operating_logo: operating_airline.data?.[0]?.logo || "-",
-        carrier_operating_flight_number: String(item.carrier.operatingFlightNumber),
+        carrier_operating_airline: operating_airline.data?.[0]?.name || '-',
+        carrier_operating_logo: operating_airline.data?.[0]?.logo || '-',
+        carrier_operating_flight_number: String(
+          item.carrier.operatingFlightNumber
+        ),
         carrier_aircraft_code: aircraft.code,
         carrier_aircraft_name: aircraft.name,
       };
@@ -344,8 +380,12 @@ export default class SabreFlightService extends AbstractServices {
             const segd = pfd.segments[j];
             const segment = segd?.segment;
             if (segment !== undefined) {
-              const meal_type = this.flightUtils.getMeal(segment?.mealCode || '');
-              const cabin_type = this.flightUtils.getCabin(segment?.cabinCode || '');
+              const meal_type = this.flightUtils.getMeal(
+                segment?.mealCode || ''
+              );
+              const cabin_type = this.flightUtils.getCabin(
+                segment?.cabinCode || ''
+              );
               segments.push({
                 id: j + 1,
                 name: `Segment-${j + 1}`,
@@ -399,15 +439,15 @@ export default class SabreFlightService extends AbstractServices {
             segments,
             baggage: newBaggage?.id
               ? {
-                id: newBaggage?.id,
-                unit: newBaggage.unit || 'pieces',
-                count: newBaggage.weight || newBaggage.pieceCount,
-              }
+                  id: newBaggage?.id,
+                  unit: newBaggage.unit || 'pieces',
+                  count: newBaggage.weight || newBaggage.pieceCount,
+                }
               : {
-                id: 1,
-                unit: 'N/A',
-                count: 'N/A',
-              },
+                  id: 1,
+                  unit: 'N/A',
+                  count: 'N/A',
+                },
           });
           segments = [];
         }
@@ -439,7 +479,8 @@ export default class SabreFlightService extends AbstractServices {
       );
 
       const validatingCarrier = await commonModel.getAirlines(
-        { code: fare.validatingCarrierCode }, false
+        { code: fare.validatingCarrierCode },
+        false
       );
 
       // Markup data
@@ -542,7 +583,12 @@ export default class SabreFlightService extends AbstractServices {
         }
       }
 
-      const ait = Math.round(((Number(fare.totalFare.equivalentAmount) + Number(fare.totalFare.totalTaxAmount)) / 100) * 0.3);
+      const ait = Math.round(
+        ((Number(fare.totalFare.equivalentAmount) +
+          Number(fare.totalFare.totalTaxAmount)) /
+          100) *
+          0.3
+      );
       const new_fare = {
         base_fare: fare.totalFare.equivalentAmount,
         total_tax: Number(fare.totalFare.totalTaxAmount),
@@ -575,9 +621,17 @@ export default class SabreFlightService extends AbstractServices {
       //add addition markup(applicable for sub agent/agent b2c)
       if (markup_amount) {
         if (markup_amount.markup_mode === 'INCREASE') {
-          new_fare.convenience_fee += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(new_fare.total_price) * Number(markup_amount.markup)) / 100;
+          new_fare.convenience_fee +=
+            markup_amount.markup_type === 'FLAT'
+              ? Number(markup_amount.markup)
+              : (Number(new_fare.total_price) * Number(markup_amount.markup)) /
+                100;
         } else {
-          new_fare.discount += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(new_fare.total_price) * Number(markup_amount.markup)) / 100;
+          new_fare.discount +=
+            markup_amount.markup_type === 'FLAT'
+              ? Number(markup_amount.markup)
+              : (Number(new_fare.total_price) * Number(markup_amount.markup)) /
+                100;
         }
       }
       new_fare.payable =
@@ -685,14 +739,18 @@ export default class SabreFlightService extends AbstractServices {
         booking_block,
         domestic_flight,
         price_changed: false,
-        direct_ticket_issue: new CommonFlightSupportService().checkDirectTicketIssue({ journey_date: reqBody.OriginDestinationInformation[0].DepartureDateTime }),
+        direct_ticket_issue:
+          new CommonFlightSupportService().checkDirectTicketIssue({
+            journey_date:
+              reqBody.OriginDestinationInformation[0].DepartureDateTime,
+          }),
         journey_type: reqBody.JourneyType,
         api: SABRE_API,
         fare: new_fare,
         refundable,
         carrier_code: fare.validatingCarrierCode,
-        carrier_name: validatingCarrier.data?.[0]?.name || "-",
-        carrier_logo: validatingCarrier.data?.[0]?.logo || "-",
+        carrier_name: validatingCarrier.data?.[0]?.name || '-',
+        carrier_logo: validatingCarrier.data?.[0]?.logo || '-',
         ticket_last_date: fare.lastTicketDate,
         ticket_last_time: fare.lastTicketTime,
         flights: legsDesc,
@@ -718,7 +776,7 @@ export default class SabreFlightService extends AbstractServices {
     set_flight_api_id,
     flight_id,
     booking_block,
-    markup_amount
+    markup_amount,
   }: {
     reqBody: IFlightSearchReqBody;
     retrieved_response: IFormattedFlightItinerary;
@@ -728,9 +786,9 @@ export default class SabreFlightService extends AbstractServices {
     booking_block: boolean;
     markup_amount?: {
       markup: number;
-      markup_type: "PER" | "FLAT";
-      markup_mode: "INCREASE" | "DECREASE";
-    }
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
   }) {
     const revalidate_req_body = await this.RevalidateFlightReqFormatter(
       reqBody,
@@ -764,7 +822,7 @@ export default class SabreFlightService extends AbstractServices {
       data: response.groupedItineraryResponse,
       markup_set_id,
       flight_id,
-      markup_amount
+      markup_amount,
     });
 
     return data[0];
@@ -777,7 +835,7 @@ export default class SabreFlightService extends AbstractServices {
   ) {
     let cabin = 'Y';
     switch (
-    reqBody.OriginDestinationInformation[0]?.TPA_Extensions?.CabinPref?.Cabin
+      reqBody.OriginDestinationInformation[0]?.TPA_Extensions?.CabinPref?.Cabin
     ) {
       case '1':
         cabin = 'Y';
@@ -948,7 +1006,7 @@ export default class SabreFlightService extends AbstractServices {
     const monthDiff = (date: string | Date): string => {
       const diff = Math.ceil(
         (new Date().getTime() - new Date(date).getTime()) /
-        (1000 * 60 * 60 * 24 * 30)
+          (1000 * 60 * 60 * 24 * 30)
       );
       return String(diff).padStart(2, '0');
     };
@@ -1019,8 +1077,8 @@ export default class SabreFlightService extends AbstractServices {
               item.type === 'INF' && item.gender === 'Male'
                 ? 'MI'
                 : item.type === 'INF' && item.gender === 'Female'
-                  ? 'FI'
-                  : item.gender[0],
+                ? 'FI'
+                : item.gender[0],
             GivenName: item.first_name,
             Surname: item.last_name,
           },
@@ -1095,8 +1153,8 @@ export default class SabreFlightService extends AbstractServices {
                 item.type === 'INF' && item.gender === 'Male'
                   ? 'MI'
                   : item.type === 'INF' && item.gender === 'Female'
-                    ? 'FI'
-                    : item.gender[0],
+                  ? 'FI'
+                  : item.gender[0],
               GivenName: item.first_name,
               Surname: item.last_name,
               DateOfBirth: String(item.date_of_birth)?.split('T')[0],
@@ -1112,8 +1170,8 @@ export default class SabreFlightService extends AbstractServices {
             item.type === 'INF'
               ? 'I' + monthDiff(item.date_of_birth)
               : item.type === 'ADT'
-                ? ''
-                : item.type,
+              ? ''
+              : item.type,
           GivenName: item.first_name + ' ' + item.reference,
           Surname: item.last_name,
           PassengerType: item.type,
@@ -1318,7 +1376,10 @@ export default class SabreFlightService extends AbstractServices {
       requestBody
     );
     if (!response) {
-      throw new CustomError('Something went wrong. Please try again later', 500);
+      throw new CustomError(
+        'Something went wrong. Please try again later',
+        500
+      );
     }
     if (
       response?.CreatePassengerNameRecordRS?.ApplicationResults?.status !==
@@ -1344,9 +1405,9 @@ export default class SabreFlightService extends AbstractServices {
           api: SABRE_API,
           endpoint: SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
           payload: requestBody,
-          response: response?.CreatePassengerNameRecordRS?.ApplicationResults
+          response: response?.CreatePassengerNameRecordRS?.ApplicationResults,
         }
-      )
+      );
       // return {
       //   success: false,
       //   code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -1496,7 +1557,7 @@ export default class SabreFlightService extends AbstractServices {
           endpoint: SabreAPIEndpoints.TICKET_ISSUE_ENDPOINT,
           payload: ticketReqBody,
           response: response,
-        }
+        },
       });
       // return {
       //   success: false,
@@ -1521,11 +1582,7 @@ export default class SabreFlightService extends AbstractServices {
   }
 
   //sabre booking cancel service
-  public async SabreBookingCancelService({
-    pnr
-  }: {
-    pnr: string;
-  }) {
+  public async SabreBookingCancelService({ pnr }: { pnr: string }) {
     //cancel booking req formatter
     const cancelBookingBody = this.SabreBookingCancelReqFormatter(pnr);
     const response = await this.request.postRequest(
@@ -1652,5 +1709,4 @@ export default class SabreFlightService extends AbstractServices {
     };
   }
   /////==================GET BOOKING(END)=========================//////////////
-
 }

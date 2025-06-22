@@ -6,13 +6,13 @@ export interface IWFTTFlightSearchResBody {
 
 interface IWFTTFLightSearchData {
   search_id: string;
-  journey_type: "1" | "2" | "3";
+  journey_type: '1' | '2' | '3';
   leg_descriptions: {
     departureDate: string;
     departureLocation: string;
     arrivalLocation: string;
   }[];
-  total: number
+  total: number;
   results: IWFTTFlightSearchResults[];
 }
 
@@ -33,7 +33,7 @@ export interface IWFTTFlightSearchResults {
   booking_block: boolean;
   direct_ticket_issue: boolean;
   isDomesticFlight: boolean;
-  journey_type: "1" | "2" | "3";
+  journey_type: '1' | '2' | '3';
   api: string;
   fare: IWFTTFormattedFare;
   refundable: boolean;

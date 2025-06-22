@@ -64,19 +64,19 @@ export default class PublicCommonService extends AbstractServices {
   //get all city
   public async getAllCity(req: Request) {
     const model = this.Model.CommonModel();
-    const city_list = await model.getCity(req.query);
+    const city_list = await model.getCity(req.query, false);
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: city_list,
+      data: city_list.data,
     };
   }
 
   //get all airport
   public async getAllAirport(req: Request) {
     const model = this.Model.CommonModel();
-    const get_airport = await model.getAirport(req.query);
+    const get_airport = await model.getAirport(req.query, false);
 
     return {
       success: true,

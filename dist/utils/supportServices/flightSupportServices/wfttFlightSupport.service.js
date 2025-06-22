@@ -40,7 +40,7 @@ class WfttFlightService extends abstract_service_1.default {
     }
     // Flight search service
     FlightSearch(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, markup_set_id, markup_amount }) {
+        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, markup_set_id, markup_amount, }) {
             const response = yield this.request.postRequest(wfttApiEndpoints_1.default.FLIGHT_SEARCH_ENDPOINT, reqBody);
             // return [response];
             if (!response) {
@@ -54,14 +54,14 @@ class WfttFlightService extends abstract_service_1.default {
                 reqBody: reqBody,
                 set_flight_api_id,
                 search_id: response.data.search_id,
-                markup_amount
+                markup_amount,
             });
             return result;
         });
     }
     // Flight search response formatter
     FlightSearchResFormatter(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ data, reqBody, set_flight_api_id, search_id, markup_amount }) {
+        return __awaiter(this, arguments, void 0, function* ({ data, reqBody, set_flight_api_id, search_id, markup_amount, }) {
             // const result: IFormattedFlightItinerary[] = [];
             const airports = [];
             const OriginDest = reqBody.OriginDestinationInformation;
@@ -70,7 +70,7 @@ class WfttFlightService extends abstract_service_1.default {
                 airports.push(item.DestinationLocation.LocationCode);
             });
             const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
-            return yield Promise.all(data.map((item) => __awaiter(this, void 0, void 0, function* () {
+            return (yield Promise.all(data.map((item) => __awaiter(this, void 0, void 0, function* () {
                 const domestic_flight = item.isDomesticFlight;
                 let fare = {
                     base_fare: item.fare.base_fare,
@@ -158,10 +158,18 @@ class WfttFlightService extends abstract_service_1.default {
                 //add addition markup(applicable for sub agent/agent b2c)
                 if (markup_amount) {
                     if (markup_amount.markup_mode === 'INCREASE') {
-                        fare.convenience_fee += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(fare.total_price) * Number(markup_amount.markup)) / 100;
+                        fare.convenience_fee +=
+                            markup_amount.markup_type === 'FLAT'
+                                ? Number(markup_amount.markup)
+                                : (Number(fare.total_price) * Number(markup_amount.markup)) /
+                                    100;
                     }
                     else {
-                        fare.discount += markup_amount.markup_type === 'FLAT' ? Number(markup_amount.markup) : (Number(fare.total_price) * Number(markup_amount.markup)) / 100;
+                        fare.discount +=
+                            markup_amount.markup_type === 'FLAT'
+                                ? Number(markup_amount.markup)
+                                : (Number(fare.total_price) * Number(markup_amount.markup)) /
+                                    100;
                     }
                 }
                 fare.payable =
@@ -169,14 +177,15 @@ class WfttFlightService extends abstract_service_1.default {
                         Number(fare.convenience_fee) -
                         Number(fare.discount);
                 const { isDomesticFlight, fare: wftt_fare, api, api_search_id } = item, rest = __rest(item, ["isDomesticFlight", "fare", "api", "api_search_id"]);
+                // const career =
                 return Object.assign(Object.assign({ domestic_flight,
                     fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API }, rest), { leg_description: [] });
-            })));
+            }))));
         });
     }
     //Revalidate service
     FlightRevalidate(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ reqBody, revalidate_body, set_flight_api_id, markup_amount }) {
+        return __awaiter(this, arguments, void 0, function* ({ reqBody, revalidate_body, set_flight_api_id, markup_amount, }) {
             const response = yield this.request.getRequest(wfttApiEndpoints_1.default.FLIGHT_REVALIDATE_ENDPOINT, revalidate_body);
             if (!response) {
                 lib_1.default.writeJsonFile('wftt_revalidate_request', revalidate_body);
@@ -185,7 +194,7 @@ class WfttFlightService extends abstract_service_1.default {
                     api: flightConstent_1.WFTT_API,
                     endpoint: wfttApiEndpoints_1.default.FLIGHT_REVALIDATE_ENDPOINT,
                     payload: revalidate_body,
-                    response
+                    response,
                 });
             }
             if (!response.data) {
@@ -195,8 +204,8 @@ class WfttFlightService extends abstract_service_1.default {
                 data: [response.data],
                 reqBody: reqBody,
                 set_flight_api_id,
-                search_id: "",
-                markup_amount
+                search_id: '',
+                markup_amount,
             });
             return result[0];
         });

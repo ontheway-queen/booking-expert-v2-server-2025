@@ -54,12 +54,13 @@ class AdminConfigService extends abstract_service_1.default {
     getAllCity(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.Model.CommonModel();
-            const city_list = yield model.getCity(req.query);
+            const city_list = yield model.getCity(req.query, true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: city_list,
+                data: city_list.data,
+                total: city_list.total,
             };
         });
     }
@@ -104,12 +105,13 @@ class AdminConfigService extends abstract_service_1.default {
     getAllAirport(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.Model.CommonModel();
-            const get_airport = yield model.getAirport(req.query);
+            const get_airport = yield model.getAirport(req.query, true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
                 data: get_airport.data,
+                total: get_airport.total,
             };
         });
     }
@@ -181,12 +183,13 @@ class AdminConfigService extends abstract_service_1.default {
     getAllAirlines(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.Model.CommonModel();
-            const get_airlines = yield model.getAirlines(req.query, false);
+            const get_airlines = yield model.getAirlines(req.query, true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
                 data: get_airlines.data,
+                total: get_airlines.total,
             };
         });
     }
@@ -260,6 +263,75 @@ class AdminConfigService extends abstract_service_1.default {
             yield model.deleteAirlines(Number(airlines_id));
             if (check.logo) {
                 yield this.manageFile.deleteFromCloud([check.logo]);
+            }
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+            };
+        });
+    }
+    // get b2c markup
+    getB2CMarkupSet(_req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.B2CMarkupConfigModel();
+            const b2c_markup = yield model.getB2CMarkupConfigData('Both');
+            const data = {};
+            b2c_markup.forEach((markup) => {
+                if (markup.type === 'Flight') {
+                    data.flight_markup_set = Object.assign({}, markup);
+                }
+                if (markup.type === 'Hotel') {
+                    data.hotel_markup_set = Object.assign({}, markup);
+                }
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data,
+            };
+        });
+    }
+    // UPDATE B2C MARKUP
+    updateB2CMarkupConfig(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const body = req.body;
+            const B2CMarkupConfigModel = this.Model.B2CMarkupConfigModel();
+            const markupSetModel = this.Model.MarkupSetModel();
+            if (body.flight_set_id) {
+                // Check if the markup set exists
+                const existingFlightMarkupSet = yield markupSetModel.getSingleMarkupSet({
+                    id: body.flight_set_id,
+                });
+                if (!existingFlightMarkupSet) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: 'Flight markup set not found.',
+                    };
+                }
+                yield B2CMarkupConfigModel.upsertB2CMarkupConfig({
+                    type: 'Flight',
+                    markup_set_id: body.flight_set_id,
+                });
+            }
+            if (body.hotel_set_id) {
+                // Check if the markup set exists
+                const existingHotelMarkupSet = yield markupSetModel.getSingleMarkupSet({
+                    id: body.hotel_set_id,
+                });
+                if (!existingHotelMarkupSet) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: 'Hotel markup set not found.',
+                    };
+                }
+                yield B2CMarkupConfigModel.upsertB2CMarkupConfig({
+                    type: 'Hotel',
+                    markup_set_id: body.hotel_set_id,
+                });
             }
             return {
                 success: true,

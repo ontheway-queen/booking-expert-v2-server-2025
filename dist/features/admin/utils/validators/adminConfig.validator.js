@@ -15,14 +15,14 @@ class AdminConfigValidator {
         });
         this.createCity = joi_1.default.object({
             country_id: joi_1.default.number().required(),
-            name: joi_1.default.number().required(),
+            name: joi_1.default.string().required(),
             code: joi_1.default.string().optional(),
             lat: joi_1.default.string().optional(),
             lng: joi_1.default.string().optional(),
         });
         this.updateCity = joi_1.default.object({
             country_id: joi_1.default.number().optional(),
-            name: joi_1.default.number().optional(),
+            name: joi_1.default.string().optional(),
             code: joi_1.default.string().optional(),
             lat: joi_1.default.string().optional(),
             lng: joi_1.default.string().optional(),
@@ -73,6 +73,10 @@ class AdminConfigValidator {
         this.createAirlines = joi_1.default.object({
             name: joi_1.default.string().required(),
             code: joi_1.default.string().required(),
+        });
+        this.updateB2CMarkupSet = joi_1.default.object({
+            flight_set_id: joi_1.default.number().optional(),
+            hotel_set_id: joi_1.default.number().optional(),
         });
     }
 }

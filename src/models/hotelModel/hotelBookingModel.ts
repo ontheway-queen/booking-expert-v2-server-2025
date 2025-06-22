@@ -5,7 +5,6 @@ import {
   IGetBookingModelData,
   IGetBookingModelQuery,
   IGetSingleBookingModelData,
-  IGetSingleBookingModelParams,
   IInsertHotelBookingCancellationPayload,
   IInsertHotelBookingPayload,
   IInsertHotelBookingTravelerPayload,
@@ -141,31 +140,24 @@ export default class HotelBookingModel extends Schema {
     };
   }
 
-  public async getSingleBooking({
-    source_type,
-    booking_id,
-  }: IGetSingleBookingModelParams): Promise<IGetSingleBookingModelData | null> {
-    return await this.db('hotel_booking AS hb')
+  public async getSingleAgentBookingForAdmin(
+    booking_id: number
+  ): Promise<IGetSingleBookingModelData | null> {
+    return await this.db('agent_hotel_booking_view AS hb')
       .withSchema(this.DBO_SCHEMA)
-      .select(
-        'hb.id',
-        'hb.booking_ref',
-        'hb.hotel_code',
-        'hb.hotel_name',
-        'hb.sell_price',
-        'hb.checkin_date',
-        'hb.checkout_date',
-        'hb.status',
-        'hb.finalized',
-        'hb.created_at'
-      )
+      .select('hb.*')
       .where((qb) => {
-        if (source_type !== 'ALL') {
-          qb.andWhere('hb.source_type', source_type);
-        }
-
         qb.andWhere('hb.id', booking_id);
       })
       .first();
+  }
+
+  public async getHotelBookingTraveler(booking_id: number) {
+    return await this.db('hotel_booking_traveler AS hbt')
+      .withSchema(this.DBO_SCHEMA)
+      .select('hbt.*')
+      .where((qb) => {
+        qb.andWhere('hbt.booking_id', booking_id);
+      });
   }
 }

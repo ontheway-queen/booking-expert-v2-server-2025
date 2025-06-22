@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
+const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AdminAgentHotelService extends abstract_service_1.default {
     constructor() {
         super();
@@ -22,7 +23,7 @@ class AdminAgentHotelService extends abstract_service_1.default {
             const { agency_id, filter, from_date, limit, skip, to_date } = req.query;
             const hotelBookingModel = this.Model.HotelBookingModel();
             const data = yield hotelBookingModel.getHotelBooking({
-                source_type: 'AGENT',
+                source_type: constants_1.SOURCE_AGENT,
                 filter,
                 from_date,
                 to_date,
@@ -42,11 +43,9 @@ class AdminAgentHotelService extends abstract_service_1.default {
     getSingleBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
+            const booking_id = Number(id);
             const hotelBookingModel = this.Model.HotelBookingModel();
-            const data = yield hotelBookingModel.getSingleBooking({
-                booking_id: Number(id),
-                source_type: 'AGENT',
-            });
+            const data = yield hotelBookingModel.getSingleAgentBookingForAdmin(booking_id);
             if (!data) {
                 return {
                     success: false,
@@ -54,11 +53,12 @@ class AdminAgentHotelService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
+            const travelers = yield hotelBookingModel.getHotelBookingTraveler(booking_id);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data,
+                data: Object.assign(Object.assign({}, data), { travelers }),
             };
         });
     }

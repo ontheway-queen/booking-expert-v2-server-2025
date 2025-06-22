@@ -176,10 +176,10 @@ class CommonModel extends schema_1.default {
     }
     //get all city
     getCity(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ country_id, limit, skip, filter, code, }) {
-            return yield this.db('city AS c')
+        return __awaiter(this, arguments, void 0, function* ({ country_id, limit, skip, filter, code, }, need_total = false) {
+            const data = yield this.db('city AS c')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .select('c.id', 'c.name', 'co.name AS country_name')
+                .select('c.id', 'c.name', 'c.country_id', 'co.name AS country_name', 'c.code', 'c.lat', 'c.lng')
                 .leftJoin('country AS co', 'c.country_id', 'co.id')
                 .where((qb) => {
                 if (country_id) {
@@ -198,6 +198,31 @@ class CommonModel extends schema_1.default {
                 .orderBy('c.name', 'asc')
                 .limit(limit || 100)
                 .offset(skip || 0);
+            let total = [];
+            if (need_total) {
+                total = yield this.db('city AS c')
+                    .withSchema(this.PUBLIC_SCHEMA)
+                    .count('c.id as total')
+                    .leftJoin('country AS co', 'c.country_id', 'co.id')
+                    .where((qb) => {
+                    if (country_id) {
+                        qb.andWhere('c.country_id', country_id);
+                    }
+                    if (code) {
+                        qb.orWhere('c.code', code);
+                    }
+                    if (filter) {
+                        qb.andWhere((qqb) => {
+                            qqb.orWhere('c.name', 'ilike', `%${filter}%`);
+                            qqb.orWhere('c.code', filter);
+                        });
+                    }
+                });
+            }
+            return {
+                data,
+                total: total.length ? total[0].total : 0,
+            };
         });
     }
     //insert city

@@ -54,6 +54,7 @@ export default class AgentHotelController extends AbstractController {
       }
     }
   );
+
   public getHotelBooking = this.asyncWrapper.wrap(
     { querySchema: this.validator.getHotelBooking },
     async (req: Request, res: Response) => {

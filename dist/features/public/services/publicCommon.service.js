@@ -76,12 +76,12 @@ class PublicCommonService extends abstract_service_1.default {
     getAllCity(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.Model.CommonModel();
-            const city_list = yield model.getCity(req.query);
+            const city_list = yield model.getCity(req.query, false);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: city_list,
+                data: city_list.data,
             };
         });
     }
@@ -89,7 +89,7 @@ class PublicCommonService extends abstract_service_1.default {
     getAllAirport(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.Model.CommonModel();
-            const get_airport = yield model.getAirport(req.query);
+            const get_airport = yield model.getAirport(req.query, false);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,

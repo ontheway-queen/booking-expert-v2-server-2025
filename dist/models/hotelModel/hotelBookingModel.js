@@ -105,18 +105,25 @@ class HotelBookingModel extends schema_1.default {
             };
         });
     }
-    getSingleBooking(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ source_type, booking_id, }) {
-            return yield this.db('hotel_booking AS hb')
+    getSingleAgentBookingForAdmin(booking_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('agent_hotel_booking_view AS hb')
                 .withSchema(this.DBO_SCHEMA)
-                .select('hb.id', 'hb.booking_ref', 'hb.hotel_code', 'hb.hotel_name', 'hb.sell_price', 'hb.checkin_date', 'hb.checkout_date', 'hb.status', 'hb.finalized', 'hb.created_at')
+                .select('hb.*')
                 .where((qb) => {
-                if (source_type !== 'ALL') {
-                    qb.andWhere('hb.source_type', source_type);
-                }
                 qb.andWhere('hb.id', booking_id);
             })
                 .first();
+        });
+    }
+    getHotelBookingTraveler(booking_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('hotel_booking_traveler AS hbt')
+                .withSchema(this.DBO_SCHEMA)
+                .select('hbt.*')
+                .where((qb) => {
+                qb.andWhere('hbt.booking_id', booking_id);
+            });
         });
     }
 }

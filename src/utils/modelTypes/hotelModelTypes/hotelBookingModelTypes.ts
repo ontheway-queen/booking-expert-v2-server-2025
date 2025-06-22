@@ -47,6 +47,7 @@ export interface IInsertHotelBookingTravelerPayload {
   room: number;
   type: string;
   title: string;
+  name: string;
   surname: string;
   id_file?: string;
 }
@@ -98,15 +99,4 @@ export interface IInsertHotelBookingCancellationPayload {
   booking_id: number;
   from_date: string;
   fee: number;
-}
-
-export interface IGetSingleBookingModelParams {
-  source_type:
-    | typeof SOURCE_AGENT
-    | typeof SOURCE_B2C
-    | typeof SOURCE_EXTERNAL
-    | typeof SOURCE_SUB_AGENT
-    | typeof SOURCE_AGENT_B2C
-    | 'ALL';
-  booking_id: number;
 }

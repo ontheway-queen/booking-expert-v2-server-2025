@@ -320,7 +320,7 @@ class AgentHotelService extends abstract_service_1.default {
                     }),
                     search_id: payload.search_id,
                     hotel_extra_charges: JSON.stringify(recheck.hotel_extra_charges),
-                    free_cancellation: (_a = recheck.rates[0].cancellation_policy) === null || _a === void 0 ? void 0 : _a.free_cancellation,
+                    free_cancellation: ((_a = recheck.rates[0].cancellation_policy) === null || _a === void 0 ? void 0 : _a.free_cancellation) || false,
                     source_type: constants_1.SOURCE_AGENT,
                     status: 'Booked',
                     free_cancellation_last_date: (_b = recheck.rates[0].cancellation_policy) === null || _b === void 0 ? void 0 : _b.free_cancellation_last_date,
@@ -346,6 +346,7 @@ class AgentHotelService extends abstract_service_1.default {
                             booking_id: hotelBooking[0].id,
                             title: pax.name,
                             surname: pax.surname,
+                            name: pax.name,
                             id_file: pax.id_file,
                             type: pax.type,
                             room: roomCount,
@@ -428,22 +429,22 @@ class AgentHotelService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const hotelBookingModel = this.Model.HotelBookingModel();
-            const data = yield hotelBookingModel.getSingleBooking({
-                booking_id: Number(id),
-                source_type: 'AGENT',
-            });
-            if (!data) {
-                return {
-                    success: false,
-                    code: this.StatusCode.HTTP_NOT_FOUND,
-                    message: this.ResMsg.HTTP_NOT_FOUND,
-                };
-            }
+            // const data = await hotelBookingModel.getSingleBooking({
+            //   booking_id: Number(id),
+            //   source_type: 'AGENT',
+            // });
+            // if (!data) {
+            //   return {
+            //     success: false,
+            //     code: this.StatusCode.HTTP_NOT_FOUND,
+            //     message: this.ResMsg.HTTP_NOT_FOUND,
+            //   };
+            // }
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data,
+                // data,
             };
         });
     }

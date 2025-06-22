@@ -40,7 +40,10 @@ export default class AgentFlightController extends AbstractController {
         sendEvent('end', { message: 'Flight search completed successfully.' });
         res.end();
       } catch (error) {
-        sendEvent('error', { message: 'An error occurred during flight search.', error });
+        sendEvent('error', {
+          message: 'An error occurred during flight search.',
+          error,
+        });
         res.end();
       }
     }
@@ -101,5 +104,4 @@ export default class AgentFlightController extends AbstractController {
       res.status(code).json(rest);
     }
   );
-
 }

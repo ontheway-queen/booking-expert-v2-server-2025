@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
 import { IGetAdminHotelBookingQuery } from '../../utils/types/adminAgentTypes/adminAgentHotel.types';
+import { SOURCE_AGENT } from '../../../../utils/miscellaneous/constants';
 
 export default class AdminAgentHotelService extends AbstractServices {
   constructor() {
@@ -15,7 +16,7 @@ export default class AdminAgentHotelService extends AbstractServices {
 
     const data = await hotelBookingModel.getHotelBooking(
       {
-        source_type: 'AGENT',
+        source_type: SOURCE_AGENT,
         filter,
         from_date,
         to_date,
@@ -38,12 +39,13 @@ export default class AdminAgentHotelService extends AbstractServices {
   public async getSingleBooking(req: Request) {
     const { id } = req.params;
 
+    const booking_id = Number(id);
+
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    const data = await hotelBookingModel.getSingleBooking({
-      booking_id: Number(id),
-      source_type: 'AGENT',
-    });
+    const data = await hotelBookingModel.getSingleAgentBookingForAdmin(
+      booking_id
+    );
 
     if (!data) {
       return {
@@ -53,11 +55,15 @@ export default class AdminAgentHotelService extends AbstractServices {
       };
     }
 
+    const travelers = await hotelBookingModel.getHotelBookingTraveler(
+      booking_id
+    );
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data,
+      data: { ...data, travelers },
     };
   }
 }

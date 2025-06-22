@@ -21,6 +21,7 @@ export default class B2CMarkupConfigModel extends Schema {
       .select(
         'b2c_markup_config.id',
         'b2c_markup_config.markup_set_id',
+        'b2c_markup_config.type',
         'markup_set.name'
       )
       .leftJoin(
@@ -39,8 +40,8 @@ export default class B2CMarkupConfigModel extends Schema {
     //update
     const res = await this.db('b2c_markup_config')
       .withSchema(this.DBO_SCHEMA)
-      .update(payload.markup_set_id)
-      .where('name', payload.name);
+      .update('markup_set_id', payload.markup_set_id)
+      .where('type', payload.type);
 
     //if update is not successful then insert
     if (!res) {

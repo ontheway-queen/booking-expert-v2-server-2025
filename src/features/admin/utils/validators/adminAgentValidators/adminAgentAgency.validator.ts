@@ -17,6 +17,7 @@ export default class AdminAgentAgencyValidator {
     address: Joi.string().trim().optional(),
     flight_markup_set: Joi.number().optional(),
     hotel_markup_set: Joi.number().optional(),
+    kam_id: Joi.number().optional(),
     white_label: Joi.boolean().optional(),
     allow_api: Joi.boolean().optional(),
     status: Joi.string().valid('Active', 'Inactive').optional(),
@@ -55,6 +56,10 @@ export default class AdminAgentAgencyValidator {
       then: Joi.number().required(),
     }),
     hotel_markup_set: Joi.alternatives().conditional('status', {
+      is: 'Active',
+      then: Joi.number().required(),
+    }),
+    kam_id: Joi.alternatives().conditional('status', {
       is: 'Active',
       then: Joi.number().required(),
     }),

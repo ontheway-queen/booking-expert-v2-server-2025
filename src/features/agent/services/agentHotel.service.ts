@@ -393,7 +393,7 @@ export class AgentHotelService extends AbstractServices {
         search_id: payload.search_id,
         hotel_extra_charges: JSON.stringify(recheck.hotel_extra_charges),
         free_cancellation:
-          recheck.rates[0].cancellation_policy?.free_cancellation,
+          recheck.rates[0].cancellation_policy?.free_cancellation || false,
         source_type: SOURCE_AGENT,
         status: 'Booked',
         free_cancellation_last_date:
@@ -428,6 +428,7 @@ export class AgentHotelService extends AbstractServices {
             booking_id: hotelBooking[0].id,
             title: pax.name,
             surname: pax.surname,
+            name: pax.name,
             id_file: pax.id_file,
             type: pax.type,
             room: roomCount,
@@ -524,24 +525,24 @@ export class AgentHotelService extends AbstractServices {
 
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    const data = await hotelBookingModel.getSingleBooking({
-      booking_id: Number(id),
-      source_type: 'AGENT',
-    });
+    // const data = await hotelBookingModel.getSingleBooking({
+    //   booking_id: Number(id),
+    //   source_type: 'AGENT',
+    // });
 
-    if (!data) {
-      return {
-        success: false,
-        code: this.StatusCode.HTTP_NOT_FOUND,
-        message: this.ResMsg.HTTP_NOT_FOUND,
-      };
-    }
+    // if (!data) {
+    //   return {
+    //     success: false,
+    //     code: this.StatusCode.HTTP_NOT_FOUND,
+    //     message: this.ResMsg.HTTP_NOT_FOUND,
+    //   };
+    // }
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data,
+      // data,
     };
   }
 }

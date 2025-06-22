@@ -47,5 +47,10 @@ export default class AdminConfigRouter extends AbstractRouter {
         this.controller.updateAirlines
       )
       .delete(this.controller.deleteAirlines);
+
+    this.router
+      .route('/b2c-markup-set')
+      .get(this.controller.getB2CMarkupSet)
+      .put(this.controller.updateB2CMarkupSet);
   }
 }

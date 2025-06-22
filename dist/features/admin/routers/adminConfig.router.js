@@ -38,6 +38,10 @@ class AdminConfigRouter extends abstract_router_1.default {
             .route('/airlines/:id')
             .patch(this.uploader.cloudUploadRaw(this.fileFolders.AIRLINES_FILES, ['logo']), this.controller.updateAirlines)
             .delete(this.controller.deleteAirlines);
+        this.router
+            .route('/b2c-markup-set')
+            .get(this.controller.getB2CMarkupSet)
+            .put(this.controller.updateB2CMarkupSet);
     }
 }
 exports.default = AdminConfigRouter;

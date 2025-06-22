@@ -21,6 +21,7 @@ class AdminAgentAgencyValidator {
             address: joi_1.default.string().trim().optional(),
             flight_markup_set: joi_1.default.number().optional(),
             hotel_markup_set: joi_1.default.number().optional(),
+            kam_id: joi_1.default.number().optional(),
             white_label: joi_1.default.boolean().optional(),
             allow_api: joi_1.default.boolean().optional(),
             status: joi_1.default.string().valid('Active', 'Inactive').optional(),
@@ -58,6 +59,10 @@ class AdminAgentAgencyValidator {
                 then: joi_1.default.number().required(),
             }),
             hotel_markup_set: joi_1.default.alternatives().conditional('status', {
+                is: 'Active',
+                then: joi_1.default.number().required(),
+            }),
+            kam_id: joi_1.default.alternatives().conditional('status', {
                 is: 'Active',
                 then: joi_1.default.number().required(),
             }),
