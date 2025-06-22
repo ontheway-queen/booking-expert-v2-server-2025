@@ -13,8 +13,7 @@ class PublicPaymentRouter extends abstract_router_1.default {
         this.callRouter();
     }
     callRouter() {
-        this.router.route('/ssl')
-            .post(this.controller.transactionUsingSSL);
+        this.router.route('/ssl').post(this.controller.transactionUsingSSL);
     }
 }
 exports.PublicPaymentRouter = PublicPaymentRouter;
