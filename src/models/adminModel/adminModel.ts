@@ -2,21 +2,22 @@ import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   IAdminCreatePayload,
+  ICheckAdminRolePayload,
   ICheckUserAdmin,
   ICreateAdminAuditTrailPayload,
-  ICreateRolePayload,
+  ICreateAdminRolePayload,
+  IGetAdminAllPermissionsData,
   IGetAdminAuditTrailQuery,
   IGetAdminData,
   IGetAdminListFilterQuery,
-  IGetAllPermissionsData,
-  IGetRoleListData,
-  IGetRoleListQuery,
+  IGetAdminRoleListData,
+  IGetAdminRoleListQuery,
   IGetSingleAdminData,
   IGetSingleAdminQuery,
-  IGetSingleRoleWithPermissionsData,
-  IInsertRolePermissionPayload,
+  IGetSingleAdminRoleWithPermissionsData,
+  IInsertAdminRolePermissionPayload,
   IUpdateAdminPayload,
-  IUpdateRolePayload,
+  IUpdateAdminRolePayload,
 } from '../../utils/modelTypes/adminModelTypes/adminModel.types';
 
 export default class AdminModel extends Schema {
@@ -58,15 +59,16 @@ export default class AdminModel extends Schema {
       .where((qb) => {
         if (query.filter) {
           qb.where((qbc) => {
-            qbc.where('ua.username', 'ilike', `%${query.filter}%`);
+            qbc.where('ua.name', 'ilike', `%${query.filter}%`);
+            qbc.where('ua.username', query.filter);
             qbc.orWhere('ua.email', 'ilike', `%${query.filter}%`);
             qbc.orWhere('ua.phone_number', 'ilike', `%${query.filter}%`);
           });
         }
-        if (query.role) {
-          qb.andWhere('rl.id', query.role);
+        if (query.role_id) {
+          qb.andWhere('ua.role_id', query.role_id);
         }
-        if (query.status === 'true' || query.status === 'false') {
+        if (query.status !== undefined) {
           qb.andWhere('ua.status', query.status);
         }
       })
@@ -89,8 +91,8 @@ export default class AdminModel extends Schema {
               qbc.orWhere('ua.phone_number', 'ilike', `%${query.filter}%`);
             });
           }
-          if (query.role) {
-            qb.andWhere('rl.id', query.role);
+          if (query.role_id) {
+            qb.andWhere('ua.role_id', query.role_id);
           }
           if (query.status === 'true' || query.status === 'false') {
             qb.andWhere('ua.status', query.status);
@@ -155,7 +157,7 @@ export default class AdminModel extends Schema {
         'ua.two_fa'
       )
       .withSchema(this.ADMIN_SCHEMA)
-      .where((qb) => {
+      .andWhere((qb) => {
         if (email) {
           qb.orWhere('ua.email', email);
         }
@@ -194,16 +196,17 @@ export default class AdminModel extends Schema {
   }
 
   // Get all permissions
-  public async getAllPermissions(): Promise<IGetAllPermissionsData[]> {
+  public async getAllPermissions(): Promise<IGetAdminAllPermissionsData[]> {
     return await this.db('permissions')
       .withSchema(this.ADMIN_SCHEMA)
-      .select('per.id', 'per.name', 'ua.name as created_by', 'per.created_at')
-      .leftJoin('user_admin as ua', 'ua.id', 'per.created_by')
+      .select('per.id', 'per.name')
       .orderBy('per.name', 'asc');
   }
 
   // Create role
-  public async createRole(payload: ICreateRolePayload) {
+  public async createRole(
+    payload: ICreateAdminRolePayload
+  ): Promise<{ id: number }[]> {
     return await this.db('roles')
       .withSchema(this.ADMIN_SCHEMA)
       .insert(payload, 'id');
@@ -211,24 +214,51 @@ export default class AdminModel extends Schema {
 
   // Get all roles
   public async getAllRoles(
-    payload: IGetRoleListQuery
-  ): Promise<IGetRoleListData[]> {
+    payload: IGetAdminRoleListQuery
+  ): Promise<IGetAdminRoleListData[]> {
+    return await this.db('roles AS r')
+      .withSchema(this.ADMIN_SCHEMA)
+      .select(
+        'r.id',
+        'r.name',
+        'r.status',
+        'r.is_main_role',
+        'r.created_at',
+        'r.created_by',
+        'ua.name as created_by_name'
+      )
+      .leftJoin('user_admin AS ua', 'ua.id', 'r.created_by')
+      .where((qb) => {
+        if (payload.name) {
+          qb.andWhere('r.name', 'ilike', `%${payload.name}%`);
+        }
+        if (payload.status !== undefined) {
+          qb.andWhere('r.status', payload.status);
+        }
+      })
+      .orderBy('r.name', 'asc');
+  }
+
+  // Check Role
+  public async checkRole(
+    payload: ICheckAdminRolePayload
+  ): Promise<IGetAdminRoleListData | null> {
     return await this.db('roles')
       .withSchema(this.ADMIN_SCHEMA)
       .select('id', 'name', 'status', 'is_main_role')
       .where((qb) => {
         if (payload.name) {
-          qb.andWhere('name', 'ilike', `%${payload.name}%`);
+          qb.andWhere('name', payload.name);
         }
-        if (payload.status !== undefined) {
-          qb.andWhere('status', payload.status);
+        if (payload.id) {
+          qb.andWhere('id', payload.id);
         }
       })
-      .orderBy('name', 'asc');
+      .first();
   }
 
   // update role
-  public async updateRole(payload: IUpdateRolePayload, id: number) {
+  public async updateRole(payload: IUpdateAdminRolePayload, id: number) {
     return await this.db('roles')
       .withSchema(this.ADMIN_SCHEMA)
       .update(payload)
@@ -238,7 +268,7 @@ export default class AdminModel extends Schema {
   // Get single role with permissions
   public async getSingleRoleWithPermissions(
     id: number
-  ): Promise<IGetSingleRoleWithPermissionsData> {
+  ): Promise<IGetSingleAdminRoleWithPermissionsData | null> {
     return await this.db('roles as rol')
       .withSchema(this.ADMIN_SCHEMA)
       .select(
@@ -276,7 +306,9 @@ export default class AdminModel extends Schema {
   }
 
   // insert roles permissions
-  public async insertRolePermission(payload: IInsertRolePermissionPayload[]) {
+  public async insertRolePermission(
+    payload: IInsertAdminRolePermissionPayload[]
+  ) {
     return await this.db('role_permissions')
       .withSchema(this.ADMIN_SCHEMA)
       .insert(payload);

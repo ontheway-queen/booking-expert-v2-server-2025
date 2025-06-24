@@ -37,15 +37,16 @@ class AdminModel extends schema_1.default {
                 .where((qb) => {
                 if (query.filter) {
                     qb.where((qbc) => {
-                        qbc.where('ua.username', 'ilike', `%${query.filter}%`);
+                        qbc.where('ua.name', 'ilike', `%${query.filter}%`);
+                        qbc.where('ua.username', query.filter);
                         qbc.orWhere('ua.email', 'ilike', `%${query.filter}%`);
                         qbc.orWhere('ua.phone_number', 'ilike', `%${query.filter}%`);
                     });
                 }
-                if (query.role) {
-                    qb.andWhere('rl.id', query.role);
+                if (query.role_id) {
+                    qb.andWhere('ua.role_id', query.role_id);
                 }
-                if (query.status === 'true' || query.status === 'false') {
+                if (query.status !== undefined) {
                     qb.andWhere('ua.status', query.status);
                 }
             })
@@ -66,8 +67,8 @@ class AdminModel extends schema_1.default {
                             qbc.orWhere('ua.phone_number', 'ilike', `%${query.filter}%`);
                         });
                     }
-                    if (query.role) {
-                        qb.andWhere('rl.id', query.role);
+                    if (query.role_id) {
+                        qb.andWhere('ua.role_id', query.role_id);
                     }
                     if (query.status === 'true' || query.status === 'false') {
                         qb.andWhere('ua.status', query.status);
@@ -105,7 +106,7 @@ class AdminModel extends schema_1.default {
             return yield this.db('user_admin as ua')
                 .select('ua.id', 'ua.username', 'ua.name', 'ua.phone_number', 'ua.role_id', 'ua.password_hash', 'ua.gender', 'ua.photo', 'ua.email', 'ua.status', 'ua.is_main_user', 'ua.two_fa')
                 .withSchema(this.ADMIN_SCHEMA)
-                .where((qb) => {
+                .andWhere((qb) => {
                 if (email) {
                     qb.orWhere('ua.email', email);
                 }
@@ -142,8 +143,7 @@ class AdminModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('permissions')
                 .withSchema(this.ADMIN_SCHEMA)
-                .select('per.id', 'per.name', 'ua.name as created_by', 'per.created_at')
-                .leftJoin('user_admin as ua', 'ua.id', 'per.created_by')
+                .select('per.id', 'per.name')
                 .orderBy('per.name', 'asc');
         });
     }
@@ -158,18 +158,36 @@ class AdminModel extends schema_1.default {
     // Get all roles
     getAllRoles(payload) {
         return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('roles AS r')
+                .withSchema(this.ADMIN_SCHEMA)
+                .select('r.id', 'r.name', 'r.status', 'r.is_main_role', 'r.created_at', 'r.created_by', 'ua.name as created_by_name')
+                .leftJoin('user_admin AS ua', 'ua.id', 'r.created_by')
+                .where((qb) => {
+                if (payload.name) {
+                    qb.andWhere('r.name', 'ilike', `%${payload.name}%`);
+                }
+                if (payload.status !== undefined) {
+                    qb.andWhere('r.status', payload.status);
+                }
+            })
+                .orderBy('r.name', 'asc');
+        });
+    }
+    // Check Role
+    checkRole(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('roles')
                 .withSchema(this.ADMIN_SCHEMA)
                 .select('id', 'name', 'status', 'is_main_role')
                 .where((qb) => {
                 if (payload.name) {
-                    qb.andWhere('name', 'ilike', `%${payload.name}%`);
+                    qb.andWhere('name', payload.name);
                 }
-                if (payload.status !== undefined) {
-                    qb.andWhere('status', payload.status);
+                if (payload.id) {
+                    qb.andWhere('id', payload.id);
                 }
             })
-                .orderBy('name', 'asc');
+                .first();
         });
     }
     // update role

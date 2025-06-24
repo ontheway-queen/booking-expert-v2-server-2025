@@ -12,7 +12,7 @@ export interface IAdminCreatePayload {
 
 export interface IGetAdminListFilterQuery {
   filter?: string;
-  role?: number;
+  role_id?: number;
   limit?: number;
   skip?: number;
   status?: string;
@@ -45,6 +45,7 @@ export interface IGetSingleAdminData {
   phone_number: string;
   photo: string | null;
   role_id: number;
+  password_hash: string;
   is_main_user: boolean;
   two_fa: boolean;
   status: boolean;
@@ -83,36 +84,43 @@ export interface ICheckUserAdmin {
   two_fa: boolean;
 }
 
-export interface ICreateRolePayload {
+export interface ICreateAdminRolePayload {
   name: string;
+  created_by: number;
   id_main_role?: boolean;
 }
 
-export interface IGetRoleListQuery {
+export interface IGetAdminRoleListQuery {
   name?: string;
   status?: boolean;
 }
 
-export interface IGetRoleListData {
+export interface ICheckAdminRolePayload {
+  name?: string;
+  id?: number;
+  status?: boolean;
+}
+
+export interface IGetAdminRoleListData {
   id: number;
   name: string;
   status: boolean;
   is_main_role: boolean;
 }
 
-export interface IUpdateRolePayload {
+export interface IUpdateAdminRolePayload {
   name?: string;
-  status?: number;
+  status?: boolean;
 }
 
-export interface IGetAllPermissionsData {
+export interface IGetAdminAllPermissionsData {
   id: number;
   name: string;
   created_by: string;
   created_at: string;
 }
 
-export interface IGetSingleRoleWithPermissionsData {
+export interface IGetSingleAdminRoleWithPermissionsData {
   role_id: number;
   role_name: string;
   status: boolean;
@@ -127,7 +135,7 @@ export interface IGetSingleRoleWithPermissionsData {
   }[];
 }
 
-export interface IInsertRolePermissionPayload {
+export interface IInsertAdminRolePermissionPayload {
   role_id: number;
   permission_id: number;
   read?: boolean;

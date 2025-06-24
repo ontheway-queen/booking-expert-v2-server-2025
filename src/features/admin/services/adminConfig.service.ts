@@ -12,7 +12,6 @@ import {
   ICreateAirlinesPayload,
   IUpdateAirlinesPayload,
 } from '../../../utils/modelTypes/commonModelTypes/commonModelTypes';
-import { get } from 'http';
 
 export class AdminConfigService extends AbstractServices {
   public async checkSlug(req: Request) {
