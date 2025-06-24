@@ -30,6 +30,8 @@ export default class AgentAdministrationRouter extends AbstractRouter {
       .post(this.controller.createRole)
       .get(this.controller.getRoleList);
 
+    this.router.route('/permissions').get(this.controller.getPermissionsList);
+
     this.router
       .route('/role/:id/permissions')
       .get(this.controller.getSingleRoleWithPermissions)

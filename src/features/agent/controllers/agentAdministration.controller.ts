@@ -26,6 +26,14 @@ export default class AgentAdministrationController extends AbstractController {
     }
   );
 
+  public getPermissionsList = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getPermissionsList(req);
+      res.status(code).json(data);
+    }
+  );
+
   public getSingleRoleWithPermissions = this.asyncWrapper.wrap(
     { paramSchema: this.commonValidator.singleParamNumValidator() },
     async (req: Request, res: Response) => {

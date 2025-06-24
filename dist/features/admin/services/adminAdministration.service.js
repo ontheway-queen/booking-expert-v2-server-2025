@@ -94,6 +94,18 @@ class AdminAdministrationService extends abstract_service_1.default {
             };
         });
     }
+    //permissions
+    getPermissionsList(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.AdminModel();
+            const permissions = yield model.getAllPermissions();
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                data: permissions,
+            };
+        });
+    }
     //get single role permission
     getSingleRolePermission(req) {
         return __awaiter(this, void 0, void 0, function* () {

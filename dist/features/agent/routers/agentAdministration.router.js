@@ -24,6 +24,7 @@ class AgentAdministrationRouter extends abstract_router_1.default {
             .route('/role')
             .post(this.controller.createRole)
             .get(this.controller.getRoleList);
+        this.router.route('/permissions').get(this.controller.getPermissionsList);
         this.router
             .route('/role/:id/permissions')
             .get(this.controller.getSingleRoleWithPermissions)

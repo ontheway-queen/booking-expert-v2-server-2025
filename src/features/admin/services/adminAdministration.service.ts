@@ -91,6 +91,17 @@ export class AdminAdministrationService extends AbstractServices {
     };
   }
 
+  //permissions
+  public async getPermissionsList(req: Request) {
+    const model = this.Model.AdminModel();
+    const permissions = await model.getAllPermissions();
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      data: permissions,
+    };
+  }
+
   //get single role permission
   public async getSingleRolePermission(req: Request) {
     const role_id = req.params.id;

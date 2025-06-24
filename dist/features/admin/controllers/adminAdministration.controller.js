@@ -39,6 +39,10 @@ class AdminAdministrationController extends abstract_controller_1.default {
             const _a = yield this.service.getRoleList(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
+        this.getPermissionsList = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getPermissionsList(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
         this.getSingleRoleWithPermissions = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getSingleRolePermission(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
