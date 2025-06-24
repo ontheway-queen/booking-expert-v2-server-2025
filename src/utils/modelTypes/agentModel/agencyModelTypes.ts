@@ -13,6 +13,7 @@ export interface ICreateAgencyPayload {
   flight_markup_set?: number;
   hotel_markup_set?: number;
   created_by?: number;
+  kam_id?: number;
   ref_id?: number;
   white_label?: boolean;
   allow_api?: boolean;
@@ -28,6 +29,7 @@ export interface IUpdateAgencyPayload {
   email?: string;
   phone?: string;
   address?: string;
+  kam_id?: number;
   status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   flight_markup_set?: number;
   hotel_markup_set?: number;

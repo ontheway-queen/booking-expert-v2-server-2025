@@ -74,7 +74,9 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     token: '',
                 };
                 if (data.white_label) {
-                    const wPermissions = yield AgencyModel.getWhiteLabelPermission({ agency_id });
+                    const wPermissions = yield AgencyModel.getWhiteLabelPermission({
+                        agency_id,
+                    });
                     if (wPermissions) {
                         whiteLabelPermissions = wPermissions;
                     }
@@ -106,9 +108,23 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
                 }
                 const { user_id } = req.admin;
-                const _a = req.body, { white_label_permissions } = _a, restBody = __rest(_a, ["white_label_permissions"]);
+                const _a = req.body, { white_label_permissions, kam_id } = _a, restBody = __rest(_a, ["white_label_permissions", "kam_id"]);
                 const files = req.files || [];
                 const payload = Object.assign({}, restBody);
+                if (kam_id) {
+                    const adminModel = this.Model.AdminModel(trx);
+                    const checkKam = yield adminModel.checkUserAdmin({ id: kam_id });
+                    if (!checkKam) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Invalid KAM ID',
+                        };
+                    }
+                    else {
+                        payload.kam_id = kam_id;
+                    }
+                }
                 files.forEach((file) => {
                     switch (file.fieldname) {
                         case 'agency_logo':
@@ -128,7 +144,9 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     }
                 });
                 if (restBody.white_label && !white_label_permissions) {
-                    const checkPermission = yield AgentModel.getWhiteLabelPermission({ agency_id });
+                    const checkPermission = yield AgentModel.getWhiteLabelPermission({
+                        agency_id,
+                    });
                     if (!checkPermission) {
                         const uuid = (0, uuid_1.v4)();
                         yield AgentModel.createWhiteLabelPermission({
@@ -145,7 +163,9 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     }
                 }
                 if (white_label_permissions) {
-                    const checkPermission = yield AgentModel.getWhiteLabelPermission({ agency_id });
+                    const checkPermission = yield AgentModel.getWhiteLabelPermission({
+                        agency_id,
+                    });
                     if (checkPermission && white_label_permissions) {
                         yield AgentModel.updateWhiteLabelPermission(white_label_permissions, agency_id);
                     }
@@ -176,7 +196,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 yield this.insertAdminAudit(trx, {
                     created_by: user_id,
                     type: 'UPDATE',
-                    details: `Agency Updated. Data: ${JSON.stringify(payload)}`,
+                    details: `Agency Updated - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
                     payload,
                 });
                 return {
@@ -207,6 +227,13 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const body = req.body;
                 let payload = {};
                 if (body.status === 'Active') {
+                    if (!body.hotel_markup_set || !body.flight_markup_set || !body.kam_id) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
+                            message: 'Flight, hotel markup sets and kam_id are required for activation.',
+                        };
+                    }
                     const checkFlightMarkupSet = yield MarkupSetModel.getSingleMarkupSet({
                         id: body.flight_markup_set,
                         status: true,
@@ -234,6 +261,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     payload.status = body.status;
                     payload.flight_markup_set = body.flight_markup_set;
                     payload.hotel_markup_set = body.hotel_markup_set;
+                    payload.kam_id = body.kam_id;
                 }
                 else {
                     payload.status = body.status;
@@ -265,7 +293,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                const { status, email, id, username, name, photo, agency_status, phone_number, agency_email, agency_name, is_main_user, ref_id, agency_logo, address } = checkUserAgency;
+                const { status, email, id, username, name, photo, agency_status, phone_number, agency_email, agency_name, is_main_user, ref_id, agency_logo, address, } = checkUserAgency;
                 if (agency_status === 'Inactive' ||
                     agency_status === 'Incomplete' ||
                     agency_status === 'Rejected') {
@@ -295,7 +323,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     photo,
                     ref_id,
                     address,
-                    agency_logo
+                    agency_logo,
                 };
                 const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
                 yield this.insertAdminAudit(trx, {
@@ -322,24 +350,25 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const { white_label_permissions, user_name } = body, rest = __rest(body, ["white_label_permissions", "user_name"]);
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agencyUserModel = this.Model.AgencyUserModel(trx);
+                const adminModel = this.Model.AdminModel(trx);
                 const checkSubAgentName = yield agencyModel.checkAgency({
-                    name: body.agency_name
+                    name: body.agency_name,
                 });
                 if (checkSubAgentName) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: "Duplicate agency name! Agency already exists with this name"
+                        message: 'Duplicate agency name! Agency already exists with this name',
                     };
                 }
                 const checkAgentUser = yield agencyUserModel.checkUser({
-                    email: body.email
+                    email: body.email,
                 });
                 if (checkAgentUser) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: "Email already exists. Please use another email"
+                        message: 'Email already exists. Please use another email',
                     };
                 }
                 let agency_logo = '';
@@ -365,7 +394,18 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                             throw new customError_1.default('Invalid files. Please provide valid trade license, civil aviation, NID, logo', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                 });
-                const agent_no = yield lib_1.default.generateNo({ trx, type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent });
+                const agent_no = yield lib_1.default.generateNo({
+                    trx,
+                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent,
+                });
+                const checkKam = yield adminModel.checkUserAdmin({ id: body.kam_id });
+                if (!checkKam) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'Invalid KAM ID',
+                    };
+                }
                 const newAgency = yield agencyModel.createAgency(Object.assign({ status: 'Active', agent_no: agent_no, agency_logo,
                     civil_aviation,
                     trade_license,
@@ -373,8 +413,22 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const newRole = yield agencyUserModel.createRole({
                     agency_id: newAgency[0].id,
                     name: 'Super Admin',
-                    is_main_role: true
+                    is_main_role: true,
                 });
+                const rolePermissionsPayload = [];
+                const permissions = yield agencyUserModel.getAllPermissions();
+                permissions.forEach((permission) => {
+                    rolePermissionsPayload.push({
+                        role_id: newRole[0].id,
+                        permission_id: permission.id,
+                        agency_id: newAgency[0].id,
+                        delete: true,
+                        write: true,
+                        read: true,
+                        update: true,
+                    });
+                });
+                yield agencyUserModel.insertRolePermission(rolePermissionsPayload);
                 let username = lib_1.default.generateUsername(body.user_name);
                 let suffix = 1;
                 while (yield agencyUserModel.checkUser({ username })) {
@@ -391,7 +445,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     name: body.user_name,
                     phone_number: body.phone,
                     role_id: newRole[0].id,
-                    username
+                    username,
                 });
                 if (body.white_label && !white_label_permissions) {
                     const checkPermission = yield agencyModel.getWhiteLabelPermission(newAgency[0].id);
@@ -425,21 +479,21 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     emailSub: `Booking Expert Agency Credentials`,
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(body.agency_name, {
                         email: body.email,
-                        password: password
-                    })
+                        password: password,
+                    }),
                 });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "Agent has been created",
+                    message: 'Agent has been created',
                     data: {
                         agency_id: newAgency[0].id,
                         user_id: newUser[0].id,
                         agency_logo,
                         civil_aviation,
                         trade_license,
-                        national_id
-                    }
+                        national_id,
+                    },
                 };
             }));
         });

@@ -11,6 +11,7 @@ export interface IAdminAgentUpdateAgencyReqBody {
   phone?: string;
   flight_markup_set?: number;
   hotel_markup_set?: number;
+  kam_id?: number;
   address?: string;
   white_label?: boolean;
   allow_api?: boolean;
@@ -28,8 +29,9 @@ export interface IAdminAgentUpdateAgencyReqBody {
 
 export interface IAdminAgentUpdateAgencyApplicationReqBody {
   status: 'Active' | 'Rejected';
-  hotel_markup_set: number;
-  flight_markup_set: number;
+  hotel_markup_set?: number;
+  flight_markup_set?: number;
+  kam_id: number;
 }
 
 export interface IAdminCreateAgentReqBody {
@@ -40,6 +42,7 @@ export interface IAdminCreateAgentReqBody {
   phone: string;
   flight_markup_set: number;
   hotel_markup_set: number;
+  kam_id: number;
   white_label: boolean;
   allow_api: boolean;
   white_label_permissions?: {

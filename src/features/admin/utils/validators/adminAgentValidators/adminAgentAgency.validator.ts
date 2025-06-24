@@ -73,6 +73,7 @@ export default class AdminAgentAgencyValidator {
     user_name: Joi.string().trim().required(),
     flight_markup_set: Joi.number().required(),
     hotel_markup_set: Joi.number().required(),
+    kam_id: Joi.number().required(),
     white_label: Joi.boolean().required(),
     allow_api: Joi.boolean().required(),
     white_label_permissions: Joi.string()

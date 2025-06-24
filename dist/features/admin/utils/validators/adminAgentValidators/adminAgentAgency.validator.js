@@ -75,6 +75,7 @@ class AdminAgentAgencyValidator {
             user_name: joi_1.default.string().trim().required(),
             flight_markup_set: joi_1.default.number().required(),
             hotel_markup_set: joi_1.default.number().required(),
+            kam_id: joi_1.default.number().required(),
             white_label: joi_1.default.boolean().required(),
             allow_api: joi_1.default.boolean().required(),
             white_label_permissions: joi_1.default.string()

@@ -19,6 +19,7 @@ import {
 } from '../../../../utils/miscellaneous/constants';
 import EmailSendLib from '../../../../utils/lib/emailSendLib';
 import { registrationVerificationCompletedTemplate } from '../../../../utils/templates/registrationVerificationCompletedTemplate';
+import { IInsertAgencyRolePermissionPayload } from '../../../../utils/modelTypes/agentModel/agencyUserModelTypes';
 
 export default class AdminAgentAgencyService extends AbstractServices {
   constructor() {
@@ -68,9 +69,9 @@ export default class AdminAgentAgencyService extends AbstractServices {
       };
 
       if (data.white_label) {
-        const wPermissions = await AgencyModel.getWhiteLabelPermission(
-          { agency_id }
-        );
+        const wPermissions = await AgencyModel.getWhiteLabelPermission({
+          agency_id,
+        });
 
         if (wPermissions) {
           whiteLabelPermissions = wPermissions;
@@ -112,13 +113,28 @@ export default class AdminAgentAgencyService extends AbstractServices {
           this.StatusCode.HTTP_NOT_FOUND
         );
       }
+
       const { user_id } = req.admin;
-      const { white_label_permissions, ...restBody } =
+      const { white_label_permissions, kam_id, ...restBody } =
         req.body as IAdminAgentUpdateAgencyReqBody;
 
       const files = (req.files as Express.Multer.File[]) || [];
 
       const payload: IUpdateAgencyPayload = { ...restBody };
+
+      if (kam_id) {
+        const adminModel = this.Model.AdminModel(trx);
+        const checkKam = await adminModel.checkUserAdmin({ id: kam_id });
+        if (!checkKam) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Invalid KAM ID',
+          };
+        } else {
+          payload.kam_id = kam_id;
+        }
+      }
 
       files.forEach((file) => {
         switch (file.fieldname) {
@@ -143,9 +159,9 @@ export default class AdminAgentAgencyService extends AbstractServices {
       });
 
       if (restBody.white_label && !white_label_permissions) {
-        const checkPermission = await AgentModel.getWhiteLabelPermission(
-          {agency_id}
-        );
+        const checkPermission = await AgentModel.getWhiteLabelPermission({
+          agency_id,
+        });
 
         if (!checkPermission) {
           const uuid = uuidv4();
@@ -164,9 +180,9 @@ export default class AdminAgentAgencyService extends AbstractServices {
       }
 
       if (white_label_permissions) {
-        const checkPermission = await AgentModel.getWhiteLabelPermission(
-          {agency_id}
-        );
+        const checkPermission = await AgentModel.getWhiteLabelPermission({
+          agency_id,
+        });
 
         if (checkPermission && white_label_permissions) {
           await AgentModel.updateWhiteLabelPermission(
@@ -209,7 +225,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
       await this.insertAdminAudit(trx, {
         created_by: user_id,
         type: 'UPDATE',
-        details: `Agency Updated. Data: ${JSON.stringify(payload)}`,
+        details: `Agency Updated - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
         payload,
       });
 
@@ -253,6 +269,15 @@ export default class AdminAgentAgencyService extends AbstractServices {
       let payload: IUpdateAgencyPayload = {};
 
       if (body.status === 'Active') {
+        if (!body.hotel_markup_set || !body.flight_markup_set || !body.kam_id) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
+            message:
+              'Flight, hotel markup sets and kam_id are required for activation.',
+          };
+        }
+
         const checkFlightMarkupSet = await MarkupSetModel.getSingleMarkupSet({
           id: body.flight_markup_set,
           status: true,
@@ -283,6 +308,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         payload.status = body.status;
         payload.flight_markup_set = body.flight_markup_set;
         payload.hotel_markup_set = body.hotel_markup_set;
+        payload.kam_id = body.kam_id;
       } else {
         payload.status = body.status;
       }
@@ -331,7 +357,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         is_main_user,
         ref_id,
         agency_logo,
-        address
+        address,
       } = checkUserAgency;
 
       if (
@@ -367,7 +393,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         photo,
         ref_id,
         address,
-        agency_logo
+        agency_logo,
       };
 
       const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
@@ -398,29 +424,31 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       const agencyModel = this.Model.AgencyModel(trx);
       const agencyUserModel = this.Model.AgencyUserModel(trx);
+      const adminModel = this.Model.AdminModel(trx);
 
       const checkSubAgentName = await agencyModel.checkAgency({
-        name: body.agency_name
+        name: body.agency_name,
       });
 
       if (checkSubAgentName) {
         return {
           success: false,
           code: this.StatusCode.HTTP_CONFLICT,
-          message: "Duplicate agency name! Agency already exists with this name"
+          message:
+            'Duplicate agency name! Agency already exists with this name',
         };
       }
 
       const checkAgentUser = await agencyUserModel.checkUser({
-        email: body.email
+        email: body.email,
       });
 
       if (checkAgentUser) {
         return {
           success: false,
           code: this.StatusCode.HTTP_CONFLICT,
-          message: "Email already exists. Please use another email"
-        }
+          message: 'Email already exists. Please use another email',
+        };
       }
 
       let agency_logo = '';
@@ -451,7 +479,20 @@ export default class AdminAgentAgencyService extends AbstractServices {
         }
       });
 
-      const agent_no = await Lib.generateNo({ trx, type: GENERATE_AUTO_UNIQUE_ID.agent });
+      const agent_no = await Lib.generateNo({
+        trx,
+        type: GENERATE_AUTO_UNIQUE_ID.agent,
+      });
+
+      const checkKam = await adminModel.checkUserAdmin({ id: body.kam_id });
+
+      if (!checkKam) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Invalid KAM ID',
+        };
+      }
 
       const newAgency = await agencyModel.createAgency({
         status: 'Active',
@@ -461,14 +502,32 @@ export default class AdminAgentAgencyService extends AbstractServices {
         trade_license,
         national_id,
         created_by: user_id,
-        ...rest
+        ...rest,
       });
 
       const newRole = await agencyUserModel.createRole({
         agency_id: newAgency[0].id,
         name: 'Super Admin',
-        is_main_role: true
+        is_main_role: true,
       });
+
+      const rolePermissionsPayload: IInsertAgencyRolePermissionPayload[] = [];
+
+      const permissions = await agencyUserModel.getAllPermissions();
+
+      permissions.forEach((permission) => {
+        rolePermissionsPayload.push({
+          role_id: newRole[0].id,
+          permission_id: permission.id,
+          agency_id: newAgency[0].id,
+          delete: true,
+          write: true,
+          read: true,
+          update: true,
+        });
+      });
+
+      await agencyUserModel.insertRolePermission(rolePermissionsPayload);
 
       let username = Lib.generateUsername(body.user_name);
 
@@ -490,7 +549,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         name: body.user_name,
         phone_number: body.phone,
         role_id: newRole[0].id,
-        username
+        username,
       });
 
       if (body.white_label && !white_label_permissions) {
@@ -534,32 +593,28 @@ export default class AdminAgentAgencyService extends AbstractServices {
         }
       }
 
-
       await EmailSendLib.sendEmail({
         email: body.email,
         emailSub: `Booking Expert Agency Credentials`,
-        emailBody: registrationVerificationCompletedTemplate(
-          body.agency_name,
-          {
-            email: body.email,
-            password: password
-          }
-        )
+        emailBody: registrationVerificationCompletedTemplate(body.agency_name, {
+          email: body.email,
+          password: password,
+        }),
       });
 
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: "Agent has been created",
+        message: 'Agent has been created',
         data: {
           agency_id: newAgency[0].id,
           user_id: newUser[0].id,
           agency_logo,
           civil_aviation,
           trade_license,
-          national_id
-        }
-      }
+          national_id,
+        },
+      };
     });
   }
 }
