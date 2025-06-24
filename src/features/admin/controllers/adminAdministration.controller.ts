@@ -11,7 +11,7 @@ export default class AdminAdministrationController extends AbstractController {
   }
 
   public createRole = this.asyncWrapper.wrap(
-    { querySchema: this.validator.createRole },
+    { bodySchema: this.validator.createRole },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.createRole(req);
       res.status(code).json(data);

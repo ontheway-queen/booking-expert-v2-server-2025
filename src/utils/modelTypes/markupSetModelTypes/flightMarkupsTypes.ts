@@ -1,65 +1,64 @@
 interface IMarkupTypes {
-    markup_type: 'PER' | 'FLAT';
-    markup_mode: 'INCREASE' | 'DECREASE';
+  markup_type: 'PER' | 'FLAT';
+  markup_mode: 'INCREASE' | 'DECREASE';
 }
 
-
 export interface ICreateFlightMarkupsPayload extends IMarkupTypes {
-    markup_set_flight_api_id: number;
-    airline: string;
-    markup_domestic?: number;
-    markup_from_dac?: number;
-    markup_to_dac?: number;
-    markup_soto?: number;
-    created_by: number;
-    booking_block?: boolean;
-    issue_block?: boolean;
+  markup_set_flight_api_id: number;
+  airline: string;
+  markup_domestic?: number;
+  markup_from_dac?: number;
+  markup_to_dac?: number;
+  markup_soto?: number;
+  created_by: number;
+  booking_block?: boolean;
+  issue_block?: boolean;
 }
 
 export interface IUpdateFlightMarkupsPayload {
-    airline?: string;
-    markup_domestic?: number;
-    markup_from_dac?: number;
-    markup_to_dac?: number;
-    markup_soto?: number;
-    status?: boolean;
-    updated_by: number;
-    updated_at: Date;
-    markup_type?: 'PER' | 'FLAT';
-    markup_mode?: 'INCREASE' | 'DECREASE';
-    booking_block?: boolean;
-    issue_block?: boolean;
+  airline?: string;
+  markup_domestic?: number;
+  markup_from_dac?: number;
+  markup_to_dac?: number;
+  markup_soto?: number;
+  status?: boolean;
+  updated_by: number;
+  updated_at: Date;
+  markup_type?: 'PER' | 'FLAT';
+  markup_mode?: 'INCREASE' | 'DECREASE';
+  booking_block?: boolean;
+  issue_block?: boolean;
 }
 
 export interface IGetFlightMarkupsData extends IMarkupTypes {
-    key: number;
-    airline: string;
-    airline_name: string;
-    airline_logo: string;
-    markup_domestic: number;
-    markup_from_dac: number;
-    markup_to_dac: number;
-    markup_soto: number;
-    status: boolean;
-    booking_block: boolean;
-    issue_block: boolean;
-    created_by: number;
-    updated_by: number | null;
-    last_updated_at: Date | null;
-    markup_set_flight_api_id: number;
-    api_name: string;
-    api_logo: string | null;
+  key: number;
+  airline: string;
+  airline_name: string;
+  airline_logo: string;
+  markup_domestic: number;
+  markup_from_dac: number;
+  markup_to_dac: number;
+  markup_soto: number;
+  status: boolean;
+  booking_block: boolean;
+  issue_block: boolean;
+  created_by: number;
+  updated_by: number | null;
+  last_updated_at: Date | null;
+  markup_set_flight_api_id: number;
+  api_name: string;
+  api_logo: string | null;
 }
 
 export interface IGetFlightMarkupsListFilterQuery {
-    airline?: string;
-    markup_set_flight_api_id?: number;
-    status?: boolean;
-    api_status?: boolean;
-    limit?: number;
-    skip?: number;
+  airline?: string;
+  markup_set_flight_api_id?: number;
+  status?: boolean;
+  api_status?: boolean;
+  limit?: number;
+  skip?: number;
 }
 
 export interface IGetApiActiveAirlinesData {
-    Code: string;
+  Code: string;
 }

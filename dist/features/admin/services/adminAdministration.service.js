@@ -76,6 +76,7 @@ class AdminAdministrationService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: this.ResMsg.HTTP_SUCCESSFUL,
+                    data: { id: role_res[0].id },
                 };
             }));
         });

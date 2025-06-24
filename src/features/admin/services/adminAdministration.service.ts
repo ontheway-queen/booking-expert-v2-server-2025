@@ -74,6 +74,7 @@ export class AdminAdministrationService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: this.ResMsg.HTTP_SUCCESSFUL,
+        data: { id: role_res[0].id },
       };
     });
   }

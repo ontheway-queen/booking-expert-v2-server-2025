@@ -49,7 +49,7 @@ export default class AdminAdministrationValidator {
     filter: Joi.string().optional().trim(),
     limit: Joi.number().optional(),
     skip: Joi.number().optional(),
-    role_id: Joi.number().required(),
+    role_id: Joi.number().optional(),
     status: Joi.boolean().optional(),
   });
 

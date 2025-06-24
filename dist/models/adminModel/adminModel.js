@@ -141,7 +141,7 @@ class AdminModel extends schema_1.default {
     // Get all permissions
     getAllPermissions() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('permissions')
+            return yield this.db('permissions AS per')
                 .withSchema(this.ADMIN_SCHEMA)
                 .select('per.id', 'per.name')
                 .orderBy('per.name', 'asc');
@@ -160,7 +160,7 @@ class AdminModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('roles AS r')
                 .withSchema(this.ADMIN_SCHEMA)
-                .select('r.id', 'r.name', 'r.status', 'r.is_main_role', 'r.created_at', 'r.created_by', 'ua.name as created_by_name')
+                .select('r.id', 'r.name', 'r.status', 'r.is_main_role', 'r.create_date', 'r.created_by', 'ua.name as created_by_name')
                 .leftJoin('user_admin AS ua', 'ua.id', 'r.created_by')
                 .where((qb) => {
                 if (payload.name) {

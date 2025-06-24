@@ -197,7 +197,7 @@ export default class AdminModel extends Schema {
 
   // Get all permissions
   public async getAllPermissions(): Promise<IGetAdminAllPermissionsData[]> {
-    return await this.db('permissions')
+    return await this.db('permissions AS per')
       .withSchema(this.ADMIN_SCHEMA)
       .select('per.id', 'per.name')
       .orderBy('per.name', 'asc');
@@ -223,7 +223,7 @@ export default class AdminModel extends Schema {
         'r.name',
         'r.status',
         'r.is_main_role',
-        'r.created_at',
+        'r.create_date',
         'r.created_by',
         'ua.name as created_by_name'
       )

@@ -106,6 +106,9 @@ export interface IGetAdminRoleListData {
   name: string;
   status: boolean;
   is_main_role: boolean;
+  create_date: string;
+  created_by: number;
+  created_by_name: string;
 }
 
 export interface IUpdateAdminRolePayload {
@@ -116,8 +119,6 @@ export interface IUpdateAdminRolePayload {
 export interface IGetAdminAllPermissionsData {
   id: number;
   name: string;
-  created_by: string;
-  created_at: string;
 }
 
 export interface IGetSingleAdminRoleWithPermissionsData {

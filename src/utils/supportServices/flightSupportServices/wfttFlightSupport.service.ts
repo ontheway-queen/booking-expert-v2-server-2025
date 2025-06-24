@@ -30,12 +30,48 @@ export default class WfttFlightService extends AbstractServices {
     this.trx = trx;
   }
 
+  // Request body formatter
+  private async FlightSearchReqFormatter(
+    reqBody: IFlightSearchReqBody,
+    set_flight_api_id: number
+  ): Promise<IFlightSearchReqBody> {
+    const {
+      JourneyType,
+      airline_code,
+      OriginDestinationInformation,
+      PassengerTypeQuantity,
+    } = reqBody;
+
+    const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
+
+    const defaultAllowedAirlines =
+      await flightMarkupsModel.getAPIActiveAirlines(set_flight_api_id);
+
+    let newAirlineCodes: { Code: string }[] = [];
+
+    if (airline_code?.length) {
+      defaultAllowedAirlines.forEach((airline) => {
+        if (airline_code.some((code) => code.Code === airline.Code)) {
+          newAirlineCodes.push({ Code: airline.Code });
+        }
+      });
+    } else {
+      newAirlineCodes = defaultAllowedAirlines;
+    }
+
+    // Format the request body as per WFTT API requirements
+    return {
+      JourneyType,
+      airline_code: newAirlineCodes,
+      OriginDestinationInformation,
+      PassengerTypeQuantity,
+    };
+  }
+
   // Flight search service
   public async FlightSearch({
     set_flight_api_id,
-    booking_block,
     reqBody,
-    markup_set_id,
     markup_amount,
   }: {
     reqBody: IFlightSearchReqBody;
@@ -48,12 +84,16 @@ export default class WfttFlightService extends AbstractServices {
       markup_mode: 'INCREASE' | 'DECREASE';
     };
   }) {
+    const formattedReqBody = await this.FlightSearchReqFormatter(
+      reqBody,
+      set_flight_api_id
+    );
+
     const response: IWFTTFlightSearchResBody | undefined =
       await this.request.postRequest(
         WfttAPIEndpoints.FLIGHT_SEARCH_ENDPOINT,
-        reqBody
+        formattedReqBody
       );
-    // return [response];
 
     if (!response) {
       return [];
@@ -101,9 +141,12 @@ export default class WfttFlightService extends AbstractServices {
     });
 
     const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
+    const commonModel = this.Model.CommonModel(this.trx);
+
     return (await Promise.all(
       data.map(async (item) => {
         const domestic_flight = item.isDomesticFlight;
+
         let fare = {
           base_fare: item.fare.base_fare,
           total_tax: item.fare.total_tax,
@@ -118,6 +161,7 @@ export default class WfttFlightService extends AbstractServices {
         let finalMarkup = 0;
         let finalMarkupType = '';
         let finalMarkupMode = '';
+
         // Set Markup if route Markup is not available and airlines Markup is available
         if (!finalMarkup && !finalMarkupType && !finalMarkupMode) {
           //airline markup
@@ -225,9 +269,58 @@ export default class WfttFlightService extends AbstractServices {
           isDomesticFlight,
           fare: wftt_fare,
           api,
+          carrier_code,
+          carrier_logo,
           api_search_id,
+          flights,
           ...rest
         } = item;
+
+        const newFlights = await Promise.all(
+          flights.map(async (flight) => {
+            const { options } = flight;
+
+            const newOptions = await Promise.all(
+              options.map(async (option) => {
+                const { carrier: optionsCareer } = option;
+
+                const newCareer = { ...optionsCareer };
+
+                const careerMarketing = await commonModel.getAirlineByCode(
+                  optionsCareer.carrier_marketing_code
+                );
+
+                if (
+                  optionsCareer.carrier_marketing_code ===
+                  optionsCareer.carrier_operating_code
+                ) {
+                  newCareer.carrier_marketing_logo = careerMarketing.logo;
+                  newCareer.carrier_operating_logo = careerMarketing.logo;
+                } else {
+                  const careerOperating = await commonModel.getAirlineByCode(
+                    optionsCareer.carrier_operating_code
+                  );
+
+                  newCareer.carrier_marketing_logo = careerMarketing.logo;
+                  newCareer.carrier_operating_logo = careerOperating.logo;
+                }
+
+                return {
+                  ...option,
+                  carrier: newCareer,
+                  fare,
+                };
+              })
+            );
+
+            return {
+              ...flight,
+              options: newOptions,
+            };
+          })
+        );
+
+        const career = await commonModel.getAirlineByCode(carrier_code);
 
         // const career =
         return {
@@ -236,6 +329,9 @@ export default class WfttFlightService extends AbstractServices {
           price_changed: false,
           api_search_id: search_id,
           api: CUSTOM_API,
+          carrier_code,
+          carrier_logo: career.logo,
+          flights: newFlights,
           ...rest,
           leg_description: [],
         };

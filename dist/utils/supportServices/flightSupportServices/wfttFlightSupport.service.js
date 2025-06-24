@@ -38,11 +38,37 @@ class WfttFlightService extends abstract_service_1.default {
         this.request = new wfttRequest_1.default();
         this.trx = trx;
     }
+    // Request body formatter
+    FlightSearchReqFormatter(reqBody, set_flight_api_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { JourneyType, airline_code, OriginDestinationInformation, PassengerTypeQuantity, } = reqBody;
+            const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
+            const defaultAllowedAirlines = yield flightMarkupsModel.getAPIActiveAirlines(set_flight_api_id);
+            let newAirlineCodes = [];
+            if (airline_code === null || airline_code === void 0 ? void 0 : airline_code.length) {
+                defaultAllowedAirlines.forEach((airline) => {
+                    if (airline_code.some((code) => code.Code === airline.Code)) {
+                        newAirlineCodes.push({ Code: airline.Code });
+                    }
+                });
+            }
+            else {
+                newAirlineCodes = defaultAllowedAirlines;
+            }
+            // Format the request body as per WFTT API requirements
+            return {
+                JourneyType,
+                airline_code: newAirlineCodes,
+                OriginDestinationInformation,
+                PassengerTypeQuantity,
+            };
+        });
+    }
     // Flight search service
     FlightSearch(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, booking_block, reqBody, markup_set_id, markup_amount, }) {
-            const response = yield this.request.postRequest(wfttApiEndpoints_1.default.FLIGHT_SEARCH_ENDPOINT, reqBody);
-            // return [response];
+        return __awaiter(this, arguments, void 0, function* ({ set_flight_api_id, reqBody, markup_amount, }) {
+            const formattedReqBody = yield this.FlightSearchReqFormatter(reqBody, set_flight_api_id);
+            const response = yield this.request.postRequest(wfttApiEndpoints_1.default.FLIGHT_SEARCH_ENDPOINT, formattedReqBody);
             if (!response) {
                 return [];
             }
@@ -70,6 +96,7 @@ class WfttFlightService extends abstract_service_1.default {
                 airports.push(item.DestinationLocation.LocationCode);
             });
             const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
+            const commonModel = this.Model.CommonModel(this.trx);
             return (yield Promise.all(data.map((item) => __awaiter(this, void 0, void 0, function* () {
                 const domestic_flight = item.isDomesticFlight;
                 let fare = {
@@ -176,10 +203,31 @@ class WfttFlightService extends abstract_service_1.default {
                     Number(fare.total_price) +
                         Number(fare.convenience_fee) -
                         Number(fare.discount);
-                const { isDomesticFlight, fare: wftt_fare, api, api_search_id } = item, rest = __rest(item, ["isDomesticFlight", "fare", "api", "api_search_id"]);
+                const { isDomesticFlight, fare: wftt_fare, api, carrier_code, carrier_logo, api_search_id, flights } = item, rest = __rest(item, ["isDomesticFlight", "fare", "api", "carrier_code", "carrier_logo", "api_search_id", "flights"]);
+                const newFlights = yield Promise.all(flights.map((flight) => __awaiter(this, void 0, void 0, function* () {
+                    const { options } = flight;
+                    const newOptions = yield Promise.all(options.map((option) => __awaiter(this, void 0, void 0, function* () {
+                        const { carrier: optionsCareer } = option;
+                        const newCareer = Object.assign({}, optionsCareer);
+                        const careerMarketing = yield commonModel.getAirlineByCode(optionsCareer.carrier_marketing_code);
+                        if (optionsCareer.carrier_marketing_code ===
+                            optionsCareer.carrier_operating_code) {
+                            newCareer.carrier_marketing_logo = careerMarketing.logo;
+                            newCareer.carrier_operating_logo = careerMarketing.logo;
+                        }
+                        else {
+                            const careerOperating = yield commonModel.getAirlineByCode(optionsCareer.carrier_operating_code);
+                            newCareer.carrier_marketing_logo = careerMarketing.logo;
+                            newCareer.carrier_operating_logo = careerOperating.logo;
+                        }
+                        return Object.assign(Object.assign({}, option), { carrier: newCareer, fare });
+                    })));
+                    return Object.assign(Object.assign({}, flight), { options: newOptions });
+                })));
+                const career = yield commonModel.getAirlineByCode(carrier_code);
                 // const career =
                 return Object.assign(Object.assign({ domestic_flight,
-                    fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API }, rest), { leg_description: [] });
+                    fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API, carrier_code, carrier_logo: career.logo, flights: newFlights }, rest), { leg_description: [] });
             }))));
         });
     }

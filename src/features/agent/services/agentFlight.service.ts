@@ -55,6 +55,7 @@ export class AgentFlightService extends AbstractServices {
       const agency_details = await agencyModel.checkAgency({
         agency_id: ref_id || agency_id,
       });
+
       if (!agency_details?.flight_markup_set) {
         return {
           success: false,

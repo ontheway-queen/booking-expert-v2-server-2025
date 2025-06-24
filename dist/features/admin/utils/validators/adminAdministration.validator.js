@@ -46,7 +46,7 @@ class AdminAdministrationValidator {
             filter: joi_1.default.string().optional().trim(),
             limit: joi_1.default.number().optional(),
             skip: joi_1.default.number().optional(),
-            role_id: joi_1.default.number().required(),
+            role_id: joi_1.default.number().optional(),
             status: joi_1.default.boolean().optional(),
         });
         this.updateAdmin = joi_1.default.object({

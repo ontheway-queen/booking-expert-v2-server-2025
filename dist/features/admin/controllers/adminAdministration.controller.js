@@ -31,7 +31,7 @@ class AdminAdministrationController extends abstract_controller_1.default {
         super();
         this.validator = new adminAdministration_validator_1.default();
         this.service = new adminAdministration_service_1.AdminAdministrationService();
-        this.createRole = this.asyncWrapper.wrap({ querySchema: this.validator.createRole }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.createRole = this.asyncWrapper.wrap({ bodySchema: this.validator.createRole }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.createRole(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
