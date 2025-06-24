@@ -31,5 +31,11 @@ class AbstractServices {
             yield adminModel.createAudit(payload);
         });
     }
+    insertAgentAudit(trx, payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const agentModel = this.Model.AgencyModel(trx);
+            yield agentModel.createAudit(payload);
+        });
+    }
 }
 exports.default = AbstractServices;

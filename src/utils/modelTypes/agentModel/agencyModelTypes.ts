@@ -100,6 +100,7 @@ export interface IGetSingleAgencyData {
   flight_markup_set: string;
   hotel_markup_set: string;
   ref_id: number;
+  kam_id?: number;
   civil_aviation: string;
   referred_by: string;
   trade_license: string;

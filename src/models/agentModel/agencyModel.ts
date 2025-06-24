@@ -255,6 +255,7 @@ export default class AgencyModel extends Schema {
         'ag.agency_logo',
         'ag.agency_name',
         'ag.email',
+        'ag.kam_id',
         'ag.phone',
         'ag.address',
         'ag.status',

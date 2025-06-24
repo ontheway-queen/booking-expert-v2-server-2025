@@ -3,9 +3,11 @@ export interface ICreateAgencyUserPayload {
   username: string;
   name: string;
   email: string;
+  gender?: 'Male' | 'Female' | 'Other';
   hashed_password: string;
   phone_number: string;
   photo?: string;
+  created_by?: number;
   role_id: number;
   is_main_user: boolean;
 }
@@ -27,7 +29,8 @@ export interface IUpdateAgencyUserPayload {
 export interface IGetAgencyUserListQuery {
   agency_id: number;
   filter?: string;
-  status?: string;
+  role_id?: number;
+  status?: boolean;
   limit?: string;
   skip?: string;
 }
@@ -43,6 +46,21 @@ export interface IGetAgencyUserListData {
   is_main_user: boolean;
   status: boolean;
   socket_id?: string;
+}
+
+export interface IGetSingleAgencyUserData {
+  id: number;
+  email: string;
+  name: string;
+  photo: string;
+  phone_number: string;
+  username: string;
+  hashed_password: string;
+  two_fa: boolean;
+  role_id: number;
+  role_name: string;
+  status: boolean;
+  is_main_user: boolean;
 }
 
 export interface ICheckAgencyUserData {
@@ -78,6 +96,7 @@ export interface ICreateAgencyRolePayload {
   name: string;
   is_main_role?: boolean;
   agency_id: number;
+  created_by?: number;
 }
 
 export interface IGetAllAgencyPermissionsData {
@@ -100,7 +119,7 @@ export interface IGetAgencyRoleListData {
 
 export interface IUpdateAgencyRolePayload {
   name?: string;
-  status?: number;
+  status?: boolean;
 }
 
 export interface IGetAllPermissionsData {
@@ -133,4 +152,18 @@ export interface IInsertAgencyRolePermissionPayload {
   write?: boolean;
   update?: boolean;
   delete?: boolean;
+}
+
+export interface ICheckAgencyRolePayload {
+  id?: number;
+  agency_id: number;
+  name?: string;
+  status?: boolean;
+}
+
+export interface ICheckAgencyRoleData {
+  id: number;
+  name: string;
+  is_main_role: boolean;
+  status: boolean;
 }

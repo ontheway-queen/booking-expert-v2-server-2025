@@ -61,8 +61,8 @@ export default class AdminModel extends Schema {
           qb.where((qbc) => {
             qbc.where('ua.name', 'ilike', `%${query.filter}%`);
             qbc.where('ua.username', query.filter);
-            qbc.orWhere('ua.email', 'ilike', `%${query.filter}%`);
-            qbc.orWhere('ua.phone_number', 'ilike', `%${query.filter}%`);
+            qbc.orWhere('ua.email', query.filter);
+            qbc.orWhere('ua.phone_number', query.filter);
           });
         }
         if (query.role_id) {
@@ -86,9 +86,10 @@ export default class AdminModel extends Schema {
         .where((qb) => {
           if (query.filter) {
             qb.where((qbc) => {
-              qbc.where('ua.username', 'ilike', `%${query.filter}%`);
-              qbc.orWhere('ua.email', 'ilike', `%${query.filter}%`);
-              qbc.orWhere('ua.phone_number', 'ilike', `%${query.filter}%`);
+              qbc.where('ua.name', 'ilike', `%${query.filter}%`);
+              qbc.where('ua.username', query.filter);
+              qbc.orWhere('ua.email', query.filter);
+              qbc.orWhere('ua.phone_number', query.filter);
             });
           }
           if (query.role_id) {

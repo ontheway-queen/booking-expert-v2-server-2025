@@ -2,6 +2,8 @@ import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import { DATA_LIMIT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
+  ICheckAgencyRoleData,
+  ICheckAgencyRolePayload,
   ICheckAgencyUserData,
   ICreateAgencyRolePayload,
   ICreateAgencyUserPayload,
@@ -75,10 +77,16 @@ export default class AgencyUserModel extends Schema {
       .leftJoin('roles as rl', 'rl.id', 'au.role_id')
       .where((qb) => {
         qb.andWhere('au.agency_id', query.agency_id);
-        if (query.filter) {
-          qb.where('au.username', 'ilike', `%${query.filter}%`)
-            .orWhere('au.email', 'ilike', `%${query.filter}%`)
-            .orWhere('au.name', 'ilike', `%${query.filter}%`);
+        qb.andWhere((qbc) => {
+          if (query.filter) {
+            qbc.where('au.name', 'ilike', `%${query.filter}%`);
+            qbc.where('au.username', query.filter);
+            qbc.orWhere('au.email', query.filter);
+            qbc.orWhere('au.phone_number', query.filter);
+          }
+        });
+        if (query.role_id) {
+          qb.andWhere('au.role_id', query.role_id);
         }
         if (query.status !== undefined) {
           qb.andWhere('au.status', query.status);
@@ -95,11 +103,14 @@ export default class AgencyUserModel extends Schema {
         .count('au.id AS total')
         .where((qb) => {
           qb.andWhere('au.agency_id', query.agency_id);
-          if (query.filter) {
-            qb.where('au.username', 'ilike', `%${query.filter}%`)
-              .orWhere('au.email', 'ilike', `%${query.filter}%`)
-              .orWhere('au.name', 'ilike', `%${query.filter}%`);
-          }
+          qb.andWhere((qbc) => {
+            if (query.filter) {
+              qbc.where('au.name', 'ilike', `%${query.filter}%`);
+              qbc.where('au.username', query.filter);
+              qbc.orWhere('au.email', query.filter);
+              qbc.orWhere('au.phone_number', query.filter);
+            }
+          });
           if (query.status !== undefined) {
             qb.andWhere('au.status', query.status);
           }
@@ -178,6 +189,35 @@ export default class AgencyUserModel extends Schema {
       .first();
   }
 
+  // check agency user
+  public async getSingleAgencyUser({
+    id,
+    agency_id,
+  }: {
+    agency_id: number;
+    id: number;
+  }): Promise<ICheckAgencyUserData | null> {
+    return await this.db('agency_user AS au')
+      .withSchema(this.AGENT_SCHEMA)
+      .select(
+        'au.id',
+        'au.email',
+        'au.phone_number',
+        'au.photo',
+        'au.name',
+        'au.username',
+        'au.two_fa',
+        'au.role_id',
+        'r.name AS role_name',
+        'au.status',
+        'au.is_main_user'
+      )
+      .leftJoin('roles AS r', 'au.role_id', 'r.id')
+      .andWhere('au.id', id)
+      .andWhere('au.agency_id', agency_id)
+      .first();
+  }
+
   // Create role
   public async createRole(payload: ICreateAgencyRolePayload) {
     return await this.db('roles')
@@ -202,6 +242,24 @@ export default class AgencyUserModel extends Schema {
         }
       })
       .orderBy('name', 'asc');
+  }
+
+  public async checkRole(
+    payload: ICheckAgencyRolePayload
+  ): Promise<ICheckAgencyRoleData | null> {
+    return await this.db('roles')
+      .withSchema(this.AGENT_SCHEMA)
+      .select('id', 'name', 'status', 'is_main_role')
+      .where((qb) => {
+        qb.andWhere('agency_id', payload.agency_id);
+        if (payload.name) {
+          qb.andWhere('name', payload.name);
+        }
+        if (payload.id) {
+          qb.andWhere('id', payload.id);
+        }
+      })
+      .first();
   }
 
   public async getAllPermissions(): Promise<IGetAllAgencyPermissionsData[]> {
