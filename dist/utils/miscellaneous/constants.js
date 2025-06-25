@@ -11,6 +11,7 @@ exports.origin = [
     'https://admin-3f9e4x.bookingexpert.us',
     'http://10.10.220.42:3000',
     'http://10.10.220.42:6565',
+    'http://10.10.220.42:5000',
 ];
 // OTP types constants
 exports.OTP_TYPES = {
