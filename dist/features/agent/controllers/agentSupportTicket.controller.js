@@ -23,43 +23,44 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AgentTravelerController = void 0;
+exports.AgentSupportTicketController = void 0;
 const abstract_controller_1 = __importDefault(require("../../../abstract/abstract.controller"));
-const agentTraveler_service_1 = require("../services/agentTraveler.service");
-const agentTraveler_validator_1 = require("../utils/validators/agentTraveler.validator");
-class AgentTravelerController extends abstract_controller_1.default {
+const agentSupportTicket_service_1 = require("../services/agentSupportTicket.service");
+const agentSupportTicket_validator_1 = __importDefault(require("../utils/validators/agentSupportTicket.validator"));
+class AgentSupportTicketController extends abstract_controller_1.default {
     constructor() {
         super();
-        this.service = new agentTraveler_service_1.AgentTravelerService();
-        this.validator = new agentTraveler_validator_1.AgentTravelerValidator();
-        this.createTraveler = this.asyncWrapper.wrap({
-            bodySchema: this.validator.create,
+        this.service = new agentSupportTicket_service_1.AgentSupportTicketService();
+        this.validator = new agentSupportTicket_validator_1.default();
+        this.createSupportTicker = this.asyncWrapper.wrap({
+            bodySchema: this.validator.createSupportTicket,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.createTraveler(req), { code } = _a, rest = __rest(_a, ["code"]);
+            const _a = yield this.service.createSupportTicket(req), { code } = _a, rest = __rest(_a, ["code"]);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
+        }));
+        this.getSupportTicket = this.asyncWrapper.wrap({
+            bodySchema: this.validator.getSupportTicket,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getSupportTicket(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
-        this.getAllTraveler = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.getAllTraveler(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
-        }));
-        this.getSingleTraveler = this.asyncWrapper.wrap({
+        this.getSingleSupportTicket = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.getSingleTraveler(req), { code } = _a, rest = __rest(_a, ["code"]);
+            const _a = yield this.service.getSingleSupportTicketWithMsg(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
-        this.updateTraveler = this.asyncWrapper.wrap({
-            bodySchema: this.validator.update,
-        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.updateTraveler(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
-        }));
-        this.deleteTraveler = this.asyncWrapper.wrap({
+        this.getSupportTicketMsg = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.deleteTraveler(req), { code } = _a, rest = __rest(_a, ["code"]);
+            const _a = yield this.service.getSupportTicketMsg(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
     }
 }
-exports.AgentTravelerController = AgentTravelerController;
+exports.AgentSupportTicketController = AgentSupportTicketController;

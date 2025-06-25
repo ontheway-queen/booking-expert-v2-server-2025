@@ -34,6 +34,22 @@ export default class AdminAdministrationController extends AbstractController {
     }
   );
 
+  public createPermission = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.addPermissionsList(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public updatePermission = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.updatePermission(req);
+      res.status(code).json(data);
+    }
+  );
+
   public getSingleRoleWithPermissions = this.asyncWrapper.wrap(
     { paramSchema: this.commonValidator.singleParamNumValidator() },
     async (req: Request, res: Response) => {

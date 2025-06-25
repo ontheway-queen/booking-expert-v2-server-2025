@@ -25,7 +25,14 @@ export default class AdminAdministrationRouter extends AbstractRouter {
         this.controller.updateAdmin
       );
 
-    this.router.route('/permissions').get(this.controller.getPermissionsList);
+    this.router
+      .route('/permissions')
+      .get(this.controller.getPermissionsList)
+      .post(this.controller.createPermission);
+
+    this.router
+      .route('/permissions/:id')
+      .patch(this.controller.updatePermission);
 
     this.router
       .route('/role')

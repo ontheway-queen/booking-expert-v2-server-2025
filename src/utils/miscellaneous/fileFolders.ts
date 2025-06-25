@@ -18,6 +18,7 @@ class FileFolder {
   static readonly SPECIAL_OFFER = 'special-offer';
   static readonly BANK_INVOICE_FILES = 'bank-invoice-files';
   static readonly AGENT_FLIGHT_BOOKING_FILES = 'agent/flight-booking-files';
+  static readonly AGENT_SUPPORT_TICKET_FILES = 'agent/support-ticket-files';
   static readonly AGENT_B2C_FLIGHT_BOOKING_FILES =
     'agent-b2c/flight-booking-files';
   static readonly AGENT_HOTEL_BOOKING_FILES = 'agent/hotel-booking-files';

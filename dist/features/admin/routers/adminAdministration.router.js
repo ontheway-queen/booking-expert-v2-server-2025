@@ -20,7 +20,13 @@ class AdminAdministrationRouter extends abstract_router_1.default {
             .route('/admin/:id')
             .get(this.controller.getSingleAdmin)
             .patch(this.uploader.cloudUploadRaw(this.fileFolders.ADMIN_FILES, ['photo']), this.controller.updateAdmin);
-        this.router.route('/permissions').get(this.controller.getPermissionsList);
+        this.router
+            .route('/permissions')
+            .get(this.controller.getPermissionsList)
+            .post(this.controller.createPermission);
+        this.router
+            .route('/permissions/:id')
+            .patch(this.controller.updatePermission);
         this.router
             .route('/role')
             .post(this.controller.createRole)

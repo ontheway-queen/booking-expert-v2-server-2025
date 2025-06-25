@@ -10,7 +10,7 @@ class AdminAdministrationValidator {
             role_name: joi_1.default.string().required().max(100),
             permissions: joi_1.default.array()
                 .items(joi_1.default.object({
-                permission_id: joi_1.default.number().required(),
+                id: joi_1.default.number().required(),
                 read: joi_1.default.boolean().required(),
                 write: joi_1.default.boolean().required(),
                 update: joi_1.default.boolean().required(),
@@ -26,7 +26,7 @@ class AdminAdministrationValidator {
             role_name: joi_1.default.string().max(100),
             permissions: joi_1.default.array()
                 .items(joi_1.default.object({
-                permission_id: joi_1.default.number().required(),
+                id: joi_1.default.number().required(),
                 read: joi_1.default.boolean().required(),
                 write: joi_1.default.boolean().required(),
                 update: joi_1.default.boolean().required(),

@@ -46,14 +46,14 @@ export class AdminAdministrationService extends AbstractServices {
       });
 
       const uniquePermission = [
-        ...new Map(permissions.map((obj) => [obj.permission_id, obj])).values(),
+        ...new Map(permissions.map((obj) => [obj.id, obj])).values(),
       ];
 
       if (uniquePermission.length) {
         const permission_body = uniquePermission.map((element: any) => {
           return {
             role_id: role_res[0].id,
-            permission_id: element.permission_id,
+            permission_id: element.id,
             read: element.read,
             write: element.write,
             update: element.update,
@@ -99,6 +99,28 @@ export class AdminAdministrationService extends AbstractServices {
       success: true,
       code: this.StatusCode.HTTP_OK,
       data: permissions,
+    };
+  }
+
+  //permissions
+  public async addPermissionsList(req: Request) {
+    const model = this.Model.AdminModel();
+    const permissions = await model.createPermission(req.body.name);
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      data: permissions[0].id,
+    };
+  }
+
+  //permissions
+  public async updatePermission(req: Request) {
+    const model = this.Model.AdminModel();
+    const { id } = req.params;
+    await model.updatePermission(Number(id), req.body.name);
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
     };
   }
 
@@ -189,7 +211,7 @@ export class AdminAdministrationService extends AbstractServices {
 
         for (let i = 0; i < perReqData.length; i++) {
           for (let j = 0; j < getPermissions.length; j++) {
-            if (perReqData[i].permission_id == getPermissions[j].id) {
+            if (perReqData[i].id == getPermissions[j].id) {
               addPermissions.push(perReqData[i]);
             }
           }
@@ -204,9 +226,7 @@ export class AdminAdministrationService extends AbstractServices {
         for (let i = 0; i < addPermissions.length; i++) {
           let found = false;
           for (let j = 0; j < permissions.length; j++) {
-            if (
-              addPermissions[i].permission_id == permissions[j].permission_id
-            ) {
+            if (addPermissions[i].id == permissions[j].permission_id) {
               found = true;
               haveToUpdateVal.push(addPermissions[i]);
               break;
@@ -222,12 +242,11 @@ export class AdminAdministrationService extends AbstractServices {
         const add_permission_body = insertPermissionVal.map((element: any) => {
           return {
             role_id,
-            permission_id: element.permission_id,
+            permission_id: element.id,
             read: element.read,
             write: element.write,
             update: element.update,
             delete: element.delete,
-            created_by: user_id,
           };
         });
 

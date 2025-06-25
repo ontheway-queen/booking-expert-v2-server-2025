@@ -52,13 +52,13 @@ class AdminAdministrationService extends abstract_service_1.default {
                     created_by: user_id,
                 });
                 const uniquePermission = [
-                    ...new Map(permissions.map((obj) => [obj.permission_id, obj])).values(),
+                    ...new Map(permissions.map((obj) => [obj.id, obj])).values(),
                 ];
                 if (uniquePermission.length) {
                     const permission_body = uniquePermission.map((element) => {
                         return {
                             role_id: role_res[0].id,
-                            permission_id: element.permission_id,
+                            permission_id: element.id,
                             read: element.read,
                             write: element.write,
                             update: element.update,
@@ -103,6 +103,30 @@ class AdminAdministrationService extends abstract_service_1.default {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 data: permissions,
+            };
+        });
+    }
+    //permissions
+    addPermissionsList(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.AdminModel();
+            const permissions = yield model.createPermission(req.body.name);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                data: permissions[0].id,
+            };
+        });
+    }
+    //permissions
+    updatePermission(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.AdminModel();
+            const { id } = req.params;
+            yield model.updatePermission(Number(id), req.body.name);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
             };
         });
     }
@@ -174,7 +198,7 @@ class AdminAdministrationService extends abstract_service_1.default {
                     const addPermissions = [];
                     for (let i = 0; i < perReqData.length; i++) {
                         for (let j = 0; j < getPermissions.length; j++) {
-                            if (perReqData[i].permission_id == getPermissions[j].id) {
+                            if (perReqData[i].id == getPermissions[j].id) {
                                 addPermissions.push(perReqData[i]);
                             }
                         }
@@ -186,7 +210,7 @@ class AdminAdministrationService extends abstract_service_1.default {
                     for (let i = 0; i < addPermissions.length; i++) {
                         let found = false;
                         for (let j = 0; j < permissions.length; j++) {
-                            if (addPermissions[i].permission_id == permissions[j].permission_id) {
+                            if (addPermissions[i].id == permissions[j].permission_id) {
                                 found = true;
                                 haveToUpdateVal.push(addPermissions[i]);
                                 break;
@@ -200,12 +224,11 @@ class AdminAdministrationService extends abstract_service_1.default {
                     const add_permission_body = insertPermissionVal.map((element) => {
                         return {
                             role_id,
-                            permission_id: element.permission_id,
+                            permission_id: element.id,
                             read: element.read,
                             write: element.write,
                             update: element.update,
                             delete: element.delete,
-                            created_by: user_id,
                         };
                     });
                     if (add_permission_body.length) {

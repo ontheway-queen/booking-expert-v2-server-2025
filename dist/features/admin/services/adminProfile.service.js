@@ -129,21 +129,22 @@ class AdminProfileService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const CTHotelModel = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const response = yield CTHotelModel.GetBalance();
-                const CTHotelBalance = {
-                    balance: '0.00',
-                    emergency_credit: '0.00',
-                };
+                const Balances = [
+                    {
+                        name: 'CT Hotel Balance',
+                        balance: '0.00',
+                        emergency_credit: '0.00',
+                    },
+                ];
                 if (response.data) {
-                    CTHotelBalance.balance = response.data.balance;
-                    CTHotelBalance.emergency_credit = response.data.lend_balance;
+                    Balances[0].balance = response.data.balance;
+                    Balances[0].emergency_credit = response.data.lend_balance;
                 }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: {
-                        CTHotelBalance,
-                    },
+                    data: Balances,
                 };
             }));
         });

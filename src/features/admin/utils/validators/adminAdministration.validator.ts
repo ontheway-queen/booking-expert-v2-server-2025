@@ -6,7 +6,7 @@ export default class AdminAdministrationValidator {
     permissions: Joi.array()
       .items(
         Joi.object({
-          permission_id: Joi.number().required(),
+          id: Joi.number().required(),
           read: Joi.boolean().required(),
           write: Joi.boolean().required(),
           update: Joi.boolean().required(),
@@ -26,7 +26,7 @@ export default class AdminAdministrationValidator {
     permissions: Joi.array()
       .items(
         Joi.object({
-          permission_id: Joi.number().required(),
+          id: Joi.number().required(),
           read: Joi.boolean().required(),
           write: Joi.boolean().required(),
           update: Joi.boolean().required(),

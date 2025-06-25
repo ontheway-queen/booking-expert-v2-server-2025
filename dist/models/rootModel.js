@@ -37,6 +37,7 @@ const moneyReceiptModel_1 = __importDefault(require("./paymentModel/moneyReceipt
 const travelerModel_1 = __importDefault(require("./travelerModel/travelerModel"));
 const othersModel_1 = __importDefault(require("./othersModel/othersModel"));
 const hotelBookingModel_1 = __importDefault(require("./hotelModel/hotelBookingModel"));
+const supportTicketModel_1 = __importDefault(require("./othersModel/supportTicketModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -169,6 +170,10 @@ class Models {
     //Hotel Booking model
     HotelBookingModel(trx) {
         return new hotelBookingModel_1.default(trx || database_1.db);
+    }
+    //Support Ticket model
+    SupportTicketModel(trx) {
+        return new supportTicketModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

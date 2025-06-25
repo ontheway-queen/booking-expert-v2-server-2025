@@ -213,6 +213,20 @@ export default class AdminModel extends Schema {
       .insert(payload, 'id');
   }
 
+  // Create role
+  public async createPermission(name: string): Promise<{ id: number }[]> {
+    return await this.db('permissions')
+      .withSchema(this.ADMIN_SCHEMA)
+      .insert({ name }, 'id');
+  }
+
+  public async updatePermission(id: number, name: string): Promise<void> {
+    await this.db('permissions')
+      .withSchema(this.ADMIN_SCHEMA)
+      .update({ name })
+      .where({ id });
+  }
+
   // Get all roles
   public async getAllRoles(
     payload: IGetAdminRoleListQuery
@@ -285,8 +299,8 @@ export default class AdminModel extends Schema {
       ) then (
         select json_agg(
           json_build_object(
-            'permission_id', per.id,
-            'permission_name', per.name,
+            'id', per.id,
+            'name', per.name,
             'read', rp.read,
             'write', rp.write,
             'update', rp.update,

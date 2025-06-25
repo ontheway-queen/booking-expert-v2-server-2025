@@ -1,0 +1,57 @@
+import { Request, Response } from 'express';
+import AbstractController from '../../../abstract/abstract.controller';
+import { AgentSupportTicketService } from '../services/agentSupportTicket.service';
+import AgentSupportTicketValidator from '../utils/validators/agentSupportTicket.validator';
+
+export class AgentSupportTicketController extends AbstractController {
+  private service = new AgentSupportTicketService();
+  private validator = new AgentSupportTicketValidator();
+  constructor() {
+    super();
+  }
+
+  public createSupportTicker = this.asyncWrapper.wrap(
+    {
+      bodySchema: this.validator.createSupportTicket,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.createSupportTicket(req);
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
+    }
+  );
+
+  public getSupportTicket = this.asyncWrapper.wrap(
+    {
+      bodySchema: this.validator.getSupportTicket,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getSupportTicket(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public getSingleSupportTicket = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } =
+        await this.service.getSingleSupportTicketWithMsg(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public getSupportTicketMsg = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getSupportTicketMsg(req);
+      res.status(code).json(rest);
+    }
+  );
+}

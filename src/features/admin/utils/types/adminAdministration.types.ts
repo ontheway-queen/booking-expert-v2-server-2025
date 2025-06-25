@@ -1,7 +1,7 @@
 export interface ICreateAdminRoleReqBody {
   role_name: string;
   permissions: {
-    permission_id: number;
+    id: number;
     read: boolean;
     write: boolean;
     update: boolean;
@@ -18,7 +18,7 @@ export interface IUpdateAdminRolePermissionsReqBody {
   role_name?: string;
   status?: boolean;
   permissions?: {
-    permission_id: number;
+    id: number;
     read: boolean;
     write: boolean;
     update: boolean;

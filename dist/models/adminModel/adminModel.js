@@ -156,6 +156,22 @@ class AdminModel extends schema_1.default {
                 .insert(payload, 'id');
         });
     }
+    // Create role
+    createPermission(name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('permissions')
+                .withSchema(this.ADMIN_SCHEMA)
+                .insert({ name }, 'id');
+        });
+    }
+    updatePermission(id, name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.db('permissions')
+                .withSchema(this.ADMIN_SCHEMA)
+                .update({ name })
+                .where({ id });
+        });
+    }
     // Get all roles
     getAllRoles(payload) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -213,8 +229,8 @@ class AdminModel extends schema_1.default {
       ) then (
         select json_agg(
           json_build_object(
-            'permission_id', per.id,
-            'permission_name', per.name,
+            'id', per.id,
+            'name', per.name,
             'read', rp.read,
             'write', rp.write,
             'update', rp.update,
