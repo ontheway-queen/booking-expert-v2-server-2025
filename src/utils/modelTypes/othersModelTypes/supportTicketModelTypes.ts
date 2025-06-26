@@ -74,6 +74,10 @@ export interface IGetSingleAgentSupportTicketData {
   ref_id?: number;
   source_id: number;
   subject: string;
+  closed_by: string | null;
+  close_date: string | null;
+  reopen_by: string | null;
+  reopen_date: string | null;
   status: 'Open' | 'Closed' | 'ReOpen';
   agency_name: string;
   agency_logo: string;
@@ -100,4 +104,13 @@ export interface IGetSupportTicketMessagesData {
   attachments: string;
   reply_by: 'Admin' | 'Customer';
   created_at: string;
+}
+export interface IUpdateSupportTicketPayload {
+  last_message_id?: number;
+  closed_by_user_id?: number;
+  status?: 'Open' | 'Closed' | 'ReOpen';
+  closed_by?: 'Admin' | 'Customer';
+  close_date?: Date;
+  reopen_by?: 'Admin' | 'Customer';
+  reopen_date?: Date;
 }

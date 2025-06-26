@@ -90,8 +90,11 @@ class AgentSupportTicketService extends abstract_service_1.default {
             const { id } = req.params;
             const ticket_id = Number(id);
             const supportTicketModel = this.Model.SupportTicketModel();
-            const ticket = yield supportTicketModel.getSingleAgentSupportTicket(ticket_id);
-            if (!ticket || (ticket === null || ticket === void 0 ? void 0 : ticket.source_id) !== agency_id) {
+            const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
+                id: ticket_id,
+                agent_id: agency_id,
+            });
+            if (!ticket) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_NOT_FOUND,
@@ -116,8 +119,11 @@ class AgentSupportTicketService extends abstract_service_1.default {
             const query = req.query;
             const ticket_id = Number(id);
             const supportTicketModel = this.Model.SupportTicketModel();
-            const ticket = yield supportTicketModel.getSingleAgentSupportTicket(ticket_id);
-            if (!ticket || (ticket === null || ticket === void 0 ? void 0 : ticket.source_id) !== agency_id) {
+            const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
+                id: ticket_id,
+                agent_id: agency_id,
+            });
+            if (!ticket) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_NOT_FOUND,
@@ -138,10 +144,81 @@ class AgentSupportTicketService extends abstract_service_1.default {
         });
     }
     sendSupportTicketReplay(req) {
-        return __awaiter(this, void 0, void 0, function* () { });
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { user_id, agency_id } = req.agencyUser;
+                const support_ticket_id = Number(req.params.id);
+                const { message } = req.body;
+                const supportTicketModel = this.Model.SupportTicketModel(trx);
+                const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
+                    id: support_ticket_id,
+                    agent_id: agency_id,
+                });
+                if (!ticket) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const files = req.files || [];
+                const newMsg = yield supportTicketModel.insertSupportTicketMessage({
+                    message,
+                    reply_by: 'Customer',
+                    sender_id: user_id,
+                    support_ticket_id,
+                    attachments: JSON.stringify(files.map((file) => file.filename)),
+                });
+                const payload = {
+                    last_message_id: newMsg[0].id,
+                };
+                if (ticket.status === 'Closed') {
+                    payload.status = 'ReOpen';
+                    payload.reopen_by = 'Customer';
+                    payload.reopen_date = new Date();
+                }
+                yield supportTicketModel.updateSupportTicket(payload, support_ticket_id, constants_1.SOURCE_AGENT);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                    data: {
+                        id: newMsg[0].id,
+                    },
+                };
+            }));
+        });
     }
     closeSupportTicket(req) {
-        return __awaiter(this, void 0, void 0, function* () { });
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const support_ticket_id = Number(req.params.id);
+                const { user_id, agency_id } = req.agencyUser;
+                const supportTicketModel = this.Model.SupportTicketModel(trx);
+                const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
+                    id: support_ticket_id,
+                    agent_id: agency_id,
+                });
+                if (!ticket) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                yield supportTicketModel.updateSupportTicket({
+                    close_date: new Date(),
+                    closed_by: 'Customer',
+                    closed_by_user_id: user_id,
+                    status: 'Closed',
+                }, support_ticket_id, constants_1.SOURCE_AGENT);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                };
+            }));
+        });
     }
 }
 exports.AgentSupportTicketService = AgentSupportTicketService;

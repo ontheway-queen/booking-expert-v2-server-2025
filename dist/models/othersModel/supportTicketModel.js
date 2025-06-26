@@ -123,15 +123,20 @@ class SupportTicketModel extends schema_1.default {
             return { data, total: ((_b = total[0]) === null || _b === void 0 ? void 0 : _b.total) || 0 };
         });
     }
-    getSingleAgentSupportTicket(id) {
-        return __awaiter(this, void 0, void 0, function* () {
+    getSingleAgentSupportTicket(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ id, agent_id, }) {
             return yield this.db('support_tickets AS st')
                 .withSchema(this.DBO_SCHEMA)
-                .select('st.id', 'st.support_no', 'st.source_id', 'st.ref_type', 'st.ref_id', 'st.subject', 'st.status', 'a.agency_name', 'a.agency_logo', 'au.name AS created_by_name', 'au.photo AS created_by_photo', 'st.created_at')
+                .select('st.id', 'st.support_no', 'st.source_id', 'st.ref_type', 'st.close_date', 'st.closed_by', 'st.reopen_date', 'st.reopen_by', 'st.ref_id', 'st.subject', 'st.status', 'a.agency_name', 'a.agency_logo', 'au.name AS created_by_name', 'au.photo AS created_by_photo', 'st.created_at')
                 .joinRaw(`LEFT JOIN agent.agency AS a ON a.id = st.source_id`)
                 .joinRaw(`LEFT JOIN agent.agency_user AS au ON au.id = st.user_id`)
-                .andWhere('st.id', id)
-                .andWhere('st.source_type', constants_1.SOURCE_AGENT)
+                .where((qb) => {
+                qb.andWhere('st.id', id);
+                qb.andWhere('st.source_type', constants_1.SOURCE_AGENT);
+                if (agent_id) {
+                    qb.andWhere('st.source_id', agent_id);
+                }
+            })
                 .first();
         });
     }

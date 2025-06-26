@@ -27,4 +27,8 @@ export default class AgentSupportTicketValidator {
     limit: Joi.number().optional(),
     skip: Joi.number().optional(),
   });
+
+  public sendMsg = Joi.object({
+    message: Joi.string().trim().required(),
+  });
 }

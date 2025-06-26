@@ -8,6 +8,7 @@ import {
   IGetSupportTicketMessagesData,
   IInsertSupportTicketMessagePayload,
   IInsertSupportTicketPayload,
+  IUpdateSupportTicketPayload,
 } from '../../utils/modelTypes/othersModelTypes/supportTicketModelTypes';
 
 export default class SupportTicketModel extends Schema {
@@ -27,10 +28,7 @@ export default class SupportTicketModel extends Schema {
   }
 
   public async updateSupportTicket(
-    payload: {
-      last_message_id?: number;
-      status?: 'Open' | 'Closed' | 'ReOpen';
-    },
+    payload: IUpdateSupportTicketPayload,
     id: number,
     source_type: 'AGENT' | 'AGENT B2C' | 'B2C'
   ) {
@@ -182,9 +180,13 @@ export default class SupportTicketModel extends Schema {
     return { data, total: total[0]?.total || 0 };
   }
 
-  public async getSingleAgentSupportTicket(
-    id: number
-  ): Promise<IGetSingleAgentSupportTicketData | null> {
+  public async getSingleAgentSupportTicket({
+    id,
+    agent_id,
+  }: {
+    id: number;
+    agent_id?: number;
+  }): Promise<IGetSingleAgentSupportTicketData | null> {
     return await this.db('support_tickets AS st')
       .withSchema(this.DBO_SCHEMA)
       .select(
@@ -192,6 +194,10 @@ export default class SupportTicketModel extends Schema {
         'st.support_no',
         'st.source_id',
         'st.ref_type',
+        'st.close_date',
+        'st.closed_by',
+        'st.reopen_date',
+        'st.reopen_by',
         'st.ref_id',
         'st.subject',
         'st.status',
@@ -203,8 +209,13 @@ export default class SupportTicketModel extends Schema {
       )
       .joinRaw(`LEFT JOIN agent.agency AS a ON a.id = st.source_id`)
       .joinRaw(`LEFT JOIN agent.agency_user AS au ON au.id = st.user_id`)
-      .andWhere('st.id', id)
-      .andWhere('st.source_type', SOURCE_AGENT)
+      .where((qb) => {
+        qb.andWhere('st.id', id);
+        qb.andWhere('st.source_type', SOURCE_AGENT);
+        if (agent_id) {
+          qb.andWhere('st.source_id', agent_id);
+        }
+      })
       .first();
   }
 }

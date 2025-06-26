@@ -61,6 +61,19 @@ class AgentSupportTicketController extends abstract_controller_1.default {
             const _a = yield this.service.getSupportTicketMsg(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.sendSupportTicketReplay = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+            bodySchema: this.validator.sendMsg,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.sendSupportTicketReplay(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.closeSupportTicket = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.closeSupportTicket(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.AgentSupportTicketController = AgentSupportTicketController;

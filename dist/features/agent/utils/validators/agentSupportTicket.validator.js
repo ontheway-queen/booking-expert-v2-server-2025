@@ -22,6 +22,9 @@ class AgentSupportTicketValidator {
             limit: joi_1.default.number().optional(),
             skip: joi_1.default.number().optional(),
         });
+        this.sendMsg = joi_1.default.object({
+            message: joi_1.default.string().trim().required(),
+        });
     }
 }
 exports.default = AgentSupportTicketValidator;

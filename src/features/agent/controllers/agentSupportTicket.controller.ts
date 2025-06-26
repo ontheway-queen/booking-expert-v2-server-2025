@@ -54,4 +54,25 @@ export class AgentSupportTicketController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public sendSupportTicketReplay = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+      bodySchema: this.validator.sendMsg,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.sendSupportTicketReplay(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public closeSupportTicket = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.closeSupportTicket(req);
+      res.status(code).json(rest);
+    }
+  );
 }
