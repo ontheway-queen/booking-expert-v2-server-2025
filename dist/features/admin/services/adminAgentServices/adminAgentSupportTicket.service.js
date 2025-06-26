@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AgentSupportTicketService = void 0;
-const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
-const lib_1 = __importDefault(require("../../../utils/lib/lib"));
-const constants_1 = require("../../../utils/miscellaneous/constants");
-class AgentSupportTicketService extends abstract_service_1.default {
+exports.AdminAgentSupportTicketService = void 0;
+const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
+const lib_1 = __importDefault(require("../../../../utils/lib/lib"));
+const constants_1 = require("../../../../utils/miscellaneous/constants");
+class AdminAgentSupportTicketService extends abstract_service_1.default {
     constructor() {
         super();
     }
@@ -24,8 +24,19 @@ class AgentSupportTicketService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const data = req.body;
-                const { user_id, agency_id } = req.agencyUser;
+                const { user_id } = req.admin;
                 const supportTicketModel = this.Model.SupportTicketModel(trx);
+                const agencyModel = this.Model.AgencyModel(trx);
+                const checkAgent = yield agencyModel.checkAgency({
+                    agency_id: data.agent_id,
+                });
+                if (!checkAgent) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
+                        message: 'Invalid agent id.',
+                    };
+                }
                 const support_no = yield lib_1.default.generateNo({
                     trx,
                     type: 'Agent_SupportTicket',
@@ -37,15 +48,15 @@ class AgentSupportTicketService extends abstract_service_1.default {
                     subject: data.subject,
                     priority: data.priority,
                     created_by_user_id: user_id,
-                    created_by: 'Customer',
-                    source_id: agency_id,
+                    created_by: 'Admin',
+                    source_id: data.agent_id,
                     source_type: constants_1.SOURCE_AGENT,
                     support_no,
                 });
                 const msg = yield supportTicketModel.insertSupportTicketMessage({
                     support_ticket_id: ticket[0].id,
                     message: data.details,
-                    reply_by: 'Customer',
+                    reply_by: 'Admin',
                     sender_id: user_id,
                     attachments: JSON.stringify(files.map((file) => file.filename)),
                 });
@@ -72,10 +83,9 @@ class AgentSupportTicketService extends abstract_service_1.default {
     }
     getSupportTicket(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyUser;
             const supportTicketModel = this.Model.SupportTicketModel();
             const query = req.query;
-            const data = yield supportTicketModel.getAgentSupportTicket(Object.assign({ agent_id: agency_id }, query), true);
+            const data = yield supportTicketModel.getAgentSupportTicket(Object.assign({}, query), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -87,13 +97,11 @@ class AgentSupportTicketService extends abstract_service_1.default {
     }
     getSingleSupportTicketWithMsg(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyUser;
             const { id } = req.params;
             const ticket_id = Number(id);
             const supportTicketModel = this.Model.SupportTicketModel();
             const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                 id: ticket_id,
-                agent_id: agency_id,
             });
             if (!ticket) {
                 return {
@@ -115,14 +123,12 @@ class AgentSupportTicketService extends abstract_service_1.default {
     }
     getSupportTicketMsg(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyUser;
             const { id } = req.params;
             const query = req.query;
             const ticket_id = Number(id);
             const supportTicketModel = this.Model.SupportTicketModel();
             const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                 id: ticket_id,
-                agent_id: agency_id,
             });
             if (!ticket) {
                 return {
@@ -147,13 +153,12 @@ class AgentSupportTicketService extends abstract_service_1.default {
     sendSupportTicketReplay(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { user_id, agency_id } = req.agencyUser;
+                const { user_id } = req.admin;
                 const support_ticket_id = Number(req.params.id);
                 const { message } = req.body;
                 const supportTicketModel = this.Model.SupportTicketModel(trx);
                 const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                     id: support_ticket_id,
-                    agent_id: agency_id,
                 });
                 if (!ticket) {
                     return {
@@ -165,7 +170,7 @@ class AgentSupportTicketService extends abstract_service_1.default {
                 const files = req.files || [];
                 const newMsg = yield supportTicketModel.insertSupportTicketMessage({
                     message,
-                    reply_by: 'Customer',
+                    reply_by: 'Admin',
                     sender_id: user_id,
                     support_ticket_id,
                     attachments: JSON.stringify(files.map((file) => file.filename)),
@@ -175,7 +180,7 @@ class AgentSupportTicketService extends abstract_service_1.default {
                 };
                 if (ticket.status === 'Closed') {
                     payload.status = 'ReOpen';
-                    payload.reopen_by = 'Customer';
+                    payload.reopen_by = 'Admin';
                     payload.reopen_date = new Date();
                 }
                 yield supportTicketModel.updateSupportTicket(payload, support_ticket_id, constants_1.SOURCE_AGENT);
@@ -194,11 +199,10 @@ class AgentSupportTicketService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const support_ticket_id = Number(req.params.id);
-                const { user_id, agency_id } = req.agencyUser;
+                const { user_id } = req.admin;
                 const supportTicketModel = this.Model.SupportTicketModel(trx);
                 const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                     id: support_ticket_id,
-                    agent_id: agency_id,
                 });
                 if (!ticket) {
                     return {
@@ -216,7 +220,7 @@ class AgentSupportTicketService extends abstract_service_1.default {
                 }
                 yield supportTicketModel.updateSupportTicket({
                     close_date: new Date(),
-                    closed_by: 'Customer',
+                    closed_by: 'Admin',
                     closed_by_user_id: user_id,
                     status: 'Closed',
                 }, support_ticket_id, constants_1.SOURCE_AGENT);
@@ -229,4 +233,4 @@ class AgentSupportTicketService extends abstract_service_1.default {
         });
     }
 }
-exports.AgentSupportTicketService = AgentSupportTicketService;
+exports.AdminAgentSupportTicketService = AdminAgentSupportTicketService;

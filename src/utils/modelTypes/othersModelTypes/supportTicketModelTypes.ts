@@ -2,7 +2,8 @@ export interface IInsertSupportTicketPayload {
   support_no: string;
   source_type: 'AGENT' | 'AGENT B2C' | 'B2C';
   source_id: number;
-  user_id: number;
+  created_by_user_id: number;
+  created_by: 'Admin' | 'Customer';
   ref_id?: number;
   ref_type:
     | 'Flight'
@@ -35,6 +36,7 @@ export interface IGetAgencySupportTicketListData {
     | 'Payments';
   last_message: string;
   reply_by: 'Admin' | 'Customer';
+  created_by: 'Admin' | 'Customer';
   last_message_created_at: string;
   created_at: string;
 }
@@ -42,7 +44,7 @@ export interface IGetAgencySupportTicketListData {
 export interface IGetAgencySupportTicketListQuery {
   status?: 'Open' | 'Closed' | 'ReOpen';
   agent_id?: number;
-  user_id?: number;
+  created_by_user_id?: number;
   reply_by?: 'Admin' | 'Customer';
   priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
   limit?: number;
@@ -81,8 +83,8 @@ export interface IGetSingleAgentSupportTicketData {
   status: 'Open' | 'Closed' | 'ReOpen';
   agency_name: string;
   agency_logo: string;
-  created_by_name: string;
-  created_by_photo: string;
+  created_by_id: number;
+  created_by: 'Admin' | 'Customer';
   created_at: string;
 }
 

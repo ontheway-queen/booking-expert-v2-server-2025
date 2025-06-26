@@ -56,11 +56,11 @@ class SupportTicketModel extends schema_1.default {
         });
     }
     getAgentSupportTicket(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ agent_id, limit, priority, reply_by, skip, status, user_id, from_date, to_date, ref_type, }, need_total = false) {
+        return __awaiter(this, arguments, void 0, function* ({ agent_id, limit, priority, reply_by, skip, status, created_by_user_id, from_date, to_date, ref_type, }, need_total = false) {
             var _b;
             const data = yield this.db('support_tickets AS st')
                 .withSchema(this.DBO_SCHEMA)
-                .select('st.id', 'st.support_no', 'st.subject', 'st.status', 'st.ref_type', 'a.agency_name', 'a.agency_logo', 'stm.message AS last_message', 'stm.reply_by', 'stm.created_at AS last_message_created_at', 'st.created_at')
+                .select('st.id', 'st.support_no', 'st.subject', 'st.priority', 'st.status', 'st.ref_type', 'a.agency_name', 'a.agency_logo', 'stm.message AS last_message', 'stm.reply_by', 'stm.created_at AS last_message_created_at', 'st.created_at')
                 .joinRaw(`LEFT JOIN agent.agency AS a ON a.id = st.source_id`)
                 .leftJoin('support_ticket_messages AS stm', 'st.id', 'stm.support_ticket_id')
                 .where((qb) => {
@@ -68,8 +68,8 @@ class SupportTicketModel extends schema_1.default {
                 if (agent_id) {
                     qb.where('st.source_id', agent_id);
                 }
-                if (user_id) {
-                    qb.where('st.user_id', user_id);
+                if (created_by_user_id) {
+                    qb.where('st.created_by_user_id', created_by_user_id);
                 }
                 if (status) {
                     qb.where('st.status', status);
@@ -100,8 +100,8 @@ class SupportTicketModel extends schema_1.default {
                     if (agent_id) {
                         qb.where('st.source_id', agent_id);
                     }
-                    if (user_id) {
-                        qb.where('st.user_id', user_id);
+                    if (created_by_user_id) {
+                        qb.where('st.created_by_user_id', created_by_user_id);
                     }
                     if (status) {
                         qb.where('st.status', status);
@@ -127,9 +127,8 @@ class SupportTicketModel extends schema_1.default {
         return __awaiter(this, arguments, void 0, function* ({ id, agent_id, }) {
             return yield this.db('support_tickets AS st')
                 .withSchema(this.DBO_SCHEMA)
-                .select('st.id', 'st.support_no', 'st.source_id', 'st.ref_type', 'st.close_date', 'st.closed_by', 'st.reopen_date', 'st.reopen_by', 'st.ref_id', 'st.subject', 'st.status', 'a.agency_name', 'a.agency_logo', 'au.name AS created_by_name', 'au.photo AS created_by_photo', 'st.created_at')
+                .select('st.id', 'st.support_no', 'st.source_id', 'st.ref_type', 'st.close_date', 'st.closed_by', 'st.reopen_date', 'st.reopen_by', 'st.created_by_user_id', 'st.created_by', 'st.ref_id', 'st.subject', 'st.status', 'a.agency_name', 'a.agency_logo', 'st.created_at')
                 .joinRaw(`LEFT JOIN agent.agency AS a ON a.id = st.source_id`)
-                .joinRaw(`LEFT JOIN agent.agency_user AS au ON au.id = st.user_id`)
                 .where((qb) => {
                 qb.andWhere('st.id', id);
                 qb.andWhere('st.source_type', constants_1.SOURCE_AGENT);

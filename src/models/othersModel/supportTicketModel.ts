@@ -89,7 +89,7 @@ export default class SupportTicketModel extends Schema {
       reply_by,
       skip,
       status,
-      user_id,
+      created_by_user_id,
       from_date,
       to_date,
       ref_type,
@@ -102,6 +102,7 @@ export default class SupportTicketModel extends Schema {
         'st.id',
         'st.support_no',
         'st.subject',
+        'st.priority',
         'st.status',
         'st.ref_type',
         'a.agency_name',
@@ -122,8 +123,8 @@ export default class SupportTicketModel extends Schema {
         if (agent_id) {
           qb.where('st.source_id', agent_id);
         }
-        if (user_id) {
-          qb.where('st.user_id', user_id);
+        if (created_by_user_id) {
+          qb.where('st.created_by_user_id', created_by_user_id);
         }
         if (status) {
           qb.where('st.status', status);
@@ -156,8 +157,8 @@ export default class SupportTicketModel extends Schema {
           if (agent_id) {
             qb.where('st.source_id', agent_id);
           }
-          if (user_id) {
-            qb.where('st.user_id', user_id);
+          if (created_by_user_id) {
+            qb.where('st.created_by_user_id', created_by_user_id);
           }
           if (status) {
             qb.where('st.status', status);
@@ -198,17 +199,16 @@ export default class SupportTicketModel extends Schema {
         'st.closed_by',
         'st.reopen_date',
         'st.reopen_by',
+        'st.created_by_user_id',
+        'st.created_by',
         'st.ref_id',
         'st.subject',
         'st.status',
         'a.agency_name',
         'a.agency_logo',
-        'au.name AS created_by_name',
-        'au.photo AS created_by_photo',
         'st.created_at'
       )
       .joinRaw(`LEFT JOIN agent.agency AS a ON a.id = st.source_id`)
-      .joinRaw(`LEFT JOIN agent.agency_user AS au ON au.id = st.user_id`)
       .where((qb) => {
         qb.andWhere('st.id', id);
         qb.andWhere('st.source_type', SOURCE_AGENT);
