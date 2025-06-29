@@ -1,3 +1,0 @@
--- admin.permissions Removed created at and created by columns
--- agency user, admin user default two fa true
--- support ticket, support ticket msg table fully updated

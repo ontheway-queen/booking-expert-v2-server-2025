@@ -229,7 +229,7 @@ class AuthChecker {
                 const agencyModel = new agencyModel_1.default(database_1.db);
                 const agentB2CUserModel = new agencyB2CUserModel_1.default(database_1.db);
                 const check_agency = yield agencyModel.checkAgency({
-                    agency_id
+                    agency_id,
                 });
                 if (!check_agency || check_agency.status !== 'Active') {
                     res
@@ -239,7 +239,7 @@ class AuthChecker {
                 }
                 const check_agent_b2c = yield agentB2CUserModel.checkUser({
                     email: user_email,
-                    agency_id
+                    agency_id,
                 });
                 if (!check_agent_b2c || check_agent_b2c.status === false) {
                     res
@@ -259,7 +259,7 @@ class AuthChecker {
                     user_email: String(user_email),
                     username: String(check_agent_b2c === null || check_agent_b2c === void 0 ? void 0 : check_agent_b2c.username),
                     name: String(check_agent_b2c === null || check_agent_b2c === void 0 ? void 0 : check_agent_b2c.name),
-                    phone_number: String(check_agent_b2c === null || check_agent_b2c === void 0 ? void 0 : check_agent_b2c.phone_number)
+                    phone_number: String(check_agent_b2c === null || check_agent_b2c === void 0 ? void 0 : check_agent_b2c.phone_number),
                 };
                 next();
             }
@@ -278,7 +278,7 @@ class AuthChecker {
             else {
                 const agencyModel = new agencyModel_1.default(database_1.db);
                 const check_token = yield agencyModel.getWhiteLabelPermission({
-                    token: token
+                    token: token,
                 });
                 if (!check_token) {
                     res
@@ -287,7 +287,7 @@ class AuthChecker {
                     return;
                 }
                 const check_agency = yield agencyModel.checkAgency({
-                    agency_id: check_token === null || check_token === void 0 ? void 0 : check_token.agency_id
+                    agency_id: check_token === null || check_token === void 0 ? void 0 : check_token.agency_id,
                 });
                 if (!check_agency || check_agency.status !== 'Active') {
                     res
@@ -304,10 +304,11 @@ class AuthChecker {
                     holiday: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.holiday),
                     umrah: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.umrah),
                     group_fare: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.group_fare),
-                    blog: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.blog)
+                    blog: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.blog),
                 };
                 const endpoint = module;
-                const hasPermission = endpoint in req.agencyB2CWhiteLabel && req.agencyB2CWhiteLabel[endpoint] === true;
+                const hasPermission = endpoint in req.agencyB2CWhiteLabel &&
+                    req.agencyB2CWhiteLabel[endpoint] === true;
                 if (!hasPermission) {
                     res
                         .status(statusCode_1.default.HTTP_UNAUTHORIZED)

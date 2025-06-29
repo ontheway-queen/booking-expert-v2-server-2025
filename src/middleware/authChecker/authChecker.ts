@@ -276,7 +276,7 @@ export default class AuthChecker {
       const agentB2CUserModel = new AgencyB2CUserModel(db);
 
       const check_agency = await agencyModel.checkAgency({
-        agency_id
+        agency_id,
       });
       if (!check_agency || check_agency.status !== 'Active') {
         res
@@ -287,7 +287,7 @@ export default class AuthChecker {
 
       const check_agent_b2c = await agentB2CUserModel.checkUser({
         email: user_email,
-        agency_id
+        agency_id,
       });
 
       if (!check_agent_b2c || check_agent_b2c.status === false) {
@@ -308,8 +308,8 @@ export default class AuthChecker {
         user_email: String(user_email),
         username: String(check_agent_b2c?.username),
         name: String(check_agent_b2c?.name),
-        phone_number: String(check_agent_b2c?.phone_number)
-      }
+        phone_number: String(check_agent_b2c?.phone_number),
+      };
       next();
     }
   };
@@ -330,7 +330,7 @@ export default class AuthChecker {
     } else {
       const agencyModel = new AgencyModel(db);
       const check_token = await agencyModel.getWhiteLabelPermission({
-        token: token
+        token: token,
       });
       if (!check_token) {
         res
@@ -340,7 +340,7 @@ export default class AuthChecker {
       }
 
       const check_agency = await agencyModel.checkAgency({
-        agency_id: check_token?.agency_id
+        agency_id: check_token?.agency_id,
       });
 
       if (!check_agency || check_agency.status !== 'Active') {
@@ -359,12 +359,21 @@ export default class AuthChecker {
         holiday: Boolean(check_token?.holiday),
         umrah: Boolean(check_token?.umrah),
         group_fare: Boolean(check_token?.group_fare),
-        blog: Boolean(check_token?.blog)
+        blog: Boolean(check_token?.blog),
       };
       // Check permission
-      type WhiteLabelEndpoint = 'flight' | 'hotel' | 'visa' | 'holiday' | 'umrah' | 'group_fare' | 'blog';
+      type WhiteLabelEndpoint =
+        | 'flight'
+        | 'hotel'
+        | 'visa'
+        | 'holiday'
+        | 'umrah'
+        | 'group_fare'
+        | 'blog';
       const endpoint = module as WhiteLabelEndpoint;
-      const hasPermission = endpoint in req.agencyB2CWhiteLabel && req.agencyB2CWhiteLabel[endpoint] === true;
+      const hasPermission =
+        endpoint in req.agencyB2CWhiteLabel &&
+        req.agencyB2CWhiteLabel[endpoint] === true;
       if (!hasPermission) {
         res
           .status(StatusCode.HTTP_UNAUTHORIZED)
