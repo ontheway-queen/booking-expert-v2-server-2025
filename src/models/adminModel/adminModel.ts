@@ -12,9 +12,9 @@ import {
   IGetAdminListFilterQuery,
   IGetAdminRoleListData,
   IGetAdminRoleListQuery,
+  IGetAllPermissionsOfRoleData,
   IGetSingleAdminData,
   IGetSingleAdminQuery,
-  IGetSingleAdminRoleWithPermissionsData,
   IInsertAdminRolePermissionPayload,
   IUpdateAdminPayload,
   IUpdateAdminRolePayload,
@@ -204,6 +204,17 @@ export default class AdminModel extends Schema {
       .orderBy('per.name', 'asc');
   }
 
+  // Get all permissions
+  public async checkPermission(
+    id: number
+  ): Promise<IGetAdminAllPermissionsData | null> {
+    return await this.db('permissions AS per')
+      .withSchema(this.ADMIN_SCHEMA)
+      .select('per.id', 'per.name')
+      .where('per.id', id)
+      .first();
+  }
+
   // Create role
   public async createRole(
     payload: ICreateAdminRolePayload
@@ -258,15 +269,24 @@ export default class AdminModel extends Schema {
   public async checkRole(
     payload: ICheckAdminRolePayload
   ): Promise<IGetAdminRoleListData | null> {
-    return await this.db('roles')
+    return await this.db('roles AS r')
       .withSchema(this.ADMIN_SCHEMA)
-      .select('id', 'name', 'status', 'is_main_role')
+      .select(
+        'r.id',
+        'r.name AS role_name',
+        'r.status',
+        'r.is_main_role',
+        'r.create_date',
+        'r.created_by',
+        'ua.name as created_by_name'
+      )
+      .leftJoin('user_admin AS ua', 'ua.id', 'r.created_by')
       .where((qb) => {
         if (payload.name) {
-          qb.andWhere('name', payload.name);
+          qb.andWhere('r.name', payload.name);
         }
         if (payload.id) {
-          qb.andWhere('id', payload.id);
+          qb.andWhere('r.id', payload.id);
         }
       })
       .first();
@@ -281,42 +301,47 @@ export default class AdminModel extends Schema {
   }
 
   // Get single role with permissions
-  public async getSingleRoleWithPermissions(
+  public async getAllPermissionsOfSingleRole(
     id: number
-  ): Promise<IGetSingleAdminRoleWithPermissionsData | null> {
-    return await this.db('roles as rol')
+  ): Promise<IGetAllPermissionsOfRoleData[]> {
+    return await this.db('role_permissions AS rp')
       .withSchema(this.ADMIN_SCHEMA)
       .select(
-        'rol.id as role_id',
-        'rol.name as role_name',
-        'rol.status',
-        'rol.is_main_role',
-        this.db.raw(`
-      case when exists (
-        select 1
-        from ${this.ADMIN_SCHEMA}.role_permissions rp
-        where rp.role_id = rol.id
-      ) then (
-        select json_agg(
-          json_build_object(
-            'id', per.id,
-            'name', per.name,
-            'read', rp.read,
-            'write', rp.write,
-            'update', rp.update,
-            'delete', rp.delete
-          )
-                order by per.name asc
-        )
-        from ${this.ADMIN_SCHEMA}.role_permissions rp
-        left join ${this.ADMIN_SCHEMA}.permissions per
-        on rp.permission_id = per.id
-        where rp.role_id = rol.id
-        group by rp.role_id
-      ) else '[]' end as permissions
-    `)
+        'rp.permission_id AS id',
+        'p.name',
+        'rp.read',
+        'rp.write',
+        'rp.update',
+        'rp.delete'
       )
-      .where('rol.id', id)
+      .leftJoin('permissions AS p', 'rp.permission_id', 'p.id')
+      .where('rp.role_id', id);
+  }
+
+  public async checkRolePermission({
+    permission_id,
+    role_id,
+  }: {
+    role_id: number;
+    permission_id: number;
+  }): Promise<{
+    id: number;
+    read: boolean;
+    write: boolean;
+    update: boolean;
+    delete: true;
+  } | null> {
+    return await this.db('role_permissions AS rp')
+      .withSchema(this.ADMIN_SCHEMA)
+      .select(
+        'rp.permission_id AS id',
+        'rp.read',
+        'rp.write',
+        'rp.update',
+        'rp.delete'
+      )
+      .andWhere('rp.role_id', role_id)
+      .andWhere('rp.permission_id', permission_id)
       .first();
   }
 

@@ -1,32 +1,42 @@
 import axios from 'axios';
 import Models from '../../../models/rootModel';
-import { SABRE_API, SABRE_TOKEN_ENV, WFTT_API, WFTT_TOKEN_ENV } from '../../miscellaneous/flightConstent';
+import { WFTT_API, WFTT_TOKEN_ENV } from '../../miscellaneous/flightConstent';
 import config from '../../../config/config';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
 const BASE_URL = config.WFTT_URL;
 
 export default class WfttRequests {
   // get request
-  public async getRequest(endpoint: string, requestData: { search_id: string, flight_id: string }) {
+  public async getRequest(
+    endpoint: string,
+    requestData: { search_id: string; flight_id: string }
+  ) {
     try {
       const authModel = new Models().CommonModel();
 
       const token = await authModel.getEnv(WFTT_TOKEN_ENV);
+      // console.log(token)
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
 
-      let apiUrl = BASE_URL + endpoint;
+      let apiUrl =
+        BASE_URL +
+        endpoint +
+        `?search_id=${requestData.search_id}&flight_id=${requestData.flight_id}&token=${token}`;
 
-      apiUrl+= `?token=Bearer ${token}`;
-      apiUrl+=`&search_id=${requestData.search_id}`;
-      apiUrl+=`&flight_id=${requestData.flight_id}`;
-
-      const response = await axios.get(apiUrl);
+      const response = await axios.request({
+        method: 'GET',
+        url: apiUrl,
+        headers: headers,
+      });
 
       const data = response.data;
 
       return data;
     } catch (error: any) {
-      console.error('Error calling API:', error.response.status);
-      return { code: error.response.status, data: [] };
+      console.error('Error calling API:', error.response.statusText);
+      return false;
     }
   }
 
@@ -62,13 +72,12 @@ export default class WfttRequests {
             endpoint: apiUrl,
             payload: requestData,
             response: response.data,
-          }
+          },
         });
         return false;
       }
       // console.log("response again", response);
       return response.data;
-
     } catch (error: any) {
       console.log(error);
       return false;

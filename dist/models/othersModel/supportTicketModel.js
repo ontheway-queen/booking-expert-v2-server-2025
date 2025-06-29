@@ -62,7 +62,7 @@ class SupportTicketModel extends schema_1.default {
                 .withSchema(this.DBO_SCHEMA)
                 .select('st.id', 'st.support_no', 'st.subject', 'st.priority', 'st.status', 'st.ref_type', 'a.agency_name', 'a.agency_logo', 'stm.message AS last_message', 'stm.reply_by', 'stm.created_at AS last_message_created_at', 'st.created_at')
                 .joinRaw(`LEFT JOIN agent.agency AS a ON a.id = st.source_id`)
-                .leftJoin('support_ticket_messages AS stm', 'st.id', 'stm.support_ticket_id')
+                .leftJoin('support_ticket_messages AS stm', 'st.last_message_id', 'stm.id')
                 .where((qb) => {
                 qb.where('st.source_type', constants_1.SOURCE_AGENT);
                 if (agent_id) {

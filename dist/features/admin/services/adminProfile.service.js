@@ -31,7 +31,8 @@ class AdminProfileService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
-            const role = yield adminModel.getSingleRoleWithPermissions(admin.role_id);
+            const role = yield adminModel.checkRole({ id: admin.role_id });
+            const permissions = yield adminModel.getAllPermissionsOfSingleRole(admin.role_id);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -47,7 +48,7 @@ class AdminProfileService extends abstract_service_1.default {
                     phone_number: admin.phone_number,
                     gender: admin.gender,
                     is_main_user: admin.is_main_user,
-                    role,
+                    role: Object.assign(Object.assign({}, role), { permissions }),
                 },
             };
         });

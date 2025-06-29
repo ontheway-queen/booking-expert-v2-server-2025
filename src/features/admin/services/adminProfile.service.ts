@@ -27,7 +27,11 @@ export default class AdminProfileService extends AbstractServices {
       };
     }
 
-    const role = await adminModel.getSingleRoleWithPermissions(admin.role_id);
+    const role = await adminModel.checkRole({ id: admin.role_id });
+
+    const permissions = await adminModel.getAllPermissionsOfSingleRole(
+      admin.role_id
+    );
 
     return {
       success: true,
@@ -44,7 +48,7 @@ export default class AdminProfileService extends AbstractServices {
         phone_number: admin.phone_number,
         gender: admin.gender,
         is_main_user: admin.is_main_user,
-        role,
+        role: { ...role, permissions },
       },
     };
   }

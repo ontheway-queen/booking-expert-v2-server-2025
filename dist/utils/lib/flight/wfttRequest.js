@@ -25,17 +25,24 @@ class WfttRequests {
             try {
                 const authModel = new rootModel_1.default().CommonModel();
                 const token = yield authModel.getEnv(flightConstent_1.WFTT_TOKEN_ENV);
-                let apiUrl = BASE_URL + endpoint;
-                apiUrl += `?token=Bearer ${token}`;
-                apiUrl += `&search_id=${requestData.search_id}`;
-                apiUrl += `&flight_id=${requestData.flight_id}`;
-                const response = yield axios_1.default.get(apiUrl);
+                // console.log(token)
+                const headers = {
+                    Authorization: `Bearer ${token}`,
+                };
+                let apiUrl = BASE_URL +
+                    endpoint +
+                    `?search_id=${requestData.search_id}&flight_id=${requestData.flight_id}&token=${token}`;
+                const response = yield axios_1.default.request({
+                    method: 'GET',
+                    url: apiUrl,
+                    headers: headers,
+                });
                 const data = response.data;
                 return data;
             }
             catch (error) {
-                console.error('Error calling API:', error.response.status);
-                return { code: error.response.status, data: [] };
+                console.error('Error calling API:', error.response.statusText);
+                return false;
             }
         });
     }
@@ -70,7 +77,7 @@ class WfttRequests {
                             endpoint: apiUrl,
                             payload: requestData,
                             response: response.data,
-                        }
+                        },
                     });
                     return false;
                 }

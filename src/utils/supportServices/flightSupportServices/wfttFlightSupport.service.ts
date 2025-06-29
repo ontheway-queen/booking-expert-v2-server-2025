@@ -361,6 +361,8 @@ export default class WfttFlightService extends AbstractServices {
         revalidate_body
       );
 
+    console.log({ response });
+
     if (!response) {
       Lib.writeJsonFile('wftt_revalidate_request', revalidate_body);
       Lib.writeJsonFile('wftt_revalidate_response', response);

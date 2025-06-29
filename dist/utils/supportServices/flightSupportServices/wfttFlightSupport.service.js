@@ -235,6 +235,7 @@ class WfttFlightService extends abstract_service_1.default {
     FlightRevalidate(_a) {
         return __awaiter(this, arguments, void 0, function* ({ reqBody, revalidate_body, set_flight_api_id, markup_amount, }) {
             const response = yield this.request.getRequest(wfttApiEndpoints_1.default.FLIGHT_REVALIDATE_ENDPOINT, revalidate_body);
+            console.log({ response });
             if (!response) {
                 lib_1.default.writeJsonFile('wftt_revalidate_request', revalidate_body);
                 lib_1.default.writeJsonFile('wftt_revalidate_response', response);

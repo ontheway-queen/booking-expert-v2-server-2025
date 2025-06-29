@@ -116,7 +116,11 @@ export default class AuthAdminService extends AbstractServices {
 
       const token = Lib.createToken(tokenData, config.JWT_SECRET_ADMIN, '24h');
 
-      const role = await AdminModel.getSingleRoleWithPermissions(role_id);
+      const role = await AdminModel.checkRole({ id: role_id });
+
+      const permissions = await AdminModel.getAllPermissionsOfSingleRole(
+        role_id
+      );
 
       await this.insertAdminAudit(trx, {
         created_by: id,
@@ -139,7 +143,7 @@ export default class AuthAdminService extends AbstractServices {
           phone_number,
           gender,
           is_main_user,
-          role,
+          role: { ...role, permissions },
         },
         token,
       };
@@ -211,7 +215,7 @@ export default class AuthAdminService extends AbstractServices {
         '24h'
       );
 
-      const role = await AdminModel.getSingleRoleWithPermissions(role_id);
+      const role = await AdminModel.checkRole({ id: role_id });
 
       await this.insertAdminAudit(trx, {
         created_by: id,

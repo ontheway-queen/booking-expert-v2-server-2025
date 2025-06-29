@@ -148,6 +148,16 @@ class AdminModel extends schema_1.default {
                 .orderBy('per.name', 'asc');
         });
     }
+    // Get all permissions
+    checkPermission(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('permissions AS per')
+                .withSchema(this.ADMIN_SCHEMA)
+                .select('per.id', 'per.name')
+                .where('per.id', id)
+                .first();
+        });
+    }
     // Create role
     createRole(payload) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -193,15 +203,16 @@ class AdminModel extends schema_1.default {
     // Check Role
     checkRole(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('roles')
+            return yield this.db('roles AS r')
                 .withSchema(this.ADMIN_SCHEMA)
-                .select('id', 'name', 'status', 'is_main_role')
+                .select('r.id', 'r.name AS role_name', 'r.status', 'r.is_main_role', 'r.create_date', 'r.created_by', 'ua.name as created_by_name')
+                .leftJoin('user_admin AS ua', 'ua.id', 'r.created_by')
                 .where((qb) => {
                 if (payload.name) {
-                    qb.andWhere('name', payload.name);
+                    qb.andWhere('r.name', payload.name);
                 }
                 if (payload.id) {
-                    qb.andWhere('id', payload.id);
+                    qb.andWhere('r.id', payload.id);
                 }
             })
                 .first();
@@ -217,35 +228,22 @@ class AdminModel extends schema_1.default {
         });
     }
     // Get single role with permissions
-    getSingleRoleWithPermissions(id) {
+    getAllPermissionsOfSingleRole(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('roles as rol')
+            return yield this.db('role_permissions AS rp')
                 .withSchema(this.ADMIN_SCHEMA)
-                .select('rol.id as role_id', 'rol.name as role_name', 'rol.status', 'rol.is_main_role', this.db.raw(`
-      case when exists (
-        select 1
-        from ${this.ADMIN_SCHEMA}.role_permissions rp
-        where rp.role_id = rol.id
-      ) then (
-        select json_agg(
-          json_build_object(
-            'id', per.id,
-            'name', per.name,
-            'read', rp.read,
-            'write', rp.write,
-            'update', rp.update,
-            'delete', rp.delete
-          )
-                order by per.name asc
-        )
-        from ${this.ADMIN_SCHEMA}.role_permissions rp
-        left join ${this.ADMIN_SCHEMA}.permissions per
-        on rp.permission_id = per.id
-        where rp.role_id = rol.id
-        group by rp.role_id
-      ) else '[]' end as permissions
-    `))
-                .where('rol.id', id)
+                .select('rp.permission_id AS id', 'p.name', 'rp.read', 'rp.write', 'rp.update', 'rp.delete')
+                .leftJoin('permissions AS p', 'rp.permission_id', 'p.id')
+                .where('rp.role_id', id);
+        });
+    }
+    checkRolePermission(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ permission_id, role_id, }) {
+            return yield this.db('role_permissions AS rp')
+                .withSchema(this.ADMIN_SCHEMA)
+                .select('rp.permission_id AS id', 'rp.read', 'rp.write', 'rp.update', 'rp.delete')
+                .andWhere('rp.role_id', role_id)
+                .andWhere('rp.permission_id', permission_id)
                 .first();
         });
     }

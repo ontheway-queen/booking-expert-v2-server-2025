@@ -115,8 +115,8 @@ export default class SupportTicketModel extends Schema {
       .joinRaw(`LEFT JOIN agent.agency AS a ON a.id = st.source_id`)
       .leftJoin(
         'support_ticket_messages AS stm',
-        'st.id',
-        'stm.support_ticket_id'
+        'st.last_message_id',
+        'stm.id'
       )
       .where((qb) => {
         qb.where('st.source_type', SOURCE_AGENT);

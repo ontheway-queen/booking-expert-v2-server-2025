@@ -98,7 +98,8 @@ class AuthAdminService extends abstract_service_1.default {
                     photo,
                 };
                 const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_ADMIN, '24h');
-                const role = yield AdminModel.getSingleRoleWithPermissions(role_id);
+                const role = yield AdminModel.checkRole({ id: role_id });
+                const permissions = yield AdminModel.getAllPermissionsOfSingleRole(role_id);
                 yield this.insertAdminAudit(trx, {
                     created_by: id,
                     type: 'GET',
@@ -119,7 +120,7 @@ class AuthAdminService extends abstract_service_1.default {
                         phone_number,
                         gender,
                         is_main_user,
-                        role,
+                        role: Object.assign(Object.assign({}, role), { permissions }),
                     },
                     token,
                 };
@@ -167,7 +168,7 @@ class AuthAdminService extends abstract_service_1.default {
                     photo,
                 };
                 const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_ADMIN, '24h');
-                const role = yield AdminModel.getSingleRoleWithPermissions(role_id);
+                const role = yield AdminModel.checkRole({ id: role_id });
                 yield this.insertAdminAudit(trx, {
                     created_by: id,
                     type: 'GET',

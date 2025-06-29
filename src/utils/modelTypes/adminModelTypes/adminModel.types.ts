@@ -121,19 +121,13 @@ export interface IGetAdminAllPermissionsData {
   name: string;
 }
 
-export interface IGetSingleAdminRoleWithPermissionsData {
-  role_id: number;
-  role_name: string;
-  status: boolean;
-  is_main_role: boolean;
-  permissions: {
-    permission_id: number;
-    permission_name: string;
-    read: boolean;
-    write: boolean;
-    update: boolean;
-    delete: boolean;
-  }[];
+export interface IGetAllPermissionsOfRoleData {
+  permission_id: number;
+  permission_name: string;
+  read: boolean;
+  write: boolean;
+  update: boolean;
+  delete: boolean;
 }
 
 export interface IInsertAdminRolePermissionPayload {

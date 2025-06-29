@@ -118,12 +118,14 @@ export class AgentSupportTicketService extends AbstractServices {
       support_ticket_id: ticket_id,
     });
 
+    const { agency_logo, agency_name, source_id, ...rest } = ticket;
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
       data: {
-        ...ticket,
+        ...rest,
         conversations: msgs,
       },
     };

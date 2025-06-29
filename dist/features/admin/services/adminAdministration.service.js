@@ -133,21 +133,22 @@ class AdminAdministrationService extends abstract_service_1.default {
     //get single role permission
     getSingleRolePermission(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const role_id = req.params.id;
+            const role_id = Number(req.params.id);
             const model = this.Model.AdminModel();
-            const role_permission = yield model.getSingleRoleWithPermissions(parseInt(role_id));
-            if (!role_permission) {
+            const role = yield model.checkRole({ id: role_id });
+            if (!role) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_NOT_FOUND,
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
+            const role_permission = yield model.getAllPermissionsOfSingleRole(role_id);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: role_permission,
+                data: Object.assign(Object.assign({}, role), { permissions: role_permission }),
             };
         });
     }
@@ -159,7 +160,7 @@ class AdminAdministrationService extends abstract_service_1.default {
                 const model = this.Model.AdminModel(trx);
                 const { id } = req.params;
                 const role_id = Number(id);
-                const check_role = yield model.getSingleRoleWithPermissions(role_id);
+                const check_role = yield model.checkRole({ id: role_id });
                 if (!check_role) {
                     return {
                         success: false,
@@ -194,63 +195,29 @@ class AdminAdministrationService extends abstract_service_1.default {
                     yield model.updateRole(updateRolePayload, role_id);
                 }
                 if (perReqData && perReqData.length) {
-                    const getPermissions = yield model.getAllPermissions();
-                    const addPermissions = [];
-                    for (let i = 0; i < perReqData.length; i++) {
-                        for (let j = 0; j < getPermissions.length; j++) {
-                            if (perReqData[i].id == getPermissions[j].id) {
-                                addPermissions.push(perReqData[i]);
-                            }
-                        }
-                    }
-                    // get single role permission
-                    const { permissions } = check_role;
-                    const insertPermissionVal = [];
-                    const haveToUpdateVal = [];
-                    for (let i = 0; i < addPermissions.length; i++) {
-                        let found = false;
-                        for (let j = 0; j < permissions.length; j++) {
-                            if (addPermissions[i].id == permissions[j].permission_id) {
-                                found = true;
-                                haveToUpdateVal.push(addPermissions[i]);
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            insertPermissionVal.push(addPermissions[i]);
-                        }
-                    }
-                    // insert permission
-                    const add_permission_body = insertPermissionVal.map((element) => {
-                        return {
+                    const rolePermissionPayload = [];
+                    const promiseData = perReqData.map((per) => __awaiter(this, void 0, void 0, function* () {
+                        const { id } = per, restPer = __rest(per, ["id"]);
+                        const check = yield model.checkRolePermission({
+                            permission_id: id,
                             role_id,
-                            permission_id: element.id,
-                            read: element.read,
-                            write: element.write,
-                            update: element.update,
-                            delete: element.delete,
-                        };
-                    });
-                    if (add_permission_body.length) {
-                        yield model.insertRolePermission(add_permission_body);
-                    }
-                    // update section
-                    if (haveToUpdateVal.length) {
-                        const update_permission_res = haveToUpdateVal.map((element) => __awaiter(this, void 0, void 0, function* () {
-                            yield model.updateRolePermission({
-                                read: element.read,
-                                update: element.update,
-                                write: element.write,
-                                delete: element.delete,
-                            }, element.permission_id, role_id);
-                        }));
-                        yield Promise.all(update_permission_res);
+                        });
+                        if (check) {
+                            yield model.updateRolePermission(restPer, id, role_id);
+                        }
+                        else {
+                            rolePermissionPayload.push(Object.assign({ permission_id: id, role_id }, restPer));
+                        }
+                    }));
+                    yield Promise.all(promiseData);
+                    if (rolePermissionPayload.length) {
+                        yield model.insertRolePermission(rolePermissionPayload);
                     }
                 }
                 yield this.insertAdminAudit(trx, {
                     created_by: user_id,
                     type: 'UPDATE',
-                    details: `Role updated with name ${check_role.role_name}`,
+                    details: `Role updated with name ${check_role.name}`,
                     payload: JSON.stringify(req.body),
                 });
                 return {

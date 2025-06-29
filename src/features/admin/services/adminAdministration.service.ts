@@ -10,6 +10,7 @@ import {
 } from '../utils/types/adminAdministration.types';
 import {
   IAdminCreatePayload,
+  IInsertAdminRolePermissionPayload,
   IUpdateAdminPayload,
   IUpdateAdminRolePayload,
 } from '../../../utils/modelTypes/adminModelTypes/adminModel.types';
@@ -126,14 +127,12 @@ export class AdminAdministrationService extends AbstractServices {
 
   //get single role permission
   public async getSingleRolePermission(req: Request) {
-    const role_id = req.params.id;
+    const role_id = Number(req.params.id);
     const model = this.Model.AdminModel();
 
-    const role_permission = await model.getSingleRoleWithPermissions(
-      parseInt(role_id)
-    );
+    const role = await model.checkRole({ id: role_id });
 
-    if (!role_permission) {
+    if (!role) {
       return {
         success: false,
         code: this.StatusCode.HTTP_NOT_FOUND,
@@ -141,11 +140,13 @@ export class AdminAdministrationService extends AbstractServices {
       };
     }
 
+    const role_permission = await model.getAllPermissionsOfSingleRole(role_id);
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: role_permission,
+      data: { ...role, permissions: role_permission },
     };
   }
 
@@ -158,7 +159,7 @@ export class AdminAdministrationService extends AbstractServices {
       const { id } = req.params;
 
       const role_id = Number(id);
-      const check_role = await model.getSingleRoleWithPermissions(role_id);
+      const check_role = await model.checkRole({ id: role_id });
 
       if (!check_role) {
         return {
@@ -205,85 +206,37 @@ export class AdminAdministrationService extends AbstractServices {
       }
 
       if (perReqData && perReqData.length) {
-        const getPermissions = await model.getAllPermissions();
+        const rolePermissionPayload: IInsertAdminRolePermissionPayload[] = [];
 
-        const addPermissions = [];
-
-        for (let i = 0; i < perReqData.length; i++) {
-          for (let j = 0; j < getPermissions.length; j++) {
-            if (perReqData[i].id == getPermissions[j].id) {
-              addPermissions.push(perReqData[i]);
-            }
-          }
-        }
-
-        // get single role permission
-        const { permissions } = check_role;
-
-        const insertPermissionVal: any = [];
-        const haveToUpdateVal: any = [];
-
-        for (let i = 0; i < addPermissions.length; i++) {
-          let found = false;
-          for (let j = 0; j < permissions.length; j++) {
-            if (addPermissions[i].id == permissions[j].permission_id) {
-              found = true;
-              haveToUpdateVal.push(addPermissions[i]);
-              break;
-            }
-          }
-
-          if (!found) {
-            insertPermissionVal.push(addPermissions[i]);
-          }
-        }
-
-        // insert permission
-        const add_permission_body = insertPermissionVal.map((element: any) => {
-          return {
+        const promiseData = perReqData.map(async (per) => {
+          const { id, ...restPer } = per;
+          const check = await model.checkRolePermission({
+            permission_id: id,
             role_id,
-            permission_id: element.id,
-            read: element.read,
-            write: element.write,
-            update: element.update,
-            delete: element.delete,
-          };
+          });
+
+          if (check) {
+            await model.updateRolePermission(restPer, id, role_id);
+          } else {
+            rolePermissionPayload.push({
+              permission_id: id,
+              role_id,
+              ...restPer,
+            });
+          }
         });
 
-        if (add_permission_body.length) {
-          await model.insertRolePermission(add_permission_body);
-        }
+        await Promise.all(promiseData);
 
-        // update section
-        if (haveToUpdateVal.length) {
-          const update_permission_res = haveToUpdateVal.map(
-            async (element: {
-              read: boolean;
-              write: boolean;
-              update: boolean;
-              delete: boolean;
-              permission_id: number;
-            }) => {
-              await model.updateRolePermission(
-                {
-                  read: element.read,
-                  update: element.update,
-                  write: element.write,
-                  delete: element.delete,
-                },
-                element.permission_id,
-                role_id
-              );
-            }
-          );
-          await Promise.all(update_permission_res);
+        if (rolePermissionPayload.length) {
+          await model.insertRolePermission(rolePermissionPayload);
         }
       }
 
       await this.insertAdminAudit(trx, {
         created_by: user_id,
         type: 'UPDATE',
-        details: `Role updated with name ${check_role.role_name}`,
+        details: `Role updated with name ${check_role.name}`,
         payload: JSON.stringify(req.body),
       });
 
