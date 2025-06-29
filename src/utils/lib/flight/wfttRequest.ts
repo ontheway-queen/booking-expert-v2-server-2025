@@ -7,10 +7,7 @@ const BASE_URL = config.WFTT_URL;
 
 export default class WfttRequests {
   // get request
-  public async getRequest(
-    endpoint: string,
-    requestData: { search_id: string; flight_id: string }
-  ) {
+  public async getRequest(endpoint: string) {
     try {
       const authModel = new Models().CommonModel();
 
@@ -20,10 +17,7 @@ export default class WfttRequests {
         Authorization: `Bearer ${token}`,
       };
 
-      let apiUrl =
-        BASE_URL +
-        endpoint +
-        `?search_id=${requestData.search_id}&flight_id=${requestData.flight_id}&token=${token}`;
+      let apiUrl = BASE_URL + endpoint;
 
       const response = await axios.request({
         method: 'GET',

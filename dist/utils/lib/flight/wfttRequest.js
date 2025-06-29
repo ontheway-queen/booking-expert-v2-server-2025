@@ -20,7 +20,7 @@ const constants_1 = require("../../miscellaneous/constants");
 const BASE_URL = config_1.default.WFTT_URL;
 class WfttRequests {
     // get request
-    getRequest(endpoint, requestData) {
+    getRequest(endpoint) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const authModel = new rootModel_1.default().CommonModel();
@@ -29,9 +29,7 @@ class WfttRequests {
                 const headers = {
                     Authorization: `Bearer ${token}`,
                 };
-                let apiUrl = BASE_URL +
-                    endpoint +
-                    `?search_id=${requestData.search_id}&flight_id=${requestData.flight_id}&token=${token}`;
+                let apiUrl = BASE_URL + endpoint;
                 const response = yield axios_1.default.request({
                     method: 'GET',
                     url: apiUrl,

@@ -355,11 +355,14 @@ export default class WfttFlightService extends AbstractServices {
       markup_mode: 'INCREASE' | 'DECREASE';
     };
   }) {
+    console.log({ revalidate_body });
+
+    const endpoint =
+      WfttAPIEndpoints.FLIGHT_REVALIDATE_ENDPOINT +
+      `?search_id=${revalidate_body.search_id}&flight_id=${revalidate_body.flight_id}`;
+
     const response: IWFTTFlightRevalidateResponse =
-      await this.request.getRequest(
-        WfttAPIEndpoints.FLIGHT_REVALIDATE_ENDPOINT,
-        revalidate_body
-      );
+      await this.request.getRequest(endpoint);
 
     console.log({ response });
 
