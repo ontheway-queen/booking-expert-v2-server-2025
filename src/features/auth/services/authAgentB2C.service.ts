@@ -3,7 +3,11 @@ import AbstractServices from '../../../abstract/abstract.service';
 import config from '../../../config/config';
 import Lib from '../../../utils/lib/lib';
 import { ITokenParseAgencyB2CUser } from '../../public/utils/types/publicCommon.types';
-import { ILoginReqBody, IRegisterAgentB2CReqBody, IResetPassReqBody } from '../utils/types/authTypes';
+import {
+  ILoginReqBody,
+  IRegisterAgentB2CReqBody,
+  IResetPassReqBody,
+} from '../utils/types/authTypes';
 import { OTP_TYPES } from '../../../utils/miscellaneous/constants';
 
 export default class AuthAgentB2CService extends AbstractServices {
@@ -23,15 +27,15 @@ export default class AuthAgentB2CService extends AbstractServices {
 
       const check_email = await AgentB2CUserModel.checkUser({
         email,
-        agency_id
+        agency_id,
       });
       if (check_email) {
         return {
           success: false,
           code: this.StatusCode.HTTP_CONFLICT,
-          message: "Email already exist. Please use another email."
-        }
-      };
+          message: 'Email already exist. Please use another email.',
+        };
+      }
 
       const agent_details = await AgentModel.getSingleAgency(agency_id);
 
@@ -54,7 +58,7 @@ export default class AuthAgentB2CService extends AbstractServices {
         phone_number,
         username,
         gender,
-        photo: files?.[0]?.filename
+        photo: files?.[0]?.filename,
       });
 
       const tokenData: ITokenParseAgencyB2CUser = {
@@ -69,7 +73,7 @@ export default class AuthAgentB2CService extends AbstractServices {
         user_email: email,
         username,
         name,
-        phone_number
+        phone_number,
       };
 
       const AuthToken = Lib.createToken(
@@ -83,26 +87,28 @@ export default class AuthAgentB2CService extends AbstractServices {
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: `Registration has been completed`,
         data: {
-          ...tokenData
+          user_id: tokenData.user_id,
+          user_email: tokenData.user_email,
+          name: tokenData.name,
+          phone_number: tokenData.phone_number,
+          photo: tokenData.photo,
         },
         token: AuthToken,
       };
     });
   }
 
-
-
   public async login(req: Request) {
     return this.db.transaction(async (trx) => {
       const { password, user_or_email } = req.body as ILoginReqBody;
-      const { agency_id, blog, flight, group_fare, holiday, hotel, umrah, visa } = req.agencyB2CWhiteLabel;
+      const { agency_id } = req.agencyB2CWhiteLabel;
       const AgentB2CUserModel = this.Model.AgencyB2CUserModel(trx);
       const AgentModel = this.Model.AgencyModel(trx);
 
       const checkAgentB2C = await AgentB2CUserModel.checkUser({
         username: user_or_email,
         email: user_or_email,
-        agency_id
+        agency_id,
       });
 
       if (!checkAgentB2C) {
@@ -117,8 +123,9 @@ export default class AuthAgentB2CService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_UNAUTHORIZED,
-          message: "Your account is disabled. Please contact with the authority!"
-        }
+          message:
+            'Your account is disabled. Please contact with the authority!',
+        };
       }
 
       const agent_details = await AgentModel.getSingleAgency(agency_id);
@@ -126,16 +133,16 @@ export default class AuthAgentB2CService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_UNAUTHORIZED,
-          message: this.StatusCode.HTTP_UNAUTHORIZED
-        }
+          message: this.StatusCode.HTTP_UNAUTHORIZED,
+        };
       }
 
-      if (agent_details.status !== "Active") {
+      if (agent_details.status !== 'Active') {
         return {
           success: false,
           code: this.StatusCode.HTTP_UNAUTHORIZED,
-          message: this.StatusCode.HTTP_UNAUTHORIZED
-        }
+          message: this.StatusCode.HTTP_UNAUTHORIZED,
+        };
       }
 
       const checkPassword = await Lib.compareHashValue(
@@ -177,21 +184,16 @@ export default class AuthAgentB2CService extends AbstractServices {
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.LOGIN_SUCCESSFUL,
         data: {
-          ...tokenData,
-          blog,
-          flight,
-          group_fare,
-          holiday,
-          hotel,
-          umrah,
-          visa
+          user_id: tokenData.user_id,
+          user_email: tokenData.user_email,
+          name: tokenData.name,
+          phone_number: tokenData.phone_number,
+          photo: tokenData.photo,
         },
         token: AuthToken,
       };
     });
   }
-
-
 
   public async resetPassword(req: Request) {
     const { agency_id } = req.agencyB2CWhiteLabel;
@@ -223,7 +225,11 @@ export default class AuthAgentB2CService extends AbstractServices {
 
     const password_hash = await Lib.hashValue(password);
 
-    await AgencyB2CUserModel.updateUserByEmail({ password_hash }, email, agency_id);
+    await AgencyB2CUserModel.updateUserByEmail(
+      { password_hash },
+      email,
+      agency_id
+    );
 
     return {
       success: true,

@@ -157,10 +157,9 @@ class AgentB2CHolidayService extends abstract_service_1.default {
     getHolidayPackageBookingList(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id } = req.agencyB2CUser;
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const query = req.query;
-                console.log({ agency_id });
                 const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ booked_by: constants_1.SOURCE_AGENT_B2C, source_id: agency_id }, query), true);
                 return {
                     success: true,
@@ -174,7 +173,7 @@ class AgentB2CHolidayService extends abstract_service_1.default {
     getSingleHolidayPackageBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id } = req.agencyB2CUser;
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const { id } = req.params;
                 const get_booking = yield holidayPackageBookingModel.getSingleHolidayBooking({
@@ -202,7 +201,7 @@ class AgentB2CHolidayService extends abstract_service_1.default {
     cancelHolidayPackageBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyUser;
+                const { agency_id, user_id } = req.agencyB2CUser;
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const { id } = req.params;
                 const get_booking = yield holidayPackageBookingModel.getSingleHolidayBooking({

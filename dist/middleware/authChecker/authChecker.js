@@ -309,7 +309,7 @@ class AuthChecker {
                 const endpoint = module;
                 const hasPermission = endpoint in req.agencyB2CWhiteLabel &&
                     req.agencyB2CWhiteLabel[endpoint] === true;
-                if (!hasPermission) {
+                if (!hasPermission && module !== 'agent-b2c') {
                     res
                         .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                         .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });

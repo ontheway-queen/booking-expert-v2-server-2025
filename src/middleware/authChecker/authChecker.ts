@@ -332,6 +332,7 @@ export default class AuthChecker {
       const check_token = await agencyModel.getWhiteLabelPermission({
         token: token,
       });
+
       if (!check_token) {
         res
           .status(StatusCode.HTTP_UNAUTHORIZED)
@@ -349,6 +350,7 @@ export default class AuthChecker {
           .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
         return;
       }
+
       const module = req.originalUrl.split('/')[4] || '';
 
       req.agencyB2CWhiteLabel = {
@@ -361,6 +363,7 @@ export default class AuthChecker {
         group_fare: Boolean(check_token?.group_fare),
         blog: Boolean(check_token?.blog),
       };
+
       // Check permission
       type WhiteLabelEndpoint =
         | 'flight'
@@ -370,11 +373,14 @@ export default class AuthChecker {
         | 'umrah'
         | 'group_fare'
         | 'blog';
+
       const endpoint = module as WhiteLabelEndpoint;
+
       const hasPermission =
         endpoint in req.agencyB2CWhiteLabel &&
         req.agencyB2CWhiteLabel[endpoint] === true;
-      if (!hasPermission) {
+
+      if (!hasPermission && module !== 'agent-b2c') {
         res
           .status(StatusCode.HTTP_UNAUTHORIZED)
           .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });

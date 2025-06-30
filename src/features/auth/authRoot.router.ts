@@ -28,6 +28,10 @@ export default class AuthRootRouter {
     this.Router.use('/admin', this.authAdminRouter.router);
 
     // Agent B2C auth routes
-    this.Router.use('/agent-b2c', new AuthChecker().whiteLabelAuthChecker, this.authAgentB2CRouter.router);
+    this.Router.use(
+      '/agent-b2c',
+      new AuthChecker().whiteLabelAuthChecker,
+      this.authAgentB2CRouter.router
+    );
   }
 }

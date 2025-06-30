@@ -188,12 +188,11 @@ export class AgentB2CHolidayService extends AbstractServices {
 
   public async getHolidayPackageBookingList(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id } = req.agencyB2CUser;
       const holidayPackageBookingModel =
         this.Model.HolidayPackageBookingModel(trx);
       const query = req.query;
 
-      console.log({ agency_id });
       const getBookingList =
         await holidayPackageBookingModel.getHolidayBookingList(
           {
@@ -215,7 +214,7 @@ export class AgentB2CHolidayService extends AbstractServices {
 
   public async getSingleHolidayPackageBooking(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id } = req.agencyB2CUser;
       const holidayPackageBookingModel =
         this.Model.HolidayPackageBookingModel(trx);
       const { id } = req.params as unknown as { id: number };
@@ -245,7 +244,7 @@ export class AgentB2CHolidayService extends AbstractServices {
 
   public async cancelHolidayPackageBooking(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyUser;
+      const { agency_id, user_id } = req.agencyB2CUser;
       const holidayPackageBookingModel =
         this.Model.HolidayPackageBookingModel(trx);
       const { id } = req.params as unknown as { id: number };

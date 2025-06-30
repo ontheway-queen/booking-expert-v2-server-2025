@@ -14,7 +14,7 @@ export default class AuthAgentB2CRouter extends AbstractRouter {
       .route('/register')
       .post(
         this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_FILES, [
-          'photo'
+          'photo',
         ]),
         this.controller.register
       );

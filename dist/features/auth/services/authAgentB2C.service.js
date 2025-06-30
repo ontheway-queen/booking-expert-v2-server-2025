@@ -31,16 +31,15 @@ class AuthAgentB2CService extends abstract_service_1.default {
                 const files = req.files || [];
                 const check_email = yield AgentB2CUserModel.checkUser({
                     email,
-                    agency_id
+                    agency_id,
                 });
                 if (check_email) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: "Email already exist. Please use another email."
+                        message: 'Email already exist. Please use another email.',
                     };
                 }
-                ;
                 const agent_details = yield AgentModel.getSingleAgency(agency_id);
                 let username = lib_1.default.generateUsername(name);
                 let suffix = 1;
@@ -57,7 +56,7 @@ class AuthAgentB2CService extends abstract_service_1.default {
                     phone_number,
                     username,
                     gender,
-                    photo: (_a = files === null || files === void 0 ? void 0 : files[0]) === null || _a === void 0 ? void 0 : _a.filename
+                    photo: (_a = files === null || files === void 0 ? void 0 : files[0]) === null || _a === void 0 ? void 0 : _a.filename,
                 });
                 const tokenData = {
                     agency_id,
@@ -71,14 +70,20 @@ class AuthAgentB2CService extends abstract_service_1.default {
                     user_email: email,
                     username,
                     name,
-                    phone_number
+                    phone_number,
                 };
                 const AuthToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT_B2C, '24h');
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: `Registration has been completed`,
-                    data: Object.assign({}, tokenData),
+                    data: {
+                        user_id: tokenData.user_id,
+                        user_email: tokenData.user_email,
+                        name: tokenData.name,
+                        phone_number: tokenData.phone_number,
+                        photo: tokenData.photo,
+                    },
                     token: AuthToken,
                 };
             }));
@@ -88,13 +93,13 @@ class AuthAgentB2CService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { password, user_or_email } = req.body;
-                const { agency_id, blog, flight, group_fare, holiday, hotel, umrah, visa } = req.agencyB2CWhiteLabel;
+                const { agency_id } = req.agencyB2CWhiteLabel;
                 const AgentB2CUserModel = this.Model.AgencyB2CUserModel(trx);
                 const AgentModel = this.Model.AgencyModel(trx);
                 const checkAgentB2C = yield AgentB2CUserModel.checkUser({
                     username: user_or_email,
                     email: user_or_email,
-                    agency_id
+                    agency_id,
                 });
                 if (!checkAgentB2C) {
                     return {
@@ -107,7 +112,7 @@ class AuthAgentB2CService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_UNAUTHORIZED,
-                        message: "Your account is disabled. Please contact with the authority!"
+                        message: 'Your account is disabled. Please contact with the authority!',
                     };
                 }
                 const agent_details = yield AgentModel.getSingleAgency(agency_id);
@@ -115,14 +120,14 @@ class AuthAgentB2CService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_UNAUTHORIZED,
-                        message: this.StatusCode.HTTP_UNAUTHORIZED
+                        message: this.StatusCode.HTTP_UNAUTHORIZED,
                     };
                 }
-                if (agent_details.status !== "Active") {
+                if (agent_details.status !== 'Active') {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_UNAUTHORIZED,
-                        message: this.StatusCode.HTTP_UNAUTHORIZED
+                        message: this.StatusCode.HTTP_UNAUTHORIZED,
                     };
                 }
                 const checkPassword = yield lib_1.default.compareHashValue(password, checkAgentB2C.password_hash);
@@ -152,13 +157,13 @@ class AuthAgentB2CService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.LOGIN_SUCCESSFUL,
-                    data: Object.assign(Object.assign({}, tokenData), { blog,
-                        flight,
-                        group_fare,
-                        holiday,
-                        hotel,
-                        umrah,
-                        visa }),
+                    data: {
+                        user_id: tokenData.user_id,
+                        user_email: tokenData.user_email,
+                        name: tokenData.name,
+                        phone_number: tokenData.phone_number,
+                        photo: tokenData.photo,
+                    },
                     token: AuthToken,
                 };
             }));
