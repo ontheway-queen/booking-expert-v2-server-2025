@@ -9,15 +9,25 @@ export default class AdminHolidayRouter extends AbstractRouter {
   }
 
   private callRouter() {
-    this.router.route('/')
-      .post(this.uploader.cloudUploadRaw(this.fileFolders.ADMIN_HOLIDAY_PACKAGE,
-        ['images']), this.controller.createHoliday)
+    this.router
+      .route('/')
+      .post(
+        this.uploader.cloudUploadRaw(this.fileFolders.ADMIN_HOLIDAY_PACKAGE, [
+          'images',
+        ]),
+        this.controller.createHoliday
+      )
       .get(this.controller.getHolidayPackageList);
 
-    this.router.route('/:id')
+    this.router
+      .route('/:id')
       .get(this.controller.getSingleHolidayPackage)
-      .patch(this.uploader.cloudUploadRaw(this.fileFolders.ADMIN_HOLIDAY_PACKAGE,
-        ['images']), this.controller.updateHolidayPackage)
+      .patch(
+        this.uploader.cloudUploadRaw(this.fileFolders.ADMIN_HOLIDAY_PACKAGE, [
+          'images',
+        ]),
+        this.controller.updateHolidayPackage
+      )
       .delete(this.controller.deleteHolidayPackage);
   }
 }

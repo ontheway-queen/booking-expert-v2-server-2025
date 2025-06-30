@@ -25,7 +25,7 @@ class AgentB2CSubUsersService extends abstract_service_1.default {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 total: data.total,
-                data: data.data
+                data: data.data,
             };
         });
     }
@@ -39,13 +39,13 @@ class AgentB2CSubUsersService extends abstract_service_1.default {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_NOT_FOUND,
-                    message: this.ResMsg.HTTP_NOT_FOUND
+                    message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
-                data
+                data,
             };
         });
     }
@@ -60,7 +60,7 @@ class AgentB2CSubUsersService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 const body = req.body;
@@ -68,7 +68,7 @@ class AgentB2CSubUsersService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "Profile has been updated"
+                    message: 'Profile has been updated',
                 };
             }));
         });

@@ -26,7 +26,7 @@ class AgentB2CSubFlightService extends abstract_service_1.default {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 total: data.total,
-                data: data.data
+                data: data.data,
             };
         });
     }
@@ -48,10 +48,9 @@ class AgentB2CSubFlightService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                ;
                 const price_breakdown_data = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(Number(id));
                 const segment_data = yield flightSegmentModel.getFlightBookingSegment(Number(id));
                 const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(Number(id));
@@ -60,7 +59,7 @@ class AgentB2CSubFlightService extends abstract_service_1.default {
                     code: this.StatusCode.HTTP_OK,
                     data: Object.assign(Object.assign({}, booking_data), { price_breakdown_data,
                         segment_data,
-                        traveler_data })
+                        traveler_data }),
                 };
             }));
         });

@@ -273,19 +273,23 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const { id } = req.params;
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
-                const data = yield holidayPackageModel.getSingleHolidayPackage({ id: Number(id), created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT, agency_id });
+                const data = yield holidayPackageModel.getSingleHolidayPackage({
+                    id: Number(id),
+                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT,
+                    agency_id,
+                });
                 if (!data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: "Holiday package not found"
+                        message: 'Holiday package not found',
                     };
                 }
                 yield holidayPackageModel.updateHolidayPackage({ is_deleted: true }, Number(id));
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "Holiday package has been deleted successfully"
+                    message: 'Holiday package has been deleted successfully',
                 };
             }));
         });

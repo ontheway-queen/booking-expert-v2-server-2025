@@ -9,21 +9,23 @@ export default class AgentHolidayRouter extends AbstractRouter {
   }
 
   private callRouter() {
+    this.router.route('/search').post(this.controller.searchHolidayPackage);
 
-    this.router.route('/search')
-      .post(this.controller.searchHolidayPackage);
-
-    this.router.route('/search/:slug')
+    this.router
+      .route('/search/:slug')
       .get(this.controller.getSingleHolidayPackage);
 
-    this.router.route('/booking')
+    this.router
+      .route('/booking')
       .post(this.controller.bookHolidayPackage)
       .get(this.controller.getHolidayPackageBookingList);
 
-    this.router.route('/booking/:id')
+    this.router
+      .route('/booking/:id')
       .get(this.controller.getSingleHolidayPackageBooking);
 
-    this.router.route('/booking/:id/cancel')
+    this.router
+      .route('/booking/:id/cancel')
       .post(this.controller.cancelHolidayPackageBooking);
   }
 }
