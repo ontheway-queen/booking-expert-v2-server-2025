@@ -19,7 +19,6 @@ const sabreFlightSupport_service_1 = __importDefault(require("../../../utils/sup
 const wfttFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service"));
 const uuid_1 = require("uuid");
 const redis_1 = require("../../../app/redis");
-const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 const commonFlightSupport_service_1 = require("../../../utils/supportServices/flightSupportServices/commonFlightSupport.service");
 const constants_1 = require("../../../utils/miscellaneous/constants");
 class B2CFlightService extends abstract_service_1.default {
@@ -113,7 +112,6 @@ class B2CFlightService extends abstract_service_1.default {
     flightSearchSSE(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, ref_id } = req.agencyUser;
                 const JourneyType = req.query.JourneyType;
                 const OriginDestinationInformation = req.query
                     .OriginDestinationInformation;
@@ -121,44 +119,26 @@ class B2CFlightService extends abstract_service_1.default {
                     .PassengerTypeQuantity;
                 const airline_code = req.query
                     .airline_code;
+                const b2cMarkupConfig = this.Model.B2CMarkupConfigModel(trx);
+                const markupSet = yield b2cMarkupConfig.getB2CMarkupConfigData('Flight');
+                if (!markupSet.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                    };
+                }
+                const markup_set_id = markupSet[0].markup_set_id;
                 const body = {
                     JourneyType,
                     OriginDestinationInformation,
                     PassengerTypeQuantity,
                     airline_code,
                 };
-                //get flight markup set id
-                const agencyModel = this.Model.AgencyModel(trx);
-                const agency_details = yield agencyModel.checkAgency({
-                    agency_id: ref_id || agency_id,
-                });
-                if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: 'No commission set has been found for the agency',
-                    };
-                }
-                //get sub agent markup
-                let markup_amount = undefined;
-                if (ref_id) {
-                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
-                        trx,
-                        type: 'Flight',
-                        agency_id,
-                    });
-                    if (!markup_amount) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: 'Markup information is empty. Contact with the authority',
-                        };
-                    }
-                }
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
                 const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
                     status: true,
-                    markup_set_id: agency_details.flight_markup_set,
+                    markup_set_id,
                 });
                 //extract API IDs
                 let sabre_set_flight_api_id = 0;
@@ -214,10 +194,9 @@ class B2CFlightService extends abstract_service_1.default {
                     yield sendResults('Sabre', () => __awaiter(this, void 0, void 0, function* () {
                         return sabreSubService.FlightSearch({
                             booking_block: false,
-                            markup_set_id: agency_details.flight_markup_set,
+                            markup_set_id,
                             reqBody: body,
                             set_flight_api_id: sabre_set_flight_api_id,
-                            markup_amount,
                         });
                     }));
                 }
@@ -227,10 +206,9 @@ class B2CFlightService extends abstract_service_1.default {
                     yield sendResults('WFTT', () => __awaiter(this, void 0, void 0, function* () {
                         return wfttSubService.FlightSearch({
                             booking_block: false,
-                            markup_set_id: agency_details.flight_markup_set,
+                            markup_set_id,
                             reqBody: body,
                             set_flight_api_id: wftt_set_flight_api_id,
-                            markup_amount,
                         });
                     }));
                 }

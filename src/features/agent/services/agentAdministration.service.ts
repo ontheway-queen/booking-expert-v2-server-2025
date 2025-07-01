@@ -297,7 +297,7 @@ export class AgentAdministrationService extends AbstractServices {
     return this.db.transaction(async (trx) => {
       const { user_id, agency_id } = req.agencyUser;
 
-      const { password, email, name, role_id, phone_number, gender } =
+      const { password, email, name, role_id, phone_number } =
         req.body as ICreateAgentReqBody;
 
       const model = this.Model.AgencyUserModel(trx);
@@ -349,7 +349,6 @@ export class AgentAdministrationService extends AbstractServices {
         role_id,
         username,
         phone_number,
-        gender,
         agency_id,
         is_main_user: false,
       };

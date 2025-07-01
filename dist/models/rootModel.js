@@ -38,6 +38,8 @@ const travelerModel_1 = __importDefault(require("./travelerModel/travelerModel")
 const othersModel_1 = __importDefault(require("./othersModel/othersModel"));
 const hotelBookingModel_1 = __importDefault(require("./hotelModel/hotelBookingModel"));
 const supportTicketModel_1 = __importDefault(require("./othersModel/supportTicketModel"));
+const visaModel_1 = __importDefault(require("./visaModel/visaModel"));
+const visaApplicationModel_1 = __importDefault(require("./visaModel/visaApplicationModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -174,6 +176,14 @@ class Models {
     //Support Ticket model
     SupportTicketModel(trx) {
         return new supportTicketModel_1.default(trx || database_1.db);
+    }
+    //Visa model
+    VisaModel(trx) {
+        return new visaModel_1.default(trx || database_1.db);
+    }
+    //Visa Application model
+    VisaApplicationModel(trx) {
+        return new visaApplicationModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

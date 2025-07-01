@@ -34,6 +34,8 @@ import TravelerModel from './travelerModel/travelerModel';
 import OthersModel from './othersModel/othersModel';
 import HotelBookingModel from './hotelModel/hotelBookingModel';
 import SupportTicketModel from './othersModel/supportTicketModel';
+import VisaModel from './visaModel/visaModel';
+import VisaApplicationModel from './visaModel/visaApplicationModel';
 
 export default class Models {
   //Common model
@@ -202,5 +204,14 @@ export default class Models {
   //Support Ticket model
   public SupportTicketModel(trx?: Knex.Transaction) {
     return new SupportTicketModel(trx || db);
+  }
+  //Visa model
+  public VisaModel(trx?: Knex.Transaction) {
+    return new VisaModel(trx || db);
+  }
+
+  //Visa Application model
+  public VisaApplicationModel(trx?: Knex.Transaction) {
+    return new VisaApplicationModel(trx || db);
   }
 }

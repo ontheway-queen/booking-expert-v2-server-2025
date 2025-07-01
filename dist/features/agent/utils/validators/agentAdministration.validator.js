@@ -37,7 +37,6 @@ class AgentAdministrationValidator {
         this.createAgencyUser = joi_1.default.object({
             name: joi_1.default.string().required().trim(),
             email: joi_1.default.string().lowercase().trim().required(),
-            gender: joi_1.default.string().valid('Male', 'Female', 'Other').required(),
             phone_number: joi_1.default.string().required().trim(),
             role_id: joi_1.default.number().required(),
             password: joi_1.default.string().trim().required(),
@@ -52,7 +51,6 @@ class AgentAdministrationValidator {
         this.updateAgencyUser = joi_1.default.object({
             name: joi_1.default.string().trim().optional(),
             email: joi_1.default.string().lowercase().trim().optional(),
-            gender: joi_1.default.string().valid('Male', 'Female', 'Other').optional(),
             phone_number: joi_1.default.string().optional().trim(),
             role_id: joi_1.default.number().optional(),
             status: joi_1.default.boolean().optional(),

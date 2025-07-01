@@ -39,7 +39,6 @@ export default class AgentAdministrationValidator {
   public createAgencyUser = Joi.object({
     name: Joi.string().required().trim(),
     email: Joi.string().lowercase().trim().required(),
-    gender: Joi.string().valid('Male', 'Female', 'Other').required(),
     phone_number: Joi.string().required().trim(),
     role_id: Joi.number().required(),
     password: Joi.string().trim().required(),
@@ -56,7 +55,6 @@ export default class AgentAdministrationValidator {
   public updateAgencyUser = Joi.object({
     name: Joi.string().trim().optional(),
     email: Joi.string().lowercase().trim().optional(),
-    gender: Joi.string().valid('Male', 'Female', 'Other').optional(),
     phone_number: Joi.string().optional().trim(),
     role_id: Joi.number().optional(),
     status: Joi.boolean().optional(),

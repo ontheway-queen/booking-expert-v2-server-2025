@@ -1,0 +1,2 @@
+-- agent.roles Status data type changed to boolean
+-- agent.agency_user removed gender column

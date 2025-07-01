@@ -3,7 +3,6 @@ export interface ICreateAgencyUserPayload {
   username: string;
   name: string;
   email: string;
-  gender?: 'Male' | 'Female' | 'Other';
   hashed_password: string;
   phone_number: string;
   photo?: string;

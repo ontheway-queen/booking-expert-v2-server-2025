@@ -128,7 +128,6 @@ export class B2CFlightService extends AbstractServices {
 
   public async flightSearchSSE(req: Request, res: Response) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, ref_id } = req.agencyUser;
       const JourneyType = req.query.JourneyType as string;
       const OriginDestinationInformation = req.query
         .OriginDestinationInformation as unknown as IOriginDestinationInformationPayload[];
@@ -136,6 +135,19 @@ export class B2CFlightService extends AbstractServices {
         .PassengerTypeQuantity as unknown as IPassengerTypeQuantityPayload[];
       const airline_code = req.query
         .airline_code as unknown as IAirlineCodePayload[];
+      const b2cMarkupConfig = this.Model.B2CMarkupConfigModel(trx);
+
+      const markupSet = await b2cMarkupConfig.getB2CMarkupConfigData('Flight');
+
+      if (!markupSet.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+        };
+      }
+
+      const markup_set_id = markupSet[0].markup_set_id;
 
       const body = {
         JourneyType,
@@ -144,40 +156,10 @@ export class B2CFlightService extends AbstractServices {
         airline_code,
       } as unknown as IFlightSearchReqBody;
 
-      //get flight markup set id
-      const agencyModel = this.Model.AgencyModel(trx);
-      const agency_details = await agencyModel.checkAgency({
-        agency_id: ref_id || agency_id,
-      });
-      if (!agency_details?.flight_markup_set) {
-        return {
-          success: false,
-          code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: 'No commission set has been found for the agency',
-        };
-      }
-
-      //get sub agent markup
-      let markup_amount = undefined;
-      if (ref_id) {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Flight',
-          agency_id,
-        });
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
-      }
-
       const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
       const apiData = await markupSetFlightApiModel.getMarkupSetFlightApi({
         status: true,
-        markup_set_id: agency_details.flight_markup_set,
+        markup_set_id,
       });
 
       //extract API IDs
@@ -253,10 +235,9 @@ export class B2CFlightService extends AbstractServices {
         await sendResults('Sabre', async () =>
           sabreSubService.FlightSearch({
             booking_block: false,
-            markup_set_id: agency_details.flight_markup_set,
+            markup_set_id,
             reqBody: body,
             set_flight_api_id: sabre_set_flight_api_id,
-            markup_amount,
           })
         );
       }
@@ -266,10 +247,9 @@ export class B2CFlightService extends AbstractServices {
         await sendResults('WFTT', async () =>
           wfttSubService.FlightSearch({
             booking_block: false,
-            markup_set_id: agency_details.flight_markup_set,
+            markup_set_id,
             reqBody: body,
             set_flight_api_id: wftt_set_flight_api_id,
-            markup_amount,
           })
         );
       }

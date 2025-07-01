@@ -36,7 +36,6 @@ export interface IGetAgentListReqQuery {
 
 export interface ICreateAgentReqBody {
   name: string;
-  gender: 'Male' | 'Female' | 'Other';
   email: string;
   phone_number: string;
   role_id: number;
@@ -45,7 +44,6 @@ export interface ICreateAgentReqBody {
 
 export interface IUpdateAgentReqBody {
   name?: string;
-  gender?: string;
   email?: string;
   password_hash?: string;
   phone_number?: string;

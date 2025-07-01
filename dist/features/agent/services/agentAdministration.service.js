@@ -252,7 +252,7 @@ class AgentAdministrationService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id, agency_id } = req.agencyUser;
-                const { password, email, name, role_id, phone_number, gender } = req.body;
+                const { password, email, name, role_id, phone_number } = req.body;
                 const model = this.Model.AgencyUserModel(trx);
                 //check admins email and phone number
                 const check_user = yield model.checkUser({
@@ -293,7 +293,6 @@ class AgentAdministrationService extends abstract_service_1.default {
                     role_id,
                     username,
                     phone_number,
-                    gender,
                     agency_id,
                     is_main_user: false,
                 };
