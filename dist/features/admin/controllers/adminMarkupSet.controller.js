@@ -24,13 +24,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_controller_1 = __importDefault(require("../../../abstract/abstract.controller"));
-const adminMarkupSet_service_1 = require("../services/adminMarkupSet.service");
 const adminMarkupSet_validator_1 = __importDefault(require("../utils/validators/adminMarkupSet.validator"));
-class AdminMarkupSetController extends abstract_controller_1.default {
+const adminHotelMarkupSet_service_1 = require("../services/adminHotelMarkupSet.service");
+class AdminHotelMarkupSetController extends abstract_controller_1.default {
     constructor() {
         super();
         this.validator = new adminMarkupSet_validator_1.default();
-        this.service = new adminMarkupSet_service_1.AdminMarkupSetService();
+        this.service = new adminHotelMarkupSet_service_1.AdminHotelMarkupSetService();
         this.getMarkupSet = this.asyncWrapper.wrap({ querySchema: this.validator.getMarkupSetSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getMarkupSet(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
@@ -96,4 +96,4 @@ class AdminMarkupSetController extends abstract_controller_1.default {
         }));
     }
 }
-exports.default = AdminMarkupSetController;
+exports.default = AdminHotelMarkupSetController;

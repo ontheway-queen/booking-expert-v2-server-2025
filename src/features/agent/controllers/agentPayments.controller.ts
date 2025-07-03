@@ -21,7 +21,9 @@ export default class AgentPaymentsController extends AbstractController {
   public getCurrentDepositRequest = this.asyncWrapper.wrap(
     { bodySchema: this.validator.getDeposit },
     async (req: Request, res: Response) => {
-      const { code, ...rest } = await this.service.getCurrentDepositRequest(req);
+      const { code, ...rest } = await this.service.getCurrentDepositRequest(
+        req
+      );
       res.status(code).json(rest);
     }
   );
@@ -29,7 +31,9 @@ export default class AgentPaymentsController extends AbstractController {
   public cancelCurrentDepositRequest = this.asyncWrapper.wrap(
     null,
     async (req: Request, res: Response) => {
-      const { code, ...rest } = await this.service.cancelCurrentDepositRequest(req);
+      const { code, ...rest } = await this.service.cancelCurrentDepositRequest(
+        req
+      );
       res.status(code).json(rest);
     }
   );
@@ -69,7 +73,9 @@ export default class AgentPaymentsController extends AbstractController {
   public topUpUsingPaymentGateway = this.asyncWrapper.wrap(
     { bodySchema: this.validator.topUpUsingPaymentGateway },
     async (req: Request, res: Response) => {
-      const { code, ...rest } = await this.service.topUpUsingPaymentGateway(req);
+      const { code, ...rest } = await this.service.topUpUsingPaymentGateway(
+        req
+      );
       res.status(code).json(rest);
     }
   );
@@ -113,5 +119,4 @@ export default class AgentPaymentsController extends AbstractController {
       res.status(code).json(rest);
     }
   );
-
 }

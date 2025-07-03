@@ -1,2 +1,9 @@
 -- agent.roles Status data type changed to boolean
 -- agent.agency_user removed gender column
+-- new table dbo.route_block
+-- dbo.flight_api table name changed to dbo.flight_supplier and added 2 column name and pcc
+-- new table dbo.dynamic_fare_supplier
+-- new table dbo.airlines_preference
+-- new type dbo.type_airline_preference
+-- new table dbo.dynamic_fare_tax
+-- new table dbo.supplier_airlines_dynamic_fare

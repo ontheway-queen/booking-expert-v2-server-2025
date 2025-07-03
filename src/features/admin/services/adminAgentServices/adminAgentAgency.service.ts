@@ -14,8 +14,8 @@ import Lib from '../../../../utils/lib/lib';
 import config from '../../../../config/config';
 import {
   GENERATE_AUTO_UNIQUE_ID,
-  MARKUP_SET_TYPE_FLIGHT,
-  MARKUP_SET_TYPE_HOTEL,
+  SET_TYPE_FLIGHT,
+  SET_TYPE_HOTEL,
 } from '../../../../utils/miscellaneous/constants';
 import EmailSendLib from '../../../../utils/lib/emailSendLib';
 import { registrationVerificationCompletedTemplate } from '../../../../utils/templates/registrationVerificationCompletedTemplate';
@@ -242,7 +242,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
       const { id } = req.params;
       const agency_id = Number(id);
       const AgentModel = this.Model.AgencyModel(trx);
-      const MarkupSetModel = this.Model.MarkupSetModel(trx);
+      const MarkupSetModel = this.Model.DynamicFareSetModel(trx);
       const checkAgency = await AgentModel.checkAgency({
         agency_id,
       });
@@ -278,10 +278,10 @@ export default class AdminAgentAgencyService extends AbstractServices {
           };
         }
 
-        const checkFlightMarkupSet = await MarkupSetModel.getSingleMarkupSet({
+        const checkFlightMarkupSet = await MarkupSetModel.checkDynamicFareSet({
           id: body.flight_markup_set,
           status: true,
-          type: MARKUP_SET_TYPE_FLIGHT,
+          type: SET_TYPE_FLIGHT,
         });
 
         if (!checkFlightMarkupSet) {
@@ -291,11 +291,13 @@ export default class AdminAgentAgencyService extends AbstractServices {
             message: 'Invalid flight markup set.',
           };
         }
-        const checkHotelMarkupSet = await MarkupSetModel.getSingleMarkupSet({
-          id: body.hotel_markup_set,
-          status: true,
-          type: MARKUP_SET_TYPE_HOTEL,
-        });
+
+        const checkHotelMarkupSet =
+          await MarkupSetModel.getSingleDynamicFareSet({
+            id: body.hotel_markup_set,
+            status: true,
+            type: SET_TYPE_HOTEL,
+          });
 
         if (!checkHotelMarkupSet) {
           return {

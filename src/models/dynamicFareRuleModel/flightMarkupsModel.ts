@@ -6,7 +6,7 @@ import {
   IGetFlightMarkupsData,
   IGetFlightMarkupsListFilterQuery,
   IUpdateFlightMarkupsPayload,
-} from '../../utils/modelTypes/markupSetModelTypes/flightMarkupsTypes';
+} from '../../utils/modelTypes/dynamicFareRulesModelTypes/flightMarkupsTypes';
 
 export default class FlightMarkupsModel extends Schema {
   private db: TDB;

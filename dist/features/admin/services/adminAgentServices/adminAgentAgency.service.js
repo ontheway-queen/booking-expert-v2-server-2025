@@ -213,7 +213,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const { id } = req.params;
                 const agency_id = Number(id);
                 const AgentModel = this.Model.AgencyModel(trx);
-                const MarkupSetModel = this.Model.MarkupSetModel(trx);
+                const MarkupSetModel = this.Model.DynamicFareSetModel(trx);
                 const checkAgency = yield AgentModel.checkAgency({
                     agency_id,
                 });
@@ -234,10 +234,10 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                             message: 'Flight, hotel markup sets and kam_id are required for activation.',
                         };
                     }
-                    const checkFlightMarkupSet = yield MarkupSetModel.getSingleMarkupSet({
+                    const checkFlightMarkupSet = yield MarkupSetModel.checkDynamicFareSet({
                         id: body.flight_markup_set,
                         status: true,
-                        type: constants_1.MARKUP_SET_TYPE_FLIGHT,
+                        type: constants_1.SET_TYPE_FLIGHT,
                     });
                     if (!checkFlightMarkupSet) {
                         return {
@@ -246,10 +246,10 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                             message: 'Invalid flight markup set.',
                         };
                     }
-                    const checkHotelMarkupSet = yield MarkupSetModel.getSingleMarkupSet({
+                    const checkHotelMarkupSet = yield MarkupSetModel.getSingleDynamicFareSet({
                         id: body.hotel_markup_set,
                         status: true,
-                        type: constants_1.MARKUP_SET_TYPE_HOTEL,
+                        type: constants_1.SET_TYPE_HOTEL,
                     });
                     if (!checkHotelMarkupSet) {
                         return {

@@ -6,11 +6,14 @@ import AdminConfigRouter from './routers/adminConfig.router';
 import AdminGroupFareRouter from './routers/adminGroupFare.router';
 import AdminHolidayRouter from './routers/adminHoliday.router';
 import AdminMainRouter from './routers/adminMain.router';
-import AdminMarkupSetRouter from './routers/adminMarkupSet.router';
+import AdminHotelMarkupSetRouter from './routers/adminHotelMarkupSet.router';
 import AdminProfileRouter from './routers/adminProfile.router';
 import AdminReportRouter from './routers/adminReport.router';
 import AdminUmrahRouter from './routers/adminUmrah.router';
 import AdminVisaRouter from './routers/adminVisa.router';
+import { AdminAirlinesPreferenceRouter } from './routers/adminAirlinesPreference.router';
+import { AdminDynamicFareRouter } from './routers/adminDynamicFare.router';
+import { AdminDynamicFareSetRouter } from './routers/adminDynamicFareSet.router';
 
 export default class AdminRootRouter {
   public Router = Router();
@@ -21,11 +24,14 @@ export default class AdminRootRouter {
   private adminGroupFareRouter = new AdminGroupFareRouter();
   private adminHolidayRouter = new AdminHolidayRouter();
   private adminMainRouter = new AdminMainRouter();
-  private adminMarkupSetRouter = new AdminMarkupSetRouter();
+  private adminHotelMarkupSetRouter = new AdminHotelMarkupSetRouter();
   private adminProfileRouter = new AdminProfileRouter();
   private adminReportRouter = new AdminReportRouter();
   private adminUmrahRouter = new AdminUmrahRouter();
   private adminVisaRouter = new AdminVisaRouter();
+  private adminAirlinesPreferenceRouter = new AdminAirlinesPreferenceRouter();
+  private adminDynamicFareRouter = new AdminDynamicFareRouter();
+  private adminDynamicFareSetRouter = new AdminDynamicFareSetRouter();
 
   //Admin Agent ,Admin B2C Sub Root Router Class
   private adminB2CRouter = new AdminB2CRouter();
@@ -42,9 +48,15 @@ export default class AdminRootRouter {
     this.Router.use('/config', this.adminConfigRouter.router);
     this.Router.use('/group-fare', this.adminGroupFareRouter.router);
     this.Router.use('/holiday', this.adminHolidayRouter.router);
-    this.Router.use('/markup-set', this.adminMarkupSetRouter.router);
     this.Router.use('/umrah', this.adminUmrahRouter.router);
     this.Router.use('/visa', this.adminVisaRouter.router);
+    this.Router.use(
+      '/airlines-preference',
+      this.adminAirlinesPreferenceRouter.router
+    );
+    this.Router.use('/hotel-markup-set', this.adminHotelMarkupSetRouter.router);
+    this.Router.use('/dynamic-fare-set', this.adminDynamicFareSetRouter.router);
+    this.Router.use('/dynamic-fare', this.adminDynamicFareRouter.router);
 
     //Admin Agent, Admin B2C Root Routes
     this.Router.use('/agent', this.adminAgentRouter.router);

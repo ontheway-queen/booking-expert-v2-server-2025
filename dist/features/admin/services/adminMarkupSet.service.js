@@ -23,16 +23,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminMarkupSetService = void 0;
+exports.AdminDynamicFareSetService = void 0;
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
 const customError_1 = __importDefault(require("../../../utils/lib/customError"));
-class AdminMarkupSetService extends abstract_service_1.default {
-    createFlightMarkupSet(req) {
+class AdminDynamicFareSetService extends abstract_service_1.default {
+    createFlightFareRulesSet(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id } = req.admin;
-                const { api, name } = req.body;
+                const { name } = req.body;
                 const markupSetModel = this.Model.MarkupSetModel(trx);
                 const flightApiModel = this.Model.FlightApiModel(trx);
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
@@ -46,7 +46,7 @@ class AdminMarkupSetService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: 'Markup Set name already exists',
+                        message: 'Dynamic fare set name already exists',
                     };
                 }
                 //create a markup set
@@ -569,4 +569,4 @@ class AdminMarkupSetService extends abstract_service_1.default {
         });
     }
 }
-exports.AdminMarkupSetService = AdminMarkupSetService;
+exports.AdminDynamicFareSetService = AdminDynamicFareSetService;

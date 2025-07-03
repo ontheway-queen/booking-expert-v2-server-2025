@@ -79,40 +79,18 @@ class Lib {
   }
 
   // generate Random pass
-  public static generateRandomPassword(
-    length: number,
-    options: {
-      includeUppercase?: boolean;
-      includeNumbers?: boolean;
-      includeSpecialChars?: boolean;
-    } = {}
-  ) {
-    const {
-      includeUppercase = true,
-      includeNumbers = true,
-      includeSpecialChars = true,
-    } = options;
+  public static generateRandomPassword(length: number) {
+    const letters = `abc+[]{}|;depqrstuvwxyzABCDEFGH!@#$%^&*()_:',.<>?/IJKLMNOPQRSTUVWXYZ01234fghijklmno56789`;
 
-    const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
-    const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numberChars = '0123456789';
-    const specialChars = "!@#$%^&*()_+[]{}|;:',.<>?/";
+    let randomNums = '';
 
-    let characterPool = lowercaseChars;
-    if (includeUppercase) characterPool += uppercaseChars;
-    if (includeNumbers) characterPool += numberChars;
-    if (includeSpecialChars) characterPool += specialChars;
+    for (let i = 0; i < length; i++) {
+      const randomNumber = Math.floor(Math.random() * letters.length);
 
-    if (!characterPool) {
-      throw new Error(
-        'Character pool cannot be empty. Please enable at least one character type.'
-      );
+      randomNums += letters[randomNumber];
     }
 
-    return Array.from(
-      { length },
-      () => characterPool[Math.floor(Math.random() * characterPool.length)]
-    ).join('');
+    return randomNums;
   }
 
   //remove country code from phone number

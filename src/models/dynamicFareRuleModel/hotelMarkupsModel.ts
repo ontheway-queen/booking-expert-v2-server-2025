@@ -5,7 +5,7 @@ import {
   IGetHotelMarkupQuery,
   IInsertHotelMarkupPayload,
   IUpdateHotelMarkupPayload,
-} from '../../utils/modelTypes/markupSetModelTypes/hotelMarkupsTypes';
+} from '../../utils/modelTypes/dynamicFareRulesModelTypes/hotelMarkupsTypes';
 
 export default class HotelMarkupsModel extends Schema {
   private db: TDB;

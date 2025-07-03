@@ -16,7 +16,7 @@ import {
   ICTHotelSearchResponseHotel,
   ICancellationPolicy,
 } from '../../supportTypes/hotelTypes/ctHotelSupport.types';
-import HotelMarkupsModel from '../../../models/markupSetModel/hotelMarkupsModel';
+import HotelMarkupsModel from '../../../models/dynamicFareRuleModel/hotelMarkupsModel';
 import {
   MARKUP_MODE_INCREASE,
   MARKUP_TYPE_PER,

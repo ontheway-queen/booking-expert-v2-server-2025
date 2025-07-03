@@ -47,8 +47,8 @@ export const DATA_LIMIT = 100;
 export const OTP_DEFAULT_EXPIRY = 3;
 
 // markup set types
-export const MARKUP_SET_TYPE_FLIGHT = 'Flight';
-export const MARKUP_SET_TYPE_HOTEL = 'Hotel';
+export const SET_TYPE_FLIGHT = 'Flight';
+export const SET_TYPE_HOTEL = 'Hotel';
 
 //error logs level
 export const ERROR_LEVEL_DEBUG = 'DEBUG';

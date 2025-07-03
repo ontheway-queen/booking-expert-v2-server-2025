@@ -264,6 +264,8 @@ export class B2CFlightService extends AbstractServices {
       };
       //get data from redis using the search id
       const retrievedData = await getRedis(search_id);
+
+      console.log({ retrievedData });
       if (!retrievedData) {
         return {
           success: false,
@@ -275,6 +277,8 @@ export class B2CFlightService extends AbstractServices {
       const retrieveResponse = retrievedData.response as {
         results: IFormattedFlightItinerary[];
       };
+
+      console.log(retrieveResponse.results[0]);
       const foundItem = retrieveResponse.results.find(
         (item) => item.flight_id === flight_id
       );

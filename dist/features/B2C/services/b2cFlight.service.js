@@ -221,6 +221,7 @@ class B2CFlightService extends abstract_service_1.default {
                 const { flight_id, search_id } = req.query;
                 //get data from redis using the search id
                 const retrievedData = yield (0, redis_1.getRedis)(search_id);
+                console.log({ retrievedData });
                 if (!retrievedData) {
                     return {
                         success: false,
@@ -229,6 +230,7 @@ class B2CFlightService extends abstract_service_1.default {
                     };
                 }
                 const retrieveResponse = retrievedData.response;
+                console.log(retrieveResponse.results[0]);
                 const foundItem = retrieveResponse.results.find((item) => item.flight_id === flight_id);
                 if (!foundItem) {
                     return {

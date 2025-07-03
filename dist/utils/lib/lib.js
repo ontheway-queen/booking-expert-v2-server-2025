@@ -78,23 +78,14 @@ class Lib {
         // Write response in json data file======================
     }
     // generate Random pass
-    static generateRandomPassword(length, options = {}) {
-        const { includeUppercase = true, includeNumbers = true, includeSpecialChars = true, } = options;
-        const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
-        const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const numberChars = '0123456789';
-        const specialChars = "!@#$%^&*()_+[]{}|;:',.<>?/";
-        let characterPool = lowercaseChars;
-        if (includeUppercase)
-            characterPool += uppercaseChars;
-        if (includeNumbers)
-            characterPool += numberChars;
-        if (includeSpecialChars)
-            characterPool += specialChars;
-        if (!characterPool) {
-            throw new Error('Character pool cannot be empty. Please enable at least one character type.');
+    static generateRandomPassword(length) {
+        const letters = `abc+[]{}|;depqrstuvwxyzABCDEFGH!@#$%^&*()_:',.<>?/IJKLMNOPQRSTUVWXYZ01234fghijklmno56789`;
+        let randomNums = '';
+        for (let i = 0; i < length; i++) {
+            const randomNumber = Math.floor(Math.random() * letters.length);
+            randomNums += letters[randomNumber];
         }
-        return Array.from({ length }, () => characterPool[Math.floor(Math.random() * characterPool.length)]).join('');
+        return randomNums;
     }
     //remove country code from phone number
     static removeCountryCodeFromPhoneNumber(phone_number) {

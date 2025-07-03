@@ -1,13 +1,13 @@
-interface markupType {
+interface setType {
   type: 'Flight' | 'Hotel';
 }
 
-export interface ICreateMarkupSetPayload extends markupType {
+export interface ICreateDynamicFareSetPayload extends setType {
   name: string;
   created_by: number;
 }
 
-export interface IUpdateMarkupSetPayload {
+export interface IUpdateDynamicFarePayload {
   name?: string;
   status?: boolean;
   is_deleted?: true;
@@ -15,7 +15,7 @@ export interface IUpdateMarkupSetPayload {
   last_updated?: Date;
 }
 
-export interface IGetMarkupSetData extends markupType {
+export interface IGetDynamicFareData extends setType {
   id: number;
   name: string;
   status: boolean;
@@ -28,7 +28,7 @@ export interface IGetMarkupSetData extends markupType {
   is_deleted: boolean;
 }
 
-export interface IGetMarkupListFilterQuery {
+export interface IGetDynamicFareListFilterQuery {
   filter?: string;
   status?: boolean;
   type?: 'Flight' | 'Hotel';

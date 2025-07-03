@@ -6,7 +6,11 @@ import {
   ICreateAirportReqBody,
   IUpdateAirportReqBody,
 } from '../utils/types/adminConfig.types';
-import { SLUG_TYPE_HOLIDAY } from '../../../utils/miscellaneous/constants';
+import {
+  SET_TYPE_FLIGHT,
+  SET_TYPE_HOTEL,
+  SLUG_TYPE_HOLIDAY,
+} from '../../../utils/miscellaneous/constants';
 import { HOLIDAY_CREATED_BY_ADMIN } from '../../../utils/miscellaneous/holidayConstants';
 import {
   ICreateAirlinesPayload,
@@ -323,19 +327,20 @@ export class AdminConfigService extends AbstractServices {
     };
 
     const B2CMarkupConfigModel = this.Model.B2CMarkupConfigModel();
-    const markupSetModel = this.Model.MarkupSetModel();
+    const markupSetModel = this.Model.DynamicFareSetModel();
 
     if (body.flight_set_id) {
       // Check if the markup set exists
-      const existingFlightMarkupSet = await markupSetModel.getSingleMarkupSet({
+      const existingFlightMarkupSet = await markupSetModel.checkDynamicFareSet({
         id: body.flight_set_id,
+        type: SET_TYPE_FLIGHT,
       });
 
       if (!existingFlightMarkupSet) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: 'Flight markup set not found.',
+          message: 'Flight set not found.',
         };
       }
 
@@ -347,15 +352,16 @@ export class AdminConfigService extends AbstractServices {
 
     if (body.hotel_set_id) {
       // Check if the markup set exists
-      const existingHotelMarkupSet = await markupSetModel.getSingleMarkupSet({
+      const existingHotelMarkupSet = await markupSetModel.checkDynamicFareSet({
         id: body.hotel_set_id,
+        type: SET_TYPE_HOTEL,
       });
 
       if (!existingHotelMarkupSet) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: 'Hotel markup set not found.',
+          message: 'Hotel set not found.',
         };
       }
 

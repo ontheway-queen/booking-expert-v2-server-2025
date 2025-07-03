@@ -6,11 +6,10 @@ import AgencyB2CUserModel from './agencyB2CModel/agencyB2CUserModel';
 import AgencyModel from './agentModel/agencyModel';
 import AgencyUserModel from './agentModel/agencyUserModel';
 import B2CUserModel from './b2cModel/b2cUserModel';
-import MarkupSetModel from './markupSetModel/markupSetModel';
-import FlightApiModel from './markupSetModel/flightApiModel';
-import MarkupSetFlightApiModel from './markupSetModel/markupSetFlightApiModel';
-import FlightMarkupsModel from './markupSetModel/flightMarkupsModel';
-import B2CMarkupConfigModel from './markupSetModel/b2cMarkupConfigModel';
+import FlightApiModel from './dynamicFareRuleModel/flightApiModel';
+import MarkupSetFlightApiModel from './dynamicFareRuleModel/markupSetFlightApiModel';
+import FlightMarkupsModel from './dynamicFareRuleModel/flightMarkupsModel';
+import B2CMarkupConfigModel from './dynamicFareRuleModel/b2cMarkupConfigModel';
 import FlightBookingModel from './flightModel/flightBookingModel';
 import FlightBookingPriceBreakdownModel from './flightModel/flightBookingPriceBreakdownModel';
 import FlightBookingSegmentModel from './flightModel/flightBookingSegmentModel';
@@ -23,7 +22,7 @@ import HolidayPackagePricingModel from './holidayPackageModel/holidayPackagePric
 import HolidayPackageItineraryModel from './holidayPackageModel/holidayPackageItineraryModel';
 import HolidayPackageServiceModel from './holidayPackageModel/holidayPackageServiceModel';
 import HolidayPackageImagesModel from './holidayPackageModel/holidayPackageImagesModel';
-import HotelMarkupsModel from './markupSetModel/hotelMarkupsModel';
+import HotelMarkupsModel from './dynamicFareRuleModel/hotelMarkupsModel';
 import HolidayPackageCityModel from './holidayPackageModel/holidayPackageCityModel';
 import HolidayPackageBookingModel from './holidayPackageModel/holidayPackageBookingModel';
 import SubAgentMarkupModel from './agentModel/subAgentMarkupModel';
@@ -36,6 +35,9 @@ import HotelBookingModel from './hotelModel/hotelBookingModel';
 import SupportTicketModel from './othersModel/supportTicketModel';
 import VisaModel from './visaModel/visaModel';
 import VisaApplicationModel from './visaModel/visaApplicationModel';
+import AirlinesPreferenceModel from './dynamicFareRuleModel/airlinesPreferenceModel';
+import DynamicFareModel from './dynamicFareRuleModel/dynamicFareModel';
+import DynamicFareSetModel from './dynamicFareRuleModel/dynamicFareSetModel';
 
 export default class Models {
   //Common model
@@ -66,11 +68,6 @@ export default class Models {
   //booking request models
   public B2CUserModel(trx?: Knex.Transaction) {
     return new B2CUserModel(trx || db);
-  }
-
-  //Markup Set Model
-  public MarkupSetModel(trx?: Knex.Transaction) {
-    return new MarkupSetModel(trx || db);
   }
 
   //Flight API Model
@@ -213,5 +210,19 @@ export default class Models {
   //Visa Application model
   public VisaApplicationModel(trx?: Knex.Transaction) {
     return new VisaApplicationModel(trx || db);
+  }
+
+  //Airlines Preference model
+  public AirlinesPreferenceModel(trx?: Knex.Transaction) {
+    return new AirlinesPreferenceModel(trx || db);
+  }
+  //Dynamic Fare Model
+  public DynamicFareModel(trx?: Knex.Transaction) {
+    return new DynamicFareModel(trx || db);
+  }
+
+  //Dynamic Fare Set Model
+  public DynamicFareSetModel(trx?: Knex.Transaction) {
+    return new DynamicFareSetModel(trx || db);
   }
 }

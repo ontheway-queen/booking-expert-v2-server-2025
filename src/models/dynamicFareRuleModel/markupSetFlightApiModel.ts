@@ -5,7 +5,7 @@ import {
   IGetMarkupSetFlightApiData,
   IGetMarkupSetFlightApiListFilterQuery,
   IUpdateMarkupSetFlightApiPayload,
-} from '../../utils/modelTypes/markupSetModelTypes/markupSetFlightApiTypes';
+} from '../../utils/modelTypes/dynamicFareRulesModelTypes/markupSetFlightApiTypes';
 
 export default class MarkupSetFlightApiModel extends Schema {
   private db: TDB;

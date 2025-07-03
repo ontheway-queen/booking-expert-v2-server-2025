@@ -10,11 +10,10 @@ const agencyB2CUserModel_1 = __importDefault(require("./agencyB2CModel/agencyB2C
 const agencyModel_1 = __importDefault(require("./agentModel/agencyModel"));
 const agencyUserModel_1 = __importDefault(require("./agentModel/agencyUserModel"));
 const b2cUserModel_1 = __importDefault(require("./b2cModel/b2cUserModel"));
-const markupSetModel_1 = __importDefault(require("./markupSetModel/markupSetModel"));
-const flightApiModel_1 = __importDefault(require("./markupSetModel/flightApiModel"));
-const markupSetFlightApiModel_1 = __importDefault(require("./markupSetModel/markupSetFlightApiModel"));
-const flightMarkupsModel_1 = __importDefault(require("./markupSetModel/flightMarkupsModel"));
-const b2cMarkupConfigModel_1 = __importDefault(require("./markupSetModel/b2cMarkupConfigModel"));
+const flightApiModel_1 = __importDefault(require("./dynamicFareRuleModel/flightApiModel"));
+const markupSetFlightApiModel_1 = __importDefault(require("./dynamicFareRuleModel/markupSetFlightApiModel"));
+const flightMarkupsModel_1 = __importDefault(require("./dynamicFareRuleModel/flightMarkupsModel"));
+const b2cMarkupConfigModel_1 = __importDefault(require("./dynamicFareRuleModel/b2cMarkupConfigModel"));
 const flightBookingModel_1 = __importDefault(require("./flightModel/flightBookingModel"));
 const flightBookingPriceBreakdownModel_1 = __importDefault(require("./flightModel/flightBookingPriceBreakdownModel"));
 const flightBookingSegmentModel_1 = __importDefault(require("./flightModel/flightBookingSegmentModel"));
@@ -27,7 +26,7 @@ const holidayPackagePricingModel_1 = __importDefault(require("./holidayPackageMo
 const holidayPackageItineraryModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageItineraryModel"));
 const holidayPackageServiceModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageServiceModel"));
 const holidayPackageImagesModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageImagesModel"));
-const hotelMarkupsModel_1 = __importDefault(require("./markupSetModel/hotelMarkupsModel"));
+const hotelMarkupsModel_1 = __importDefault(require("./dynamicFareRuleModel/hotelMarkupsModel"));
 const holidayPackageCityModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageCityModel"));
 const holidayPackageBookingModel_1 = __importDefault(require("./holidayPackageModel/holidayPackageBookingModel"));
 const subAgentMarkupModel_1 = __importDefault(require("./agentModel/subAgentMarkupModel"));
@@ -40,6 +39,9 @@ const hotelBookingModel_1 = __importDefault(require("./hotelModel/hotelBookingMo
 const supportTicketModel_1 = __importDefault(require("./othersModel/supportTicketModel"));
 const visaModel_1 = __importDefault(require("./visaModel/visaModel"));
 const visaApplicationModel_1 = __importDefault(require("./visaModel/visaApplicationModel"));
+const airlinesPreferenceModel_1 = __importDefault(require("./dynamicFareRuleModel/airlinesPreferenceModel"));
+const dynamicFareModel_1 = __importDefault(require("./dynamicFareRuleModel/dynamicFareModel"));
+const dynamicFareSetModel_1 = __importDefault(require("./dynamicFareRuleModel/dynamicFareSetModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -64,10 +66,6 @@ class Models {
     //booking request models
     B2CUserModel(trx) {
         return new b2cUserModel_1.default(trx || database_1.db);
-    }
-    //Markup Set Model
-    MarkupSetModel(trx) {
-        return new markupSetModel_1.default(trx || database_1.db);
     }
     //Flight API Model
     FlightApiModel(trx) {
@@ -184,6 +182,18 @@ class Models {
     //Visa Application model
     VisaApplicationModel(trx) {
         return new visaApplicationModel_1.default(trx || database_1.db);
+    }
+    //Airlines Preference model
+    AirlinesPreferenceModel(trx) {
+        return new airlinesPreferenceModel_1.default(trx || database_1.db);
+    }
+    //Dynamic Fare Model
+    DynamicFareModel(trx) {
+        return new dynamicFareModel_1.default(trx || database_1.db);
+    }
+    //Dynamic Fare Set Model
+    DynamicFareSetModel(trx) {
+        return new dynamicFareSetModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

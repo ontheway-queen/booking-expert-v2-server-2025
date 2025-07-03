@@ -170,7 +170,7 @@ export class AgentPaymentsService extends AbstractServices {
       );
 
       return {
-        success: false,
+        success: true,
         code: this.StatusCode.HTTP_OK,
         message: 'Deposit request has been cancelled',
       };

@@ -43,15 +43,19 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
                 const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
                     status: true,
-                    markup_set_id: agency_details.flight_markup_set
+                    markup_set_id: agency_details.flight_markup_set,
                 });
                 //get b2c markup
-                const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({ trx, type: 'Flight', agency_id });
+                const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({
+                    trx,
+                    type: 'Flight',
+                    agency_id,
+                });
                 if (!markup_amount) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "Markup information is empty. Contact with the authority"
+                        message: 'Markup information is empty. Contact with the authority',
                     };
                 }
                 //extract API IDs
@@ -74,7 +78,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         markup_set_id: agency_details.flight_markup_set,
                         reqBody: body,
                         set_flight_api_id: sabre_set_flight_api_id,
-                        markup_amount
+                        markup_amount,
                     });
                 }
                 if (wftt_set_flight_api_id) {
@@ -84,7 +88,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         markup_set_id: agency_details.flight_markup_set,
                         reqBody: body,
                         set_flight_api_id: wftt_set_flight_api_id,
-                        markup_amount
+                        markup_amount,
                     });
                 }
                 //generate search ID
@@ -125,14 +129,17 @@ class AgentB2CFlightService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id } = req.agencyB2CWhiteLabel;
                 const JourneyType = req.query.JourneyType;
-                const OriginDestinationInformation = req.query.OriginDestinationInformation;
-                const PassengerTypeQuantity = req.query.PassengerTypeQuantity;
-                const airline_code = req.query.airline_code;
+                const OriginDestinationInformation = req.query
+                    .OriginDestinationInformation;
+                const PassengerTypeQuantity = req.query
+                    .PassengerTypeQuantity;
+                const airline_code = req.query
+                    .airline_code;
                 const body = {
                     JourneyType,
                     OriginDestinationInformation,
                     PassengerTypeQuantity,
-                    airline_code
+                    airline_code,
                 };
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
@@ -147,15 +154,19 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
                 const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
                     status: true,
-                    markup_set_id: agency_details.flight_markup_set
+                    markup_set_id: agency_details.flight_markup_set,
                 });
                 //get b2c markup
-                const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({ trx, type: 'Flight', agency_id });
+                const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({
+                    trx,
+                    type: 'Flight',
+                    agency_id,
+                });
                 if (!markup_amount) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "Markup information is empty. Contact with the authority"
+                        message: 'Markup information is empty. Contact with the authority',
                     };
                 }
                 //extract API IDs
@@ -179,7 +190,10 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     };
                 });
                 res.write('event: search_info\n');
-                res.write(`data: ${JSON.stringify({ search_id, leg_description: leg_descriptions })}\n\n`);
+                res.write(`data: ${JSON.stringify({
+                    search_id,
+                    leg_description: leg_descriptions,
+                })}\n\n`);
                 // Initialize Redis storage
                 const responseData = {
                     search_id,
@@ -212,7 +226,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                             markup_set_id: agency_details.flight_markup_set,
                             reqBody: body,
                             set_flight_api_id: sabre_set_flight_api_id,
-                            markup_amount
+                            markup_amount,
                         });
                     }));
                 }
@@ -225,7 +239,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                             markup_set_id: agency_details.flight_markup_set,
                             reqBody: body,
                             set_flight_api_id: wftt_set_flight_api_id,
-                            markup_amount
+                            markup_amount,
                         });
                     }));
                 }
@@ -259,7 +273,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: res ? res : flightConstent_1.FLIGHT_FARE_RESPONSE
+                    data: res ? res : flightConstent_1.FLIGHT_FARE_RESPONSE,
                 };
             }));
         });
@@ -280,12 +294,16 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     };
                 }
                 //get b2c markup
-                const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({ trx, type: 'Flight', agency_id });
+                const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({
+                    trx,
+                    type: 'Flight',
+                    agency_id,
+                });
                 if (!markup_amount) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "Markup information is empty. Contact with the authority"
+                        message: 'Markup information is empty. Contact with the authority',
                     };
                 }
                 //revalidate using the flight support service
@@ -294,13 +312,13 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     search_id,
                     flight_id,
                     markup_set_id: agency_details.flight_markup_set,
-                    markup_amount
+                    markup_amount,
                 });
                 if (data === null || data === void 0 ? void 0 : data.revalidate_data) {
                     yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
                     return {
                         success: true,
-                        message: "Ticket has been revalidated successfully!",
+                        message: 'Ticket has been revalidated successfully!',
                         data: Object.assign(Object.assign({}, data.revalidate_data), { remaining_time: data.redis_remaining_time }),
                         code: this.StatusCode.HTTP_OK,
                     };
@@ -317,7 +335,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id } = req.agencyB2CWhiteLabel;
-                const { user_id, name, user_email, agency_email, agency_address, agency_logo, agency_name, agency_number } = req.agencyB2CUser;
+                const { user_id, name, user_email, agency_email, agency_address, agency_logo, agency_name, agency_number, } = req.agencyB2CUser;
                 const body = req.body;
                 const booking_confirm = req.query.booking_confirm;
                 //get flight markup set id
@@ -331,12 +349,16 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     };
                 }
                 //get b2c markup
-                const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({ trx, type: 'Flight', agency_id });
+                const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({
+                    trx,
+                    type: 'Flight',
+                    agency_id,
+                });
                 if (!markup_amount) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "Markup information is empty. Contact with the authority"
+                        message: 'Markup information is empty. Contact with the authority',
                     };
                 }
                 //revalidate
@@ -345,7 +367,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     search_id: body.search_id,
                     flight_id: body.flight_id,
                     markup_set_id: agency_details.flight_markup_set,
-                    markup_amount
+                    markup_amount,
                 });
                 if (!(rev_data === null || rev_data === void 0 ? void 0 : rev_data.revalidate_data)) {
                     return {
@@ -357,12 +379,15 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 const data = rev_data.revalidate_data;
                 //if price has been changed and no confirmation of booking then return
                 if (!booking_confirm) {
-                    const price_changed = yield flightSupportService.checkBookingPriceChange({ flight_id: body.flight_id, booking_price: data.fare.total_price });
+                    const price_changed = yield flightSupportService.checkBookingPriceChange({
+                        flight_id: body.flight_id,
+                        booking_price: data.fare.total_price,
+                    });
                     if (price_changed === true) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_CONFLICT,
-                            message: this.ResMsg.BOOKING_PRICE_CHANGED
+                            message: this.ResMsg.BOOKING_PRICE_CHANGED,
                         };
                     }
                     else if (price_changed === null) {
@@ -380,7 +405,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     departure_date: data.flights[0].options[0].departure.date,
                     flight_number: `${data.flights[0].options[0].carrier.carrier_marketing_flight_number}`,
                     domestic_flight: data.domestic_flight,
-                    passenger: body.passengers
+                    passenger: body.passengers,
                 });
                 if (!checkEligibilityOfBooking.success) {
                     return checkEligibilityOfBooking;
@@ -401,11 +426,11 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     last_time: data.ticket_last_time,
                     flight_data: data,
                     traveler_data: body.passengers,
-                    type: "Agent_Flight",
+                    type: 'Agent_Flight',
                     source_type: constants_1.SOURCE_AGENT_B2C,
                     source_id: agency_id,
                     invoice_ref_type: constants_1.INVOICE_REF_TYPES.agent_b2c_flight_booking,
-                    api: data.api
+                    api: data.api,
                 });
                 // //send email
                 // const bookingSubService = new CommonFlightBookingSupportService(trx);
@@ -425,12 +450,12 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "The flight has been booked successfully!",
+                    message: 'The flight has been booked successfully!',
                     data: {
                         booking_id,
                         booking_ref,
-                        status: flightConstent_1.FLIGHT_BOOKING_IN_PROCESS
-                    }
+                        status: flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
+                    },
                 };
             }));
         });
@@ -447,7 +472,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     total: data.total,
-                    data: data.data
+                    data: data.data,
                 };
             }));
         });
@@ -466,16 +491,15 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     id: Number(id),
                     booked_by: constants_1.SOURCE_AGENT_B2C,
                     agency_id,
-                    user_id
+                    user_id,
                 });
                 if (!booking_data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                ;
                 const price_breakdown_data = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(Number(id));
                 const segment_data = yield flightSegmentModel.getFlightBookingSegment(Number(id));
                 const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(Number(id));
@@ -484,7 +508,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     code: this.StatusCode.HTTP_OK,
                     data: Object.assign(Object.assign({}, booking_data), { price_breakdown_data,
                         segment_data,
-                        traveler_data })
+                        traveler_data }),
                 };
             }));
         });

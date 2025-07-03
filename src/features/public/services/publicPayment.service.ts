@@ -32,10 +32,12 @@ export class PublicPaymentService extends AbstractServices {
                 redirect_url: decodeURIComponent(f_page),
               };
             }
+
             //verify tran id from ssl
             const session = await axios.post(
               `${config.SSL_URL}/validator/api/validationserverAPI.php?val_id=${body?.val_id}&store_id=${config.SSL_STORE_ID}&store_passwd=${config.SSL_STORE_PASSWORD}&format=json`
             );
+
             if (!['VALID', 'VALIDATED'].includes(session?.data?.status)) {
               return {
                 success: true,

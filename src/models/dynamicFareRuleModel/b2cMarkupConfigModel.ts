@@ -3,7 +3,7 @@ import Schema from '../../utils/miscellaneous/schema';
 import {
   IGetB2CMarkupConfigData,
   IUpsertB2CMarkupConfigPayload,
-} from '../../utils/modelTypes/markupSetModelTypes/b2cMarkupConfigTypes';
+} from '../../utils/modelTypes/dynamicFareRulesModelTypes/b2cMarkupConfigTypes';
 
 export default class B2CMarkupConfigModel extends Schema {
   private db: TDB;

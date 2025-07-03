@@ -298,17 +298,18 @@ class AdminConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const body = req.body;
             const B2CMarkupConfigModel = this.Model.B2CMarkupConfigModel();
-            const markupSetModel = this.Model.MarkupSetModel();
+            const markupSetModel = this.Model.DynamicFareSetModel();
             if (body.flight_set_id) {
                 // Check if the markup set exists
-                const existingFlightMarkupSet = yield markupSetModel.getSingleMarkupSet({
+                const existingFlightMarkupSet = yield markupSetModel.checkDynamicFareSet({
                     id: body.flight_set_id,
+                    type: constants_1.SET_TYPE_FLIGHT,
                 });
                 if (!existingFlightMarkupSet) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: 'Flight markup set not found.',
+                        message: 'Flight set not found.',
                     };
                 }
                 yield B2CMarkupConfigModel.upsertB2CMarkupConfig({
@@ -318,14 +319,15 @@ class AdminConfigService extends abstract_service_1.default {
             }
             if (body.hotel_set_id) {
                 // Check if the markup set exists
-                const existingHotelMarkupSet = yield markupSetModel.getSingleMarkupSet({
+                const existingHotelMarkupSet = yield markupSetModel.checkDynamicFareSet({
                     id: body.hotel_set_id,
+                    type: constants_1.SET_TYPE_HOTEL,
                 });
                 if (!existingHotelMarkupSet) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: 'Hotel markup set not found.',
+                        message: 'Hotel set not found.',
                     };
                 }
                 yield B2CMarkupConfigModel.upsertB2CMarkupConfig({

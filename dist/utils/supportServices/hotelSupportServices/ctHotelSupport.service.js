@@ -27,7 +27,7 @@ exports.CTHotelSupportService = void 0;
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const ctHotelRequest_1 = __importDefault(require("../../lib/hotel/ctHotelRequest"));
 const ctHotelApiEndpoints_1 = __importDefault(require("../../miscellaneous/endpoints/ctHotelApiEndpoints"));
-const hotelMarkupsModel_1 = __importDefault(require("../../../models/markupSetModel/hotelMarkupsModel"));
+const hotelMarkupsModel_1 = __importDefault(require("../../../models/dynamicFareRuleModel/hotelMarkupsModel"));
 const constants_1 = require("../../miscellaneous/constants");
 class CTHotelSupportService extends abstract_service_1.default {
     constructor(trx) {
