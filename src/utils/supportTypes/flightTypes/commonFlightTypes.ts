@@ -145,10 +145,16 @@ interface IFormattedFare {
   base_fare: number;
   total_tax: number;
   discount: number;
-  convenience_fee: number;
-  total_price: number;
   payable: number;
   ait: number;
+  vendor_price: {
+    base_fare: number;
+    tax: number;
+    charge: number;
+    discount: number;
+    gross_fare: number;
+    net_fare: number;
+  };
 }
 
 export interface IFormattedPassenger {

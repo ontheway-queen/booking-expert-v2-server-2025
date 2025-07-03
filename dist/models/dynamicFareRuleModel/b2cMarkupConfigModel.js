@@ -22,11 +22,11 @@ class B2CMarkupConfigModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('b2c_markup_config')
                 .withSchema(this.DBO_SCHEMA)
-                .select('b2c_markup_config.id', 'b2c_markup_config.markup_set_id', 'b2c_markup_config.type', 'markup_set.name')
-                .leftJoin('markup_set', 'markup_set.id', 'b2c_markup_config.markup_set_id')
+                .select('b2c_markup_config.id', 'b2c_markup_config.markup_set_id', 'b2c_markup_config.type', 'dynamic_fare_set.name')
+                .leftJoin('dynamic_fare_set', 'b2c_markup_config.markup_set_id', 'dynamic_fare_set.id')
                 .where((qb) => {
                 if (type !== 'Both') {
-                    qb.where('markup_set.type', type);
+                    qb.where('dynamic_fare_set.type', type);
                 }
             });
         });

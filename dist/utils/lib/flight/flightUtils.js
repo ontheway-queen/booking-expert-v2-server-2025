@@ -55,12 +55,12 @@ class FlightUtils {
         const date = new Date(dateStr);
         // Validate date
         if (isNaN(date.getTime())) {
-            throw new Error("Invalid date format");
+            throw new Error('Invalid date format');
         }
         // Extract HH:mm:ss from time string
         const match = timeStr.match(/^(\d{2}):(\d{2}):(\d{2})/);
         if (!match) {
-            throw new Error("Invalid time format");
+            throw new Error('Invalid time format');
         }
         const [_, hours, minutes, seconds] = match.map(Number);
         // Set time in UTC
@@ -68,7 +68,6 @@ class FlightUtils {
         // Format output: YYYY-MM-DDTHH:mm:ss
         return date.toISOString().slice(0, 19);
     }
-    ;
     // Get legs desc
     getLegsDesc(legItems, legDesc, OriginDest) {
         const legsDesc = [];
@@ -124,10 +123,10 @@ class FlightUtils {
     }
     //get journey type
     getJourneyType(journey_type) {
-        if (journey_type === "1") {
+        if (journey_type === '1') {
             return flightConstent_1.JOURNEY_TYPE_ONE_WAY;
         }
-        else if (journey_type === "2") {
+        else if (journey_type === '2') {
             return flightConstent_1.JOURNEY_TYPE_ROUND_TRIP;
         }
         else {
@@ -158,6 +157,47 @@ class FlightUtils {
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
         return `${hours > 0 ? hours + ' hour' + (hours > 1 ? 's' : '') : ''} ${mins > 0 ? mins + ' minute' + (mins > 1 ? 's' : '') : ''}`.trim();
+    }
+    // find route type
+    routeTypeFinder({ airportsPayload, originDest, }) {
+        let route_type = flightConstent_1.ROUTE_TYPE.SOTO;
+        let airports = [];
+        if (originDest) {
+            originDest.forEach((item) => {
+                airports.push(item.OriginLocation.LocationCode);
+                airports.push(item.DestinationLocation.LocationCode);
+            });
+        }
+        else if (airportsPayload) {
+            airports = airportsPayload;
+        }
+        if (airports.every((airport) => staticData_1.BD_AIRPORT.includes(airport))) {
+            route_type = flightConstent_1.ROUTE_TYPE.DOMESTIC;
+        }
+        else if (staticData_1.BD_AIRPORT.includes(airports[0])) {
+            route_type = flightConstent_1.ROUTE_TYPE.FROM_DAC;
+        }
+        else if (airports.some((code) => staticData_1.BD_AIRPORT.includes(code))) {
+            route_type = flightConstent_1.ROUTE_TYPE.TO_DAC;
+        }
+        else {
+            route_type = flightConstent_1.ROUTE_TYPE.SOTO;
+        }
+        return route_type;
+    }
+    getClassFromId(cabin) {
+        if (cabin === '1') {
+            return 'ECONOMY';
+        }
+        else if (cabin === '2') {
+            return 'PREMIUM';
+        }
+        else if (cabin === '3') {
+            return 'BUSINESS';
+        }
+        else {
+            return 'FIRST';
+        }
     }
 }
 exports.default = FlightUtils;

@@ -72,7 +72,7 @@ export class B2CFlightService extends AbstractServices {
           booking_block: false,
           markup_set_id,
           reqBody: body,
-          set_flight_api_id: sabre_set_flight_api_id,
+          dynamic_fare_supplier_id: sabre_set_flight_api_id,
         });
       }
       if (wftt_set_flight_api_id) {
@@ -237,7 +237,7 @@ export class B2CFlightService extends AbstractServices {
             booking_block: false,
             markup_set_id,
             reqBody: body,
-            set_flight_api_id: sabre_set_flight_api_id,
+            dynamic_fare_supplier_id: sabre_set_flight_api_id,
           })
         );
       }

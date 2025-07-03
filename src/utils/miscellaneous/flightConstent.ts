@@ -1,8 +1,19 @@
-
 export const SABRE_TOKEN_ENV = 'sabre_token';
 export const WFTT_TOKEN_ENV = 'wftt_token';
 
 export const SABRE_FLIGHT_ITINS = '200ITINS';
+// Route type
+export const ROUTE_TYPE: {
+  FROM_DAC: 'FROM_DAC';
+  TO_DAC: 'TO_DAC';
+  DOMESTIC: 'DOMESTIC';
+  SOTO: 'SOTO';
+} = {
+  FROM_DAC: 'FROM_DAC',
+  TO_DAC: 'TO_DAC',
+  DOMESTIC: 'DOMESTIC',
+  SOTO: 'SOTO',
+};
 
 // API Name Const
 export const SABRE_API = 'SABRE';

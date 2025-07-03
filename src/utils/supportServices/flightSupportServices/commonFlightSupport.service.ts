@@ -12,6 +12,7 @@ import { IFormattedFlightItinerary } from '../../supportTypes/flightTypes/common
 import SabreFlightService from './sabreFlightSupport.service';
 import WfttFlightService from './wfttFlightSupport.service';
 import CustomError from '../../lib/customError';
+import { IGetSupplierAirlinesDynamicFareQuery } from '../../modelTypes/dynamicFareRulesModelTypes/dynamicFareModelTypes';
 
 export class CommonFlightSupportService extends AbstractServices {
   private trx: Knex.Transaction;
@@ -141,5 +142,143 @@ export class CommonFlightSupportService extends AbstractServices {
     const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
 
     return diffInDays < MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET;
+  }
+
+  //calculate convenience fee and discount
+  public async calculateFlightMarkup({
+    airline,
+    base_fare,
+    flight_class,
+    dynamic_fare_supplier_id,
+    route_type,
+    total_segments,
+  }: {
+    dynamic_fare_supplier_id: number;
+    airline: string;
+    flight_class: string;
+    base_fare: number;
+    total_segments: number;
+    route_type: 'SOTO' | 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC';
+  }) {
+    const dynamicFareModel = this.Model.DynamicFareModel(this.trx);
+
+    let markup = 0;
+    let commission = 0;
+    let pax_markup = 0;
+
+    const getFareMarkupQuery: IGetSupplierAirlinesDynamicFareQuery = {
+      dynamic_fare_supplier_id,
+      airline,
+      flight_class,
+    };
+
+    if (route_type === 'DOMESTIC') {
+      getFareMarkupQuery.domestic = true;
+    } else if (route_type === 'FROM_DAC') {
+      getFareMarkupQuery.from_dac = true;
+    } else if (route_type === 'TO_DAC') {
+      getFareMarkupQuery.to_dac = true;
+    } else {
+      getFareMarkupQuery.soto = true;
+    }
+
+    //get airline wise fare
+    const supplier_airline_fare =
+      await dynamicFareModel.getSupplierAirlinesFares(getFareMarkupQuery);
+
+    if (supplier_airline_fare.length) {
+      if (supplier_airline_fare[0].markup_type === 'FLAT') {
+        markup += Number(supplier_airline_fare[0].markup);
+      } else if (supplier_airline_fare[0].markup_type === 'PER') {
+        markup +=
+          Number(base_fare) * (Number(supplier_airline_fare[0].markup) / 100);
+      }
+
+      if (supplier_airline_fare[0].commission_type === 'FLAT') {
+        commission += Number(supplier_airline_fare[0].commission);
+      } else if (supplier_airline_fare[0].commission_type === 'PER') {
+        commission +=
+          Number(base_fare) *
+          (Number(supplier_airline_fare[0].commission) / 100);
+      }
+
+      if (supplier_airline_fare[0].segment_markup_type === 'FLAT') {
+        markup +=
+          Number(supplier_airline_fare[0].segment_markup) * total_segments;
+      } else if (supplier_airline_fare[0].segment_markup_type === 'PER') {
+        markup +=
+          Number(base_fare) *
+          (Number(supplier_airline_fare[0].segment_markup) / 100) *
+          total_segments;
+      }
+
+      if (supplier_airline_fare[0].segment_commission_type === 'FLAT') {
+        commission +=
+          Number(supplier_airline_fare[0].segment_commission) * total_segments;
+      } else if (supplier_airline_fare[0].segment_commission_type === 'PER') {
+        commission +=
+          Number(base_fare) *
+          (Number(supplier_airline_fare[0].segment_commission) / 100) *
+          total_segments;
+      }
+
+      if (supplier_airline_fare[0].pax_markup) {
+        pax_markup += Number(supplier_airline_fare[0].pax_markup);
+      }
+    } else {
+      //get default fare for the current API if separate commission not exist
+      const dynamic_fare_supplier = await dynamicFareModel.getSuppliers({
+        id: dynamic_fare_supplier_id,
+        status: true,
+      });
+
+      if (dynamic_fare_supplier.length) {
+        if (dynamic_fare_supplier[0].commission_type === 'FLAT') {
+          commission += Number(dynamic_fare_supplier[0].commission);
+        } else if (dynamic_fare_supplier[0].commission_type === 'PER') {
+          commission +=
+            Number(base_fare) *
+            (Number(dynamic_fare_supplier[0].commission) / 100);
+        }
+
+        if (dynamic_fare_supplier[0].markup_type === 'FLAT') {
+          markup += Number(dynamic_fare_supplier[0].markup);
+        } else if (dynamic_fare_supplier[0].markup_type === 'PER') {
+          markup +=
+            Number(base_fare) * (Number(dynamic_fare_supplier[0].markup) / 100);
+        }
+
+        if (dynamic_fare_supplier[0].pax_markup) {
+          pax_markup += Number(dynamic_fare_supplier[0].pax_markup);
+        }
+
+        if (dynamic_fare_supplier[0].segment_markup_type === 'FLAT') {
+          markup +=
+            Number(dynamic_fare_supplier[0].segment_markup) * total_segments;
+        } else if (dynamic_fare_supplier[0].segment_markup_type === 'PER') {
+          markup +=
+            Number(base_fare) *
+            (Number(dynamic_fare_supplier[0].segment_markup) / 100) *
+            total_segments;
+        }
+
+        if (dynamic_fare_supplier[0].segment_commission_type === 'FLAT') {
+          commission +=
+            Number(dynamic_fare_supplier[0].segment_commission) *
+            total_segments;
+        } else if (dynamic_fare_supplier[0].segment_commission_type === 'PER') {
+          commission +=
+            Number(base_fare) *
+            (Number(dynamic_fare_supplier[0].segment_commission) / 100) *
+            total_segments;
+        }
+      }
+    }
+
+    return {
+      markup: Number(Number(markup).toFixed(2)),
+      commission: Number(Number(commission).toFixed(2)),
+      pax_markup: Number(Number(pax_markup).toFixed(2)),
+    };
   }
 }

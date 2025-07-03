@@ -22,16 +22,16 @@ export default class B2CMarkupConfigModel extends Schema {
         'b2c_markup_config.id',
         'b2c_markup_config.markup_set_id',
         'b2c_markup_config.type',
-        'markup_set.name'
+        'dynamic_fare_set.name'
       )
       .leftJoin(
-        'markup_set',
-        'markup_set.id',
-        'b2c_markup_config.markup_set_id'
+        'dynamic_fare_set',
+        'b2c_markup_config.markup_set_id',
+        'dynamic_fare_set.id'
       )
       .where((qb) => {
         if (type !== 'Both') {
-          qb.where('markup_set.type', type);
+          qb.where('dynamic_fare_set.type', type);
         }
       });
   }

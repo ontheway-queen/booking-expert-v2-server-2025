@@ -38,6 +38,7 @@ import VisaApplicationModel from './visaModel/visaApplicationModel';
 import AirlinesPreferenceModel from './dynamicFareRuleModel/airlinesPreferenceModel';
 import DynamicFareModel from './dynamicFareRuleModel/dynamicFareModel';
 import DynamicFareSetModel from './dynamicFareRuleModel/dynamicFareSetModel';
+import PartialPaymentRuleModel from './dynamicFareRuleModel/partialPaymentRulesModel';
 
 export default class Models {
   //Common model
@@ -224,5 +225,9 @@ export default class Models {
   //Dynamic Fare Set Model
   public DynamicFareSetModel(trx?: Knex.Transaction) {
     return new DynamicFareSetModel(trx || db);
+  }
+  //Dynamic Fare Set Model
+  public PartialPaymentRuleModel(trx?: Knex.Transaction) {
+    return new PartialPaymentRuleModel(trx || db);
   }
 }

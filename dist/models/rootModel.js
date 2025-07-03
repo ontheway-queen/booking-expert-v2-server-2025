@@ -42,6 +42,7 @@ const visaApplicationModel_1 = __importDefault(require("./visaModel/visaApplicat
 const airlinesPreferenceModel_1 = __importDefault(require("./dynamicFareRuleModel/airlinesPreferenceModel"));
 const dynamicFareModel_1 = __importDefault(require("./dynamicFareRuleModel/dynamicFareModel"));
 const dynamicFareSetModel_1 = __importDefault(require("./dynamicFareRuleModel/dynamicFareSetModel"));
+const partialPaymentRulesModel_1 = __importDefault(require("./dynamicFareRuleModel/partialPaymentRulesModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -194,6 +195,10 @@ class Models {
     //Dynamic Fare Set Model
     DynamicFareSetModel(trx) {
         return new dynamicFareSetModel_1.default(trx || database_1.db);
+    }
+    //Dynamic Fare Set Model
+    PartialPaymentRuleModel(trx) {
+        return new partialPaymentRulesModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

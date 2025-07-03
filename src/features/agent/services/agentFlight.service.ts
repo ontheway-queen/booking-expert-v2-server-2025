@@ -109,7 +109,7 @@ export class AgentFlightService extends AbstractServices {
           booking_block: false,
           markup_set_id: agency_details.flight_markup_set,
           reqBody: body,
-          set_flight_api_id: sabre_set_flight_api_id,
+          dynamic_fare_supplier_id: sabre_set_flight_api_id,
           markup_amount,
         });
       }
@@ -294,7 +294,7 @@ export class AgentFlightService extends AbstractServices {
             booking_block: false,
             markup_set_id: agency_details.flight_markup_set,
             reqBody: body,
-            set_flight_api_id: sabre_set_flight_api_id,
+            dynamic_fare_supplier_id: sabre_set_flight_api_id,
             markup_amount,
           })
         );

@@ -1,10 +1,24 @@
-import { JOURNEY_TYPE_MULTI_CITY, JOURNEY_TYPE_ONE_WAY, JOURNEY_TYPE_ROUND_TRIP } from '../../miscellaneous/flightConstent';
 import {
+  JOURNEY_TYPE_MULTI_CITY,
+  JOURNEY_TYPE_ONE_WAY,
+  JOURNEY_TYPE_ROUND_TRIP,
+  ROUTE_TYPE,
+} from '../../miscellaneous/flightConstent';
+import {
+  BD_AIRPORT,
   SABRE_CABIN_CODE,
   SABRE_MEAL_CODE,
 } from '../../miscellaneous/staticData';
-import { IFormattedFlight, IFormattedFlightOption, IFlightAvailability } from '../../supportTypes/flightTypes/commonFlightTypes';
-import { IFormattedLegDesc, OriginDestinationInformation } from '../../supportTypes/flightTypes/sabreFlightTypes';
+import {
+  IFormattedFlight,
+  IFormattedFlightOption,
+  IFlightAvailability,
+  IOriginDestinationInformationPayload,
+} from '../../supportTypes/flightTypes/commonFlightTypes';
+import {
+  IFormattedLegDesc,
+  OriginDestinationInformation,
+} from '../../supportTypes/flightTypes/sabreFlightTypes';
 
 export default class FlightUtils {
   // get meal by code
@@ -23,13 +37,13 @@ export default class FlightUtils {
 
     // Validate date
     if (isNaN(date.getTime())) {
-      throw new Error("Invalid date format");
+      throw new Error('Invalid date format');
     }
 
     // Extract HH:mm:ss from time string
     const match = timeStr.match(/^(\d{2}):(\d{2}):(\d{2})/);
     if (!match) {
-      throw new Error("Invalid time format");
+      throw new Error('Invalid time format');
     }
 
     const [_, hours, minutes, seconds] = match.map(Number);
@@ -39,7 +53,7 @@ export default class FlightUtils {
 
     // Format output: YYYY-MM-DDTHH:mm:ss
     return date.toISOString().slice(0, 19);
-  };
+  }
 
   // Get legs desc
   public getLegsDesc(
@@ -156,7 +170,9 @@ export default class FlightUtils {
   };
 
   //get route of flight
-  public getRouteOfFlight(leg_description: { departureLocation: string, arrivalLocation: string }[]) {
+  public getRouteOfFlight(
+    leg_description: { departureLocation: string; arrivalLocation: string }[]
+  ) {
     let route;
     route = leg_description.map((item: any) => {
       return item.departureLocation;
@@ -169,10 +185,10 @@ export default class FlightUtils {
   }
 
   //get journey type
-  public getJourneyType(journey_type: "1" | "2" | "3") {
-    if (journey_type === "1") {
+  public getJourneyType(journey_type: '1' | '2' | '3') {
+    if (journey_type === '1') {
       return JOURNEY_TYPE_ONE_WAY;
-    } else if (journey_type === "2") {
+    } else if (journey_type === '2') {
       return JOURNEY_TYPE_ROUND_TRIP;
     } else {
       return JOURNEY_TYPE_MULTI_CITY;
@@ -185,15 +201,19 @@ export default class FlightUtils {
     const cabin_info: string[] = [];
     availability.map((item) => {
       item.segments.map((segment) => {
-        baggage_info.push(`${segment.passenger[0].baggage_count} ${segment.passenger[0].baggage_unit}`);
-        cabin_info.push(`${segment.passenger[0].cabin_type} ${segment.passenger[0].booking_code}`);
+        baggage_info.push(
+          `${segment.passenger[0].baggage_count} ${segment.passenger[0].baggage_unit}`
+        );
+        cabin_info.push(
+          `${segment.passenger[0].cabin_type} ${segment.passenger[0].booking_code}`
+        );
       });
     });
 
     return {
       baggage_info,
       cabin_info,
-    }
+    };
   }
 
   //segment place info
@@ -208,5 +228,52 @@ export default class FlightUtils {
     return `${hours > 0 ? hours + ' hour' + (hours > 1 ? 's' : '') : ''} ${
       mins > 0 ? mins + ' minute' + (mins > 1 ? 's' : '') : ''
     }`.trim();
+  }
+
+  // find route type
+  public routeTypeFinder({
+    airportsPayload,
+    originDest,
+  }: {
+    originDest?: IOriginDestinationInformationPayload[];
+    airportsPayload?: string[];
+  }) {
+    let route_type: 'SOTO' | 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' =
+      ROUTE_TYPE.SOTO;
+
+    let airports: string[] = [];
+
+    if (originDest) {
+      originDest.forEach((item) => {
+        airports.push(item.OriginLocation.LocationCode);
+        airports.push(item.DestinationLocation.LocationCode);
+      });
+    } else if (airportsPayload) {
+      airports = airportsPayload;
+    }
+
+    if (airports.every((airport) => BD_AIRPORT.includes(airport))) {
+      route_type = ROUTE_TYPE.DOMESTIC;
+    } else if (BD_AIRPORT.includes(airports[0])) {
+      route_type = ROUTE_TYPE.FROM_DAC;
+    } else if (airports.some((code) => BD_AIRPORT.includes(code))) {
+      route_type = ROUTE_TYPE.TO_DAC;
+    } else {
+      route_type = ROUTE_TYPE.SOTO;
+    }
+
+    return route_type;
+  }
+
+  public getClassFromId(cabin: string) {
+    if (cabin === '1') {
+      return 'ECONOMY';
+    } else if (cabin === '2') {
+      return 'PREMIUM';
+    } else if (cabin === '3') {
+      return 'BUSINESS';
+    } else {
+      return 'FIRST';
+    }
   }
 }

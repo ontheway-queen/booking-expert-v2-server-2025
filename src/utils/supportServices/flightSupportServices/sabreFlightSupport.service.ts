@@ -12,18 +12,16 @@ import {
   FLIGHT_BOOKING_REFUNDED,
   FLIGHT_BOOKING_VOID,
   FLIGHT_TICKET_ISSUE,
+  ROUTE_TYPE,
   SABRE_API,
   SABRE_FLIGHT_ITINS,
 } from '../../miscellaneous/flightConstent';
 
 import {
   ERROR_LEVEL_WARNING,
-  MARKUP_MODE_INCREASE,
-  MARKUP_TYPE_PER,
   PROJECT_EMAIL,
 } from '../../miscellaneous/constants';
 import SabreAPIEndpoints from '../../miscellaneous/endpoints/sabreApiEndpoints';
-import { BD_AIRPORT } from '../../miscellaneous/staticData';
 import {
   IFormattedFlight,
   IFormattedFlightItinerary,
@@ -48,10 +46,13 @@ import {
 } from '../../supportTypes/flightTypes/sabreFlightTypes';
 import { CommonFlightSupportService } from './commonFlightSupport.service';
 import { IFlightBookingRequestBody } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
+import { IGetAirlinesPreferenceQuery } from '../../modelTypes/dynamicFareRulesModelTypes/airlinesPreferenceModelTypes';
+
 export default class SabreFlightService extends AbstractServices {
   private trx: Knex.Transaction;
   private request = new SabreRequests();
   private flightUtils = new FlightUtils();
+
   constructor(trx: Knex.Transaction) {
     super();
     this.trx = trx;
@@ -61,18 +62,62 @@ export default class SabreFlightService extends AbstractServices {
   // Flight Search Request formatter
   private async FlightReqFormatterV5(
     body: IFlightSearchReqBody,
-    set_flight_api_id: number
+    dynamic_fare_supplier_id: number,
+    route_type: 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' | 'SOTO'
   ) {
-    const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
-    const cappingAirlines: { Code: string }[] =
-      await flightMarkupsModel.getAPIActiveAirlines(set_flight_api_id);
+    const AirlinesPrefModel = this.Model.AirlinesPreferenceModel(this.trx);
 
-    const airlines: { Code: string }[] = [];
-    for (const airline of cappingAirlines) {
-      if (String(airline.Code) === String(body?.airline_code?.[0]?.Code)) {
-        airlines.push(airline);
+    const prefAirlinesQuery: IGetAirlinesPreferenceQuery = {
+      dynamic_fare_supplier_id,
+      pref_type: 'PREFERRED',
+      status: true,
+    };
+
+    if (route_type === ROUTE_TYPE.DOMESTIC) {
+      prefAirlinesQuery.domestic = true;
+    } else if (route_type === ROUTE_TYPE.FROM_DAC) {
+      prefAirlinesQuery.domestic = true;
+    } else if (route_type === ROUTE_TYPE.TO_DAC) {
+      prefAirlinesQuery.domestic = true;
+    } else if (route_type === ROUTE_TYPE.SOTO) {
+      prefAirlinesQuery.domestic = true;
+    }
+
+    // Get preferred airlines
+    const cappingAirlinesRaw: { Code: string }[] =
+      await AirlinesPrefModel.getAirlinePrefCodes(prefAirlinesQuery);
+    const preferredAirlines: string[] = cappingAirlinesRaw.map((el) => el.Code);
+
+    let finalAirlineCodes: string[] = [];
+
+    if (body.airline_code?.length) {
+      const requestedAirlines: string[] = body.airline_code.map(
+        (el) => el.Code
+      );
+
+      if (preferredAirlines.length) {
+        // Use common values only
+        finalAirlineCodes = requestedAirlines.filter((code) =>
+          preferredAirlines.includes(code)
+        );
+        if (finalAirlineCodes.length === 0) {
+          return false;
+        }
+      } else {
+        // No preferred, use all requested
+        finalAirlineCodes = requestedAirlines;
+      }
+    } else {
+      if (preferredAirlines.length) {
+        // Only preferred exist
+        finalAirlineCodes = preferredAirlines;
       }
     }
+
+    // Return in the format: { Code: string }[]
+    const airlines: { Code: string }[] = finalAirlineCodes.map((code) => ({
+      Code: code,
+    }));
 
     const originDestinationInfo: OriginDestinationInformation[] = [];
     body.OriginDestinationInformation.forEach((item) => {
@@ -126,7 +171,7 @@ export default class SabreFlightService extends AbstractServices {
         AvailableFlightsOnly: true,
         OriginDestinationInformation: originDestinationInfo,
         TravelPreferences: {
-          VendorPref: airlines.length ? airlines : cappingAirlines,
+          VendorPref: airlines.length ? airlines : undefined,
           TPA_Extensions: {
             LongConnectTime: {
               Enable: true,
@@ -164,14 +209,13 @@ export default class SabreFlightService extends AbstractServices {
 
   // Flight search service
   public async FlightSearch({
-    set_flight_api_id,
+    dynamic_fare_supplier_id,
     booking_block,
     reqBody,
-    markup_set_id,
     markup_amount,
   }: {
     reqBody: IFlightSearchReqBody;
-    set_flight_api_id: number;
+    dynamic_fare_supplier_id: number;
     markup_set_id: number;
     booking_block: boolean;
     markup_amount?: {
@@ -180,9 +224,14 @@ export default class SabreFlightService extends AbstractServices {
       markup_mode: 'INCREASE' | 'DECREASE';
     };
   }) {
+    let route_type = this.flightUtils.routeTypeFinder({
+      originDest: reqBody.OriginDestinationInformation,
+    });
+
     const flightRequestBody = await this.FlightReqFormatterV5(
       reqBody,
-      set_flight_api_id
+      dynamic_fare_supplier_id,
+      route_type
     );
 
     const response = await this.request.postRequest(
@@ -200,29 +249,30 @@ export default class SabreFlightService extends AbstractServices {
     const result = await this.FlightSearchResFormatter({
       data: response.groupedItineraryResponse,
       reqBody: reqBody,
-      set_flight_api_id,
+      dynamic_fare_supplier_id,
       booking_block,
-      markup_set_id,
+      route_type,
+      markup_amount,
     });
     return result;
   }
 
   // Flight search Response formatter
   private async FlightSearchResFormatter({
-    set_flight_api_id,
+    dynamic_fare_supplier_id,
     booking_block,
     data,
     reqBody,
-    markup_set_id,
-    flight_id,
     markup_amount,
+    route_type,
+    flight_id,
   }: {
     data: ISabreResponseResult;
     reqBody: IFlightSearchReqBody;
-    set_flight_api_id: number;
-    markup_set_id: number;
+    dynamic_fare_supplier_id: number;
     booking_block: boolean;
     flight_id?: string;
+    route_type: 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' | 'SOTO';
     markup_amount?: {
       markup: number;
       markup_type: 'PER' | 'FLAT';
@@ -230,20 +280,32 @@ export default class SabreFlightService extends AbstractServices {
     };
   }) {
     const commonModel = this.Model.CommonModel(this.trx);
-    const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
-    // const routeConfigModel = this.Model.flightRouteConfigModel(this.trx);
-    const airports: string[] = [];
+    const AirlinesPreferenceModel = this.Model.AirlinesPreferenceModel(
+      this.trx
+    );
+
+    const getBlockedAirlinesPayload: IGetAirlinesPreferenceQuery = {
+      dynamic_fare_supplier_id,
+      pref_type: 'BLOCKED',
+    };
+
+    if (route_type === ROUTE_TYPE.DOMESTIC) {
+      getBlockedAirlinesPayload.domestic = true;
+    } else if (route_type === ROUTE_TYPE.FROM_DAC) {
+      getBlockedAirlinesPayload.from_dac = true;
+    } else if (route_type === ROUTE_TYPE.TO_DAC) {
+      getBlockedAirlinesPayload.to_dac = true;
+    } else {
+      getBlockedAirlinesPayload.soto = true;
+    }
+
+    const blockedAirlines: { Code: string }[] =
+      await AirlinesPreferenceModel.getAirlinePrefCodes(
+        getBlockedAirlinesPayload
+      );
 
     const OriginDest = reqBody.OriginDestinationInformation;
 
-    OriginDest.forEach((item) => {
-      airports.push(item.OriginLocation.LocationCode);
-      airports.push(item.DestinationLocation.LocationCode);
-    });
-
-    let domestic_flight = airports.every((airport) =>
-      BD_AIRPORT.includes(airport)
-    );
     const scheduleDesc: IFormattedScheduleDesc[] = [];
 
     for (const item of data.scheduleDescs) {
@@ -357,10 +419,233 @@ export default class SabreFlightService extends AbstractServices {
       const itinerary = itineraryGroup.itineraries[i];
       const fare = itinerary.pricingInformation[0].fare;
 
+      const validatingCarrier = await commonModel.getAirlines(
+        { code: fare.validatingCarrierCode },
+        false
+      );
+
+      if (
+        blockedAirlines.find((ba) => ba.Code === fare.validatingCarrierCode)
+      ) {
+        continue;
+      }
+
       const passenger_lists: ISabreNewPassenger[] = [];
       let refundable: boolean = false;
 
       const baggageAndAvailabilityAllSeg: IBaggageAndAvailabilityAllSeg[] = [];
+
+      const legsDesc: IFormattedFlight[] = this.flightUtils.getLegsDesc(
+        itinerary.legs,
+        legDesc,
+        OriginDest
+      );
+
+      const ait = Math.round(
+        ((Number(fare.totalFare.equivalentAmount) +
+          Number(fare.totalFare.totalTaxAmount)) /
+          100) *
+          0.3
+      );
+
+      const new_fare = {
+        base_fare: fare.totalFare.equivalentAmount,
+        total_tax: Number(fare.totalFare.totalTaxAmount),
+        ait,
+        discount: 0,
+        payable:
+          Number(fare.totalFare.equivalentAmount) +
+          Number(fare.totalFare.totalTaxAmount) +
+          ait,
+        vendor_price: {
+          base_fare: fare.totalFare.equivalentAmount,
+          tax: fare.totalFare.totalTaxAmount,
+          charge: 0,
+          discount: 0,
+          gross_fare: Number(fare.totalFare.totalPrice),
+          net_fare: Number(fare.totalFare.totalPrice),
+        },
+      };
+
+      const availability: IFlightAvailability[] = [];
+
+      baggageAndAvailabilityAllSeg.forEach((item) => {
+        const { segmentDetails } = item;
+        segmentDetails.forEach((item2) => {
+          const foundData = availability.find(
+            (avItem) =>
+              avItem.from_airport === item2.from_airport &&
+              avItem.to_airport === item2.to_airport
+          );
+
+          if (foundData) {
+            const { segments } = foundData;
+            item2.segments.forEach((item3) => {
+              const segmentFound = segments.find(
+                (segs) => item3.name === segs.name
+              );
+
+              if (segmentFound) {
+                const passenger = segmentFound.passenger.find(
+                  (pas) => pas.type === item.passenger_type
+                );
+
+                if (!passenger) {
+                  segmentFound.passenger.push({
+                    type: item.passenger_type,
+                    count: item.passenger_count,
+                    meal_type: item3.meal_type,
+                    meal_code: item3.meal_code,
+                    cabin_code: item3.cabin_code,
+                    cabin_type: item3.cabin_type,
+                    booking_code: item3.booking_code,
+                    available_seat: item3.available_seat,
+                    available_break: item3.available_break,
+                    available_fare_break: item3.available_fare_break,
+                    baggage_unit: item2.baggage.unit,
+                    baggage_count: item2.baggage.count,
+                  });
+                }
+              } else {
+                segments.push({
+                  name: item3.name,
+                  passenger: [
+                    {
+                      type: item.passenger_type,
+                      count: item.passenger_count,
+                      meal_type: item3.meal_type,
+                      meal_code: item3.meal_code,
+                      cabin_code: item3.cabin_code,
+                      cabin_type: item3.cabin_type,
+                      booking_code: item3.booking_code,
+                      available_seat: item3.available_seat,
+                      available_break: item3.available_break,
+                      available_fare_break: item3.available_fare_break,
+                      baggage_unit: item2.baggage.unit,
+                      baggage_count: item2.baggage.count,
+                    },
+                  ],
+                });
+              }
+            });
+          } else {
+            const segments: IFlightDataAvailabilitySegment[] = [];
+
+            item2.segments.forEach((item3) => {
+              segments.push({
+                name: item3.name,
+                passenger: [
+                  {
+                    type: item.passenger_type,
+                    count: item.passenger_count,
+                    meal_type: item3.meal_type,
+                    meal_code: item3.meal_code,
+                    cabin_code: item3.cabin_code,
+                    cabin_type: item3.cabin_type,
+                    booking_code: item3.booking_code,
+                    available_seat: item3.available_seat,
+                    available_break: item3.available_break,
+                    available_fare_break: item3.available_fare_break,
+                    baggage_unit: item2.baggage.unit,
+                    baggage_count: item2.baggage.count,
+                  },
+                ],
+              });
+            });
+            availability.push({
+              from_airport: item2.from_airport,
+              to_airport: item2.to_airport,
+              segments,
+            });
+          }
+        });
+      });
+
+      let partial_payment: {
+        partial_payment: boolean;
+        payment_percentage: any;
+        travel_date_from_now: any;
+      } = {
+        partial_payment: false,
+        payment_percentage: 100,
+        travel_date_from_now: 0,
+      };
+
+      if (route_type === ROUTE_TYPE.DOMESTIC) {
+        //domestic
+        partial_payment = await this.Model.PartialPaymentRuleModel(
+          this.trx
+        ).getPartialPaymentCondition({
+          flight_api_name: SABRE_API,
+          airline: fare.validatingCarrierCode,
+          refundable,
+          travel_date:
+            reqBody.OriginDestinationInformation[0].DepartureDateTime,
+          domestic: true,
+        });
+      } else if (route_type === ROUTE_TYPE.FROM_DAC) {
+        //from dac
+        partial_payment = await this.Model.PartialPaymentRuleModel(
+          this.trx
+        ).getPartialPaymentCondition({
+          flight_api_name: SABRE_API,
+          airline: fare.validatingCarrierCode,
+          from_dac: true,
+          refundable,
+          travel_date:
+            reqBody.OriginDestinationInformation[0].DepartureDateTime,
+        });
+      } else if (route_type === ROUTE_TYPE.TO_DAC) {
+        //to dac
+        partial_payment = await this.Model.PartialPaymentRuleModel(
+          this.trx
+        ).getPartialPaymentCondition({
+          flight_api_name: SABRE_API,
+          airline: fare.validatingCarrierCode,
+          to_dac: true,
+          refundable,
+          travel_date:
+            reqBody.OriginDestinationInformation[0].DepartureDateTime,
+        });
+      } else {
+        //soto
+        partial_payment = await this.Model.PartialPaymentRuleModel(
+          this.trx
+        ).getPartialPaymentCondition({
+          flight_api_name: SABRE_API,
+          airline: fare.validatingCarrierCode,
+          refundable,
+          travel_date:
+            reqBody.OriginDestinationInformation[0].DepartureDateTime,
+          soto: true,
+        });
+      }
+
+      let total_segments = 0;
+      legsDesc.map((elm) => {
+        elm.options.map((elm2) => {
+          total_segments++;
+        });
+      });
+
+      const { markup, commission, pax_markup } =
+        await this.flightUtils.calculateFlightMarkup({
+          dynamic_fare_supplier_id,
+          airline: fare.validatingCarrierCode,
+          flight_class: this.flightUtils.getClassFromId(
+            reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
+              .Cabin
+          ),
+          base_fare: fare.totalFare.equivalentAmount,
+          total_segments,
+          route_type,
+        });
+
+      let pax_count = 0;
+
+      reqBody.PassengerTypeQuantity.map((reqPax) => {
+        pax_count += reqPax.Quantity;
+      });
 
       for (const passenger of fare.passengerInfoList) {
         const passenger_info = passenger.passengerInfo;
@@ -472,272 +757,11 @@ export default class SabreFlightService extends AbstractServices {
         passenger_lists.push(new_passenger);
       }
 
-      const legsDesc: IFormattedFlight[] = this.flightUtils.getLegsDesc(
-        itinerary.legs,
-        legDesc,
-        OriginDest
-      );
-
-      const validatingCarrier = await commonModel.getAirlines(
-        { code: fare.validatingCarrierCode },
-        false
-      );
-
-      // Markup data
-      let finalMarkup = 0;
-      let finalMarkupType = '';
-      let finalMarkupMode = '';
-
-      // const routeMarkupCheck = await routeConfigModel.getSetRoutesCommission(
-      //   {
-      //     status: true,
-      //     departure: airports[0],
-      //     arrival: airports[1],
-      //     markup_set_id,
-      //   },
-      //   false
-      // );
-
-      // // Set markup if route markup is available
-      // if (routeMarkupCheck.data.length) {
-      //   if (routeMarkupCheck.data.length > 1) {
-      //     const routeMarkupFoundOfAirline = routeMarkupCheck.data.find(
-      //       (item) => item.airline === fare.validatingCarrierCode
-      //     );
-      //     if (routeMarkupFoundOfAirline) {
-      //       const { markup, markup_type, markup_mode } = routeMarkupFoundOfAirline;
-      //       finalMarkup = markup;
-      //       finalMarkupMode = markup_mode;
-      //       finalMarkupType = markup_type;
-      //     }
-      //   } else {
-      //     const { markup, markup_type, markup_mode, airline } =
-      //       routeMarkupCheck.data[0];
-
-      //     if (!airline || airline === fare.validatingCarrierCode) {
-      //       finalMarkup = markup;
-      //       finalMarkupMode = markup_mode;
-      //       finalMarkupType = markup_type;
-      //     }
-      //   }
-      // }
-
-      // Set Markup if route Markup is not available and airlines Markup is available
-      if (!finalMarkup && !finalMarkupType && !finalMarkupMode) {
-        //airline markup
-        const markupCheck = await flightMarkupsModel.getAllFlightMarkups(
-          {
-            airline: fare.validatingCarrierCode,
-            status: true,
-            markup_set_flight_api_id: set_flight_api_id,
-            limit: 1,
-          },
-          false
-        );
-
-        // Set Amount
-        if (markupCheck.data.length) {
-          const {
-            markup_domestic,
-            markup_from_dac,
-            markup_to_dac,
-            markup_soto,
-            markup_type,
-            markup_mode,
-          } = markupCheck.data[0];
-
-          let allBdAirport = true;
-          let existBdAirport = false;
-
-          for (const airport of airports) {
-            if (BD_AIRPORT.includes(airport)) {
-              if (!existBdAirport) {
-                existBdAirport = true;
-              }
-            } else {
-              allBdAirport = false;
-            }
-          }
-
-          if (allBdAirport) {
-            // Domestic
-            finalMarkup = markup_domestic;
-            finalMarkupMode = markup_mode;
-            finalMarkupType = markup_type;
-          } else if (BD_AIRPORT.includes(airports[0])) {
-            // From Dhaka
-            finalMarkup = markup_from_dac;
-            finalMarkupMode = markup_mode;
-            finalMarkupType = markup_type;
-          } else if (existBdAirport) {
-            // To Dhaka
-            finalMarkup = markup_to_dac;
-            finalMarkupMode = markup_mode;
-            finalMarkupType = markup_type;
-          } else {
-            // Soto
-            finalMarkup = markup_soto;
-            finalMarkupMode = markup_mode;
-            finalMarkupType = markup_type;
-          }
-        }
-      }
-
-      const ait = Math.round(
-        ((Number(fare.totalFare.equivalentAmount) +
-          Number(fare.totalFare.totalTaxAmount)) /
-          100) *
-          0.3
-      );
-      const new_fare = {
-        base_fare: fare.totalFare.equivalentAmount,
-        total_tax: Number(fare.totalFare.totalTaxAmount),
-        ait,
-        discount: 0,
-        convenience_fee: 0,
-        total_price: Number(fare.totalFare.totalPrice) + ait,
-        payable: Number(fare.totalFare.totalPrice) + ait,
-      };
-
-      // Set Markup to fare
-      if (finalMarkup && finalMarkupMode && finalMarkupType) {
-        if (finalMarkupType === MARKUP_TYPE_PER) {
-          const markupAmount =
-            (Number(new_fare.base_fare) * Number(finalMarkup)) / 100;
-
-          if (finalMarkupMode === MARKUP_MODE_INCREASE) {
-            new_fare.convenience_fee += Number(markupAmount);
-          } else {
-            new_fare.discount += Number(markupAmount);
-          }
-        } else {
-          if (finalMarkupMode === MARKUP_MODE_INCREASE) {
-            new_fare.convenience_fee += Number(finalMarkup);
-          } else {
-            new_fare.discount += Number(finalMarkup);
-          }
-        }
-      }
-      //add addition markup(applicable for sub agent/agent b2c)
-      if (markup_amount) {
-        if (markup_amount.markup_mode === 'INCREASE') {
-          new_fare.convenience_fee +=
-            markup_amount.markup_type === 'FLAT'
-              ? Number(markup_amount.markup)
-              : (Number(new_fare.total_price) * Number(markup_amount.markup)) /
-                100;
-        } else {
-          new_fare.discount +=
-            markup_amount.markup_type === 'FLAT'
-              ? Number(markup_amount.markup)
-              : (Number(new_fare.total_price) * Number(markup_amount.markup)) /
-                100;
-        }
-      }
-      new_fare.payable =
-        Number(new_fare.total_price) +
-        Number(new_fare.convenience_fee) -
-        Number(new_fare.discount);
-
-      const availability: IFlightAvailability[] = [];
-
-      baggageAndAvailabilityAllSeg.forEach((item) => {
-        const { segmentDetails } = item;
-        segmentDetails.forEach((item2) => {
-          const foundData = availability.find(
-            (avItem) =>
-              avItem.from_airport === item2.from_airport &&
-              avItem.to_airport === item2.to_airport
-          );
-
-          if (foundData) {
-            const { segments } = foundData;
-            item2.segments.forEach((item3) => {
-              const segmentFound = segments.find(
-                (segs) => item3.name === segs.name
-              );
-
-              if (segmentFound) {
-                const passenger = segmentFound.passenger.find(
-                  (pas) => pas.type === item.passenger_type
-                );
-
-                if (!passenger) {
-                  segmentFound.passenger.push({
-                    type: item.passenger_type,
-                    count: item.passenger_count,
-                    meal_type: item3.meal_type,
-                    meal_code: item3.meal_code,
-                    cabin_code: item3.cabin_code,
-                    cabin_type: item3.cabin_type,
-                    booking_code: item3.booking_code,
-                    available_seat: item3.available_seat,
-                    available_break: item3.available_break,
-                    available_fare_break: item3.available_fare_break,
-                    baggage_unit: item2.baggage.unit,
-                    baggage_count: item2.baggage.count,
-                  });
-                }
-              } else {
-                segments.push({
-                  name: item3.name,
-                  passenger: [
-                    {
-                      type: item.passenger_type,
-                      count: item.passenger_count,
-                      meal_type: item3.meal_type,
-                      meal_code: item3.meal_code,
-                      cabin_code: item3.cabin_code,
-                      cabin_type: item3.cabin_type,
-                      booking_code: item3.booking_code,
-                      available_seat: item3.available_seat,
-                      available_break: item3.available_break,
-                      available_fare_break: item3.available_fare_break,
-                      baggage_unit: item2.baggage.unit,
-                      baggage_count: item2.baggage.count,
-                    },
-                  ],
-                });
-              }
-            });
-          } else {
-            const segments: IFlightDataAvailabilitySegment[] = [];
-
-            item2.segments.forEach((item3) => {
-              segments.push({
-                name: item3.name,
-                passenger: [
-                  {
-                    type: item.passenger_type,
-                    count: item.passenger_count,
-                    meal_type: item3.meal_type,
-                    meal_code: item3.meal_code,
-                    cabin_code: item3.cabin_code,
-                    cabin_type: item3.cabin_type,
-                    booking_code: item3.booking_code,
-                    available_seat: item3.available_seat,
-                    available_break: item3.available_break,
-                    available_fare_break: item3.available_fare_break,
-                    baggage_unit: item2.baggage.unit,
-                    baggage_count: item2.baggage.count,
-                  },
-                ],
-              });
-            });
-            availability.push({
-              from_airport: item2.from_airport,
-              to_airport: item2.to_airport,
-              segments,
-            });
-          }
-        });
-      });
-
       const itinery: IFormattedFlightItinerary = {
         flight_id: flight_id || uuidv4(),
         api_search_id: '',
         booking_block,
-        domestic_flight,
+        domestic_flight: route_type === ROUTE_TYPE.DOMESTIC,
         price_changed: false,
         direct_ticket_issue:
           new CommonFlightSupportService().checkDirectTicketIssue({
