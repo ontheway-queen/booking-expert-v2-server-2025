@@ -75,7 +75,6 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     sabreData = yield sabreSubService.FlightSearch({
                         booking_block: false,
-                        markup_set_id: agency_details.flight_markup_set,
                         reqBody: body,
                         dynamic_fare_supplier_id: sabre_set_flight_api_id,
                         markup_amount,
@@ -85,9 +84,8 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     const wfttSubService = new wfttFlightSupport_service_1.default(trx);
                     wfttData = yield wfttSubService.FlightSearch({
                         booking_block: false,
-                        markup_set_id: agency_details.flight_markup_set,
                         reqBody: body,
-                        set_flight_api_id: wftt_set_flight_api_id,
+                        dynamic_fare_supplier_id: wftt_set_flight_api_id,
                         markup_amount,
                     });
                 }
@@ -223,7 +221,6 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     yield sendResults('Sabre', () => __awaiter(this, void 0, void 0, function* () {
                         return sabreSubService.FlightSearch({
                             booking_block: false,
-                            markup_set_id: agency_details.flight_markup_set,
                             reqBody: body,
                             dynamic_fare_supplier_id: sabre_set_flight_api_id,
                             markup_amount,
@@ -236,9 +233,8 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     yield sendResults('WFTT', () => __awaiter(this, void 0, void 0, function* () {
                         return wfttSubService.FlightSearch({
                             booking_block: false,
-                            markup_set_id: agency_details.flight_markup_set,
                             reqBody: body,
-                            set_flight_api_id: wftt_set_flight_api_id,
+                            dynamic_fare_supplier_id: wftt_set_flight_api_id,
                             markup_amount,
                         });
                     }));
@@ -311,15 +307,14 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 const data = yield flightSupportService.FlightRevalidate({
                     search_id,
                     flight_id,
-                    markup_set_id: agency_details.flight_markup_set,
-                    markup_amount,
+                    dynamic_fare_set_id: agency_details.flight_markup_set,
                 });
-                if (data === null || data === void 0 ? void 0 : data.revalidate_data) {
+                if (data) {
                     yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
                     return {
                         success: true,
                         message: 'Ticket has been revalidated successfully!',
-                        data: Object.assign(Object.assign({}, data.revalidate_data), { remaining_time: data.redis_remaining_time }),
+                        data: data,
                         code: this.StatusCode.HTTP_OK,
                     };
                 }
@@ -366,22 +361,21 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 let rev_data = yield flightSupportService.FlightRevalidate({
                     search_id: body.search_id,
                     flight_id: body.flight_id,
-                    markup_set_id: agency_details.flight_markup_set,
-                    markup_amount,
+                    dynamic_fare_set_id: agency_details.flight_markup_set,
                 });
-                if (!(rev_data === null || rev_data === void 0 ? void 0 : rev_data.revalidate_data)) {
+                if (!rev_data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                const data = rev_data.revalidate_data;
+                const data = rev_data;
                 //if price has been changed and no confirmation of booking then return
                 if (!booking_confirm) {
                     const price_changed = yield flightSupportService.checkBookingPriceChange({
                         flight_id: body.flight_id,
-                        booking_price: data.fare.total_price,
+                        booking_price: data.fare.payable,
                     });
                     if (price_changed === true) {
                         return {

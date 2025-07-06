@@ -70,7 +70,6 @@ export class B2CFlightService extends AbstractServices {
         const sabreSubService = new SabreFlightService(trx);
         sabreData = await sabreSubService.FlightSearch({
           booking_block: false,
-          markup_set_id,
           reqBody: body,
           dynamic_fare_supplier_id: sabre_set_flight_api_id,
         });
@@ -79,9 +78,8 @@ export class B2CFlightService extends AbstractServices {
         const wfttSubService = new WfttFlightService(trx);
         wfttData = await wfttSubService.FlightSearch({
           booking_block: false,
-          markup_set_id,
           reqBody: body,
-          set_flight_api_id: wftt_set_flight_api_id,
+          dynamic_fare_supplier_id: wftt_set_flight_api_id,
         });
       }
 
@@ -235,7 +233,6 @@ export class B2CFlightService extends AbstractServices {
         await sendResults('Sabre', async () =>
           sabreSubService.FlightSearch({
             booking_block: false,
-            markup_set_id,
             reqBody: body,
             dynamic_fare_supplier_id: sabre_set_flight_api_id,
           })
@@ -247,9 +244,8 @@ export class B2CFlightService extends AbstractServices {
         await sendResults('WFTT', async () =>
           wfttSubService.FlightSearch({
             booking_block: false,
-            markup_set_id,
             reqBody: body,
-            set_flight_api_id: wftt_set_flight_api_id,
+            dynamic_fare_supplier_id: wftt_set_flight_api_id,
           })
         );
       }
@@ -326,24 +322,19 @@ export class B2CFlightService extends AbstractServices {
 
       //revalidate using the flight support service
       const flightSupportService = new CommonFlightSupportService(trx);
-      const data: {
-        revalidate_data: IFormattedFlightItinerary | null;
-        redis_remaining_time: number;
-      } | null = await flightSupportService.FlightRevalidate({
-        search_id,
-        flight_id,
-        markup_set_id: flight_markup_set,
-      });
+      const data: IFormattedFlightItinerary | null =
+        await flightSupportService.FlightRevalidate({
+          search_id,
+          flight_id,
+          dynamic_fare_set_id: flight_markup_set,
+        });
 
-      if (data?.revalidate_data) {
+      if (data) {
         await setRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
         return {
           success: true,
           message: 'Ticket has been revalidated successfully!',
-          data: {
-            ...data.revalidate_data,
-            remaining_time: data.redis_remaining_time,
-          },
+          data,
           code: this.StatusCode.HTTP_OK,
         };
       }

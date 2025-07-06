@@ -62,7 +62,6 @@ class B2CFlightService extends abstract_service_1.default {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     sabreData = yield sabreSubService.FlightSearch({
                         booking_block: false,
-                        markup_set_id,
                         reqBody: body,
                         dynamic_fare_supplier_id: sabre_set_flight_api_id,
                     });
@@ -71,9 +70,8 @@ class B2CFlightService extends abstract_service_1.default {
                     const wfttSubService = new wfttFlightSupport_service_1.default(trx);
                     wfttData = yield wfttSubService.FlightSearch({
                         booking_block: false,
-                        markup_set_id,
                         reqBody: body,
-                        set_flight_api_id: wftt_set_flight_api_id,
+                        dynamic_fare_supplier_id: wftt_set_flight_api_id,
                     });
                 }
                 //generate search ID
@@ -194,7 +192,6 @@ class B2CFlightService extends abstract_service_1.default {
                     yield sendResults('Sabre', () => __awaiter(this, void 0, void 0, function* () {
                         return sabreSubService.FlightSearch({
                             booking_block: false,
-                            markup_set_id,
                             reqBody: body,
                             dynamic_fare_supplier_id: sabre_set_flight_api_id,
                         });
@@ -206,9 +203,8 @@ class B2CFlightService extends abstract_service_1.default {
                     yield sendResults('WFTT', () => __awaiter(this, void 0, void 0, function* () {
                         return wfttSubService.FlightSearch({
                             booking_block: false,
-                            markup_set_id,
                             reqBody: body,
-                            set_flight_api_id: wftt_set_flight_api_id,
+                            dynamic_fare_supplier_id: wftt_set_flight_api_id,
                         });
                     }));
                 }
@@ -268,14 +264,14 @@ class B2CFlightService extends abstract_service_1.default {
                 const data = yield flightSupportService.FlightRevalidate({
                     search_id,
                     flight_id,
-                    markup_set_id: flight_markup_set,
+                    dynamic_fare_set_id: flight_markup_set,
                 });
-                if (data === null || data === void 0 ? void 0 : data.revalidate_data) {
+                if (data) {
                     yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
                     return {
                         success: true,
                         message: 'Ticket has been revalidated successfully!',
-                        data: Object.assign(Object.assign({}, data.revalidate_data), { remaining_time: data.redis_remaining_time }),
+                        data,
                         code: this.StatusCode.HTTP_OK,
                     };
                 }

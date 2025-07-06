@@ -8,7 +8,7 @@ export default class AdminDynamicFareService extends AbstractServices {
   public async createSupplier(req: Request) {
     return await this.db.transaction(async (trx) => {
       const model = this.Model.DynamicFareModel(trx);
-      const check_entry = await model.getSuppliers({
+      const check_entry = await model.getDynamicFareSuppliers({
         set_id: req.body.set_id,
         supplier_id: req.body.supplier_id,
       });
@@ -19,7 +19,7 @@ export default class AdminDynamicFareService extends AbstractServices {
           message: 'This supplier already exists for this set',
         };
       }
-      const res = await model.createSupplier(req.body);
+      const res = await model.createDynamicFareSupplier(req.body);
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -32,7 +32,9 @@ export default class AdminDynamicFareService extends AbstractServices {
   public async getSuppliers(req: Request) {
     const { set_id } = req.query;
     const model = this.Model.DynamicFareModel();
-    const data = await model.getSuppliers({ set_id: Number(set_id) });
+    const data = await model.getDynamicFareSuppliers({
+      set_id: Number(set_id),
+    });
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
@@ -43,7 +45,7 @@ export default class AdminDynamicFareService extends AbstractServices {
   public async updateSupplier(req: Request) {
     const model = this.Model.DynamicFareModel();
     const { id } = req.params;
-    const existing = await model.getSupplierById(Number(id));
+    const existing = await model.getDynamicFareSupplierById(Number(id));
     if (!existing.length) {
       return {
         success: false,
@@ -51,7 +53,7 @@ export default class AdminDynamicFareService extends AbstractServices {
         message: this.ResMsg.HTTP_NOT_FOUND,
       };
     }
-    await model.updateSupplier(Number(id), req.body);
+    await model.updateDynamicFareSupplier(Number(id), req.body);
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
@@ -62,7 +64,7 @@ export default class AdminDynamicFareService extends AbstractServices {
   public async deleteSupplier(req: Request) {
     const model = this.Model.DynamicFareModel();
     const { id } = req.params;
-    const existing = await model.getSupplierById(Number(id));
+    const existing = await model.getDynamicFareSupplierById(Number(id));
     if (!existing.length) {
       return {
         success: false,
@@ -70,7 +72,7 @@ export default class AdminDynamicFareService extends AbstractServices {
         message: this.ResMsg.HTTP_NOT_FOUND,
       };
     }
-    await model.deleteSupplier(Number(id));
+    await model.deleteDynamicFareSupplier(Number(id));
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
@@ -106,16 +108,30 @@ export default class AdminDynamicFareService extends AbstractServices {
       const payload: ICreateSupplierAirlinesDynamicFarePayload[] = [];
 
       for (const elm of body) {
-        const airlineCodes = elm.airline
-          .split(',')
-          .map((code: string) => code.trim().toUpperCase());
+        const checkDynamic = await model.getDynamicFareSupplierById(
+          elm.dynamic_fare_supplier_id
+        );
 
-        for (const code of airlineCodes) {
-          payload.push({
-            ...elm,
-            airline: code,
-          });
+        if (checkDynamic.length) {
+          const airlineCodes = elm.airline
+            .split(',')
+            .map((code: string) => code.trim().toUpperCase());
+
+          for (const code of airlineCodes) {
+            payload.push({
+              ...elm,
+              airline: code,
+            });
+          }
         }
+      }
+
+      if (!payload.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: 'Dynamic fare supplier id not found.',
+        };
       }
 
       await model.createSupplierAirlinesFare(payload);

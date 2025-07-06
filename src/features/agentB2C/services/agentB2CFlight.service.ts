@@ -82,19 +82,18 @@ export class AgentB2CFlightService extends AbstractServices {
         const sabreSubService = new SabreFlightService(trx);
         sabreData = await sabreSubService.FlightSearch({
           booking_block: false,
-          markup_set_id: agency_details.flight_markup_set,
           reqBody: body,
           dynamic_fare_supplier_id: sabre_set_flight_api_id,
           markup_amount,
         });
       }
+
       if (wftt_set_flight_api_id) {
         const wfttSubService = new WfttFlightService(trx);
         wfttData = await wfttSubService.FlightSearch({
           booking_block: false,
-          markup_set_id: agency_details.flight_markup_set,
           reqBody: body,
-          set_flight_api_id: wftt_set_flight_api_id,
+          dynamic_fare_supplier_id: wftt_set_flight_api_id,
           markup_amount,
         });
       }
@@ -262,7 +261,6 @@ export class AgentB2CFlightService extends AbstractServices {
         await sendResults('Sabre', async () =>
           sabreSubService.FlightSearch({
             booking_block: false,
-            markup_set_id: agency_details.flight_markup_set,
             reqBody: body,
             dynamic_fare_supplier_id: sabre_set_flight_api_id,
             markup_amount,
@@ -275,9 +273,8 @@ export class AgentB2CFlightService extends AbstractServices {
         await sendResults('WFTT', async () =>
           wfttSubService.FlightSearch({
             booking_block: false,
-            markup_set_id: agency_details.flight_markup_set,
             reqBody: body,
-            set_flight_api_id: wftt_set_flight_api_id,
+            dynamic_fare_supplier_id: wftt_set_flight_api_id,
             markup_amount,
           })
         );
@@ -359,25 +356,19 @@ export class AgentB2CFlightService extends AbstractServices {
 
       //revalidate using the flight support service
       const flightSupportService = new CommonFlightSupportService(trx);
-      const data: {
-        revalidate_data: IFormattedFlightItinerary | null;
-        redis_remaining_time: number;
-      } | null = await flightSupportService.FlightRevalidate({
-        search_id,
-        flight_id,
-        markup_set_id: agency_details.flight_markup_set,
-        markup_amount,
-      });
+      const data: IFormattedFlightItinerary | null =
+        await flightSupportService.FlightRevalidate({
+          search_id,
+          flight_id,
+          dynamic_fare_set_id: agency_details.flight_markup_set,
+        });
 
-      if (data?.revalidate_data) {
+      if (data) {
         await setRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
         return {
           success: true,
           message: 'Ticket has been revalidated successfully!',
-          data: {
-            ...data.revalidate_data,
-            remaining_time: data.redis_remaining_time,
-          },
+          data: data,
           code: this.StatusCode.HTTP_OK,
         };
       }
@@ -433,16 +424,13 @@ export class AgentB2CFlightService extends AbstractServices {
 
       //revalidate
       const flightSupportService = new CommonFlightSupportService(trx);
-      let rev_data: {
-        revalidate_data: IFormattedFlightItinerary | null;
-        redis_remaining_time: number;
-      } | null = await flightSupportService.FlightRevalidate({
-        search_id: body.search_id,
-        flight_id: body.flight_id,
-        markup_set_id: agency_details.flight_markup_set,
-        markup_amount,
-      });
-      if (!rev_data?.revalidate_data) {
+      let rev_data: IFormattedFlightItinerary | null =
+        await flightSupportService.FlightRevalidate({
+          search_id: body.search_id,
+          flight_id: body.flight_id,
+          dynamic_fare_set_id: agency_details.flight_markup_set,
+        });
+      if (!rev_data) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
@@ -450,14 +438,14 @@ export class AgentB2CFlightService extends AbstractServices {
         };
       }
 
-      const data = rev_data.revalidate_data;
+      const data = rev_data;
 
       //if price has been changed and no confirmation of booking then return
       if (!booking_confirm) {
         const price_changed =
           await flightSupportService.checkBookingPriceChange({
             flight_id: body.flight_id,
-            booking_price: data.fare.total_price,
+            booking_price: data.fare.payable,
           });
         if (price_changed === true) {
           return {

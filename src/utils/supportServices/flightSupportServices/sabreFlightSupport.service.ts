@@ -5,7 +5,6 @@ import config from '../../../config/config';
 import CustomError from '../../lib/customError';
 import FlightUtils from '../../lib/flight/flightUtils';
 import SabreRequests from '../../lib/flight/sabreRequest';
-import Lib from '../../lib/lib';
 
 import {
   FLIGHT_BOOKING_CANCELLED,
@@ -52,10 +51,11 @@ export default class SabreFlightService extends AbstractServices {
   private trx: Knex.Transaction;
   private request = new SabreRequests();
   private flightUtils = new FlightUtils();
-
+  private flightSupport: CommonFlightSupportService;
   constructor(trx: Knex.Transaction) {
     super();
     this.trx = trx;
+    this.flightSupport = new CommonFlightSupportService(trx);
   }
 
   ////////////==================FLIGHT SEARCH (START)=========================///////////
@@ -216,7 +216,6 @@ export default class SabreFlightService extends AbstractServices {
   }: {
     reqBody: IFlightSearchReqBody;
     dynamic_fare_supplier_id: number;
-    markup_set_id: number;
     booking_block: boolean;
     markup_amount?: {
       markup: number;
@@ -629,7 +628,7 @@ export default class SabreFlightService extends AbstractServices {
       });
 
       const { markup, commission, pax_markup } =
-        await this.flightUtils.calculateFlightMarkup({
+        await this.flightSupport.calculateFlightMarkup({
           dynamic_fare_supplier_id,
           airline: fare.validatingCarrierCode,
           flight_class: this.flightUtils.getClassFromId(
@@ -796,16 +795,14 @@ export default class SabreFlightService extends AbstractServices {
   public async SabreFlightRevalidate({
     reqBody,
     retrieved_response,
-    markup_set_id,
-    set_flight_api_id,
+    dynamic_fare_supplier_id,
     flight_id,
     booking_block,
     markup_amount,
   }: {
     reqBody: IFlightSearchReqBody;
     retrieved_response: IFormattedFlightItinerary;
-    markup_set_id: number;
-    set_flight_api_id: number;
+    dynamic_fare_supplier_id: number;
     flight_id: string;
     booking_block: boolean;
     markup_amount?: {
@@ -819,20 +816,20 @@ export default class SabreFlightService extends AbstractServices {
       retrieved_response
     );
 
+    const route_type = this.flightUtils.routeTypeFinder({
+      originDest: reqBody.OriginDestinationInformation,
+    });
+
     const response = await this.request.postRequest(
       SabreAPIEndpoints.FLIGHT_REVALIDATE_ENDPOINT,
       revalidate_req_body
     );
+
     if (!response) {
-      Lib.writeJsonFile('sabre_revalidate_request', revalidate_req_body);
-      Lib.writeJsonFile('sabre_revalidate_response', response);
       throw new CustomError('External API Error', 500);
     }
 
     if (response.groupedItineraryResponse?.statistics.itineraryCount === 0) {
-      Lib.writeJsonFile('sabre_revalidate_request', revalidate_req_body);
-      Lib.writeJsonFile('sabre_revalidate_response', response);
-
       throw new CustomError(
         `Cannot revalidate flight with this flight id`,
         400
@@ -840,13 +837,13 @@ export default class SabreFlightService extends AbstractServices {
     }
 
     const data = await this.FlightSearchResFormatter({
-      set_flight_api_id,
+      dynamic_fare_supplier_id,
       booking_block,
       reqBody,
       data: response.groupedItineraryResponse,
-      markup_set_id,
       flight_id,
       markup_amount,
+      route_type,
     });
 
     return data[0];

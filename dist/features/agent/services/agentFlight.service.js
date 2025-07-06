@@ -62,41 +62,39 @@ class AgentFlightService extends abstract_service_1.default {
                         };
                     }
                 }
-                const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
-                const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
+                const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
+                const apiData = yield markupSetFlightApiModel.getDynamicFareSuppliers({
                     status: true,
-                    markup_set_id: agency_details.flight_markup_set,
+                    set_id: agency_details.flight_markup_set,
                 });
                 //extract API IDs
-                let sabre_set_flight_api_id = 0;
-                let wftt_set_flight_api_id = 0;
+                let sabre_supplier_id = 0;
+                let custom_supplier_id = 0;
                 apiData.forEach((api) => {
-                    if (api.api_name === flightConstent_1.SABRE_API) {
-                        sabre_set_flight_api_id = api.id;
+                    if (api.sup_api === flightConstent_1.SABRE_API) {
+                        sabre_supplier_id = api.id;
                     }
-                    if (api.api_name === flightConstent_1.WFTT_API) {
-                        wftt_set_flight_api_id = api.id;
+                    if (api.sup_api === flightConstent_1.WFTT_API) {
+                        custom_supplier_id = api.id;
                     }
                 });
                 let sabreData = [];
                 let wfttData = [];
-                if (sabre_set_flight_api_id) {
+                if (sabre_supplier_id) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     sabreData = yield sabreSubService.FlightSearch({
                         booking_block: false,
-                        markup_set_id: agency_details.flight_markup_set,
                         reqBody: body,
-                        dynamic_fare_supplier_id: sabre_set_flight_api_id,
+                        dynamic_fare_supplier_id: sabre_supplier_id,
                         markup_amount,
                     });
                 }
-                if (wftt_set_flight_api_id) {
+                if (custom_supplier_id) {
                     const wfttSubService = new wfttFlightSupport_service_1.default(trx);
                     wfttData = yield wfttSubService.FlightSearch({
                         booking_block: false,
-                        markup_set_id: agency_details.flight_markup_set,
                         reqBody: body,
-                        set_flight_api_id: wftt_set_flight_api_id,
+                        dynamic_fare_supplier_id: custom_supplier_id,
                         markup_amount,
                     });
                 }
@@ -178,20 +176,20 @@ class AgentFlightService extends abstract_service_1.default {
                         };
                     }
                 }
-                const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
-                const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
+                const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
+                const apiData = yield markupSetFlightApiModel.getDynamicFareSuppliers({
                     status: true,
-                    markup_set_id: agency_details.flight_markup_set,
+                    set_id: agency_details.flight_markup_set,
                 });
                 //extract API IDs
-                let sabre_set_flight_api_id = 0;
-                let wftt_set_flight_api_id = 0;
+                let sabre_supplier_id = 0;
+                let custom_supplier_id = 0;
                 apiData.forEach((api) => {
-                    if (api.api_name === flightConstent_1.SABRE_API) {
-                        sabre_set_flight_api_id = api.id;
+                    if (api.sup_api === flightConstent_1.SABRE_API) {
+                        sabre_supplier_id = api.id;
                     }
-                    if (api.api_name === flightConstent_1.WFTT_API) {
-                        wftt_set_flight_api_id = api.id;
+                    if (api.sup_api === flightConstent_1.WFTT_API) {
+                        custom_supplier_id = api.id;
                     }
                 });
                 //generate search ID
@@ -232,27 +230,25 @@ class AgentFlightService extends abstract_service_1.default {
                     yield (0, redis_1.setRedis)(search_id, { reqBody: body, response: responseData });
                 });
                 // Sabre results
-                if (sabre_set_flight_api_id) {
+                if (sabre_supplier_id) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     yield sendResults('Sabre', () => __awaiter(this, void 0, void 0, function* () {
                         return sabreSubService.FlightSearch({
                             booking_block: false,
-                            markup_set_id: agency_details.flight_markup_set,
                             reqBody: body,
-                            dynamic_fare_supplier_id: sabre_set_flight_api_id,
+                            dynamic_fare_supplier_id: sabre_supplier_id,
                             markup_amount,
                         });
                     }));
                 }
                 //WFTT results
-                if (wftt_set_flight_api_id) {
+                if (custom_supplier_id) {
                     const wfttSubService = new wfttFlightSupport_service_1.default(trx);
                     yield sendResults('WFTT', () => __awaiter(this, void 0, void 0, function* () {
                         return wfttSubService.FlightSearch({
                             booking_block: false,
-                            markup_set_id: agency_details.flight_markup_set,
                             reqBody: body,
-                            set_flight_api_id: wftt_set_flight_api_id,
+                            dynamic_fare_supplier_id: custom_supplier_id,
                             markup_amount,
                         });
                     }));
@@ -330,15 +326,14 @@ class AgentFlightService extends abstract_service_1.default {
                 const data = yield flightSupportService.FlightRevalidate({
                     search_id,
                     flight_id,
-                    markup_set_id: agency_details.flight_markup_set,
-                    markup_amount,
+                    dynamic_fare_set_id: agency_details.flight_markup_set,
                 });
-                if (data === null || data === void 0 ? void 0 : data.revalidate_data) {
+                if (data) {
                     yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
                     return {
                         success: true,
                         message: 'Ticket has been revalidated successfully!',
-                        data: Object.assign(Object.assign({}, data.revalidate_data), { remaining_time: data.redis_remaining_time }),
+                        data,
                         code: this.StatusCode.HTTP_OK,
                     };
                 }
@@ -389,22 +384,21 @@ class AgentFlightService extends abstract_service_1.default {
                 let rev_data = yield flightSupportService.FlightRevalidate({
                     search_id: body.search_id,
                     flight_id: body.flight_id,
-                    markup_set_id: agency_details.flight_markup_set,
-                    markup_amount,
+                    dynamic_fare_set_id: agency_details.flight_markup_set,
                 });
-                if (!(rev_data === null || rev_data === void 0 ? void 0 : rev_data.revalidate_data)) {
+                if (!rev_data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                const data = rev_data.revalidate_data;
+                const data = rev_data;
                 //if price has been changed and no confirmation of booking then return
                 if (!booking_confirm) {
                     const price_changed = yield flightSupportService.checkBookingPriceChange({
                         flight_id: body.flight_id,
-                        booking_price: data.fare.total_price,
+                        booking_price: data.fare.payable,
                     });
                     if (price_changed === true) {
                         return {

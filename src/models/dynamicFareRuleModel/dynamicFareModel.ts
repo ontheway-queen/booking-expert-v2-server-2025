@@ -20,13 +20,15 @@ class DynamicFareModel extends Schema {
   }
 
   // Dynamic Fare Supplier
-  public async createSupplier(payload: ICreateDynamicFareSupplierPayload) {
+  public async createDynamicFareSupplier(
+    payload: ICreateDynamicFareSupplierPayload
+  ) {
     return await this.db('dynamic_fare_supplier')
       .withSchema(this.DBO_SCHEMA)
       .insert(payload, 'id');
   }
 
-  public async updateSupplier(
+  public async updateDynamicFareSupplier(
     id: number,
     payload: IUpdateDynamicFareSupplierPayload
   ) {
@@ -36,14 +38,14 @@ class DynamicFareModel extends Schema {
       .where({ id });
   }
 
-  public async deleteSupplier(id: number) {
+  public async deleteDynamicFareSupplier(id: number) {
     return await this.db('dynamic_fare_supplier')
       .withSchema(this.DBO_SCHEMA)
       .delete()
       .where({ id });
   }
 
-  public async getSuppliers(payload: {
+  public async getDynamicFareSuppliers(payload: {
     set_id?: number;
     supplier_id?: number;
     status?: boolean;
@@ -63,9 +65,11 @@ class DynamicFareModel extends Schema {
       segment_markup_type: 'PER' | 'FLAT';
       segment_commission: string;
       segment_commission_type: 'PER' | 'FLAT';
-      api: string;
-      logo: string;
       pax_markup: string;
+      sup_name: string;
+      sup_pcc: string;
+      sup_api: string;
+      sup_logo: string;
     }[]
   > {
     const { set_id, supplier_id, status } = payload;
@@ -99,7 +103,7 @@ class DynamicFareModel extends Schema {
       .orderBy('dfs.id', 'desc');
   }
 
-  public async getSupplierById(id: number) {
+  public async getDynamicFareSupplierById(id: number) {
     return await this.db('dynamic_fare_supplier')
       .withSchema(this.DBO_SCHEMA)
       .select('*')
@@ -243,27 +247,6 @@ class DynamicFareModel extends Schema {
       .withSchema(this.DBO_SCHEMA)
       .select('*')
       .where({ id });
-  }
-
-  //get b2c commission
-  public async getB2CCommission() {
-    return await this.db('btoc_commission as bc')
-      .withSchema(this.DBO_SCHEMA)
-      .join('dynamic_fare_set as cs', 'cs.id', 'bc.commission_set_id')
-      .select('bc.id', 'bc.commission_set_id', 'cs.name');
-  }
-
-  //upsert b2c commission set
-  public async upsertB2CCommission(payload: { commission_set_id: number }) {
-    const res = await this.db('btoc_commission')
-      .withSchema(this.DBO_SCHEMA)
-      .update(payload);
-
-    if (!res) {
-      await this.db('btoc_commission')
-        .withSchema(this.DBO_SCHEMA)
-        .insert(payload);
-    }
   }
 
   //get supplier list

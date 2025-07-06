@@ -4,6 +4,7 @@ import WfttRequests from '../../lib/flight/wfttRequest';
 import {
   IFormattedFlightItinerary,
   IFlightSearchReqBody,
+  IFormattedFare,
 } from '../../supportTypes/flightTypes/commonFlightTypes';
 import WfttAPIEndpoints from '../../miscellaneous/wfttApiEndpoints';
 import {
@@ -12,29 +13,61 @@ import {
   IWFTTFlightSearchResBody,
   IWFTTFlightSearchResults,
 } from '../../supportTypes/flightTypes/wfttFlightTypes';
-import { BD_AIRPORT } from '../../miscellaneous/staticData';
-import { CUSTOM_API, WFTT_API } from '../../miscellaneous/flightConstent';
-import Lib from '../../lib/lib';
 import {
-  MARKUP_MODE_INCREASE,
-  MARKUP_TYPE_PER,
-} from '../../miscellaneous/constants';
+  CUSTOM_API,
+  ROUTE_TYPE,
+  WFTT_API,
+} from '../../miscellaneous/flightConstent';
+import Lib from '../../lib/lib';
 import CustomError from '../../lib/customError';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
+import { IGetAirlinesPreferenceQuery } from '../../modelTypes/dynamicFareRulesModelTypes/airlinesPreferenceModelTypes';
+import FlightUtils from '../../lib/flight/flightUtils';
+import { CommonFlightSupportService } from './commonFlightSupport.service';
 
 export default class WfttFlightService extends AbstractServices {
   private trx: Knex.Transaction;
   private request = new WfttRequests();
+  private flightUtils = new FlightUtils();
+  private flightSupport: CommonFlightSupportService;
   constructor(trx: Knex.Transaction) {
     super();
     this.trx = trx;
+    this.flightSupport = new CommonFlightSupportService(trx);
   }
 
   // Request body formatter
-  private async FlightSearchReqFormatter(
-    reqBody: IFlightSearchReqBody,
-    set_flight_api_id: number
-  ): Promise<IFlightSearchReqBody> {
+  private async FlightSearchReqFormatter({
+    dynamic_fare_supplier_id,
+    reqBody,
+    route_type,
+  }: {
+    reqBody: IFlightSearchReqBody;
+    dynamic_fare_supplier_id: number;
+    route_type: 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' | 'SOTO';
+  }): Promise<IFlightSearchReqBody> {
+    const AirlinesPrefModel = this.Model.AirlinesPreferenceModel(this.trx);
+
+    const prefAirlinesQuery: IGetAirlinesPreferenceQuery = {
+      dynamic_fare_supplier_id,
+      pref_type: 'PREFERRED',
+      status: true,
+    };
+
+    if (route_type === ROUTE_TYPE.DOMESTIC) {
+      prefAirlinesQuery.domestic = true;
+    } else if (route_type === ROUTE_TYPE.FROM_DAC) {
+      prefAirlinesQuery.domestic = true;
+    } else if (route_type === ROUTE_TYPE.TO_DAC) {
+      prefAirlinesQuery.domestic = true;
+    } else if (route_type === ROUTE_TYPE.SOTO) {
+      prefAirlinesQuery.domestic = true;
+    }
+
+    // Get preferred airlines
+    const cappingAirlinesRaw: { Code: string }[] =
+      await AirlinesPrefModel.getAirlinePrefCodes(prefAirlinesQuery);
+
     const {
       JourneyType,
       airline_code,
@@ -42,27 +75,27 @@ export default class WfttFlightService extends AbstractServices {
       PassengerTypeQuantity,
     } = reqBody;
 
-    const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
+    let finalAirlineCodes: { Code: string }[] = [];
 
-    const defaultAllowedAirlines =
-      await flightMarkupsModel.getAPIActiveAirlines(set_flight_api_id);
+    if (airline_code.length) {
+      for (const code of airline_code) {
+        const found = cappingAirlinesRaw.find(
+          (item) => item.Code === code.Code
+        );
 
-    let newAirlineCodes: { Code: string }[] = [];
-
-    if (airline_code?.length) {
-      defaultAllowedAirlines.forEach((airline) => {
-        if (airline_code.some((code) => code.Code === airline.Code)) {
-          newAirlineCodes.push({ Code: airline.Code });
+        if (found) {
+          finalAirlineCodes.push({ Code: found.Code });
         }
-      });
+      }
     } else {
-      newAirlineCodes = defaultAllowedAirlines;
+      if (cappingAirlinesRaw.length) {
+        finalAirlineCodes = cappingAirlinesRaw;
+      }
     }
 
-    // Format the request body as per WFTT API requirements
     return {
       JourneyType,
-      airline_code: newAirlineCodes,
+      airline_code: finalAirlineCodes,
       OriginDestinationInformation,
       PassengerTypeQuantity,
     };
@@ -70,13 +103,12 @@ export default class WfttFlightService extends AbstractServices {
 
   // Flight search service
   public async FlightSearch({
-    set_flight_api_id,
+    dynamic_fare_supplier_id,
     reqBody,
     markup_amount,
   }: {
     reqBody: IFlightSearchReqBody;
-    set_flight_api_id: number;
-    markup_set_id: number;
+    dynamic_fare_supplier_id: number;
     booking_block: boolean;
     markup_amount?: {
       markup: number;
@@ -84,10 +116,14 @@ export default class WfttFlightService extends AbstractServices {
       markup_mode: 'INCREASE' | 'DECREASE';
     };
   }) {
-    const formattedReqBody = await this.FlightSearchReqFormatter(
+    const route_type = this.flightUtils.routeTypeFinder({
+      originDest: reqBody.OriginDestinationInformation,
+    });
+    const formattedReqBody = await this.FlightSearchReqFormatter({
+      dynamic_fare_supplier_id,
       reqBody,
-      set_flight_api_id
-    );
+      route_type,
+    });
 
     const response: IWFTTFlightSearchResBody | undefined =
       await this.request.postRequest(
@@ -105,9 +141,10 @@ export default class WfttFlightService extends AbstractServices {
     const result = await this.FlightSearchResFormatter({
       data: response.data.results,
       reqBody: reqBody,
-      set_flight_api_id,
+      dynamic_fare_supplier_id,
       search_id: response.data.search_id,
       markup_amount,
+      route_type,
     });
     return result;
   }
@@ -116,19 +153,21 @@ export default class WfttFlightService extends AbstractServices {
   private async FlightSearchResFormatter({
     data,
     reqBody,
-    set_flight_api_id,
+    dynamic_fare_supplier_id,
     search_id,
     markup_amount,
+    route_type,
   }: {
     data: IWFTTFlightSearchResults[];
     reqBody: IFlightSearchReqBody;
-    set_flight_api_id: number;
+    dynamic_fare_supplier_id: number;
     search_id: string;
     markup_amount?: {
       markup: number;
       markup_type: 'PER' | 'FLAT';
       markup_mode: 'INCREASE' | 'DECREASE';
     };
+    route_type: 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' | 'SOTO';
   }) {
     // const result: IFormattedFlightItinerary[] = [];
     const airports: string[] = [];
@@ -141,133 +180,16 @@ export default class WfttFlightService extends AbstractServices {
     });
 
     const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
+
     const commonModel = this.Model.CommonModel(this.trx);
 
-    return (await Promise.all(
+    const formattedData: IFormattedFlightItinerary[] = await Promise.all(
       data.map(async (item) => {
-        const domestic_flight = item.isDomesticFlight;
-
-        let fare = {
-          base_fare: item.fare.base_fare,
-          total_tax: item.fare.total_tax,
-          discount: item.fare.discount,
-          convenience_fee: item.fare.convenience_fee,
-          total_price: item.fare.total_price,
-          payable: item.fare.payable,
-          ait: item.fare.ait,
-        };
-
-        // Markup data
-        let finalMarkup = 0;
-        let finalMarkupType = '';
-        let finalMarkupMode = '';
-
-        // Set Markup if route Markup is not available and airlines Markup is available
-        if (!finalMarkup && !finalMarkupType && !finalMarkupMode) {
-          //airline markup
-          const markupCheck = await flightMarkupsModel.getAllFlightMarkups(
-            {
-              airline: item.carrier_code,
-              status: true,
-              markup_set_flight_api_id: set_flight_api_id,
-              limit: 1,
-            },
-            false
-          );
-
-          // Set Amount
-          if (markupCheck.data.length) {
-            const {
-              markup_domestic,
-              markup_from_dac,
-              markup_to_dac,
-              markup_soto,
-              markup_type,
-              markup_mode,
-            } = markupCheck.data[0];
-
-            let allBdAirport = true;
-            let existBdAirport = false;
-
-            for (const airport of airports) {
-              if (BD_AIRPORT.includes(airport)) {
-                if (!existBdAirport) {
-                  existBdAirport = true;
-                }
-              } else {
-                allBdAirport = false;
-              }
-            }
-
-            if (allBdAirport) {
-              // Domestic
-              finalMarkup = markup_domestic;
-              finalMarkupMode = markup_mode;
-              finalMarkupType = markup_type;
-            } else if (BD_AIRPORT.includes(airports[0])) {
-              // From Dhaka
-              finalMarkup = markup_from_dac;
-              finalMarkupMode = markup_mode;
-              finalMarkupType = markup_type;
-            } else if (existBdAirport) {
-              // To Dhaka
-              finalMarkup = markup_to_dac;
-              finalMarkupMode = markup_mode;
-              finalMarkupType = markup_type;
-            } else {
-              // Soto
-              finalMarkup = markup_soto;
-              finalMarkupMode = markup_mode;
-              finalMarkupType = markup_type;
-            }
-          }
-        }
-
-        // Set Markup to fare
-        if (finalMarkup && finalMarkupMode && finalMarkupType) {
-          if (finalMarkupType === MARKUP_TYPE_PER) {
-            const markupAmount =
-              (Number(fare.base_fare) * Number(finalMarkup)) / 100;
-
-            if (finalMarkupMode === MARKUP_MODE_INCREASE) {
-              fare.convenience_fee += Number(markupAmount);
-            } else {
-              fare.discount += Number(markupAmount);
-            }
-          } else {
-            if (finalMarkupMode === MARKUP_MODE_INCREASE) {
-              fare.convenience_fee += Number(finalMarkup);
-            } else {
-              fare.discount += Number(finalMarkup);
-            }
-          }
-        }
-
-        //add addition markup(applicable for sub agent/agent b2c)
-        if (markup_amount) {
-          if (markup_amount.markup_mode === 'INCREASE') {
-            fare.convenience_fee +=
-              markup_amount.markup_type === 'FLAT'
-                ? Number(markup_amount.markup)
-                : (Number(fare.total_price) * Number(markup_amount.markup)) /
-                  100;
-          } else {
-            fare.discount +=
-              markup_amount.markup_type === 'FLAT'
-                ? Number(markup_amount.markup)
-                : (Number(fare.total_price) * Number(markup_amount.markup)) /
-                  100;
-          }
-        }
-
-        fare.payable =
-          Number(fare.total_price) +
-          Number(fare.convenience_fee) -
-          Number(fare.discount);
+        const domestic_flight = route_type === ROUTE_TYPE.DOMESTIC;
 
         const {
           isDomesticFlight,
-          fare: wftt_fare,
+          fare: vendor_fare,
           api,
           carrier_code,
           carrier_logo,
@@ -275,6 +197,22 @@ export default class WfttFlightService extends AbstractServices {
           flights,
           ...rest
         } = item;
+
+        let fare: IFormattedFare = {
+          base_fare: vendor_fare.base_fare,
+          total_tax: vendor_fare.total_tax,
+          discount: vendor_fare.discount,
+          payable: vendor_fare.payable,
+          ait: vendor_fare.ait,
+          vendor_price: {
+            base_fare: vendor_fare.base_fare,
+            charge: 0,
+            discount: vendor_fare.discount,
+            gross_fare: vendor_fare.total_price,
+            net_fare: vendor_fare.payable,
+            tax: vendor_fare.total_tax,
+          },
+        };
 
         const newFlights = await Promise.all(
           flights.map(async (flight) => {
@@ -320,6 +258,26 @@ export default class WfttFlightService extends AbstractServices {
           })
         );
 
+        let total_segments = 0;
+        flights.map((elm) => {
+          elm.options.map((elm2) => {
+            total_segments++;
+          });
+        });
+
+        const { markup, commission, pax_markup } =
+          await this.flightSupport.calculateFlightMarkup({
+            dynamic_fare_supplier_id,
+            airline: carrier_code,
+            flight_class: this.flightUtils.getClassFromId(
+              reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
+                .Cabin
+            ),
+            base_fare: vendor_fare.base_fare,
+            total_segments,
+            route_type,
+          });
+
         const career = await commonModel.getAirlineByCode(carrier_code);
 
         // const career =
@@ -336,26 +294,29 @@ export default class WfttFlightService extends AbstractServices {
           leg_description: [],
         };
       })
-    )) as IFormattedFlightItinerary[];
+    );
+    return formattedData;
   }
 
   //Revalidate service
   public async FlightRevalidate({
     reqBody,
     revalidate_body,
-    set_flight_api_id,
+    dynamic_fare_supplier_id,
     markup_amount,
   }: {
     revalidate_body: IWFTTFlightRevalidateRequestBody;
     reqBody: IFlightSearchReqBody;
-    set_flight_api_id: number;
+    dynamic_fare_supplier_id: number;
     markup_amount?: {
       markup: number;
       markup_type: 'PER' | 'FLAT';
       markup_mode: 'INCREASE' | 'DECREASE';
     };
   }) {
-    console.log({ revalidate_body });
+    const route_type = this.flightUtils.routeTypeFinder({
+      originDest: reqBody.OriginDestinationInformation,
+    });
 
     const endpoint =
       WfttAPIEndpoints.FLIGHT_REVALIDATE_ENDPOINT +
@@ -363,8 +324,6 @@ export default class WfttFlightService extends AbstractServices {
 
     const response: IWFTTFlightRevalidateResponse =
       await this.request.getRequest(endpoint);
-
-    console.log({ response });
 
     if (!response) {
       Lib.writeJsonFile('wftt_revalidate_request', revalidate_body);
@@ -387,9 +346,10 @@ export default class WfttFlightService extends AbstractServices {
     const result = await this.FlightSearchResFormatter({
       data: [response.data],
       reqBody: reqBody,
-      set_flight_api_id,
+      dynamic_fare_supplier_id,
       search_id: '',
       markup_amount,
+      route_type,
     });
     return result[0];
   }

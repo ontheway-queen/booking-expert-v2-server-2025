@@ -141,7 +141,7 @@ export interface IFormattedCarrier {
   carrier_aircraft_name: string;
 }
 
-interface IFormattedFare {
+export interface IFormattedFare {
   base_fare: number;
   total_tax: number;
   discount: number;

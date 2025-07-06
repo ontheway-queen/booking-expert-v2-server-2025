@@ -18,7 +18,6 @@ const config_1 = __importDefault(require("../../../config/config"));
 const customError_1 = __importDefault(require("../../lib/customError"));
 const flightUtils_1 = __importDefault(require("../../lib/flight/flightUtils"));
 const sabreRequest_1 = __importDefault(require("../../lib/flight/sabreRequest"));
-const lib_1 = __importDefault(require("../../lib/lib"));
 const flightConstent_1 = require("../../miscellaneous/flightConstent");
 const constants_1 = require("../../miscellaneous/constants");
 const sabreApiEndpoints_1 = __importDefault(require("../../miscellaneous/endpoints/sabreApiEndpoints"));
@@ -29,6 +28,7 @@ class SabreFlightService extends abstract_service_1.default {
         this.request = new sabreRequest_1.default();
         this.flightUtils = new flightUtils_1.default();
         this.trx = trx;
+        this.flightSupport = new commonFlightSupport_service_1.CommonFlightSupportService(trx);
     }
     ////////////==================FLIGHT SEARCH (START)=========================///////////
     // Flight Search Request formatter
@@ -459,7 +459,7 @@ class SabreFlightService extends abstract_service_1.default {
                         total_segments++;
                     });
                 });
-                const { markup, commission, pax_markup } = yield this.flightUtils.calculateFlightMarkup({
+                const { markup, commission, pax_markup } = yield this.flightSupport.calculateFlightMarkup({
                     dynamic_fare_supplier_id,
                     airline: fare.validatingCarrierCode,
                     flight_class: this.flightUtils.getClassFromId(reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
@@ -590,28 +590,27 @@ class SabreFlightService extends abstract_service_1.default {
     //////==================FLIGHT REVALIDATE (START)=========================//////
     //sabre flight revalidate service
     SabreFlightRevalidate(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ reqBody, retrieved_response, markup_set_id, set_flight_api_id, flight_id, booking_block, markup_amount, }) {
+        return __awaiter(this, arguments, void 0, function* ({ reqBody, retrieved_response, dynamic_fare_supplier_id, flight_id, booking_block, markup_amount, }) {
             var _b;
             const revalidate_req_body = yield this.RevalidateFlightReqFormatter(reqBody, retrieved_response);
+            const route_type = this.flightUtils.routeTypeFinder({
+                originDest: reqBody.OriginDestinationInformation,
+            });
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_REVALIDATE_ENDPOINT, revalidate_req_body);
             if (!response) {
-                lib_1.default.writeJsonFile('sabre_revalidate_request', revalidate_req_body);
-                lib_1.default.writeJsonFile('sabre_revalidate_response', response);
                 throw new customError_1.default('External API Error', 500);
             }
             if (((_b = response.groupedItineraryResponse) === null || _b === void 0 ? void 0 : _b.statistics.itineraryCount) === 0) {
-                lib_1.default.writeJsonFile('sabre_revalidate_request', revalidate_req_body);
-                lib_1.default.writeJsonFile('sabre_revalidate_response', response);
                 throw new customError_1.default(`Cannot revalidate flight with this flight id`, 400);
             }
             const data = yield this.FlightSearchResFormatter({
-                set_flight_api_id,
+                dynamic_fare_supplier_id,
                 booking_block,
                 reqBody,
                 data: response.groupedItineraryResponse,
-                markup_set_id,
                 flight_id,
                 markup_amount,
+                route_type,
             });
             return data[0];
         });

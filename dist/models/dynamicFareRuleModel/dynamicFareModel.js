@@ -19,14 +19,14 @@ class DynamicFareModel extends schema_1.default {
         this.db = db;
     }
     // Dynamic Fare Supplier
-    createSupplier(payload) {
+    createDynamicFareSupplier(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('dynamic_fare_supplier')
                 .withSchema(this.DBO_SCHEMA)
                 .insert(payload, 'id');
         });
     }
-    updateSupplier(id, payload) {
+    updateDynamicFareSupplier(id, payload) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('dynamic_fare_supplier')
                 .withSchema(this.DBO_SCHEMA)
@@ -34,7 +34,7 @@ class DynamicFareModel extends schema_1.default {
                 .where({ id });
         });
     }
-    deleteSupplier(id) {
+    deleteDynamicFareSupplier(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('dynamic_fare_supplier')
                 .withSchema(this.DBO_SCHEMA)
@@ -42,7 +42,7 @@ class DynamicFareModel extends schema_1.default {
                 .where({ id });
         });
     }
-    getSuppliers(payload) {
+    getDynamicFareSuppliers(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             const { set_id, supplier_id, status } = payload;
             return yield this.db('dynamic_fare_supplier as dfs')
@@ -69,7 +69,7 @@ class DynamicFareModel extends schema_1.default {
                 .orderBy('dfs.id', 'desc');
         });
     }
-    getSupplierById(id) {
+    getDynamicFareSupplierById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('dynamic_fare_supplier')
                 .withSchema(this.DBO_SCHEMA)
@@ -193,28 +193,6 @@ class DynamicFareModel extends schema_1.default {
                 .withSchema(this.DBO_SCHEMA)
                 .select('*')
                 .where({ id });
-        });
-    }
-    //get b2c commission
-    getB2CCommission() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('btoc_commission as bc')
-                .withSchema(this.DBO_SCHEMA)
-                .join('dynamic_fare_set as cs', 'cs.id', 'bc.commission_set_id')
-                .select('bc.id', 'bc.commission_set_id', 'cs.name');
-        });
-    }
-    //upsert b2c commission set
-    upsertB2CCommission(payload) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const res = yield this.db('btoc_commission')
-                .withSchema(this.DBO_SCHEMA)
-                .update(payload);
-            if (!res) {
-                yield this.db('btoc_commission')
-                    .withSchema(this.DBO_SCHEMA)
-                    .insert(payload);
-            }
         });
     }
     //get supplier list

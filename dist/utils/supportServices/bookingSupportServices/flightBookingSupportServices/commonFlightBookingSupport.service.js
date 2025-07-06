@@ -146,7 +146,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 trx: this.trx,
                 type: payload.type,
             });
-            const { markup_price, markup_type } = this.getBookingMarkupDetails(payload.flight_data.fare.discount, payload.flight_data.fare.convenience_fee);
+            const { markup_price, markup_type } = this.getBookingMarkupDetails(payload.flight_data.fare.discount, payload.flight_data.fare.base_fare);
             const booking_res = yield flightBookingModel.insertFlightBooking({
                 booking_ref,
                 api: payload.status === flightConstent_1.FLIGHT_BOOKING_IN_PROCESS
@@ -164,7 +164,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 base_fare: payload.flight_data.fare.base_fare,
                 tax: payload.flight_data.fare.total_tax,
                 ait: payload.flight_data.fare.ait,
-                ticket_price: payload.flight_data.fare.total_price,
+                ticket_price: payload.flight_data.fare.payable,
                 markup_price: markup_price,
                 markup_type: markup_type,
                 payable_amount: payload.flight_data.fare.payable,

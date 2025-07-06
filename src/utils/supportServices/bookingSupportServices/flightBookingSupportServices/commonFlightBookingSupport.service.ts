@@ -195,7 +195,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
     });
     const { markup_price, markup_type } = this.getBookingMarkupDetails(
       payload.flight_data.fare.discount,
-      payload.flight_data.fare.convenience_fee
+      payload.flight_data.fare.base_fare
     );
     const booking_res = await flightBookingModel.insertFlightBooking({
       booking_ref,
@@ -217,7 +217,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       base_fare: payload.flight_data.fare.base_fare,
       tax: payload.flight_data.fare.total_tax,
       ait: payload.flight_data.fare.ait,
-      ticket_price: payload.flight_data.fare.total_price,
+      ticket_price: payload.flight_data.fare.payable,
       markup_price: markup_price,
       markup_type: markup_type,
       payable_amount: payload.flight_data.fare.payable,

@@ -21,7 +21,7 @@ class AdminDynamicFareService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
                 const model = this.Model.DynamicFareModel(trx);
-                const check_entry = yield model.getSuppliers({
+                const check_entry = yield model.getDynamicFareSuppliers({
                     set_id: req.body.set_id,
                     supplier_id: req.body.supplier_id,
                 });
@@ -32,7 +32,7 @@ class AdminDynamicFareService extends abstract_service_1.default {
                         message: 'This supplier already exists for this set',
                     };
                 }
-                const res = yield model.createSupplier(req.body);
+                const res = yield model.createDynamicFareSupplier(req.body);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -46,7 +46,9 @@ class AdminDynamicFareService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { set_id } = req.query;
             const model = this.Model.DynamicFareModel();
-            const data = yield model.getSuppliers({ set_id: Number(set_id) });
+            const data = yield model.getDynamicFareSuppliers({
+                set_id: Number(set_id),
+            });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -58,7 +60,7 @@ class AdminDynamicFareService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.Model.DynamicFareModel();
             const { id } = req.params;
-            const existing = yield model.getSupplierById(Number(id));
+            const existing = yield model.getDynamicFareSupplierById(Number(id));
             if (!existing.length) {
                 return {
                     success: false,
@@ -66,7 +68,7 @@ class AdminDynamicFareService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
-            yield model.updateSupplier(Number(id), req.body);
+            yield model.updateDynamicFareSupplier(Number(id), req.body);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -78,7 +80,7 @@ class AdminDynamicFareService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.Model.DynamicFareModel();
             const { id } = req.params;
-            const existing = yield model.getSupplierById(Number(id));
+            const existing = yield model.getDynamicFareSupplierById(Number(id));
             if (!existing.length) {
                 return {
                     success: false,
@@ -86,7 +88,7 @@ class AdminDynamicFareService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
-            yield model.deleteSupplier(Number(id));
+            yield model.deleteDynamicFareSupplier(Number(id));
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -102,12 +104,22 @@ class AdminDynamicFareService extends abstract_service_1.default {
                 const { body } = req.body;
                 const payload = [];
                 for (const elm of body) {
-                    const airlineCodes = elm.airline
-                        .split(',')
-                        .map((code) => code.trim().toUpperCase());
-                    for (const code of airlineCodes) {
-                        payload.push(Object.assign(Object.assign({}, elm), { airline: code }));
+                    const checkDynamic = yield model.getDynamicFareSupplierById(elm.dynamic_fare_supplier_id);
+                    if (checkDynamic.length) {
+                        const airlineCodes = elm.airline
+                            .split(',')
+                            .map((code) => code.trim().toUpperCase());
+                        for (const code of airlineCodes) {
+                            payload.push(Object.assign(Object.assign({}, elm), { airline: code }));
+                        }
                     }
+                }
+                if (!payload.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: 'Dynamic fare supplier id not found.',
+                    };
                 }
                 yield model.createSupplierAirlinesFare(payload);
                 return {
