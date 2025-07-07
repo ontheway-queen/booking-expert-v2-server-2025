@@ -146,7 +146,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 trx: this.trx,
                 type: payload.type,
             });
-            const { markup_price, markup_type } = this.getBookingMarkupDetails(payload.flight_data.fare.discount, payload.flight_data.fare.base_fare);
+            const { markup_price, markup_type } = this.getBookingMarkupDetails(Number(payload.flight_data.fare.discount), Number(payload.flight_data.fare.base_fare));
             const booking_res = yield flightBookingModel.insertFlightBooking({
                 booking_ref,
                 api: payload.status === flightConstent_1.FLIGHT_BOOKING_IN_PROCESS
@@ -164,14 +164,12 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 base_fare: payload.flight_data.fare.base_fare,
                 tax: payload.flight_data.fare.total_tax,
                 ait: payload.flight_data.fare.ait,
-                ticket_price: payload.flight_data.fare.payable,
-                markup_price: markup_price,
-                markup_type: markup_type,
                 payable_amount: payload.flight_data.fare.payable,
                 travel_date: payload.flight_data.flights[0].options[0].departure.date,
                 ticket_issue_last_time: payload.last_time,
                 airline_pnr: payload.airline_pnr,
                 created_by: payload.user_id,
+                vendor_fare: '',
             });
             //insert flight booking price breakdown data
             const passenger_fare = payload.flight_data.passengers.map((passenger) => {
@@ -179,9 +177,11 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                     flight_booking_id: booking_res[0].id,
                     type: passenger.type,
                     total_passenger: passenger.number,
-                    base_fare: passenger.fare.base_fare,
-                    tax: passenger.fare.tax,
-                    total_fare: passenger.fare.total_fare,
+                    base_fare: passenger.per_pax_fare.base_fare,
+                    tax: passenger.per_pax_fare.tax,
+                    ait: passenger.per_pax_fare.ait,
+                    discount: passenger.per_pax_fare.discount,
+                    total_fare: passenger.per_pax_fare.total_fare,
                 };
             });
             yield flightBookingPriceBreakdownModel.insertFlightBookingPriceBreakdown(passenger_fare);

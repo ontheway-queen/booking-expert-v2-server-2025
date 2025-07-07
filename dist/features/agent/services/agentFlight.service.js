@@ -79,7 +79,7 @@ class AgentFlightService extends abstract_service_1.default {
                     }
                 });
                 let sabreData = [];
-                let wfttData = [];
+                let customData = [];
                 if (sabre_supplier_id) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     sabreData = yield sabreSubService.FlightSearch({
@@ -90,8 +90,8 @@ class AgentFlightService extends abstract_service_1.default {
                     });
                 }
                 if (custom_supplier_id) {
-                    const wfttSubService = new wfttFlightSupport_service_1.default(trx);
-                    wfttData = yield wfttSubService.FlightSearch({
+                    const customSubService = new wfttFlightSupport_service_1.default(trx);
+                    customData = yield customSubService.FlightSearch({
                         booking_block: false,
                         reqBody: body,
                         dynamic_fare_supplier_id: custom_supplier_id,
@@ -107,7 +107,7 @@ class AgentFlightService extends abstract_service_1.default {
                         arrivalLocation: OrDeInfo.DestinationLocation.LocationCode,
                     };
                 });
-                const results = [...sabreData, ...wfttData];
+                const results = [...sabreData, ...customData];
                 results.sort((a, b) => a.fare.payable - b.fare.payable);
                 const responseData = {
                     search_id,
@@ -398,7 +398,7 @@ class AgentFlightService extends abstract_service_1.default {
                 if (!booking_confirm) {
                     const price_changed = yield flightSupportService.checkBookingPriceChange({
                         flight_id: body.flight_id,
-                        booking_price: data.fare.payable,
+                        booking_price: Number(data.fare.payable),
                     });
                     if (price_changed === true) {
                         return {

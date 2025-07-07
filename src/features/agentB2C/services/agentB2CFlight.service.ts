@@ -445,7 +445,7 @@ export class AgentB2CFlightService extends AbstractServices {
         const price_changed =
           await flightSupportService.checkBookingPriceChange({
             flight_id: body.flight_id,
-            booking_price: data.fare.payable,
+            booking_price: Number(data.fare.payable),
           });
         if (price_changed === true) {
           return {

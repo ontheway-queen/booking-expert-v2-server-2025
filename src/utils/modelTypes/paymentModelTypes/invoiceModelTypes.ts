@@ -19,8 +19,8 @@ export interface ICreateInvoicePayload {
   user_id: number;
   ref_id: number;
   ref_type: string;
-  total_amount: number;
-  due: number;
+  total_amount: number | string;
+  due: number | string;
   details: string;
   type:
     | typeof INVOICE_TYPES.SALE

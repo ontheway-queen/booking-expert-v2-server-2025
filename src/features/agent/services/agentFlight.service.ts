@@ -102,7 +102,7 @@ export class AgentFlightService extends AbstractServices {
       });
 
       let sabreData: any[] = [];
-      let wfttData: any[] = [];
+      let customData: any[] = [];
 
       if (sabre_supplier_id) {
         const sabreSubService = new SabreFlightService(trx);
@@ -113,9 +113,10 @@ export class AgentFlightService extends AbstractServices {
           markup_amount,
         });
       }
+
       if (custom_supplier_id) {
-        const wfttSubService = new WfttFlightService(trx);
-        wfttData = await wfttSubService.FlightSearch({
+        const customSubService = new WfttFlightService(trx);
+        customData = await customSubService.FlightSearch({
           booking_block: false,
           reqBody: body,
           dynamic_fare_supplier_id: custom_supplier_id,
@@ -135,7 +136,7 @@ export class AgentFlightService extends AbstractServices {
         }
       );
 
-      const results: any[] = [...sabreData, ...wfttData];
+      const results: any[] = [...sabreData, ...customData];
 
       results.sort((a, b) => a.fare.payable - b.fare.payable);
 
@@ -492,7 +493,7 @@ export class AgentFlightService extends AbstractServices {
         const price_changed =
           await flightSupportService.checkBookingPriceChange({
             flight_id: body.flight_id,
-            booking_price: data.fare.payable,
+            booking_price: Number(data.fare.payable),
           });
 
         if (price_changed === true) {

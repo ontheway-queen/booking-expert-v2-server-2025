@@ -7,3 +7,5 @@
 -- new type dbo.type_airline_preference
 -- new table dbo.dynamic_fare_tax
 -- new table dbo.supplier_airlines_dynamic_fare
+-- dbo.flight_booking_price_breakdown add new column ait, discount
+-- dbo.flight_booking add new column vendor_fare, discount . removed ticket_price,markup_price,markup_type

@@ -65,7 +65,7 @@ class WfttFlightService extends abstract_service_1.default {
             const cappingAirlinesRaw = yield AirlinesPrefModel.getAirlinePrefCodes(prefAirlinesQuery);
             const { JourneyType, airline_code, OriginDestinationInformation, PassengerTypeQuantity, } = reqBody;
             let finalAirlineCodes = [];
-            if (airline_code.length) {
+            if (airline_code === null || airline_code === void 0 ? void 0 : airline_code.length) {
                 for (const code of airline_code) {
                     const found = cappingAirlinesRaw.find((item) => item.Code === code.Code);
                     if (found) {
@@ -97,6 +97,7 @@ class WfttFlightService extends abstract_service_1.default {
                 reqBody,
                 route_type,
             });
+            console.log({ formattedReqBody });
             const response = yield this.request.postRequest(wfttApiEndpoints_1.default.FLIGHT_SEARCH_ENDPOINT, formattedReqBody);
             if (!response) {
                 return [];
@@ -125,26 +126,14 @@ class WfttFlightService extends abstract_service_1.default {
                 airports.push(item.OriginLocation.LocationCode);
                 airports.push(item.DestinationLocation.LocationCode);
             });
-            const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
             const commonModel = this.Model.CommonModel(this.trx);
+            let pax_count = 0;
+            reqBody.PassengerTypeQuantity.map((reqPax) => {
+                pax_count += reqPax.Quantity;
+            });
             const formattedData = yield Promise.all(data.map((item) => __awaiter(this, void 0, void 0, function* () {
                 const domestic_flight = route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC;
-                const { isDomesticFlight, fare: vendor_fare, api, carrier_code, carrier_logo, api_search_id, flights } = item, rest = __rest(item, ["isDomesticFlight", "fare", "api", "carrier_code", "carrier_logo", "api_search_id", "flights"]);
-                let fare = {
-                    base_fare: vendor_fare.base_fare,
-                    total_tax: vendor_fare.total_tax,
-                    discount: vendor_fare.discount,
-                    payable: vendor_fare.payable,
-                    ait: vendor_fare.ait,
-                    vendor_price: {
-                        base_fare: vendor_fare.base_fare,
-                        charge: 0,
-                        discount: vendor_fare.discount,
-                        gross_fare: vendor_fare.total_price,
-                        net_fare: vendor_fare.payable,
-                        tax: vendor_fare.total_tax,
-                    },
-                };
+                const { isDomesticFlight, fare: vendor_fare, api, carrier_code, carrier_logo, api_search_id, flights, passengers } = item, rest = __rest(item, ["isDomesticFlight", "fare", "api", "carrier_code", "carrier_logo", "api_search_id", "flights", "passengers"]);
                 const newFlights = yield Promise.all(flights.map((flight) => __awaiter(this, void 0, void 0, function* () {
                     const { options } = flight;
                     const newOptions = yield Promise.all(options.map((option) => __awaiter(this, void 0, void 0, function* () {
@@ -180,10 +169,54 @@ class WfttFlightService extends abstract_service_1.default {
                     total_segments,
                     route_type,
                 });
+                const total_pax_markup = pax_markup * pax_count;
+                let fare = {
+                    base_fare: vendor_fare.base_fare + markup + total_pax_markup,
+                    total_tax: vendor_fare.total_tax,
+                    discount: commission,
+                    ait: vendor_fare.ait,
+                    payable: (vendor_fare.base_fare +
+                        markup +
+                        total_pax_markup +
+                        vendor_fare.total_tax +
+                        vendor_fare.ait -
+                        commission).toFixed(2),
+                    vendor_price: {
+                        base_fare: vendor_fare.base_fare,
+                        charge: 0,
+                        discount: vendor_fare.discount,
+                        ait: vendor_fare.ait,
+                        gross_fare: vendor_fare.total_price,
+                        net_fare: vendor_fare.payable,
+                        tax: vendor_fare.total_tax,
+                    },
+                };
+                const newPassenger = passengers.map((oldPax) => {
+                    const per_pax_discount = commission / pax_count;
+                    const per_pax_markup = markup / pax_count;
+                    const total_pax_markup = pax_markup + per_pax_markup;
+                    const per_pax_ait = Number(fare.ait) / pax_count;
+                    const per_pax_tax = oldPax.fare.tax / oldPax.number;
+                    const per_pax_base_fare = oldPax.fare.base_fare / oldPax.number;
+                    return {
+                        type: oldPax.type,
+                        number: oldPax.number,
+                        per_pax_fare: {
+                            base_fare: (per_pax_base_fare + total_pax_markup).toFixed(2),
+                            tax: per_pax_tax.toFixed(2),
+                            ait: per_pax_ait.toFixed(2),
+                            discount: per_pax_discount.toFixed(2),
+                            total_fare: (per_pax_base_fare +
+                                total_pax_markup +
+                                per_pax_ait +
+                                per_pax_tax -
+                                per_pax_discount).toFixed(2),
+                        },
+                    };
+                });
                 const career = yield commonModel.getAirlineByCode(carrier_code);
-                // const career =
                 return Object.assign(Object.assign({ domestic_flight,
-                    fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API, carrier_code, carrier_logo: career.logo, flights: newFlights }, rest), { leg_description: [] });
+                    fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API, carrier_code, carrier_logo: career.logo, flights: newFlights, passengers: newPassenger }, rest), { leg_description: [] });
             })));
             return formattedData;
         });

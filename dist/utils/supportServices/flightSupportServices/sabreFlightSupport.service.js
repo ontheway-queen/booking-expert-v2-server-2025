@@ -192,7 +192,7 @@ class SabreFlightService extends abstract_service_1.default {
     // Flight search Response formatter
     FlightSearchResFormatter(_a) {
         return __awaiter(this, arguments, void 0, function* ({ dynamic_fare_supplier_id, booking_block, data, reqBody, markup_amount, route_type, flight_id, }) {
-            var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x;
+            var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0;
             const commonModel = this.Model.CommonModel(this.trx);
             const AirlinesPreferenceModel = this.Model.AirlinesPreferenceModel(this.trx);
             const getBlockedAirlinesPayload = {
@@ -293,7 +293,7 @@ class SabreFlightService extends abstract_service_1.default {
             });
             const itineraryGroup = data.itineraryGroups[0];
             const itineraries = [];
-            for (let i = 0; i < itineraryGroup.itineraries.length; i++) {
+            for (let i = 0; i < ((_t = itineraryGroup.itineraries) === null || _t === void 0 ? void 0 : _t.length); i++) {
                 const itinerary = itineraryGroup.itineraries[i];
                 const fare = itinerary.pricingInformation[0].fare;
                 const validatingCarrier = yield commonModel.getAirlines({ code: fare.validatingCarrierCode }, false);
@@ -310,21 +310,182 @@ class SabreFlightService extends abstract_service_1.default {
                     0.3);
                 const new_fare = {
                     base_fare: fare.totalFare.equivalentAmount,
-                    total_tax: Number(fare.totalFare.totalTaxAmount),
+                    total_tax: fare.totalFare.totalTaxAmount,
                     ait,
                     discount: 0,
-                    payable: Number(fare.totalFare.equivalentAmount) +
-                        Number(fare.totalFare.totalTaxAmount) +
-                        ait,
+                    payable: fare.totalFare.equivalentAmount + fare.totalFare.totalTaxAmount + ait,
                     vendor_price: {
                         base_fare: fare.totalFare.equivalentAmount,
                         tax: fare.totalFare.totalTaxAmount,
+                        ait: 0,
                         charge: 0,
                         discount: 0,
                         gross_fare: Number(fare.totalFare.totalPrice),
                         net_fare: Number(fare.totalFare.totalPrice),
                     },
                 };
+                let partial_payment = {
+                    partial_payment: false,
+                    payment_percentage: 100,
+                    travel_date_from_now: 0,
+                };
+                if (route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC) {
+                    //domestic
+                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
+                        flight_api_name: flightConstent_1.SABRE_API,
+                        airline: fare.validatingCarrierCode,
+                        refundable,
+                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
+                        domestic: true,
+                    });
+                }
+                else if (route_type === flightConstent_1.ROUTE_TYPE.FROM_DAC) {
+                    //from dac
+                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
+                        flight_api_name: flightConstent_1.SABRE_API,
+                        airline: fare.validatingCarrierCode,
+                        from_dac: true,
+                        refundable,
+                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
+                    });
+                }
+                else if (route_type === flightConstent_1.ROUTE_TYPE.TO_DAC) {
+                    //to dac
+                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
+                        flight_api_name: flightConstent_1.SABRE_API,
+                        airline: fare.validatingCarrierCode,
+                        to_dac: true,
+                        refundable,
+                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
+                    });
+                }
+                else {
+                    //soto
+                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
+                        flight_api_name: flightConstent_1.SABRE_API,
+                        airline: fare.validatingCarrierCode,
+                        refundable,
+                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
+                        soto: true,
+                    });
+                }
+                let total_segments = 0;
+                legsDesc.map((elm) => {
+                    elm.options.map((elm2) => {
+                        total_segments++;
+                    });
+                });
+                const { markup, commission, pax_markup } = yield this.flightSupport.calculateFlightMarkup({
+                    dynamic_fare_supplier_id,
+                    airline: fare.validatingCarrierCode,
+                    flight_class: this.flightUtils.getClassFromId(reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
+                        .Cabin),
+                    base_fare: fare.totalFare.equivalentAmount,
+                    total_segments,
+                    route_type,
+                });
+                let pax_count = 0;
+                reqBody.PassengerTypeQuantity.map((reqPax) => {
+                    pax_count += reqPax.Quantity;
+                });
+                for (const passenger of fare.passengerInfoList) {
+                    const passenger_info = passenger.passengerInfo;
+                    refundable = !passenger_info.nonRefundable;
+                    const segmentDetails = [];
+                    let legInd = 0;
+                    let segInd = 0;
+                    let segments = [];
+                    for (let i = 0; i < ((_u = passenger_info.fareComponents) === null || _u === void 0 ? void 0 : _u.length); i++) {
+                        const pfd = passenger_info.fareComponents[i];
+                        for (let j = 0; j < ((_v = pfd.segments) === null || _v === void 0 ? void 0 : _v.length); j++) {
+                            const segd = pfd.segments[j];
+                            const segment = segd === null || segd === void 0 ? void 0 : segd.segment;
+                            if (segment !== undefined) {
+                                const meal_type = this.flightUtils.getMeal((segment === null || segment === void 0 ? void 0 : segment.mealCode) || '');
+                                const cabin_type = this.flightUtils.getCabin((segment === null || segment === void 0 ? void 0 : segment.cabinCode) || '');
+                                segments.push({
+                                    id: j + 1,
+                                    name: `Segment-${j + 1}`,
+                                    meal_type: meal_type === null || meal_type === void 0 ? void 0 : meal_type.name,
+                                    meal_code: meal_type === null || meal_type === void 0 ? void 0 : meal_type.code,
+                                    cabin_code: cabin_type === null || cabin_type === void 0 ? void 0 : cabin_type.code,
+                                    cabin_type: cabin_type === null || cabin_type === void 0 ? void 0 : cabin_type.name,
+                                    booking_code: segment === null || segment === void 0 ? void 0 : segment.bookingCode,
+                                    available_seat: segment === null || segment === void 0 ? void 0 : segment.seatsAvailable,
+                                    available_break: segment === null || segment === void 0 ? void 0 : segment.availabilityBreak,
+                                    available_fare_break: segment === null || segment === void 0 ? void 0 : segment.fareBreakPoint,
+                                });
+                            }
+                            segInd++;
+                        }
+                        let newBaggage = {};
+                        if (passenger_info.baggageInformation) {
+                            const baggage = passenger_info.baggageInformation[i];
+                            if (baggage) {
+                                const allowance_id = (_w = baggage === null || baggage === void 0 ? void 0 : baggage.allowance) === null || _w === void 0 ? void 0 : _w.ref;
+                                newBaggage = data.baggageAllowanceDescs.find((all_item) => all_item.id === allowance_id);
+                            }
+                        }
+                        //all the segments are in one fareComponents object for each leg
+                        if (pfd.endAirport ===
+                            reqBody.OriginDestinationInformation[legInd].DestinationLocation
+                                .LocationCode) {
+                            legInd++;
+                            segInd = 0;
+                        }
+                        //segments are in different fareComponents object for each leg
+                        else {
+                            continue;
+                        }
+                        segmentDetails.push({
+                            id: i + 1,
+                            from_airport: reqBody.OriginDestinationInformation[legInd - 1].OriginLocation
+                                .LocationCode,
+                            to_airport: reqBody.OriginDestinationInformation[legInd - 1]
+                                .DestinationLocation.LocationCode,
+                            segments,
+                            baggage: (newBaggage === null || newBaggage === void 0 ? void 0 : newBaggage.id)
+                                ? {
+                                    id: newBaggage === null || newBaggage === void 0 ? void 0 : newBaggage.id,
+                                    unit: newBaggage.unit || 'pieces',
+                                    count: newBaggage.weight || newBaggage.pieceCount,
+                                }
+                                : {
+                                    id: 1,
+                                    unit: 'N/A',
+                                    count: 'N/A',
+                                },
+                        });
+                        segments = [];
+                    }
+                    baggageAndAvailabilityAllSeg.push({
+                        passenger_type: passenger.passengerInfo.passengerType,
+                        passenger_count: passenger.passengerInfo.passengerNumber,
+                        segmentDetails,
+                    });
+                    const per_pax_discount = commission / pax_count;
+                    const per_pax_markup = markup / pax_count;
+                    const total_pax_markup = pax_markup + per_pax_markup;
+                    const per_pax_ait = ait / pax_count;
+                    const per_pax_tax = passenger_info.passengerTotalFare.totalTaxAmount;
+                    const new_passenger = {
+                        type: passenger_info.passengerType,
+                        number: passenger_info.passengerNumber,
+                        per_pax_fare: {
+                            base_fare: (Number(passenger_info.passengerTotalFare.equivalentAmount) +
+                                total_pax_markup).toFixed(2),
+                            tax: per_pax_tax.toFixed(2),
+                            ait: per_pax_ait.toFixed(2),
+                            discount: per_pax_discount.toFixed(2),
+                            total_fare: (per_pax_ait +
+                                total_pax_markup +
+                                per_pax_tax +
+                                Number(passenger_info.passengerTotalFare.equivalentAmount) -
+                                per_pax_discount).toFixed(2),
+                        },
+                    };
+                    passenger_lists.push(new_passenger);
+                }
                 const availability = [];
                 baggageAndAvailabilityAllSeg.forEach((item) => {
                     const { segmentDetails } = item;
@@ -408,157 +569,16 @@ class SabreFlightService extends abstract_service_1.default {
                         }
                     });
                 });
-                let partial_payment = {
-                    partial_payment: false,
-                    payment_percentage: 100,
-                    travel_date_from_now: 0,
-                };
-                if (route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC) {
-                    //domestic
-                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.SABRE_API,
-                        airline: fare.validatingCarrierCode,
-                        refundable,
-                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
-                        domestic: true,
-                    });
-                }
-                else if (route_type === flightConstent_1.ROUTE_TYPE.FROM_DAC) {
-                    //from dac
-                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.SABRE_API,
-                        airline: fare.validatingCarrierCode,
-                        from_dac: true,
-                        refundable,
-                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
-                    });
-                }
-                else if (route_type === flightConstent_1.ROUTE_TYPE.TO_DAC) {
-                    //to dac
-                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.SABRE_API,
-                        airline: fare.validatingCarrierCode,
-                        to_dac: true,
-                        refundable,
-                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
-                    });
-                }
-                else {
-                    //soto
-                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.SABRE_API,
-                        airline: fare.validatingCarrierCode,
-                        refundable,
-                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
-                        soto: true,
-                    });
-                }
-                let total_segments = 0;
-                legsDesc.map((elm) => {
-                    elm.options.map((elm2) => {
-                        total_segments++;
-                    });
-                });
-                const { markup, commission, pax_markup } = yield this.flightSupport.calculateFlightMarkup({
-                    dynamic_fare_supplier_id,
-                    airline: fare.validatingCarrierCode,
-                    flight_class: this.flightUtils.getClassFromId(reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
-                        .Cabin),
-                    base_fare: fare.totalFare.equivalentAmount,
-                    total_segments,
-                    route_type,
-                });
-                let pax_count = 0;
-                reqBody.PassengerTypeQuantity.map((reqPax) => {
-                    pax_count += reqPax.Quantity;
-                });
-                for (const passenger of fare.passengerInfoList) {
-                    const passenger_info = passenger.passengerInfo;
-                    refundable = !passenger_info.nonRefundable;
-                    const segmentDetails = [];
-                    let legInd = 0;
-                    let segInd = 0;
-                    let segments = [];
-                    for (let i = 0; i < passenger_info.fareComponents.length; i++) {
-                        const pfd = passenger_info.fareComponents[i];
-                        for (let j = 0; j < pfd.segments.length; j++) {
-                            const segd = pfd.segments[j];
-                            const segment = segd === null || segd === void 0 ? void 0 : segd.segment;
-                            if (segment !== undefined) {
-                                const meal_type = this.flightUtils.getMeal((segment === null || segment === void 0 ? void 0 : segment.mealCode) || '');
-                                const cabin_type = this.flightUtils.getCabin((segment === null || segment === void 0 ? void 0 : segment.cabinCode) || '');
-                                segments.push({
-                                    id: j + 1,
-                                    name: `Segment-${j + 1}`,
-                                    meal_type: meal_type === null || meal_type === void 0 ? void 0 : meal_type.name,
-                                    meal_code: meal_type === null || meal_type === void 0 ? void 0 : meal_type.code,
-                                    cabin_code: cabin_type === null || cabin_type === void 0 ? void 0 : cabin_type.code,
-                                    cabin_type: cabin_type === null || cabin_type === void 0 ? void 0 : cabin_type.name,
-                                    booking_code: segment === null || segment === void 0 ? void 0 : segment.bookingCode,
-                                    available_seat: segment === null || segment === void 0 ? void 0 : segment.seatsAvailable,
-                                    available_break: segment === null || segment === void 0 ? void 0 : segment.availabilityBreak,
-                                    available_fare_break: segment === null || segment === void 0 ? void 0 : segment.fareBreakPoint,
-                                });
-                            }
-                            segInd++;
-                        }
-                        let newBaggage = {};
-                        if (passenger_info.baggageInformation) {
-                            const baggage = passenger_info.baggageInformation[i];
-                            if (baggage) {
-                                const allowance_id = (_t = baggage === null || baggage === void 0 ? void 0 : baggage.allowance) === null || _t === void 0 ? void 0 : _t.ref;
-                                newBaggage = data.baggageAllowanceDescs.find((all_item) => all_item.id === allowance_id);
-                            }
-                        }
-                        //all the segments are in one fareComponents object for each leg
-                        if (pfd.endAirport ===
-                            reqBody.OriginDestinationInformation[legInd].DestinationLocation
-                                .LocationCode) {
-                            legInd++;
-                            segInd = 0;
-                        }
-                        //segments are in different fareComponents object for each leg
-                        else {
-                            continue;
-                        }
-                        segmentDetails.push({
-                            id: i + 1,
-                            from_airport: reqBody.OriginDestinationInformation[legInd - 1].OriginLocation
-                                .LocationCode,
-                            to_airport: reqBody.OriginDestinationInformation[legInd - 1]
-                                .DestinationLocation.LocationCode,
-                            segments,
-                            baggage: (newBaggage === null || newBaggage === void 0 ? void 0 : newBaggage.id)
-                                ? {
-                                    id: newBaggage === null || newBaggage === void 0 ? void 0 : newBaggage.id,
-                                    unit: newBaggage.unit || 'pieces',
-                                    count: newBaggage.weight || newBaggage.pieceCount,
-                                }
-                                : {
-                                    id: 1,
-                                    unit: 'N/A',
-                                    count: 'N/A',
-                                },
-                        });
-                        segments = [];
-                    }
-                    baggageAndAvailabilityAllSeg.push({
-                        passenger_type: passenger.passengerInfo.passengerType,
-                        passenger_count: passenger.passengerInfo.passengerNumber,
-                        segmentDetails,
-                    });
-                    const new_passenger = {
-                        type: passenger_info.passengerType,
-                        number: passenger_info.passengerNumber,
-                        fare: {
-                            total_fare: passenger_info.passengerTotalFare.totalFare,
-                            tax: passenger_info.passengerTotalFare.totalTaxAmount,
-                            base_fare: passenger_info.passengerTotalFare.equivalentAmount,
-                        },
-                    };
-                    passenger_lists.push(new_passenger);
-                }
-                const itinery = {
+                const total_pax_markup = pax_markup * pax_count;
+                new_fare.base_fare = (markup +
+                    total_pax_markup +
+                    Number(new_fare.base_fare)).toFixed(2);
+                new_fare.discount = (Number(new_fare.discount) + commission).toFixed(2);
+                new_fare.payable = (Number(new_fare.base_fare) +
+                    Number(new_fare.total_tax) +
+                    Number(new_fare.ait) -
+                    Number(new_fare.discount)).toFixed(2);
+                const newItinerary = {
                     flight_id: flight_id || (0, uuid_1.v4)(),
                     api_search_id: '',
                     booking_block,
@@ -572,8 +592,8 @@ class SabreFlightService extends abstract_service_1.default {
                     fare: new_fare,
                     refundable,
                     carrier_code: fare.validatingCarrierCode,
-                    carrier_name: ((_v = (_u = validatingCarrier.data) === null || _u === void 0 ? void 0 : _u[0]) === null || _v === void 0 ? void 0 : _v.name) || '-',
-                    carrier_logo: ((_x = (_w = validatingCarrier.data) === null || _w === void 0 ? void 0 : _w[0]) === null || _x === void 0 ? void 0 : _x.logo) || '-',
+                    carrier_name: ((_y = (_x = validatingCarrier.data) === null || _x === void 0 ? void 0 : _x[0]) === null || _y === void 0 ? void 0 : _y.name) || '-',
+                    carrier_logo: ((_0 = (_z = validatingCarrier.data) === null || _z === void 0 ? void 0 : _z[0]) === null || _0 === void 0 ? void 0 : _0.logo) || '-',
                     ticket_last_date: fare.lastTicketDate,
                     ticket_last_time: fare.lastTicketTime,
                     flights: legsDesc,
@@ -581,7 +601,7 @@ class SabreFlightService extends abstract_service_1.default {
                     availability,
                     leg_description: [],
                 };
-                itineraries.push(itinery);
+                itineraries.push(newItinerary);
             }
             return itineraries;
         });
@@ -1166,7 +1186,7 @@ class SabreFlightService extends abstract_service_1.default {
     //ticket issue service
     TicketIssueService(_a) {
         return __awaiter(this, arguments, void 0, function* ({ pnr, unique_traveler, }) {
-            var _b, _c;
+            var _b, _c, _d;
             const ticketReqBody = this.SabreTicketIssueReqFormatter(pnr, unique_traveler);
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.TICKET_ISSUE_ENDPOINT, ticketReqBody);
             if (((_c = (_b = response === null || response === void 0 ? void 0 : response.AirTicketRS) === null || _b === void 0 ? void 0 : _b.ApplicationResults) === null || _c === void 0 ? void 0 : _c.status) === 'Complete') {
@@ -1194,7 +1214,7 @@ class SabreFlightService extends abstract_service_1.default {
                     // };
                 }
                 const ticket_number = [];
-                for (let i = 0; i < retrieve_booking.flightTickets.length; i++) {
+                for (let i = 0; i < ((_d = retrieve_booking.flightTickets) === null || _d === void 0 ? void 0 : _d.length); i++) {
                     ticket_number.push(retrieve_booking.flightTickets[i].number);
                 }
                 return {

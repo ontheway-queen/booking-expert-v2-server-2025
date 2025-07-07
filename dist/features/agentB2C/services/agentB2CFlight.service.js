@@ -375,7 +375,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 if (!booking_confirm) {
                     const price_changed = yield flightSupportService.checkBookingPriceChange({
                         flight_id: body.flight_id,
-                        booking_price: data.fare.payable,
+                        booking_price: Number(data.fare.payable),
                     });
                     if (price_changed === true) {
                         return {

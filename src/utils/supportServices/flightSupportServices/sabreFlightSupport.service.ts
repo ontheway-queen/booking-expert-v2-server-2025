@@ -27,6 +27,7 @@ import {
   IFlightSearchReqBody,
   IFlightAvailability,
   IFlightDataAvailabilitySegment,
+  IFormattedFare,
 } from '../../supportTypes/flightTypes/commonFlightTypes';
 import {
   IBaggageAndAvailabilityAllSeg,
@@ -245,6 +246,7 @@ export default class SabreFlightService extends AbstractServices {
     if (response.groupedItineraryResponse.statistics.itineraryCount === 0) {
       return [];
     }
+
     const result = await this.FlightSearchResFormatter({
       data: response.groupedItineraryResponse,
       reqBody: reqBody,
@@ -414,7 +416,7 @@ export default class SabreFlightService extends AbstractServices {
 
     const itineraries: IFormattedFlightItinerary[] = [];
 
-    for (let i = 0; i < itineraryGroup.itineraries.length; i++) {
+    for (let i = 0; i < itineraryGroup.itineraries?.length; i++) {
       const itinerary = itineraryGroup.itineraries[i];
       const fare = itinerary.pricingInformation[0].fare;
 
@@ -447,118 +449,23 @@ export default class SabreFlightService extends AbstractServices {
           0.3
       );
 
-      const new_fare = {
+      const new_fare: IFormattedFare = {
         base_fare: fare.totalFare.equivalentAmount,
-        total_tax: Number(fare.totalFare.totalTaxAmount),
+        total_tax: fare.totalFare.totalTaxAmount,
         ait,
         discount: 0,
         payable:
-          Number(fare.totalFare.equivalentAmount) +
-          Number(fare.totalFare.totalTaxAmount) +
-          ait,
+          fare.totalFare.equivalentAmount + fare.totalFare.totalTaxAmount + ait,
         vendor_price: {
           base_fare: fare.totalFare.equivalentAmount,
           tax: fare.totalFare.totalTaxAmount,
+          ait: 0,
           charge: 0,
           discount: 0,
           gross_fare: Number(fare.totalFare.totalPrice),
           net_fare: Number(fare.totalFare.totalPrice),
         },
       };
-
-      const availability: IFlightAvailability[] = [];
-
-      baggageAndAvailabilityAllSeg.forEach((item) => {
-        const { segmentDetails } = item;
-        segmentDetails.forEach((item2) => {
-          const foundData = availability.find(
-            (avItem) =>
-              avItem.from_airport === item2.from_airport &&
-              avItem.to_airport === item2.to_airport
-          );
-
-          if (foundData) {
-            const { segments } = foundData;
-            item2.segments.forEach((item3) => {
-              const segmentFound = segments.find(
-                (segs) => item3.name === segs.name
-              );
-
-              if (segmentFound) {
-                const passenger = segmentFound.passenger.find(
-                  (pas) => pas.type === item.passenger_type
-                );
-
-                if (!passenger) {
-                  segmentFound.passenger.push({
-                    type: item.passenger_type,
-                    count: item.passenger_count,
-                    meal_type: item3.meal_type,
-                    meal_code: item3.meal_code,
-                    cabin_code: item3.cabin_code,
-                    cabin_type: item3.cabin_type,
-                    booking_code: item3.booking_code,
-                    available_seat: item3.available_seat,
-                    available_break: item3.available_break,
-                    available_fare_break: item3.available_fare_break,
-                    baggage_unit: item2.baggage.unit,
-                    baggage_count: item2.baggage.count,
-                  });
-                }
-              } else {
-                segments.push({
-                  name: item3.name,
-                  passenger: [
-                    {
-                      type: item.passenger_type,
-                      count: item.passenger_count,
-                      meal_type: item3.meal_type,
-                      meal_code: item3.meal_code,
-                      cabin_code: item3.cabin_code,
-                      cabin_type: item3.cabin_type,
-                      booking_code: item3.booking_code,
-                      available_seat: item3.available_seat,
-                      available_break: item3.available_break,
-                      available_fare_break: item3.available_fare_break,
-                      baggage_unit: item2.baggage.unit,
-                      baggage_count: item2.baggage.count,
-                    },
-                  ],
-                });
-              }
-            });
-          } else {
-            const segments: IFlightDataAvailabilitySegment[] = [];
-
-            item2.segments.forEach((item3) => {
-              segments.push({
-                name: item3.name,
-                passenger: [
-                  {
-                    type: item.passenger_type,
-                    count: item.passenger_count,
-                    meal_type: item3.meal_type,
-                    meal_code: item3.meal_code,
-                    cabin_code: item3.cabin_code,
-                    cabin_type: item3.cabin_type,
-                    booking_code: item3.booking_code,
-                    available_seat: item3.available_seat,
-                    available_break: item3.available_break,
-                    available_fare_break: item3.available_fare_break,
-                    baggage_unit: item2.baggage.unit,
-                    baggage_count: item2.baggage.count,
-                  },
-                ],
-              });
-            });
-            availability.push({
-              from_airport: item2.from_airport,
-              to_airport: item2.to_airport,
-              segments,
-            });
-          }
-        });
-      });
 
       let partial_payment: {
         partial_payment: boolean;
@@ -657,10 +564,9 @@ export default class SabreFlightService extends AbstractServices {
         let segInd = 0;
         let segments: any[] = [];
 
-        for (let i = 0; i < passenger_info.fareComponents.length; i++) {
+        for (let i = 0; i < passenger_info.fareComponents?.length; i++) {
           const pfd = passenger_info.fareComponents[i];
-
-          for (let j = 0; j < pfd.segments.length; j++) {
+          for (let j = 0; j < pfd.segments?.length; j++) {
             const segd = pfd.segments[j];
             const segment = segd?.segment;
             if (segment !== undefined) {
@@ -742,21 +648,151 @@ export default class SabreFlightService extends AbstractServices {
           segmentDetails,
         });
 
+        const per_pax_discount = commission / pax_count;
+        const per_pax_markup = markup / pax_count;
+
+        const total_pax_markup = pax_markup + per_pax_markup;
+
+        const per_pax_ait = ait / pax_count;
+
+        const per_pax_tax = passenger_info.passengerTotalFare.totalTaxAmount;
+
         const new_passenger: ISabreNewPassenger = {
           type: passenger_info.passengerType,
           number: passenger_info.passengerNumber,
-
-          fare: {
-            total_fare: passenger_info.passengerTotalFare.totalFare,
-            tax: passenger_info.passengerTotalFare.totalTaxAmount,
-            base_fare: passenger_info.passengerTotalFare.equivalentAmount,
+          per_pax_fare: {
+            base_fare: (
+              Number(passenger_info.passengerTotalFare.equivalentAmount) +
+              total_pax_markup
+            ).toFixed(2),
+            tax: per_pax_tax.toFixed(2),
+            ait: per_pax_ait.toFixed(2),
+            discount: per_pax_discount.toFixed(2),
+            total_fare: (
+              per_pax_ait +
+              total_pax_markup +
+              per_pax_tax +
+              Number(passenger_info.passengerTotalFare.equivalentAmount) -
+              per_pax_discount
+            ).toFixed(2),
           },
         };
 
         passenger_lists.push(new_passenger);
       }
 
-      const itinery: IFormattedFlightItinerary = {
+      const availability: IFlightAvailability[] = [];
+
+      baggageAndAvailabilityAllSeg.forEach((item) => {
+        const { segmentDetails } = item;
+        segmentDetails.forEach((item2) => {
+          const foundData = availability.find(
+            (avItem) =>
+              avItem.from_airport === item2.from_airport &&
+              avItem.to_airport === item2.to_airport
+          );
+
+          if (foundData) {
+            const { segments } = foundData;
+            item2.segments.forEach((item3) => {
+              const segmentFound = segments.find(
+                (segs) => item3.name === segs.name
+              );
+
+              if (segmentFound) {
+                const passenger = segmentFound.passenger.find(
+                  (pas) => pas.type === item.passenger_type
+                );
+
+                if (!passenger) {
+                  segmentFound.passenger.push({
+                    type: item.passenger_type,
+                    count: item.passenger_count,
+                    meal_type: item3.meal_type,
+                    meal_code: item3.meal_code,
+                    cabin_code: item3.cabin_code,
+                    cabin_type: item3.cabin_type,
+                    booking_code: item3.booking_code,
+                    available_seat: item3.available_seat,
+                    available_break: item3.available_break,
+                    available_fare_break: item3.available_fare_break,
+                    baggage_unit: item2.baggage.unit,
+                    baggage_count: item2.baggage.count,
+                  });
+                }
+              } else {
+                segments.push({
+                  name: item3.name,
+                  passenger: [
+                    {
+                      type: item.passenger_type,
+                      count: item.passenger_count,
+                      meal_type: item3.meal_type,
+                      meal_code: item3.meal_code,
+                      cabin_code: item3.cabin_code,
+                      cabin_type: item3.cabin_type,
+                      booking_code: item3.booking_code,
+                      available_seat: item3.available_seat,
+                      available_break: item3.available_break,
+                      available_fare_break: item3.available_fare_break,
+                      baggage_unit: item2.baggage.unit,
+                      baggage_count: item2.baggage.count,
+                    },
+                  ],
+                });
+              }
+            });
+          } else {
+            const segments: IFlightDataAvailabilitySegment[] = [];
+
+            item2.segments.forEach((item3) => {
+              segments.push({
+                name: item3.name,
+                passenger: [
+                  {
+                    type: item.passenger_type,
+                    count: item.passenger_count,
+                    meal_type: item3.meal_type,
+                    meal_code: item3.meal_code,
+                    cabin_code: item3.cabin_code,
+                    cabin_type: item3.cabin_type,
+                    booking_code: item3.booking_code,
+                    available_seat: item3.available_seat,
+                    available_break: item3.available_break,
+                    available_fare_break: item3.available_fare_break,
+                    baggage_unit: item2.baggage.unit,
+                    baggage_count: item2.baggage.count,
+                  },
+                ],
+              });
+            });
+            availability.push({
+              from_airport: item2.from_airport,
+              to_airport: item2.to_airport,
+              segments,
+            });
+          }
+        });
+      });
+
+      const total_pax_markup = pax_markup * pax_count;
+
+      new_fare.base_fare = (
+        markup +
+        total_pax_markup +
+        Number(new_fare.base_fare)
+      ).toFixed(2);
+
+      new_fare.discount = (Number(new_fare.discount) + commission).toFixed(2);
+
+      new_fare.payable = (
+        Number(new_fare.base_fare) +
+        Number(new_fare.total_tax) +
+        Number(new_fare.ait) -
+        Number(new_fare.discount)
+      ).toFixed(2);
+
+      const newItinerary: IFormattedFlightItinerary = {
         flight_id: flight_id || uuidv4(),
         api_search_id: '',
         booking_block,
@@ -782,7 +818,7 @@ export default class SabreFlightService extends AbstractServices {
         leg_description: [],
       };
 
-      itineraries.push(itinery);
+      itineraries.push(newItinerary);
     }
 
     return itineraries;
@@ -1036,6 +1072,7 @@ export default class SabreFlightService extends AbstractServices {
     const filteredPassengers = passengers.filter(
       (passenger) => passenger.type !== 'INF'
     );
+
     const passengerLength = filteredPassengers.length;
 
     const SecureFlight: ISecureFlight[] = [];
@@ -1558,7 +1595,7 @@ export default class SabreFlightService extends AbstractServices {
       }
 
       const ticket_number = [];
-      for (let i = 0; i < retrieve_booking.flightTickets.length; i++) {
+      for (let i = 0; i < retrieve_booking.flightTickets?.length; i++) {
         ticket_number.push(retrieve_booking.flightTickets[i].number);
       }
       return {
@@ -1699,6 +1736,7 @@ export default class SabreFlightService extends AbstractServices {
           status = FLIGHT_BOOKING_CANCELLED;
         }
       }
+
       //get last time of ticket issue
       response?.specialServices?.map((elem: any) => {
         if (elem.code === 'ADTK') {

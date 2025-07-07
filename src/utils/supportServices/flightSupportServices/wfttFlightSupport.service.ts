@@ -77,7 +77,7 @@ export default class WfttFlightService extends AbstractServices {
 
     let finalAirlineCodes: { Code: string }[] = [];
 
-    if (airline_code.length) {
+    if (airline_code?.length) {
       for (const code of airline_code) {
         const found = cappingAirlinesRaw.find(
           (item) => item.Code === code.Code
@@ -124,7 +124,7 @@ export default class WfttFlightService extends AbstractServices {
       reqBody,
       route_type,
     });
-
+    console.log({ formattedReqBody });
     const response: IWFTTFlightSearchResBody | undefined =
       await this.request.postRequest(
         WfttAPIEndpoints.FLIGHT_SEARCH_ENDPOINT,
@@ -179,9 +179,13 @@ export default class WfttFlightService extends AbstractServices {
       airports.push(item.DestinationLocation.LocationCode);
     });
 
-    const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
-
     const commonModel = this.Model.CommonModel(this.trx);
+
+    let pax_count = 0;
+
+    reqBody.PassengerTypeQuantity.map((reqPax) => {
+      pax_count += reqPax.Quantity;
+    });
 
     const formattedData: IFormattedFlightItinerary[] = await Promise.all(
       data.map(async (item) => {
@@ -195,24 +199,9 @@ export default class WfttFlightService extends AbstractServices {
           carrier_logo,
           api_search_id,
           flights,
+          passengers,
           ...rest
         } = item;
-
-        let fare: IFormattedFare = {
-          base_fare: vendor_fare.base_fare,
-          total_tax: vendor_fare.total_tax,
-          discount: vendor_fare.discount,
-          payable: vendor_fare.payable,
-          ait: vendor_fare.ait,
-          vendor_price: {
-            base_fare: vendor_fare.base_fare,
-            charge: 0,
-            discount: vendor_fare.discount,
-            gross_fare: vendor_fare.total_price,
-            net_fare: vendor_fare.payable,
-            tax: vendor_fare.total_tax,
-          },
-        };
 
         const newFlights = await Promise.all(
           flights.map(async (flight) => {
@@ -278,9 +267,64 @@ export default class WfttFlightService extends AbstractServices {
             route_type,
           });
 
+        const total_pax_markup = pax_markup * pax_count;
+
+        let fare: IFormattedFare = {
+          base_fare: vendor_fare.base_fare + markup + total_pax_markup,
+          total_tax: vendor_fare.total_tax,
+          discount: commission,
+          ait: vendor_fare.ait,
+          payable: (
+            vendor_fare.base_fare +
+            markup +
+            total_pax_markup +
+            vendor_fare.total_tax +
+            vendor_fare.ait -
+            commission
+          ).toFixed(2),
+          vendor_price: {
+            base_fare: vendor_fare.base_fare,
+            charge: 0,
+            discount: vendor_fare.discount,
+            ait: vendor_fare.ait,
+            gross_fare: vendor_fare.total_price,
+            net_fare: vendor_fare.payable,
+            tax: vendor_fare.total_tax,
+          },
+        };
+
+        const newPassenger = passengers.map((oldPax) => {
+          const per_pax_discount = commission / pax_count;
+          const per_pax_markup = markup / pax_count;
+
+          const total_pax_markup = pax_markup + per_pax_markup;
+
+          const per_pax_ait = Number(fare.ait) / pax_count;
+
+          const per_pax_tax = oldPax.fare.tax / oldPax.number;
+          const per_pax_base_fare = oldPax.fare.base_fare / oldPax.number;
+
+          return {
+            type: oldPax.type,
+            number: oldPax.number,
+            per_pax_fare: {
+              base_fare: (per_pax_base_fare + total_pax_markup).toFixed(2),
+              tax: per_pax_tax.toFixed(2),
+              ait: per_pax_ait.toFixed(2),
+              discount: per_pax_discount.toFixed(2),
+              total_fare: (
+                per_pax_base_fare +
+                total_pax_markup +
+                per_pax_ait +
+                per_pax_tax -
+                per_pax_discount
+              ).toFixed(2),
+            },
+          };
+        });
+
         const career = await commonModel.getAirlineByCode(carrier_code);
 
-        // const career =
         return {
           domestic_flight,
           fare,
@@ -290,6 +334,7 @@ export default class WfttFlightService extends AbstractServices {
           carrier_code,
           carrier_logo: career.logo,
           flights: newFlights,
+          passengers: newPassenger,
           ...rest,
           leg_description: [],
         };

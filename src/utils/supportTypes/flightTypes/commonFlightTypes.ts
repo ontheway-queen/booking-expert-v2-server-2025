@@ -26,7 +26,7 @@ export interface IAirlineCodePayload {
 
 export interface IFlightSearchReqBody {
   JourneyType: '1' | '2' | '3';
-  airline_code: IAirlineCodePayload[];
+  airline_code?: IAirlineCodePayload[];
   OriginDestinationInformation: IOriginDestinationInformationPayload[];
   PassengerTypeQuantity: IPassengerTypeQuantityPayload[];
 }
@@ -142,14 +142,15 @@ export interface IFormattedCarrier {
 }
 
 export interface IFormattedFare {
-  base_fare: number;
-  total_tax: number;
-  discount: number;
-  payable: number;
-  ait: number;
+  base_fare: number | string;
+  total_tax: number | string;
+  ait: number | string;
+  discount: number | string;
+  payable: number | string;
   vendor_price: {
     base_fare: number;
     tax: number;
+    ait: number;
     charge: number;
     discount: number;
     gross_fare: number;
@@ -160,9 +161,11 @@ export interface IFormattedFare {
 export interface IFormattedPassenger {
   type: string;
   number: number;
-  fare: {
-    total_fare: number;
-    tax: number;
-    base_fare: number;
+  per_pax_fare: {
+    total_fare: string;
+    tax: string;
+    ait: string;
+    discount: string;
+    base_fare: string;
   };
 }
