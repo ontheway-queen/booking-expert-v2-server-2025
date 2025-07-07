@@ -71,7 +71,7 @@ class WfttRequests {
                         url: apiUrl,
                         http_method: 'POST',
                         metadata: {
-                            api: flightConstent_1.WFTT_API,
+                            api: flightConstent_1.CUSTOM_API,
                             endpoint: apiUrl,
                             payload: requestData,
                             response: response.data,

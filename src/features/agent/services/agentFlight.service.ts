@@ -20,7 +20,6 @@ import {
   FLIGHT_TICKET_IN_PROCESS,
   FLIGHT_TICKET_ISSUE,
   SABRE_API,
-  WFTT_API,
 } from '../../../utils/miscellaneous/flightConstent';
 import { AgentFlightBookingSupportService } from '../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service';
 import { CommonFlightBookingSupportService } from '../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service';
@@ -96,7 +95,7 @@ export class AgentFlightService extends AbstractServices {
         if (api.sup_api === SABRE_API) {
           sabre_supplier_id = api.id;
         }
-        if (api.sup_api === WFTT_API) {
+        if (api.sup_api === CUSTOM_API) {
           custom_supplier_id = api.id;
         }
       });
@@ -227,7 +226,7 @@ export class AgentFlightService extends AbstractServices {
         if (api.sup_api === SABRE_API) {
           sabre_supplier_id = api.id;
         }
-        if (api.sup_api === WFTT_API) {
+        if (api.sup_api === CUSTOM_API) {
           custom_supplier_id = api.id;
         }
       });

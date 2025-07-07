@@ -8,11 +8,11 @@ import {
   IPassengerTypeQuantityPayload,
 } from '../../../utils/supportTypes/flightTypes/commonFlightTypes';
 import {
+  CUSTOM_API,
   FLIGHT_BOOKING_IN_PROCESS,
   FLIGHT_FARE_RESPONSE,
   FLIGHT_REVALIDATE_REDIS_KEY,
   SABRE_API,
-  WFTT_API,
 } from '../../../utils/miscellaneous/flightConstent';
 import SabreFlightService from '../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service';
 import WfttFlightService from '../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service';
@@ -27,11 +27,13 @@ import {
   INVOICE_REF_TYPES,
   SOURCE_AGENT_B2C,
 } from '../../../utils/miscellaneous/constants';
+
 export class AgentB2CFlightService extends AbstractServices {
   public async flightSearch(req: Request) {
     return this.db.transaction(async (trx) => {
       const { agency_id } = req.agencyB2CWhiteLabel;
       const body = req.body as IFlightSearchReqBody;
+
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
       const agency_details = await agencyModel.checkAgency({ agency_id });
@@ -42,11 +44,6 @@ export class AgentB2CFlightService extends AbstractServices {
           message: 'No commission set has been found for the agency',
         };
       }
-      const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
-      const apiData = await markupSetFlightApiModel.getMarkupSetFlightApi({
-        status: true,
-        markup_set_id: agency_details.flight_markup_set,
-      });
 
       //get b2c markup
       const markup_amount = await Lib.getAgentB2CTotalMarkup({
@@ -62,15 +59,21 @@ export class AgentB2CFlightService extends AbstractServices {
         };
       }
 
+      const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
+      const apiData = await markupSetFlightApiModel.getDynamicFareSuppliers({
+        status: true,
+        set_id: agency_details?.flight_markup_set,
+      });
+
       //extract API IDs
       let sabre_set_flight_api_id = 0;
       let wftt_set_flight_api_id = 0;
 
       apiData.forEach((api) => {
-        if (api.api_name === SABRE_API) {
+        if (api.sup_api === SABRE_API) {
           sabre_set_flight_api_id = api.id;
         }
-        if (api.api_name === WFTT_API) {
+        if (api.sup_api === CUSTOM_API) {
           wftt_set_flight_api_id = api.id;
         }
       });
@@ -168,10 +171,10 @@ export class AgentB2CFlightService extends AbstractServices {
         };
       }
 
-      const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
-      const apiData = await markupSetFlightApiModel.getMarkupSetFlightApi({
+      const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
+      const apiData = await markupSetFlightApiModel.getDynamicFareSuppliers({
         status: true,
-        markup_set_id: agency_details.flight_markup_set,
+        set_id: agency_details?.flight_markup_set,
       });
 
       //get b2c markup
@@ -193,10 +196,10 @@ export class AgentB2CFlightService extends AbstractServices {
       let wftt_set_flight_api_id = 0;
 
       apiData.forEach((api) => {
-        if (api.api_name === SABRE_API) {
+        if (api.sup_api === SABRE_API) {
           sabre_set_flight_api_id = api.id;
         }
-        if (api.api_name === WFTT_API) {
+        if (api.sup_api === CUSTOM_API) {
           wftt_set_flight_api_id = api.id;
         }
       });

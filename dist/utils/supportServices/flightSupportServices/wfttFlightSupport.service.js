@@ -97,7 +97,6 @@ class WfttFlightService extends abstract_service_1.default {
                 reqBody,
                 route_type,
             });
-            console.log({ formattedReqBody });
             const response = yield this.request.postRequest(wfttApiEndpoints_1.default.FLIGHT_SEARCH_ENDPOINT, formattedReqBody);
             if (!response) {
                 return [];
@@ -234,7 +233,7 @@ class WfttFlightService extends abstract_service_1.default {
                 lib_1.default.writeJsonFile('wftt_revalidate_request', revalidate_body);
                 lib_1.default.writeJsonFile('wftt_revalidate_response', response);
                 throw new customError_1.default('External API Error', 500, constants_1.ERROR_LEVEL_WARNING, {
-                    api: flightConstent_1.WFTT_API,
+                    api: flightConstent_1.CUSTOM_API,
                     endpoint: wfttApiEndpoints_1.default.FLIGHT_REVALIDATE_ENDPOINT,
                     payload: revalidate_body,
                     response,

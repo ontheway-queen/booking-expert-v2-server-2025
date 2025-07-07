@@ -8,16 +8,15 @@ import {
   IPassengerTypeQuantityPayload,
 } from '../../../utils/supportTypes/flightTypes/commonFlightTypes';
 import {
+  CUSTOM_API,
   FLIGHT_FARE_RESPONSE,
   FLIGHT_REVALIDATE_REDIS_KEY,
   SABRE_API,
-  WFTT_API,
 } from '../../../utils/miscellaneous/flightConstent';
 import SabreFlightService from '../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service';
 import WfttFlightService from '../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service';
 import { v4 as uuidv4 } from 'uuid';
 import { getRedis, setRedis } from '../../../app/redis';
-import Lib from '../../../utils/lib/lib';
 import { CommonFlightSupportService } from '../../../utils/supportServices/flightSupportServices/commonFlightSupport.service';
 import { SOURCE_B2C } from '../../../utils/miscellaneous/constants';
 import { IB2CGetFlightBookingReqQuery } from '../utils/types/b2cFlight.types';
@@ -32,7 +31,6 @@ export class B2CFlightService extends AbstractServices {
       const body = req.body as IFlightSearchReqBody;
       //get flight markup set id
       const b2cMarkupConfig = this.Model.B2CMarkupConfigModel(trx);
-      const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
       const markupSet = await b2cMarkupConfig.getB2CMarkupConfigData('Flight');
 
       if (!markupSet.length) {
@@ -45,9 +43,10 @@ export class B2CFlightService extends AbstractServices {
 
       const markup_set_id = markupSet[0].markup_set_id;
 
-      const apiData = await markupSetFlightApiModel.getMarkupSetFlightApi({
+      const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
+      const apiData = await markupSetFlightApiModel.getDynamicFareSuppliers({
         status: true,
-        markup_set_id,
+        set_id: markup_set_id,
       });
 
       //extract API IDs
@@ -55,10 +54,10 @@ export class B2CFlightService extends AbstractServices {
       let wftt_set_flight_api_id = 0;
 
       apiData.forEach((api) => {
-        if (api.api_name === SABRE_API) {
+        if (api.sup_api === SABRE_API) {
           sabre_set_flight_api_id = api.id;
         }
-        if (api.api_name === WFTT_API) {
+        if (api.sup_api === CUSTOM_API) {
           wftt_set_flight_api_id = api.id;
         }
       });
@@ -154,22 +153,22 @@ export class B2CFlightService extends AbstractServices {
         airline_code,
       } as unknown as IFlightSearchReqBody;
 
-      const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
-      const apiData = await markupSetFlightApiModel.getMarkupSetFlightApi({
+      const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
+      const apiData = await markupSetFlightApiModel.getDynamicFareSuppliers({
         status: true,
-        markup_set_id,
+        set_id: markup_set_id,
       });
 
       //extract API IDs
       let sabre_set_flight_api_id = 0;
-      let wftt_set_flight_api_id = 0;
+      let custom_set_flight_api_id = 0;
 
       apiData.forEach((api) => {
-        if (api.api_name === SABRE_API) {
+        if (api.sup_api === SABRE_API) {
           sabre_set_flight_api_id = api.id;
         }
-        if (api.api_name === WFTT_API) {
-          wftt_set_flight_api_id = api.id;
+        if (api.sup_api === CUSTOM_API) {
+          custom_set_flight_api_id = api.id;
         }
       });
 
@@ -238,14 +237,15 @@ export class B2CFlightService extends AbstractServices {
           })
         );
       }
+
       //WFTT results
-      if (wftt_set_flight_api_id) {
+      if (custom_set_flight_api_id) {
         const wfttSubService = new WfttFlightService(trx);
         await sendResults('WFTT', async () =>
           wfttSubService.FlightSearch({
             booking_block: false,
             reqBody: body,
-            dynamic_fare_supplier_id: wftt_set_flight_api_id,
+            dynamic_fare_supplier_id: custom_set_flight_api_id,
           })
         );
       }

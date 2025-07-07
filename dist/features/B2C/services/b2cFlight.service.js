@@ -31,7 +31,6 @@ class B2CFlightService extends abstract_service_1.default {
                 const body = req.body;
                 //get flight markup set id
                 const b2cMarkupConfig = this.Model.B2CMarkupConfigModel(trx);
-                const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
                 const markupSet = yield b2cMarkupConfig.getB2CMarkupConfigData('Flight');
                 if (!markupSet.length) {
                     return {
@@ -41,18 +40,19 @@ class B2CFlightService extends abstract_service_1.default {
                     };
                 }
                 const markup_set_id = markupSet[0].markup_set_id;
-                const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
+                const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
+                const apiData = yield markupSetFlightApiModel.getDynamicFareSuppliers({
                     status: true,
-                    markup_set_id,
+                    set_id: markup_set_id,
                 });
                 //extract API IDs
                 let sabre_set_flight_api_id = 0;
                 let wftt_set_flight_api_id = 0;
                 apiData.forEach((api) => {
-                    if (api.api_name === flightConstent_1.SABRE_API) {
+                    if (api.sup_api === flightConstent_1.SABRE_API) {
                         sabre_set_flight_api_id = api.id;
                     }
-                    if (api.api_name === flightConstent_1.WFTT_API) {
+                    if (api.sup_api === flightConstent_1.CUSTOM_API) {
                         wftt_set_flight_api_id = api.id;
                     }
                 });
@@ -133,20 +133,20 @@ class B2CFlightService extends abstract_service_1.default {
                     PassengerTypeQuantity,
                     airline_code,
                 };
-                const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
-                const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
+                const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
+                const apiData = yield markupSetFlightApiModel.getDynamicFareSuppliers({
                     status: true,
-                    markup_set_id,
+                    set_id: markup_set_id,
                 });
                 //extract API IDs
                 let sabre_set_flight_api_id = 0;
-                let wftt_set_flight_api_id = 0;
+                let custom_set_flight_api_id = 0;
                 apiData.forEach((api) => {
-                    if (api.api_name === flightConstent_1.SABRE_API) {
+                    if (api.sup_api === flightConstent_1.SABRE_API) {
                         sabre_set_flight_api_id = api.id;
                     }
-                    if (api.api_name === flightConstent_1.WFTT_API) {
-                        wftt_set_flight_api_id = api.id;
+                    if (api.sup_api === flightConstent_1.CUSTOM_API) {
+                        custom_set_flight_api_id = api.id;
                     }
                 });
                 //generate search ID
@@ -198,13 +198,13 @@ class B2CFlightService extends abstract_service_1.default {
                     }));
                 }
                 //WFTT results
-                if (wftt_set_flight_api_id) {
+                if (custom_set_flight_api_id) {
                     const wfttSubService = new wfttFlightSupport_service_1.default(trx);
                     yield sendResults('WFTT', () => __awaiter(this, void 0, void 0, function* () {
                         return wfttSubService.FlightSearch({
                             booking_block: false,
                             reqBody: body,
-                            dynamic_fare_supplier_id: wftt_set_flight_api_id,
+                            dynamic_fare_supplier_id: custom_set_flight_api_id,
                         });
                     }));
                 }

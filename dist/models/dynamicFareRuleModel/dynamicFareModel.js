@@ -63,7 +63,7 @@ class DynamicFareModel extends schema_1.default {
                     qb.andWhere('dfs.id', payload.id);
                 }
                 if (payload.api_name) {
-                    qb.andWhere('supplier.api', payload.api_name);
+                    qb.andWhere('sup.api', payload.api_name);
                 }
             })
                 .orderBy('dfs.id', 'desc');

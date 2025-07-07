@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Models from '../../../models/rootModel';
-import { WFTT_API, WFTT_TOKEN_ENV } from '../../miscellaneous/flightConstent';
+import { CUSTOM_API, WFTT_TOKEN_ENV } from '../../miscellaneous/flightConstent';
 import config from '../../../config/config';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
 const BASE_URL = config.WFTT_URL;
@@ -62,7 +62,7 @@ export default class WfttRequests {
           url: apiUrl,
           http_method: 'POST',
           metadata: {
-            api: WFTT_API,
+            api: CUSTOM_API,
             endpoint: apiUrl,
             payload: requestData,
             response: response.data,

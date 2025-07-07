@@ -13,11 +13,7 @@ import {
   IWFTTFlightSearchResBody,
   IWFTTFlightSearchResults,
 } from '../../supportTypes/flightTypes/wfttFlightTypes';
-import {
-  CUSTOM_API,
-  ROUTE_TYPE,
-  WFTT_API,
-} from '../../miscellaneous/flightConstent';
+import { CUSTOM_API, ROUTE_TYPE } from '../../miscellaneous/flightConstent';
 import Lib from '../../lib/lib';
 import CustomError from '../../lib/customError';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
@@ -124,7 +120,6 @@ export default class WfttFlightService extends AbstractServices {
       reqBody,
       route_type,
     });
-    console.log({ formattedReqBody });
     const response: IWFTTFlightSearchResBody | undefined =
       await this.request.postRequest(
         WfttAPIEndpoints.FLIGHT_SEARCH_ENDPOINT,
@@ -374,7 +369,7 @@ export default class WfttFlightService extends AbstractServices {
       Lib.writeJsonFile('wftt_revalidate_request', revalidate_body);
       Lib.writeJsonFile('wftt_revalidate_response', response);
       throw new CustomError('External API Error', 500, ERROR_LEVEL_WARNING, {
-        api: WFTT_API,
+        api: CUSTOM_API,
         endpoint: WfttAPIEndpoints.FLIGHT_REVALIDATE_ENDPOINT,
         payload: revalidate_body,
         response,

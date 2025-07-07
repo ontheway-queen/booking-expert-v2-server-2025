@@ -40,11 +40,6 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         message: 'No commission set has been found for the agency',
                     };
                 }
-                const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
-                const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
-                    status: true,
-                    markup_set_id: agency_details.flight_markup_set,
-                });
                 //get b2c markup
                 const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({
                     trx,
@@ -58,14 +53,19 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         message: 'Markup information is empty. Contact with the authority',
                     };
                 }
+                const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
+                const apiData = yield markupSetFlightApiModel.getDynamicFareSuppliers({
+                    status: true,
+                    set_id: agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set,
+                });
                 //extract API IDs
                 let sabre_set_flight_api_id = 0;
                 let wftt_set_flight_api_id = 0;
                 apiData.forEach((api) => {
-                    if (api.api_name === flightConstent_1.SABRE_API) {
+                    if (api.sup_api === flightConstent_1.SABRE_API) {
                         sabre_set_flight_api_id = api.id;
                     }
-                    if (api.api_name === flightConstent_1.WFTT_API) {
+                    if (api.sup_api === flightConstent_1.CUSTOM_API) {
                         wftt_set_flight_api_id = api.id;
                     }
                 });
@@ -149,10 +149,10 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         message: 'No commission set has been found for the agency',
                     };
                 }
-                const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(trx);
-                const apiData = yield markupSetFlightApiModel.getMarkupSetFlightApi({
+                const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
+                const apiData = yield markupSetFlightApiModel.getDynamicFareSuppliers({
                     status: true,
-                    markup_set_id: agency_details.flight_markup_set,
+                    set_id: agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set,
                 });
                 //get b2c markup
                 const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({
@@ -171,10 +171,10 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 let sabre_set_flight_api_id = 0;
                 let wftt_set_flight_api_id = 0;
                 apiData.forEach((api) => {
-                    if (api.api_name === flightConstent_1.SABRE_API) {
+                    if (api.sup_api === flightConstent_1.SABRE_API) {
                         sabre_set_flight_api_id = api.id;
                     }
-                    if (api.api_name === flightConstent_1.WFTT_API) {
+                    if (api.sup_api === flightConstent_1.CUSTOM_API) {
                         wftt_set_flight_api_id = api.id;
                     }
                 });

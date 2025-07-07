@@ -18,7 +18,6 @@ export const ROUTE_TYPE: {
 // API Name Const
 export const SABRE_API = 'SABRE';
 export const CUSTOM_API = 'CUSTOM';
-export const WFTT_API = 'WFTT';
 export const CT_API = 'CHOLO_TRAVEL';
 
 //booking status

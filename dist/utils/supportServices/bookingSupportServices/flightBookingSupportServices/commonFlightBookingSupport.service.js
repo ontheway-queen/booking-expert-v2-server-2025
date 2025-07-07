@@ -97,9 +97,9 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
     }
     checkDirectFlightBookingPermission(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            const markupSetFlightApiModel = this.Model.MarkupSetFlightApiModel(this.trx);
-            const set_flight_api = yield markupSetFlightApiModel.getMarkupSetFlightApi({
-                markup_set_id: payload.markup_set_id,
+            const markupSetFlightApiModel = this.Model.DynamicFareModel(this.trx);
+            const set_flight_api = yield markupSetFlightApiModel.getDynamicFareSuppliers({
+                set_id: payload.markup_set_id,
                 api_name: payload.api_name,
             });
             if (!set_flight_api.length) {
@@ -109,28 +109,21 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                     message: this.ResMsg.SET_FLIGHT_API_ID_NOT_FOUND,
                 };
             }
-            const flightMarkupsModel = this.Model.FlightMarkupsModel(this.trx);
-            const flightMarkupData = yield flightMarkupsModel.getAllFlightMarkups({
-                markup_set_flight_api_id: set_flight_api[0].id,
+            const flightMarkupsModel = this.Model.DynamicFareModel(this.trx);
+            const flightMarkupData = yield flightMarkupsModel.getSupplierAirlinesFares({
+                dynamic_fare_supplier_id: set_flight_api[0].id,
                 airline: payload.airline,
             });
-            if (!flightMarkupData.data.length) {
+            if (!flightMarkupData.length) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_NOT_FOUND,
                     message: this.ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP,
                 };
             }
-            if (flightMarkupData.data[0].booking_block) {
-                return {
-                    booking_block: true,
-                };
-            }
-            else {
-                return {
-                    booking_block: false,
-                };
-            }
+            return {
+                booking_block: false,
+            };
         });
     }
     insertFlightBookingData(payload) {

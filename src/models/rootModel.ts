@@ -6,9 +6,6 @@ import AgencyB2CUserModel from './agencyB2CModel/agencyB2CUserModel';
 import AgencyModel from './agentModel/agencyModel';
 import AgencyUserModel from './agentModel/agencyUserModel';
 import B2CUserModel from './b2cModel/b2cUserModel';
-import FlightApiModel from './dynamicFareRuleModel/flightApiModel';
-import MarkupSetFlightApiModel from './dynamicFareRuleModel/markupSetFlightApiModel';
-import FlightMarkupsModel from './dynamicFareRuleModel/flightMarkupsModel';
 import B2CMarkupConfigModel from './dynamicFareRuleModel/b2cMarkupConfigModel';
 import FlightBookingModel from './flightModel/flightBookingModel';
 import FlightBookingPriceBreakdownModel from './flightModel/flightBookingPriceBreakdownModel';
@@ -69,21 +66,6 @@ export default class Models {
   //booking request models
   public B2CUserModel(trx?: Knex.Transaction) {
     return new B2CUserModel(trx || db);
-  }
-
-  //Flight API Model
-  public FlightApiModel(trx?: Knex.Transaction) {
-    return new FlightApiModel(trx || db);
-  }
-
-  //Markup Set Flight Api Model
-  public MarkupSetFlightApiModel(trx?: Knex.Transaction) {
-    return new MarkupSetFlightApiModel(trx || db);
-  }
-
-  //Flight Markups Model
-  public FlightMarkupsModel(trx?: Knex.Transaction) {
-    return new FlightMarkupsModel(trx || db);
   }
 
   //Hotel Markups Model

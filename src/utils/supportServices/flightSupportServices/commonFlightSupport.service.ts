@@ -6,7 +6,6 @@ import {
   FLIGHT_REVALIDATE_REDIS_KEY,
   MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET,
   SABRE_API,
-  WFTT_API,
 } from '../../miscellaneous/flightConstent';
 import { IFormattedFlightItinerary } from '../../supportTypes/flightTypes/commonFlightTypes';
 import SabreFlightService from './sabreFlightSupport.service';

@@ -74,7 +74,7 @@ class AgentFlightService extends abstract_service_1.default {
                     if (api.sup_api === flightConstent_1.SABRE_API) {
                         sabre_supplier_id = api.id;
                     }
-                    if (api.sup_api === flightConstent_1.WFTT_API) {
+                    if (api.sup_api === flightConstent_1.CUSTOM_API) {
                         custom_supplier_id = api.id;
                     }
                 });
@@ -188,7 +188,7 @@ class AgentFlightService extends abstract_service_1.default {
                     if (api.sup_api === flightConstent_1.SABRE_API) {
                         sabre_supplier_id = api.id;
                     }
-                    if (api.sup_api === flightConstent_1.WFTT_API) {
+                    if (api.sup_api === flightConstent_1.CUSTOM_API) {
                         custom_supplier_id = api.id;
                     }
                 });

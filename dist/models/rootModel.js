@@ -10,9 +10,6 @@ const agencyB2CUserModel_1 = __importDefault(require("./agencyB2CModel/agencyB2C
 const agencyModel_1 = __importDefault(require("./agentModel/agencyModel"));
 const agencyUserModel_1 = __importDefault(require("./agentModel/agencyUserModel"));
 const b2cUserModel_1 = __importDefault(require("./b2cModel/b2cUserModel"));
-const flightApiModel_1 = __importDefault(require("./dynamicFareRuleModel/flightApiModel"));
-const markupSetFlightApiModel_1 = __importDefault(require("./dynamicFareRuleModel/markupSetFlightApiModel"));
-const flightMarkupsModel_1 = __importDefault(require("./dynamicFareRuleModel/flightMarkupsModel"));
 const b2cMarkupConfigModel_1 = __importDefault(require("./dynamicFareRuleModel/b2cMarkupConfigModel"));
 const flightBookingModel_1 = __importDefault(require("./flightModel/flightBookingModel"));
 const flightBookingPriceBreakdownModel_1 = __importDefault(require("./flightModel/flightBookingPriceBreakdownModel"));
@@ -67,18 +64,6 @@ class Models {
     //booking request models
     B2CUserModel(trx) {
         return new b2cUserModel_1.default(trx || database_1.db);
-    }
-    //Flight API Model
-    FlightApiModel(trx) {
-        return new flightApiModel_1.default(trx || database_1.db);
-    }
-    //Markup Set Flight Api Model
-    MarkupSetFlightApiModel(trx) {
-        return new markupSetFlightApiModel_1.default(trx || database_1.db);
-    }
-    //Flight Markups Model
-    FlightMarkupsModel(trx) {
-        return new flightMarkupsModel_1.default(trx || database_1.db);
     }
     //Hotel Markups Model
     HotelMarkupsModel(trx) {
