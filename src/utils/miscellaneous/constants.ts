@@ -32,11 +32,10 @@ export const PROJECT_LOGO =
   'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_logo.png';
 export const PROJECT_ICON =
   'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_icon.png';
-export const AGENT_PROJECT_LINK = 'http://10.10.220.42:3000';
-export const B2C_PROJECT_LINK = '';
-export const PROJECT_EMAIL = 'sup.m360ict@gmail.com';
-// export const PROJECT_EMAIL = 'shakeeb.m360ict@gmail.com';
-export const PROJECT_NUMBER = '+8801958398339';
+export const AGENT_PROJECT_LINK = 'https://agent.bookingexpert.us';
+export const B2C_PROJECT_LINK = 'https://bookingexpert.us';
+export const PROJECT_EMAIL = 'support@bookingexpert.us';
+export const PROJECT_NUMBER = '+880 1958-398347';
 export const PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 
 // Email subject

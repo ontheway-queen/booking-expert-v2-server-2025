@@ -31,11 +31,10 @@ exports.OTP_TYPES = {
 exports.PROJECT_NAME = 'Booking Expert V2';
 exports.PROJECT_LOGO = 'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_logo.png';
 exports.PROJECT_ICON = 'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_icon.png';
-exports.AGENT_PROJECT_LINK = 'http://10.10.220.42:3000';
-exports.B2C_PROJECT_LINK = '';
-exports.PROJECT_EMAIL = 'sup.m360ict@gmail.com';
-// export const PROJECT_EMAIL = 'shakeeb.m360ict@gmail.com';
-exports.PROJECT_NUMBER = '+8801958398339';
+exports.AGENT_PROJECT_LINK = 'https://agent.bookingexpert.us';
+exports.B2C_PROJECT_LINK = 'https://bookingexpert.us';
+exports.PROJECT_EMAIL = 'support@bookingexpert.us';
+exports.PROJECT_NUMBER = '+880 1958-398347';
 exports.PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 // Email subject
 exports.OTP_EMAIL_SUBJECT = 'Your One Time Password For Verification';
