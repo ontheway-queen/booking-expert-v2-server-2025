@@ -12,32 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const schema_1 = __importDefault(require("../../utils/miscellaneous/schema"));
-class VisaApplicationModel extends schema_1.default {
-    constructor(db) {
+const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
+class AdminVisaService extends abstract_service_1.default {
+    constructor() {
         super();
-        this.db = db;
     }
-    createVisaApplication(payload) {
+    createVisa(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_application')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
-        });
-    }
-    createVisaApplicationTracking(payload) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_application_tracking')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
-        });
-    }
-    createVisaApplicationTraveler(payload) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_application_traveler')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
+            const { user_id } = req.admin;
+            const body = req.body;
         });
     }
 }
-exports.default = VisaApplicationModel;
+exports.default = AdminVisaService;

@@ -1429,10 +1429,12 @@ export default class SabreFlightService extends AbstractServices {
       phone: user_info.phone,
       name: user_info.name,
     });
+
     const response = await this.request.postRequest(
       SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
       requestBody
     );
+
     if (!response) {
       throw new CustomError(
         'Something went wrong. Please try again later',
@@ -1443,18 +1445,6 @@ export default class SabreFlightService extends AbstractServices {
       response?.CreatePassengerNameRecordRS?.ApplicationResults?.status !==
       'Complete'
     ) {
-      // await this.Model.errorLogsModel(trx).insert({
-      //   level: ERROR_LEVEL_WARNING,
-      //   message: 'Error from sabre while booking flight',
-      //   url: SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
-      //   http_method: 'POST',
-      //   metadata: {
-      //     api: SABRE_API,
-      //     endpoint: SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
-      //     payload: requestBody,
-      //     response: response?.CreatePassengerNameRecordRS?.ApplicationResults,
-      //   },
-      // });
       throw new CustomError(
         'This flight is already booked. Please try booking another flight',
         this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
@@ -1466,12 +1456,6 @@ export default class SabreFlightService extends AbstractServices {
           response: response?.CreatePassengerNameRecordRS?.ApplicationResults,
         }
       );
-      // return {
-      //   success: false,
-      //   code: this.StatusCode.HTTP_BAD_REQUEST,
-      //   message: this.ResMsg.HTTP_BAD_REQUEST,
-      //   error: response.CreatePassengerNameRecordRS.ApplicationResults,
-      // };
     }
 
     //return GDS PNR

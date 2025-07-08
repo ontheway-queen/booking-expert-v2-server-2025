@@ -540,7 +540,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         suffix += 1;
       }
 
-      const password = Lib.generateRandomPassword(8);
+      const password = Lib.generateRandomPassword(12);
       const hashed_password = await Lib.hashValue(password);
 
       const newUser = await agencyUserModel.createUser({

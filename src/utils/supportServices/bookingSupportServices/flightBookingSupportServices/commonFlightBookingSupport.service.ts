@@ -62,6 +62,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       const passport_number = !payload.passenger.some(
         (p) => p.passport_number == null
       );
+
       if (!passport_number) {
         return {
           success: false,
@@ -82,6 +83,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
 
     // Batch check if any passenger already booked this flight(DUPLICATE BOOKING)
     const flightModel = this.Model.FlightBookingModel(this.trx);
+
     const existingBooking = await flightModel.checkFlightBooking({
       route: payload.route,
       departure_date: payload.departure_date,
@@ -113,6 +115,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       passengers,
       status: [FLIGHT_BOOKING_CANCELLED],
     });
+
     if (cancelledBooking >= 2) {
       return {
         success: false,
@@ -167,18 +170,23 @@ export class CommonFlightBookingSupportService extends AbstractServices {
   public async insertFlightBookingData(
     payload: IInsertFlightBookingDataPayload
   ) {
+    console.log({ payload });
     const flightBookingModel = this.Model.FlightBookingModel(this.trx);
     const flightBookingPriceBreakdownModel =
       this.Model.FlightBookingPriceBreakdownModel(this.trx);
+
     const flightBookingSegmentModel = this.Model.FlightBookingSegmentModel(
       this.trx
     );
+
     const flightBookingTravelerModel = this.Model.FlightBookingTravelerModel(
       this.trx
     );
+
     const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(
       this.trx
     );
+
     const flightUtils = new FlightUtils();
 
     //insert flight booking data
@@ -186,11 +194,6 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       trx: this.trx,
       type: payload.type,
     });
-
-    const { markup_price, markup_type } = this.getBookingMarkupDetails(
-      Number(payload.flight_data.fare.discount),
-      Number(payload.flight_data.fare.base_fare)
-    );
 
     const booking_res = await flightBookingModel.insertFlightBooking({
       booking_ref,

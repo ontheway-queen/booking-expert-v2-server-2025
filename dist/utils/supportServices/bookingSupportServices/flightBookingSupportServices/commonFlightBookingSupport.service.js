@@ -128,6 +128,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
     }
     insertFlightBookingData(payload) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log({ payload });
             const flightBookingModel = this.Model.FlightBookingModel(this.trx);
             const flightBookingPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(this.trx);
             const flightBookingSegmentModel = this.Model.FlightBookingSegmentModel(this.trx);
@@ -139,7 +140,6 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 trx: this.trx,
                 type: payload.type,
             });
-            const { markup_price, markup_type } = this.getBookingMarkupDetails(Number(payload.flight_data.fare.discount), Number(payload.flight_data.fare.base_fare));
             const booking_res = yield flightBookingModel.insertFlightBooking({
                 booking_ref,
                 api: payload.status === flightConstent_1.FLIGHT_BOOKING_IN_PROCESS

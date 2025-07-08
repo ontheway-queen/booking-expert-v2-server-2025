@@ -435,7 +435,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     username = `${username}${suffix}`;
                     suffix += 1;
                 }
-                const password = lib_1.default.generateRandomPassword(8);
+                const password = lib_1.default.generateRandomPassword(12);
                 const hashed_password = yield lib_1.default.hashValue(password);
                 const newUser = yield agencyUserModel.createUser({
                     agency_id: newAgency[0].id,
