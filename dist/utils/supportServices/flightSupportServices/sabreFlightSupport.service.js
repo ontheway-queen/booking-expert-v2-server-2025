@@ -1086,30 +1086,12 @@ class SabreFlightService extends abstract_service_1.default {
             }
             if (((_c = (_b = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _b === void 0 ? void 0 : _b.ApplicationResults) === null || _c === void 0 ? void 0 : _c.status) !==
                 'Complete') {
-                // await this.Model.errorLogsModel(trx).insert({
-                //   level: ERROR_LEVEL_WARNING,
-                //   message: 'Error from sabre while booking flight',
-                //   url: SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
-                //   http_method: 'POST',
-                //   metadata: {
-                //     api: SABRE_API,
-                //     endpoint: SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
-                //     payload: requestBody,
-                //     response: response?.CreatePassengerNameRecordRS?.ApplicationResults,
-                //   },
-                // });
                 throw new customError_1.default('This flight is already booked. Please try booking another flight', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR, constants_1.ERROR_LEVEL_WARNING, {
                     api: flightConstent_1.SABRE_API,
                     endpoint: sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT,
                     payload: requestBody,
                     response: (_d = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _d === void 0 ? void 0 : _d.ApplicationResults,
                 });
-                // return {
-                //   success: false,
-                //   code: this.StatusCode.HTTP_BAD_REQUEST,
-                //   message: this.ResMsg.HTTP_BAD_REQUEST,
-                //   error: response.CreatePassengerNameRecordRS.ApplicationResults,
-                // };
             }
             //return GDS PNR
             return (_f = (_e = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _e === void 0 ? void 0 : _e.ItineraryRef) === null || _f === void 0 ? void 0 : _f.ID;

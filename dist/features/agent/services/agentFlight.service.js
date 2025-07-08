@@ -25,6 +25,7 @@ const commonFlightSupport_service_1 = require("../../../utils/supportServices/fl
 const sabreFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service"));
 const wfttFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service"));
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
+const customError_1 = __importDefault(require("../../../utils/lib/customError"));
 class AgentFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -34,6 +35,24 @@ class AgentFlightService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id, ref_id } = req.agencyUser;
                 const body = req.body;
+                if (body.JourneyType === '3') {
+                    if (body.OriginDestinationInformation.length < 2) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Invalid JourneyType/OriginDestinationInformation',
+                        };
+                    }
+                }
+                else {
+                    if (Number(body.JourneyType) !== body.OriginDestinationInformation.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Invalid JourneyType/OriginDestinationInformation',
+                        };
+                    }
+                }
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agency_details = yield agencyModel.checkAgency({
@@ -142,6 +161,24 @@ class AgentFlightService extends abstract_service_1.default {
                     .PassengerTypeQuantity;
                 const airline_code = req.query
                     .airline_code;
+                if (JourneyType === '3') {
+                    if (OriginDestinationInformation.length < 2) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Invalid JourneyType/OriginDestinationInformation',
+                        };
+                    }
+                }
+                else {
+                    if (Number(JourneyType) !== OriginDestinationInformation.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Invalid JourneyType/OriginDestinationInformation',
+                        };
+                    }
+                }
                 const body = {
                     JourneyType,
                     OriginDestinationInformation,
@@ -379,7 +416,29 @@ class AgentFlightService extends abstract_service_1.default {
                         };
                     }
                 }
-                //revalidate
+                //get data from redis using the search id
+                const retrievedData = yield (0, redis_1.getRedis)(body.search_id);
+                if (!retrievedData) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                // Match search request pax and booking request pax details=====
+                const searchReqBody = retrievedData.reqBody;
+                for (const reqPax of searchReqBody.PassengerTypeQuantity) {
+                    const { Code, Quantity } = reqPax;
+                    const found = body.passengers.filter((pax) => pax.type === Code);
+                    if (!found.length) {
+                        throw new customError_1.default('Passenger data is invalid.', this.StatusCode.HTTP_BAD_REQUEST);
+                    }
+                    if (found.length !== Quantity) {
+                        throw new customError_1.default('Passenger data is invalid.', this.StatusCode.HTTP_BAD_REQUEST);
+                    }
+                }
+                // ============================================================
+                //revalidate the flight
                 const flightSupportService = new commonFlightSupport_service_1.CommonFlightSupportService(trx);
                 let rev_data = yield flightSupportService.FlightRevalidate({
                     search_id: body.search_id,
@@ -394,7 +453,7 @@ class AgentFlightService extends abstract_service_1.default {
                     };
                 }
                 const data = rev_data;
-                //if price has been changed and no confirmation of booking then return
+                // if price has been changed and no confirmation of booking then return
                 if (!booking_confirm) {
                     const price_changed = yield flightSupportService.checkBookingPriceChange({
                         flight_id: body.flight_id,
@@ -469,7 +528,7 @@ class AgentFlightService extends abstract_service_1.default {
                     }
                 }
                 //insert the revalidate data as info log
-                const log_id = yield this.Model.ErrorLogsModel().insertErrorLogs({
+                yield this.Model.ErrorLogsModel().insertErrorLogs({
                     http_method: 'POST',
                     level: constants_1.ERROR_LEVEL_INFO,
                     message: 'Flight booking revalidate data',
@@ -486,6 +545,7 @@ class AgentFlightService extends abstract_service_1.default {
                         response: data,
                     },
                 });
+                console.log({ data });
                 //insert booking data with invoice
                 const { booking_id, booking_ref } = yield bookingSupportService.insertFlightBookingData({
                     gds_pnr,
@@ -507,8 +567,6 @@ class AgentFlightService extends abstract_service_1.default {
                     booking_block: directBookingPermission.booking_block,
                     api: data.api,
                 });
-                //if booking insertion is successful then delete the revalidate log
-                yield this.Model.ErrorLogsModel(trx).deleteErrorLogs(log_id[0].id);
                 //send email
                 const bookingSubService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
                 yield bookingSubService.sendFlightBookingMail({

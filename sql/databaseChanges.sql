@@ -1,0 +1,2 @@
+-- type updated- type_for, type_booking_source, type_price_for
+-- new table visa, visa application
