@@ -304,6 +304,7 @@ export class AgentFlightService extends AbstractServices {
         total: 0,
         results: [],
       };
+
       await setRedis(search_id, { reqBody: body, response: responseData });
 
       const data: any[] = [];

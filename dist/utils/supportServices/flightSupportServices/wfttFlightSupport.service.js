@@ -133,26 +133,6 @@ class WfttFlightService extends abstract_service_1.default {
             const formattedData = yield Promise.all(data.map((item) => __awaiter(this, void 0, void 0, function* () {
                 const domestic_flight = route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC;
                 const { isDomesticFlight, fare: vendor_fare, api, carrier_code, carrier_logo, api_search_id, flights, passengers } = item, rest = __rest(item, ["isDomesticFlight", "fare", "api", "carrier_code", "carrier_logo", "api_search_id", "flights", "passengers"]);
-                const newFlights = yield Promise.all(flights.map((flight) => __awaiter(this, void 0, void 0, function* () {
-                    const { options } = flight;
-                    const newOptions = yield Promise.all(options.map((option) => __awaiter(this, void 0, void 0, function* () {
-                        const { carrier: optionsCareer } = option;
-                        const newCareer = Object.assign({}, optionsCareer);
-                        const careerMarketing = yield commonModel.getAirlineByCode(optionsCareer.carrier_marketing_code);
-                        if (optionsCareer.carrier_marketing_code ===
-                            optionsCareer.carrier_operating_code) {
-                            newCareer.carrier_marketing_logo = careerMarketing.logo;
-                            newCareer.carrier_operating_logo = careerMarketing.logo;
-                        }
-                        else {
-                            const careerOperating = yield commonModel.getAirlineByCode(optionsCareer.carrier_operating_code);
-                            newCareer.carrier_marketing_logo = careerMarketing.logo;
-                            newCareer.carrier_operating_logo = careerOperating.logo;
-                        }
-                        return Object.assign(Object.assign({}, option), { carrier: newCareer, fare });
-                    })));
-                    return Object.assign(Object.assign({}, flight), { options: newOptions });
-                })));
                 let total_segments = 0;
                 flights.map((elm) => {
                     elm.options.map((elm2) => {
@@ -213,6 +193,26 @@ class WfttFlightService extends abstract_service_1.default {
                         },
                     };
                 });
+                const newFlights = yield Promise.all(flights.map((flight) => __awaiter(this, void 0, void 0, function* () {
+                    const { options } = flight;
+                    const newOptions = yield Promise.all(options.map((option) => __awaiter(this, void 0, void 0, function* () {
+                        const { carrier: optionsCareer } = option;
+                        const newCareer = Object.assign({}, optionsCareer);
+                        const careerMarketing = yield commonModel.getAirlineByCode(optionsCareer.carrier_marketing_code);
+                        if (optionsCareer.carrier_marketing_code ===
+                            optionsCareer.carrier_operating_code) {
+                            newCareer.carrier_marketing_logo = careerMarketing.logo;
+                            newCareer.carrier_operating_logo = careerMarketing.logo;
+                        }
+                        else {
+                            const careerOperating = yield commonModel.getAirlineByCode(optionsCareer.carrier_operating_code);
+                            newCareer.carrier_marketing_logo = careerMarketing.logo;
+                            newCareer.carrier_operating_logo = careerOperating.logo;
+                        }
+                        return Object.assign(Object.assign({}, option), { carrier: newCareer, fare });
+                    })));
+                    return Object.assign(Object.assign({}, flight), { options: newOptions });
+                })));
                 const career = yield commonModel.getAirlineByCode(carrier_code);
                 return Object.assign(Object.assign({ domestic_flight,
                     fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API, carrier_code, carrier_logo: career.logo, flights: newFlights, passengers: newPassenger }, rest), { leg_description: [] });

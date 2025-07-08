@@ -198,50 +198,6 @@ export default class WfttFlightService extends AbstractServices {
           ...rest
         } = item;
 
-        const newFlights = await Promise.all(
-          flights.map(async (flight) => {
-            const { options } = flight;
-
-            const newOptions = await Promise.all(
-              options.map(async (option) => {
-                const { carrier: optionsCareer } = option;
-
-                const newCareer = { ...optionsCareer };
-
-                const careerMarketing = await commonModel.getAirlineByCode(
-                  optionsCareer.carrier_marketing_code
-                );
-
-                if (
-                  optionsCareer.carrier_marketing_code ===
-                  optionsCareer.carrier_operating_code
-                ) {
-                  newCareer.carrier_marketing_logo = careerMarketing.logo;
-                  newCareer.carrier_operating_logo = careerMarketing.logo;
-                } else {
-                  const careerOperating = await commonModel.getAirlineByCode(
-                    optionsCareer.carrier_operating_code
-                  );
-
-                  newCareer.carrier_marketing_logo = careerMarketing.logo;
-                  newCareer.carrier_operating_logo = careerOperating.logo;
-                }
-
-                return {
-                  ...option,
-                  carrier: newCareer,
-                  fare,
-                };
-              })
-            );
-
-            return {
-              ...flight,
-              options: newOptions,
-            };
-          })
-        );
-
         let total_segments = 0;
         flights.map((elm) => {
           elm.options.map((elm2) => {
@@ -317,6 +273,50 @@ export default class WfttFlightService extends AbstractServices {
             },
           };
         });
+
+        const newFlights = await Promise.all(
+          flights.map(async (flight) => {
+            const { options } = flight;
+
+            const newOptions = await Promise.all(
+              options.map(async (option) => {
+                const { carrier: optionsCareer } = option;
+
+                const newCareer = { ...optionsCareer };
+
+                const careerMarketing = await commonModel.getAirlineByCode(
+                  optionsCareer.carrier_marketing_code
+                );
+
+                if (
+                  optionsCareer.carrier_marketing_code ===
+                  optionsCareer.carrier_operating_code
+                ) {
+                  newCareer.carrier_marketing_logo = careerMarketing.logo;
+                  newCareer.carrier_operating_logo = careerMarketing.logo;
+                } else {
+                  const careerOperating = await commonModel.getAirlineByCode(
+                    optionsCareer.carrier_operating_code
+                  );
+
+                  newCareer.carrier_marketing_logo = careerMarketing.logo;
+                  newCareer.carrier_operating_logo = careerOperating.logo;
+                }
+
+                return {
+                  ...option,
+                  carrier: newCareer,
+                  fare,
+                };
+              })
+            );
+
+            return {
+              ...flight,
+              options: newOptions,
+            };
+          })
+        );
 
         const career = await commonModel.getAirlineByCode(carrier_code);
 
