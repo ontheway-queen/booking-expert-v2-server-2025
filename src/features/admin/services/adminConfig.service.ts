@@ -7,8 +7,8 @@ import {
   IUpdateAirportReqBody,
 } from '../utils/types/adminConfig.types';
 import {
-  SET_TYPE_FLIGHT,
-  SET_TYPE_HOTEL,
+  TYPE_FLIGHT,
+  TYPE_HOTEL,
   SLUG_TYPE_HOLIDAY,
 } from '../../../utils/miscellaneous/constants';
 import { HOLIDAY_CREATED_BY_ADMIN } from '../../../utils/miscellaneous/holidayConstants';
@@ -333,7 +333,7 @@ export class AdminConfigService extends AbstractServices {
       // Check if the markup set exists
       const existingFlightMarkupSet = await markupSetModel.checkDynamicFareSet({
         id: body.flight_set_id,
-        type: SET_TYPE_FLIGHT,
+        type: TYPE_FLIGHT,
       });
 
       if (!existingFlightMarkupSet) {
@@ -354,7 +354,7 @@ export class AdminConfigService extends AbstractServices {
       // Check if the markup set exists
       const existingHotelMarkupSet = await markupSetModel.checkDynamicFareSet({
         id: body.hotel_set_id,
-        type: SET_TYPE_HOTEL,
+        type: TYPE_HOTEL,
       });
 
       if (!existingHotelMarkupSet) {

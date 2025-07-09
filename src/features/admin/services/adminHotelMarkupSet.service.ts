@@ -4,7 +4,7 @@ import {
   ICreateHotelMarkupSetReqBody,
   IUpdateHotelMarkupsReqBody,
 } from '../utils/types/adminMarkupSetTypes';
-import { SET_TYPE_HOTEL } from '../../../utils/miscellaneous/constants';
+import { TYPE_HOTEL } from '../../../utils/miscellaneous/constants';
 import { IInsertHotelMarkupPayload } from '../../../utils/modelTypes/dynamicFareRulesModelTypes/hotelMarkupsTypes';
 
 export class AdminHotelMarkupSetService extends AbstractServices {
@@ -33,7 +33,7 @@ export class AdminHotelMarkupSetService extends AbstractServices {
       const markupSetModel = this.Model.DynamicFareSetModel(trx);
       const getMarkupSet = await markupSetModel.checkDynamicFareSet({
         id: Number(id),
-        type: SET_TYPE_HOTEL,
+        type: TYPE_HOTEL,
       });
       if (!getMarkupSet) {
         return {
@@ -45,7 +45,7 @@ export class AdminHotelMarkupSetService extends AbstractServices {
 
       await markupSetModel.updateDynamicFareSet(
         { is_deleted: true },
-        { id: Number(id), type: SET_TYPE_HOTEL }
+        { id: Number(id), type: TYPE_HOTEL }
       );
 
       await this.insertAdminAudit(trx, {
@@ -72,7 +72,7 @@ export class AdminHotelMarkupSetService extends AbstractServices {
       //check if markup set name already exists
       const checkName = await MarkupSetModel.checkDynamicFareSet({
         name,
-        type: SET_TYPE_HOTEL,
+        type: TYPE_HOTEL,
       });
 
       if (checkName) {
@@ -86,7 +86,7 @@ export class AdminHotelMarkupSetService extends AbstractServices {
       const markupSet = await MarkupSetModel.createDynamicFareSet({
         created_by: user_id,
         name,
-        type: SET_TYPE_HOTEL,
+        type: TYPE_HOTEL,
       });
 
       const hotelMarkupPayload: IInsertHotelMarkupPayload[] = [
@@ -135,7 +135,7 @@ export class AdminHotelMarkupSetService extends AbstractServices {
 
       const getMarkupSet = await markupSetModel.checkDynamicFareSet({
         id: set_id,
-        type: SET_TYPE_HOTEL,
+        type: TYPE_HOTEL,
       });
 
       if (!getMarkupSet) {
@@ -224,7 +224,7 @@ export class AdminHotelMarkupSetService extends AbstractServices {
 
       const getMarkupSet = await markupSetModel.checkDynamicFareSet({
         id: set_id,
-        type: SET_TYPE_HOTEL,
+        type: TYPE_HOTEL,
       });
 
       if (!getMarkupSet) {
@@ -258,7 +258,7 @@ export class AdminHotelMarkupSetService extends AbstractServices {
           updated_by: user_id,
           last_updated: new Date(),
         },
-        { id: set_id, type: SET_TYPE_HOTEL }
+        { id: set_id, type: TYPE_HOTEL }
       );
 
       await this.insertAdminAudit(trx, {

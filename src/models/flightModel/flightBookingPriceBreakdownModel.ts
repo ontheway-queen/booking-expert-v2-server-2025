@@ -31,4 +31,10 @@ export default class FlightBookingPriceBreakdownModel extends Schema {
       .select('id', 'type', 'total_passenger', 'base_fare', 'tax', 'total_fare')
       .where({ flight_booking_id });
   }
+  public async deleteFlightBookingPriceBreakdown(flight_booking_id: number) {
+    return await this.db('flight_booking_price_breakdown')
+      .withSchema(this.DBO_SCHEMA)
+      .delete()
+      .where({ flight_booking_id });
+  }
 }

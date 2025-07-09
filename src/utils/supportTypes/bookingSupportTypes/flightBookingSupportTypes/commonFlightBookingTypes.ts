@@ -6,10 +6,6 @@ import {
   SOURCE_SUB_AGENT,
 } from '../../../miscellaneous/constants';
 import {
-  PAYMENT_TYPE_FULL,
-  PAYMENT_TYPE_PARTIAL,
-} from '../../../miscellaneous/flightConstent';
-import {
   IGetSingleFlightBookingData,
   SourceType,
 } from '../../../modelTypes/flightModelTypes/flightBookingModelTypes';
@@ -32,6 +28,7 @@ export interface ICheckDirectBookingPermissionPayload {
 export interface IFlightBookingRequestBody {
   search_id: string;
   flight_id: string;
+  booking_confirm?: boolean;
   passengers: IFlightBookingPassengerReqBody[];
 }
 
@@ -71,7 +68,7 @@ export interface IFlightBookingPassengerReqBody {
 export interface IInsertFlightBookingDataPayload {
   gds_pnr: string | null;
   airline_pnr: string | null;
-  status: 'BOOKED' | 'BOOKING IN PROCESS';
+  status: 'BOOKED' | 'BOOKING IN PROCESS' | 'PENDING';
   api_booking_ref?: string | null;
   user_id: number;
   user_name: string;

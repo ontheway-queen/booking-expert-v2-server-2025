@@ -18,6 +18,8 @@ const redis_1 = require("../../../app/redis");
 const flightConstent_1 = require("../../miscellaneous/flightConstent");
 const sabreFlightSupport_service_1 = __importDefault(require("./sabreFlightSupport.service"));
 const wfttFlightSupport_service_1 = __importDefault(require("./wfttFlightSupport.service"));
+const customError_1 = __importDefault(require("../../lib/customError"));
+const dateTimeLib_1 = __importDefault(require("../../lib/dateTimeLib"));
 class CommonFlightSupportService extends abstract_service_1.default {
     constructor(trx) {
         super();
@@ -89,7 +91,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
             if (!retrievedData) {
                 return null;
             }
-            if (retrievedData.revalidate_data.fare.total_price === payload.booking_price) {
+            if (Number(retrievedData.fare.payable) === payload.booking_price) {
                 return false;
             }
             else {
@@ -223,6 +225,28 @@ class CommonFlightSupportService extends abstract_service_1.default {
                 pax_markup: Number(Number(pax_markup).toFixed(2)),
             };
         });
+    }
+    crossCheckPax({ bookingPax, searchPax, }) {
+        for (const reqPax of searchPax) {
+            const { Code, Quantity } = reqPax;
+            const found = bookingPax.filter((pax) => pax.type === Code);
+            if (!found.length) {
+                throw new customError_1.default('Passenger data is invalid.', this.StatusCode.HTTP_BAD_REQUEST);
+            }
+            if (found.length !== Quantity) {
+                throw new customError_1.default('Passenger data is invalid.', this.StatusCode.HTTP_BAD_REQUEST);
+            }
+            if (Code.startsWith('C')) {
+                const childAge = Number(Code.split('C')[1]);
+                if (!childAge || childAge > 11) {
+                    throw new customError_1.default(`Passenger data ${Code} is invalid.`, this.StatusCode.HTTP_BAD_REQUEST);
+                }
+                const DobAge = dateTimeLib_1.default.calculateAge(found[0].date_of_birth);
+                if (DobAge !== childAge) {
+                    throw new customError_1.default(`Passenger(${Code}) age and dob is invalid.`, this.StatusCode.HTTP_BAD_REQUEST);
+                }
+            }
+        }
     }
 }
 exports.CommonFlightSupportService = CommonFlightSupportService;

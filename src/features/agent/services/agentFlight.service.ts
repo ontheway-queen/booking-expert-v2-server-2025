@@ -14,7 +14,7 @@ import {
   CUSTOM_API,
   FLIGHT_BOOKING_CONFIRMED,
   FLIGHT_BOOKING_IN_PROCESS,
-  FLIGHT_BOOKING_REQUEST,
+  FLIGHT_BOOKING_PENDING,
   FLIGHT_FARE_RESPONSE,
   FLIGHT_REVALIDATE_REDIS_KEY,
   FLIGHT_TICKET_IN_PROCESS,
@@ -39,7 +39,7 @@ import {
   IAgentGetFlightBookingReqQuery,
 } from '../utils/types/agentFlight.types';
 import Lib from '../../../utils/lib/lib';
-import CustomError from '../../../utils/lib/customError';
+import { IUpdateFlightBookingPayload } from '../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
 
 export class AgentFlightService extends AbstractServices {
   constructor() {
@@ -123,7 +123,7 @@ export class AgentFlightService extends AbstractServices {
 
       let sabreData: any[] = [];
       let customData: any[] = [];
-
+      console.log({ sabre_supplier_id, custom_supplier_id });
       if (sabre_supplier_id) {
         const sabreSubService = new SabreFlightService(trx);
         sabreData = await sabreSubService.FlightSearch({
@@ -446,7 +446,7 @@ export class AgentFlightService extends AbstractServices {
         await setRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
         return {
           success: true,
-          message: 'Ticket has been revalidated successfully!',
+          message: 'Flight has been revalidated successfully!',
           data,
           code: this.StatusCode.HTTP_OK,
         };
@@ -461,22 +461,32 @@ export class AgentFlightService extends AbstractServices {
   }
 
   public async flightBooking(req: Request) {
-    return await this.db.transaction(async (trx) => {
-      const {
-        agency_id,
-        ref_id,
-        user_id,
-        user_email,
-        name,
-        phone_number,
-        agency_email,
-        agency_name,
-        agency_logo,
-        address,
-      } = req.agencyUser;
+    const {
+      agency_id,
+      ref_id,
+      user_id,
+      user_email,
+      name,
+      phone_number,
+      agency_email,
+      agency_name,
+      agency_logo,
+      address,
+    } = req.agencyUser;
+    const body = req.body as IFlightBookingRequestBody;
 
-      const body = req.body as IFlightBookingRequestBody;
-      const booking_confirm = req.query.booking_confirm;
+    let booking_block = false;
+    let airline_pnr: string | null = null;
+    let refundable = false;
+    let gds_pnr: string | null = null;
+    let api_booking_ref: string | null = null;
+    let data: IFormattedFlightItinerary;
+    let new_booking_id: number;
+    let new_booking_ref: string;
+    let booking_status = FLIGHT_BOOKING_PENDING;
+
+    const preBookData = await this.db.transaction(async (trx) => {
+      const booking_confirm = body.booking_confirm;
 
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
@@ -523,32 +533,18 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
+      //revalidate the flight
+      const flightSupportService = new CommonFlightSupportService(trx);
+
       // Match search request pax and booking request pax details=====
       const searchReqBody = retrievedData.reqBody as IFlightSearchReqBody;
 
-      for (const reqPax of searchReqBody.PassengerTypeQuantity) {
-        const { Code, Quantity } = reqPax;
+      flightSupportService.crossCheckPax({
+        bookingPax: body.passengers,
+        searchPax: searchReqBody.PassengerTypeQuantity,
+      });
 
-        const found = body.passengers.filter((pax) => pax.type === Code);
-
-        if (!found.length) {
-          throw new CustomError(
-            'Passenger data is invalid.',
-            this.StatusCode.HTTP_BAD_REQUEST
-          );
-        }
-
-        if (found.length !== Quantity) {
-          throw new CustomError(
-            'Passenger data is invalid.',
-            this.StatusCode.HTTP_BAD_REQUEST
-          );
-        }
-      }
       // ============================================================
-
-      //revalidate the flight
-      const flightSupportService = new CommonFlightSupportService(trx);
 
       let rev_data: IFormattedFlightItinerary | null =
         await flightSupportService.FlightRevalidate({
@@ -565,7 +561,8 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
-      const data = rev_data;
+      data = rev_data;
+      refundable = data.refundable;
 
       // if price has been changed and no confirmation of booking then return
       if (!booking_confirm) {
@@ -579,6 +576,9 @@ export class AgentFlightService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_CONFLICT,
+            data: {
+              new_fare: data.fare.payable,
+            },
             message: this.ResMsg.BOOKING_PRICE_CHANGED,
           };
         } else if (price_changed === null) {
@@ -618,43 +618,6 @@ export class AgentFlightService extends AbstractServices {
         return directBookingPermission;
       }
 
-      //if booking is not blocked then book the flight using API
-      let airline_pnr: string | null = null;
-      let refundable = data.refundable;
-      let gds_pnr: string | null = null;
-      let api_booking_ref: string | null = null;
-      let status:
-        | typeof FLIGHT_BOOKING_IN_PROCESS
-        | typeof FLIGHT_BOOKING_CONFIRMED =
-        directBookingPermission.booking_block
-          ? FLIGHT_BOOKING_IN_PROCESS
-          : FLIGHT_BOOKING_CONFIRMED;
-
-      if (directBookingPermission.booking_block === false) {
-        if (data.api === SABRE_API) {
-          const sabreSubService = new SabreFlightService(trx);
-          gds_pnr = await sabreSubService.FlightBookingService({
-            body,
-            user_info: {
-              id: user_id,
-              name,
-              email: user_email,
-              phone: phone_number || '',
-            },
-            revalidate_data: data,
-          });
-
-          //get airline pnr, refundable status
-          const grnData = await sabreSubService.GRNUpdate({
-            pnr: String(gds_pnr),
-          });
-          airline_pnr = grnData.airline_pnr;
-          refundable = grnData.refundable;
-        } else if (data.api === CUSTOM_API) {
-          status = FLIGHT_BOOKING_IN_PROCESS;
-        }
-      }
-
       //insert the revalidate data as info log
       await this.Model.ErrorLogsModel().insertErrorLogs({
         http_method: 'POST',
@@ -674,13 +637,12 @@ export class AgentFlightService extends AbstractServices {
         },
       });
 
-      console.log({ data });
       //insert booking data with invoice
       const { booking_id, booking_ref } =
         await bookingSupportService.insertFlightBookingData({
           gds_pnr,
           airline_pnr,
-          status,
+          status: FLIGHT_BOOKING_PENDING,
           api_booking_ref,
           user_id,
           user_name: name,
@@ -698,11 +660,67 @@ export class AgentFlightService extends AbstractServices {
           api: data.api,
         });
 
+      new_booking_id = booking_id;
+      new_booking_ref = booking_ref;
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
+      };
+    });
+
+    if (!preBookData.success) {
+      return preBookData;
+    }
+
+    return this.db.transaction(async (trx) => {
+      if (booking_block === false) {
+        if (data.api === SABRE_API) {
+          const sabreSubService = new SabreFlightService(trx);
+          const flightBookingModel = this.Model.FlightBookingModel(trx);
+          gds_pnr = await sabreSubService.FlightBookingService({
+            body,
+            user_info: {
+              id: user_id,
+              name,
+              email: user_email,
+              phone: phone_number || '',
+            },
+            revalidate_data: data,
+          });
+
+          //get airline pnr, refundable status
+          const grnData = await sabreSubService.GRNUpdate({
+            pnr: String(gds_pnr),
+          });
+
+          airline_pnr = grnData.airline_pnr;
+          refundable = grnData.refundable;
+          booking_status = FLIGHT_BOOKING_CONFIRMED;
+
+          const payload: IUpdateFlightBookingPayload = {
+            gds_pnr,
+            status: FLIGHT_BOOKING_CONFIRMED,
+          };
+
+          if (airline_pnr) {
+            payload.airline_pnr = airline_pnr;
+          }
+          await flightBookingModel.updateFlightBooking(payload, {
+            id: new_booking_id,
+            source_type: SOURCE_AGENT,
+          });
+        } else if (data.api === CUSTOM_API) {
+          booking_status = FLIGHT_BOOKING_IN_PROCESS;
+        }
+      }
+
       //send email
       const bookingSubService = new CommonFlightBookingSupportService(trx);
 
       await bookingSubService.sendFlightBookingMail({
-        booking_id: Number(booking_id),
+        booking_id: Number(preBookData),
         email: agency_email,
         booked_by: SOURCE_AGENT,
         agency: {
@@ -712,7 +730,7 @@ export class AgentFlightService extends AbstractServices {
           address: address,
           photo: agency_logo,
         },
-        panel_link: `${AGENT_PROJECT_LINK}${FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${booking_id}`,
+        panel_link: `${AGENT_PROJECT_LINK}${FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${new_booking_id}`,
       });
 
       return {
@@ -720,12 +738,10 @@ export class AgentFlightService extends AbstractServices {
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: 'The flight has been booked successfully!',
         data: {
-          booking_id,
-          booking_ref,
+          new_booking_id,
+          new_booking_ref,
           gds_pnr,
-          status: directBookingPermission.booking_block
-            ? FLIGHT_BOOKING_IN_PROCESS
-            : FLIGHT_BOOKING_CONFIRMED,
+          status: booking_status,
         },
       };
     });
@@ -827,14 +843,6 @@ export class AgentFlightService extends AbstractServices {
           message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
-
-      // if (booking_data.status !== FLIGHT_BOOKING_CONFIRMED) {
-      //   return {
-      //     success: false,
-      //     code: this.StatusCode.HTTP_BAD_REQUEST,
-      //     message: "Issue is not allowed for this booking. Contact support team."
-      //   }
-      // }
 
       //get other information
       const get_travelers = await bookingTravelerModel.getFlightBookingTraveler(
@@ -981,7 +989,7 @@ export class AgentFlightService extends AbstractServices {
       if (
         ![
           FLIGHT_BOOKING_CONFIRMED,
-          FLIGHT_BOOKING_REQUEST,
+          FLIGHT_BOOKING_PENDING,
           FLIGHT_BOOKING_IN_PROCESS,
         ].includes(booking_data.status)
       ) {

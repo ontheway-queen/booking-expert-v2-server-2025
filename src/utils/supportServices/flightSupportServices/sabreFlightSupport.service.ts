@@ -77,48 +77,32 @@ export default class SabreFlightService extends AbstractServices {
     if (route_type === ROUTE_TYPE.DOMESTIC) {
       prefAirlinesQuery.domestic = true;
     } else if (route_type === ROUTE_TYPE.FROM_DAC) {
-      prefAirlinesQuery.domestic = true;
+      prefAirlinesQuery.from_dac = true;
     } else if (route_type === ROUTE_TYPE.TO_DAC) {
-      prefAirlinesQuery.domestic = true;
+      prefAirlinesQuery.to_dac = true;
     } else if (route_type === ROUTE_TYPE.SOTO) {
-      prefAirlinesQuery.domestic = true;
+      prefAirlinesQuery.soto = true;
     }
 
     // Get preferred airlines
-    const cappingAirlinesRaw: { Code: string }[] =
+    const preferredAirlines: { Code: string }[] =
       await AirlinesPrefModel.getAirlinePrefCodes(prefAirlinesQuery);
-    const preferredAirlines: string[] = cappingAirlinesRaw.map((el) => el.Code);
 
-    let finalAirlineCodes: string[] = [];
+    let finalAirlineCodes: { Code: string }[] = [];
 
     if (body.airline_code?.length) {
-      const requestedAirlines: string[] = body.airline_code.map(
-        (el) => el.Code
-      );
+      for (const code of body.airline_code) {
+        const found = preferredAirlines.find((item) => item.Code === code.Code);
 
-      if (preferredAirlines.length) {
-        // Use common values only
-        finalAirlineCodes = requestedAirlines.filter((code) =>
-          preferredAirlines.includes(code)
-        );
-        if (finalAirlineCodes.length === 0) {
-          return false;
+        if (found) {
+          finalAirlineCodes.push({ Code: found.Code });
         }
-      } else {
-        // No preferred, use all requested
-        finalAirlineCodes = requestedAirlines;
       }
     } else {
       if (preferredAirlines.length) {
-        // Only preferred exist
         finalAirlineCodes = preferredAirlines;
       }
     }
-
-    // Return in the format: { Code: string }[]
-    const airlines: { Code: string }[] = finalAirlineCodes.map((code) => ({
-      Code: code,
-    }));
 
     const originDestinationInfo: OriginDestinationInformation[] = [];
     body.OriginDestinationInformation.forEach((item) => {
@@ -172,7 +156,7 @@ export default class SabreFlightService extends AbstractServices {
         AvailableFlightsOnly: true,
         OriginDestinationInformation: originDestinationInfo,
         TravelPreferences: {
-          VendorPref: airlines.length ? airlines : undefined,
+          VendorPref: finalAirlineCodes.length ? finalAirlineCodes : undefined,
           TPA_Extensions: {
             LongConnectTime: {
               Enable: true,

@@ -14,8 +14,8 @@ import Lib from '../../../../utils/lib/lib';
 import config from '../../../../config/config';
 import {
   GENERATE_AUTO_UNIQUE_ID,
-  SET_TYPE_FLIGHT,
-  SET_TYPE_HOTEL,
+  TYPE_FLIGHT,
+  TYPE_HOTEL,
 } from '../../../../utils/miscellaneous/constants';
 import EmailSendLib from '../../../../utils/lib/emailSendLib';
 import { registrationVerificationCompletedTemplate } from '../../../../utils/templates/registrationVerificationCompletedTemplate';
@@ -281,7 +281,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         const checkFlightMarkupSet = await MarkupSetModel.checkDynamicFareSet({
           id: body.flight_markup_set,
           status: true,
-          type: SET_TYPE_FLIGHT,
+          type: TYPE_FLIGHT,
         });
 
         if (!checkFlightMarkupSet) {
@@ -296,7 +296,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
           await MarkupSetModel.getSingleDynamicFareSet({
             id: body.hotel_markup_set,
             status: true,
-            type: SET_TYPE_HOTEL,
+            type: TYPE_HOTEL,
           });
 
         if (!checkHotelMarkupSet) {

@@ -280,7 +280,7 @@ class AgentFlightValidator {
         });
         //GET FLIGHT LIST SCHEMA
         this.getFlightListSchema = joi_1.default.object({
-            status: joi_1.default.string().valid(flightConstent_1.FLIGHT_BOOKING_REQUEST, flightConstent_1.FLIGHT_BOOKING_CONFIRMED, flightConstent_1.FLIGHT_BOOKING_VOID, flightConstent_1.FLIGHT_BOOKING_IN_PROCESS, flightConstent_1.FLIGHT_TICKET_IN_PROCESS, flightConstent_1.FLIGHT_BOOKING_ON_HOLD, flightConstent_1.FLIGHT_TICKET_ISSUE, flightConstent_1.FLIGHT_BOOKING_EXPIRED, flightConstent_1.FLIGHT_BOOKING_CANCELLED, flightConstent_1.FLIGHT_BOOKING_REFUNDED, flightConstent_1.FLIGHT_BOOKING_REISSUED),
+            status: joi_1.default.string().valid(flightConstent_1.FLIGHT_BOOKING_PENDING, flightConstent_1.FLIGHT_BOOKING_CONFIRMED, flightConstent_1.FLIGHT_BOOKING_VOID, flightConstent_1.FLIGHT_BOOKING_IN_PROCESS, flightConstent_1.FLIGHT_TICKET_IN_PROCESS, flightConstent_1.FLIGHT_BOOKING_ON_HOLD, flightConstent_1.FLIGHT_TICKET_ISSUE, flightConstent_1.FLIGHT_BOOKING_EXPIRED, flightConstent_1.FLIGHT_BOOKING_CANCELLED, flightConstent_1.FLIGHT_BOOKING_REFUNDED, flightConstent_1.FLIGHT_BOOKING_REISSUED),
             from_date: joi_1.default.date(),
             to_date: joi_1.default.date(),
             filter: joi_1.default.string(),

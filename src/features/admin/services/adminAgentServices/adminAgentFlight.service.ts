@@ -10,9 +10,8 @@ import {
 } from '../../../../utils/miscellaneous/constants';
 import {
   FLIGHT_BOOKING_CONFIRMED,
-  FLIGHT_BOOKING_EXPIRED,
   FLIGHT_BOOKING_IN_PROCESS,
-  FLIGHT_BOOKING_REQUEST,
+  FLIGHT_BOOKING_PENDING,
   FLIGHT_TICKET_IN_PROCESS,
   FLIGHT_TICKET_ISSUE,
   PAYMENT_TYPE_FULL,
@@ -154,7 +153,7 @@ export class AdminAgentFlightService extends AbstractServices {
       if (
         ![
           FLIGHT_BOOKING_CONFIRMED,
-          FLIGHT_BOOKING_REQUEST,
+          FLIGHT_BOOKING_PENDING,
           FLIGHT_BOOKING_IN_PROCESS,
         ].includes(booking_data.status)
       ) {
@@ -326,7 +325,10 @@ export class AdminAgentFlightService extends AbstractServices {
           due: Number(payment_data.due),
           agency_id: Number(booking_data.source_id),
           booking_ref: booking_data.booking_ref,
-          deduct_amount_from: payment_data.deduct_amount_from as "Both" | "Loan" | "Balance",
+          deduct_amount_from: payment_data.deduct_amount_from as
+            | 'Both'
+            | 'Loan'
+            | 'Balance',
           paid_amount: Number(payment_data.paid_amount),
           loan_amount: Number(payment_data.loan_amount),
           invoice_id: Number(payment_data.invoice_id),
@@ -394,7 +396,7 @@ export class AdminAgentFlightService extends AbstractServices {
         {
           status: req.body.status,
         },
-        Number(id)
+        { id: Number(id), source_type: SOURCE_AGENT }
       );
 
       return {
@@ -422,7 +424,7 @@ export class AdminAgentFlightService extends AbstractServices {
         };
       }
       if (
-        ![FLIGHT_BOOKING_REQUEST, FLIGHT_BOOKING_IN_PROCESS].includes(
+        ![FLIGHT_BOOKING_PENDING, FLIGHT_BOOKING_IN_PROCESS].includes(
           booking_data.status
         )
       ) {
@@ -441,7 +443,7 @@ export class AdminAgentFlightService extends AbstractServices {
         {
           ...rest,
         },
-        Number(id)
+        { id: Number(id), source_type: SOURCE_AGENT }
       );
 
       if (ticket_numbers && ticket_numbers.length > 0) {
@@ -532,7 +534,7 @@ export class AdminAgentFlightService extends AbstractServices {
         {
           status: FLIGHT_TICKET_ISSUE,
         },
-        Number(id)
+        { id: Number(id), source_type: SOURCE_AGENT }
       );
 
       const { ticket_numbers, charge_credit } =

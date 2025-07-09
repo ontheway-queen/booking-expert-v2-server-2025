@@ -33,5 +33,13 @@ class FlightBookingPriceBreakdownModel extends schema_1.default {
                 .where({ flight_booking_id });
         });
     }
+    deleteFlightBookingPriceBreakdown(flight_booking_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('flight_booking_price_breakdown')
+                .withSchema(this.DBO_SCHEMA)
+                .delete()
+                .where({ flight_booking_id });
+        });
+    }
 }
 exports.default = FlightBookingPriceBreakdownModel;

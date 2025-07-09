@@ -127,5 +127,28 @@ class InvoiceModel extends schema_1.default {
                 .first();
         });
     }
+    deleteInvoiceInvoice(params) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('invoice')
+                .withSchema(this.DBO_SCHEMA)
+                .select('*')
+                .where((qb) => {
+                if (params.source_id) {
+                    qb.andWhere('source_id', params.source_id);
+                }
+                if (params.source_type) {
+                    qb.andWhere('source_type', params.source_type);
+                }
+                if (params.id) {
+                    qb.andWhere('id', params.id);
+                }
+                if (params.ref) {
+                    qb.andWhere('ref_id', params.ref.id);
+                    qb.andWhere('ref_type', params.ref.type);
+                }
+            })
+                .first();
+        });
+    }
 }
 exports.default = InvoiceModel;

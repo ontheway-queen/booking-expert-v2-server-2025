@@ -49,7 +49,7 @@ class AdminHotelMarkupSetService extends abstract_service_1.default {
                 const markupSetModel = this.Model.DynamicFareSetModel(trx);
                 const getMarkupSet = yield markupSetModel.checkDynamicFareSet({
                     id: Number(id),
-                    type: constants_1.SET_TYPE_HOTEL,
+                    type: constants_1.TYPE_HOTEL,
                 });
                 if (!getMarkupSet) {
                     return {
@@ -58,7 +58,7 @@ class AdminHotelMarkupSetService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                yield markupSetModel.updateDynamicFareSet({ is_deleted: true }, { id: Number(id), type: constants_1.SET_TYPE_HOTEL });
+                yield markupSetModel.updateDynamicFareSet({ is_deleted: true }, { id: Number(id), type: constants_1.TYPE_HOTEL });
                 yield this.insertAdminAudit(trx, {
                     created_by: user_id,
                     type: 'DELETE',
@@ -82,7 +82,7 @@ class AdminHotelMarkupSetService extends abstract_service_1.default {
                 //check if markup set name already exists
                 const checkName = yield MarkupSetModel.checkDynamicFareSet({
                     name,
-                    type: constants_1.SET_TYPE_HOTEL,
+                    type: constants_1.TYPE_HOTEL,
                 });
                 if (checkName) {
                     return {
@@ -94,7 +94,7 @@ class AdminHotelMarkupSetService extends abstract_service_1.default {
                 const markupSet = yield MarkupSetModel.createDynamicFareSet({
                     created_by: user_id,
                     name,
-                    type: constants_1.SET_TYPE_HOTEL,
+                    type: constants_1.TYPE_HOTEL,
                 });
                 const hotelMarkupPayload = [
                     {
@@ -139,7 +139,7 @@ class AdminHotelMarkupSetService extends abstract_service_1.default {
                 const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
                 const getMarkupSet = yield markupSetModel.checkDynamicFareSet({
                     id: set_id,
-                    type: constants_1.SET_TYPE_HOTEL,
+                    type: constants_1.TYPE_HOTEL,
                 });
                 if (!getMarkupSet) {
                     return {
@@ -205,7 +205,7 @@ class AdminHotelMarkupSetService extends abstract_service_1.default {
                 const HotelMarkupsModel = this.Model.HotelMarkupsModel(trx);
                 const getMarkupSet = yield markupSetModel.checkDynamicFareSet({
                     id: set_id,
-                    type: constants_1.SET_TYPE_HOTEL,
+                    type: constants_1.TYPE_HOTEL,
                 });
                 if (!getMarkupSet) {
                     return {
@@ -227,7 +227,7 @@ class AdminHotelMarkupSetService extends abstract_service_1.default {
                         markup_for: 'Cancel',
                     });
                 }
-                yield markupSetModel.updateDynamicFareSet(Object.assign(Object.assign({}, restBody), { updated_by: user_id, last_updated: new Date() }), { id: set_id, type: constants_1.SET_TYPE_HOTEL });
+                yield markupSetModel.updateDynamicFareSet(Object.assign(Object.assign({}, restBody), { updated_by: user_id, last_updated: new Date() }), { id: set_id, type: constants_1.TYPE_HOTEL });
                 yield this.insertAdminAudit(trx, {
                     created_by: user_id,
                     type: 'UPDATE',

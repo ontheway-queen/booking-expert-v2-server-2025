@@ -7,6 +7,11 @@ import Lib from '../../../lib/lib';
 import {
   GENERATE_AUTO_UNIQUE_ID,
   INVOICE_TYPES,
+  SOURCE_ADMIN,
+  SOURCE_AGENT,
+  SOURCE_AGENT_B2C,
+  SOURCE_B2C,
+  SOURCE_SUB_AGENT,
 } from '../../../miscellaneous/constants';
 import {
   CUSTOM_API,
@@ -14,7 +19,7 @@ import {
   FLIGHT_BOOKING_CONFIRMED,
   FLIGHT_BOOKING_IN_PROCESS,
   FLIGHT_BOOKING_ON_HOLD,
-  FLIGHT_BOOKING_REQUEST,
+  FLIGHT_BOOKING_PENDING,
   FLIGHT_TICKET_IN_PROCESS,
   FLIGHT_TICKET_ISSUE,
   TRAVELER_FILE_TYPE_PASSPORT,
@@ -90,7 +95,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       flight_number: payload.flight_number,
       passengers,
       status: [
-        FLIGHT_BOOKING_REQUEST,
+        FLIGHT_BOOKING_PENDING,
         FLIGHT_BOOKING_CONFIRMED,
         FLIGHT_BOOKING_IN_PROCESS,
         FLIGHT_TICKET_IN_PROCESS,
@@ -170,7 +175,6 @@ export class CommonFlightBookingSupportService extends AbstractServices {
   public async insertFlightBookingData(
     payload: IInsertFlightBookingDataPayload
   ) {
-    console.log({ payload });
     const flightBookingModel = this.Model.FlightBookingModel(this.trx);
     const flightBookingPriceBreakdownModel =
       this.Model.FlightBookingPriceBreakdownModel(this.trx);
@@ -340,8 +344,9 @@ export class CommonFlightBookingSupportService extends AbstractServices {
     const tracking_data: IInsertFlightBookingTrackingPayload[] = [];
     tracking_data.push({
       flight_booking_id: booking_res[0].id,
-      description: `Booking - ${booking_ref} has been made by ${payload.user_name}. Booking status - ${payload.status}`,
+      description: `Booking - ${booking_ref} has been made by Agent(${payload.user_name}). Booking status - ${payload.status}`,
     });
+
     if (payload.booking_block) {
       tracking_data.push({
         flight_booking_id: booking_res[0].id,
@@ -388,29 +393,47 @@ export class CommonFlightBookingSupportService extends AbstractServices {
     };
   }
 
-  private getBookingMarkupDetails(
-    discount: number,
-    convenience_fee: number
-  ): {
-    markup_price: number | undefined;
-    markup_type: MarkupType | undefined;
-  } {
-    if (discount > 0) {
-      return {
-        markup_price: discount,
-        markup_type: MARKUP_MODE_DECREASE,
-      };
-    } else if (convenience_fee > 0) {
-      return {
-        markup_price: convenience_fee,
-        markup_type: MARKUP_MODE_INCREASE,
-      };
-    } else {
-      return {
-        markup_price: undefined,
-        markup_type: undefined,
-      };
-    }
+  public async deleteFlightBookingData({
+    id,
+    source_type,
+  }: {
+    id: number;
+    source_type:
+      | typeof SOURCE_AGENT
+      | typeof SOURCE_SUB_AGENT
+      | typeof SOURCE_AGENT_B2C
+      | typeof SOURCE_B2C;
+  }) {
+    const flightBookingModel = this.Model.FlightBookingModel(this.trx);
+    const flightBookingPriceBreakdownModel =
+      this.Model.FlightBookingPriceBreakdownModel(this.trx);
+
+    const flightBookingSegmentModel = this.Model.FlightBookingSegmentModel(
+      this.trx
+    );
+    const invoiceModel = this.Model.InvoiceModel(this.trx);
+
+    const flightBookingTravelerModel = this.Model.FlightBookingTravelerModel(
+      this.trx
+    );
+
+    const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(
+      this.trx
+    );
+
+    await flightBookingPriceBreakdownModel.deleteFlightBookingPriceBreakdown(
+      id
+    );
+
+    await flightBookingTravelerModel.deleteFlightBookingTraveler({
+      flight_booking_id: id,
+    });
+
+    await flightBookingTrackingModel.deleteFlightBookingTracking({
+      flight_booking_id: id,
+    });
+
+    await invoiceModel.createInvoice;
   }
 
   public async updateDataAfterBookingCancel(
@@ -425,7 +448,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
         cancelled_by_type: payload.cancelled_by_type,
         cancelled_by_user_id: payload.cancelled_by_user_id,
       },
-      payload.booking_id
+      { id: payload.booking_id, source_type: SOURCE_AGENT }
     );
 
     //add tracking

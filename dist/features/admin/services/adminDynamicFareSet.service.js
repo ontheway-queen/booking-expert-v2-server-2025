@@ -26,7 +26,7 @@ class AdminDynamicFareSetService extends abstract_service_1.default {
                 const { user_id: created_by } = req.admin;
                 const model = this.Model.DynamicFareSetModel(trx);
                 const check_duplicate = yield model.checkDynamicFareSet({
-                    type: constants_1.SET_TYPE_FLIGHT,
+                    type: constants_1.TYPE_FLIGHT,
                     name,
                 });
                 if (check_duplicate) {
@@ -39,7 +39,7 @@ class AdminDynamicFareSetService extends abstract_service_1.default {
                 const res = yield model.createDynamicFareSet({
                     name,
                     created_by,
-                    type: constants_1.SET_TYPE_FLIGHT,
+                    type: constants_1.TYPE_FLIGHT,
                 });
                 return {
                     success: true,
@@ -53,7 +53,7 @@ class AdminDynamicFareSetService extends abstract_service_1.default {
     getSets(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const model = this.Model.DynamicFareSetModel();
-            const data = yield model.getAllDynamicFareSet({ type: constants_1.SET_TYPE_FLIGHT });
+            const data = yield model.getAllDynamicFareSet({ type: constants_1.TYPE_FLIGHT });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -67,7 +67,7 @@ class AdminDynamicFareSetService extends abstract_service_1.default {
             const { id } = req.params;
             const body = req.body;
             const existing = yield model.checkDynamicFareSet({
-                type: constants_1.SET_TYPE_FLIGHT,
+                type: constants_1.TYPE_FLIGHT,
                 id: Number(id),
             });
             if (!existing) {
@@ -80,7 +80,7 @@ class AdminDynamicFareSetService extends abstract_service_1.default {
             if (body.name) {
                 const check_duplicate = yield model.checkDynamicFareSet({
                     name: body.name,
-                    type: constants_1.SET_TYPE_FLIGHT,
+                    type: constants_1.TYPE_FLIGHT,
                 });
                 if (check_duplicate) {
                     return {
@@ -92,7 +92,7 @@ class AdminDynamicFareSetService extends abstract_service_1.default {
             }
             yield model.updateDynamicFareSet(body, {
                 id: Number(id),
-                type: constants_1.SET_TYPE_FLIGHT,
+                type: constants_1.TYPE_FLIGHT,
             });
             return {
                 success: true,
@@ -107,7 +107,7 @@ class AdminDynamicFareSetService extends abstract_service_1.default {
                 const model = this.Model.DynamicFareSetModel(trx);
                 const { id } = req.params;
                 const existing = yield model.checkDynamicFareSet({
-                    type: constants_1.SET_TYPE_FLIGHT,
+                    type: constants_1.TYPE_FLIGHT,
                     id: Number(id),
                 });
                 if (!existing) {
@@ -119,7 +119,7 @@ class AdminDynamicFareSetService extends abstract_service_1.default {
                 }
                 const checkUsage = yield model.checkUsages({
                     id: Number(id),
-                    type: constants_1.SET_TYPE_FLIGHT,
+                    type: constants_1.TYPE_FLIGHT,
                 });
                 if (checkUsage) {
                     return {
@@ -128,7 +128,7 @@ class AdminDynamicFareSetService extends abstract_service_1.default {
                         message: 'This set is already used for agencies. To continue update sets of the agencies.',
                     };
                 }
-                yield model.updateDynamicFareSet({ is_deleted: true }, { id: Number(id), type: constants_1.SET_TYPE_FLIGHT });
+                yield model.updateDynamicFareSet({ is_deleted: true }, { id: Number(id), type: constants_1.TYPE_FLIGHT });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,

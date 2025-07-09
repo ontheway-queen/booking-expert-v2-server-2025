@@ -303,7 +303,7 @@ class AdminConfigService extends abstract_service_1.default {
                 // Check if the markup set exists
                 const existingFlightMarkupSet = yield markupSetModel.checkDynamicFareSet({
                     id: body.flight_set_id,
-                    type: constants_1.SET_TYPE_FLIGHT,
+                    type: constants_1.TYPE_FLIGHT,
                 });
                 if (!existingFlightMarkupSet) {
                     return {
@@ -321,7 +321,7 @@ class AdminConfigService extends abstract_service_1.default {
                 // Check if the markup set exists
                 const existingHotelMarkupSet = yield markupSetModel.checkDynamicFareSet({
                     id: body.hotel_set_id,
-                    type: constants_1.SET_TYPE_HOTEL,
+                    type: constants_1.TYPE_HOTEL,
                 });
                 if (!existingHotelMarkupSet) {
                     return {

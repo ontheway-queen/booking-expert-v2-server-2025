@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
-import { SET_TYPE_FLIGHT } from '../../../utils/miscellaneous/constants';
+import { TYPE_FLIGHT } from '../../../utils/miscellaneous/constants';
 
 export default class AdminDynamicFareSetService extends AbstractServices {
   constructor() {
@@ -13,7 +13,7 @@ export default class AdminDynamicFareSetService extends AbstractServices {
       const { user_id: created_by } = req.admin;
       const model = this.Model.DynamicFareSetModel(trx);
       const check_duplicate = await model.checkDynamicFareSet({
-        type: SET_TYPE_FLIGHT,
+        type: TYPE_FLIGHT,
         name,
       });
 
@@ -27,7 +27,7 @@ export default class AdminDynamicFareSetService extends AbstractServices {
       const res = await model.createDynamicFareSet({
         name,
         created_by,
-        type: SET_TYPE_FLIGHT,
+        type: TYPE_FLIGHT,
       });
       return {
         success: true,
@@ -40,7 +40,7 @@ export default class AdminDynamicFareSetService extends AbstractServices {
 
   public async getSets(req: Request) {
     const model = this.Model.DynamicFareSetModel();
-    const data = await model.getAllDynamicFareSet({ type: SET_TYPE_FLIGHT });
+    const data = await model.getAllDynamicFareSet({ type: TYPE_FLIGHT });
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
@@ -53,7 +53,7 @@ export default class AdminDynamicFareSetService extends AbstractServices {
     const { id } = req.params;
     const body = req.body;
     const existing = await model.checkDynamicFareSet({
-      type: SET_TYPE_FLIGHT,
+      type: TYPE_FLIGHT,
       id: Number(id),
     });
     if (!existing) {
@@ -67,7 +67,7 @@ export default class AdminDynamicFareSetService extends AbstractServices {
     if (body.name) {
       const check_duplicate = await model.checkDynamicFareSet({
         name: body.name,
-        type: SET_TYPE_FLIGHT,
+        type: TYPE_FLIGHT,
       });
 
       if (check_duplicate) {
@@ -81,7 +81,7 @@ export default class AdminDynamicFareSetService extends AbstractServices {
 
     await model.updateDynamicFareSet(body, {
       id: Number(id),
-      type: SET_TYPE_FLIGHT,
+      type: TYPE_FLIGHT,
     });
 
     return {
@@ -96,7 +96,7 @@ export default class AdminDynamicFareSetService extends AbstractServices {
       const model = this.Model.DynamicFareSetModel(trx);
       const { id } = req.params;
       const existing = await model.checkDynamicFareSet({
-        type: SET_TYPE_FLIGHT,
+        type: TYPE_FLIGHT,
         id: Number(id),
       });
 
@@ -110,7 +110,7 @@ export default class AdminDynamicFareSetService extends AbstractServices {
 
       const checkUsage = await model.checkUsages({
         id: Number(id),
-        type: SET_TYPE_FLIGHT,
+        type: TYPE_FLIGHT,
       });
 
       if (checkUsage) {
@@ -124,7 +124,7 @@ export default class AdminDynamicFareSetService extends AbstractServices {
 
       await model.updateDynamicFareSet(
         { is_deleted: true },
-        { id: Number(id), type: SET_TYPE_FLIGHT }
+        { id: Number(id), type: TYPE_FLIGHT }
       );
       return {
         success: true,

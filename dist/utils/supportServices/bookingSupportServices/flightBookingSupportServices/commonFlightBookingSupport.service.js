@@ -20,7 +20,6 @@ const flightUtils_1 = __importDefault(require("../../../lib/flight/flightUtils")
 const lib_1 = __importDefault(require("../../../lib/lib"));
 const constants_1 = require("../../../miscellaneous/constants");
 const flightConstent_1 = require("../../../miscellaneous/flightConstent");
-const constants_2 = require("../../../miscellaneous/constants");
 const flightBookingCancelTemplate_1 = require("../../../templates/flightBookingCancelTemplate");
 const flightBookingTemplate_1 = require("../../../templates/flightBookingTemplate");
 const flightTicketIssueTemplate_1 = require("../../../templates/flightTicketIssueTemplate");
@@ -59,7 +58,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 flight_number: payload.flight_number,
                 passengers,
                 status: [
-                    flightConstent_1.FLIGHT_BOOKING_REQUEST,
+                    flightConstent_1.FLIGHT_BOOKING_PENDING,
                     flightConstent_1.FLIGHT_BOOKING_CONFIRMED,
                     flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
                     flightConstent_1.FLIGHT_TICKET_IN_PROCESS,
@@ -128,7 +127,6 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
     }
     insertFlightBookingData(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log({ payload });
             const flightBookingModel = this.Model.FlightBookingModel(this.trx);
             const flightBookingPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(this.trx);
             const flightBookingSegmentModel = this.Model.FlightBookingSegmentModel(this.trx);
@@ -254,7 +252,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             const tracking_data = [];
             tracking_data.push({
                 flight_booking_id: booking_res[0].id,
-                description: `Booking - ${booking_ref} has been made by ${payload.user_name}. Booking status - ${payload.status}`,
+                description: `Booking - ${booking_ref} has been made by Agent(${payload.user_name}). Booking status - ${payload.status}`,
             });
             if (payload.booking_block) {
                 tracking_data.push({
@@ -299,25 +297,23 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             };
         });
     }
-    getBookingMarkupDetails(discount, convenience_fee) {
-        if (discount > 0) {
-            return {
-                markup_price: discount,
-                markup_type: constants_2.MARKUP_MODE_DECREASE,
-            };
-        }
-        else if (convenience_fee > 0) {
-            return {
-                markup_price: convenience_fee,
-                markup_type: constants_2.MARKUP_MODE_INCREASE,
-            };
-        }
-        else {
-            return {
-                markup_price: undefined,
-                markup_type: undefined,
-            };
-        }
+    deleteFlightBookingData(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ id, source_type, }) {
+            const flightBookingModel = this.Model.FlightBookingModel(this.trx);
+            const flightBookingPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(this.trx);
+            const flightBookingSegmentModel = this.Model.FlightBookingSegmentModel(this.trx);
+            const invoiceModel = this.Model.InvoiceModel(this.trx);
+            const flightBookingTravelerModel = this.Model.FlightBookingTravelerModel(this.trx);
+            const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(this.trx);
+            yield flightBookingPriceBreakdownModel.deleteFlightBookingPriceBreakdown(id);
+            yield flightBookingTravelerModel.deleteFlightBookingTraveler({
+                flight_booking_id: id,
+            });
+            yield flightBookingTrackingModel.deleteFlightBookingTracking({
+                flight_booking_id: id,
+            });
+            yield invoiceModel.createInvoice;
+        });
     }
     updateDataAfterBookingCancel(payload) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -328,7 +324,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 cancelled_at: new Date(),
                 cancelled_by_type: payload.cancelled_by_type,
                 cancelled_by_user_id: payload.cancelled_by_user_id,
-            }, payload.booking_id);
+            }, { id: payload.booking_id, source_type: constants_1.SOURCE_AGENT });
             //add tracking
             const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(this.trx);
             const tracking_data = [];

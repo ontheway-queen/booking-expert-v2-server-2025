@@ -53,11 +53,11 @@ export default class WfttFlightService extends AbstractServices {
     if (route_type === ROUTE_TYPE.DOMESTIC) {
       prefAirlinesQuery.domestic = true;
     } else if (route_type === ROUTE_TYPE.FROM_DAC) {
-      prefAirlinesQuery.domestic = true;
+      prefAirlinesQuery.from_dac = true;
     } else if (route_type === ROUTE_TYPE.TO_DAC) {
-      prefAirlinesQuery.domestic = true;
+      prefAirlinesQuery.to_dac = true;
     } else if (route_type === ROUTE_TYPE.SOTO) {
-      prefAirlinesQuery.domestic = true;
+      prefAirlinesQuery.soto = true;
     }
 
     // Get preferred airlines

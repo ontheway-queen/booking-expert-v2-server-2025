@@ -17,6 +17,7 @@ import Lib from '../../../lib/lib';
 import {
   GENERATE_AUTO_UNIQUE_ID,
   INVOICE_REF_TYPES,
+  SOURCE_AGENT,
 } from '../../../miscellaneous/constants';
 import { IInsertFlightBookingTrackingPayload } from '../../../modelTypes/flightModelTypes/flightBookingTrackingModelTypes';
 import BalanceLib from '../../../lib/balanceLib';
@@ -92,7 +93,7 @@ export class AgentFlightBookingSupportService extends AbstractServices {
         issued_by_type: payload.issued_by_type,
         issued_by_user_id: payload.issued_by_user_id,
       },
-      payload.booking_id
+      { id: payload.booking_id, source_type: SOURCE_AGENT }
     );
 
     //add tracking

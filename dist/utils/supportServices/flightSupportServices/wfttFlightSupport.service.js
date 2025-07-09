@@ -53,13 +53,13 @@ class WfttFlightService extends abstract_service_1.default {
                 prefAirlinesQuery.domestic = true;
             }
             else if (route_type === flightConstent_1.ROUTE_TYPE.FROM_DAC) {
-                prefAirlinesQuery.domestic = true;
+                prefAirlinesQuery.from_dac = true;
             }
             else if (route_type === flightConstent_1.ROUTE_TYPE.TO_DAC) {
-                prefAirlinesQuery.domestic = true;
+                prefAirlinesQuery.to_dac = true;
             }
             else if (route_type === flightConstent_1.ROUTE_TYPE.SOTO) {
-                prefAirlinesQuery.domestic = true;
+                prefAirlinesQuery.soto = true;
             }
             // Get preferred airlines
             const cappingAirlinesRaw = yield AirlinesPrefModel.getAirlinePrefCodes(prefAirlinesQuery);

@@ -20,22 +20,37 @@ class FlightBookingTravelerModel extends schema_1.default {
     }
     insertFlightBookingTraveler(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("flight_booking_traveler")
+            return yield this.db('flight_booking_traveler')
                 .withSchema(this.DBO_SCHEMA)
                 .insert(payload, 'id');
         });
     }
     getFlightBookingTraveler(flight_booking_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("flight_booking_traveler")
+            return yield this.db('flight_booking_traveler')
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
+                .select('*')
                 .where({ flight_booking_id });
+        });
+    }
+    deleteFlightBookingTraveler(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ flight_booking_id, traveler_id, }) {
+            return yield this.db('flight_booking_traveler')
+                .withSchema(this.DBO_SCHEMA)
+                .select('*')
+                .where((qb) => {
+                if (flight_booking_id) {
+                    qb.andWhere({ flight_booking_id });
+                }
+                if (traveler_id) {
+                    qb.andWhere('id', traveler_id);
+                }
+            });
         });
     }
     updateFlightBookingTraveler(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("flight_booking_traveler")
+            return yield this.db('flight_booking_traveler')
                 .withSchema(this.DBO_SCHEMA)
                 .update(payload)
                 .where({ id });

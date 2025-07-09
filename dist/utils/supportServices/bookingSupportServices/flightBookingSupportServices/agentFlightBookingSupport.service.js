@@ -75,7 +75,7 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                 issued_at: new Date(),
                 issued_by_type: payload.issued_by_type,
                 issued_by_user_id: payload.issued_by_user_id,
-            }, payload.booking_id);
+            }, { id: payload.booking_id, source_type: constants_1.SOURCE_AGENT });
             //add tracking
             const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(this.trx);
             const tracking_data = [];

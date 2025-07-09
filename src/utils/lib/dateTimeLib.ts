@@ -78,4 +78,22 @@ export default class DateTimeLib {
     // Return the number of nights (days - 1)
     return daysDifference > 0 ? daysDifference - 1 : 0;
   }
+
+  public static calculateAge(dob: string | Date): number {
+    const birthDate = new Date(dob);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+
+    const hasBirthdayPassedThisYear =
+      today.getMonth() > birthDate.getMonth() ||
+      (today.getMonth() === birthDate.getMonth() &&
+        today.getDate() >= birthDate.getDate());
+
+    if (!hasBirthdayPassedThisYear) {
+      age--;
+    }
+
+    return age;
+  }
 }

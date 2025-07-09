@@ -130,7 +130,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 }
                 if (![
                     flightConstent_1.FLIGHT_BOOKING_CONFIRMED,
-                    flightConstent_1.FLIGHT_BOOKING_REQUEST,
+                    flightConstent_1.FLIGHT_BOOKING_PENDING,
                     flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
                 ].includes(booking_data.status)) {
                     return {
@@ -336,7 +336,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 }
                 yield flightBookingModel.updateFlightBooking({
                     status: req.body.status,
-                }, Number(id));
+                }, { id: Number(id), source_type: constants_1.SOURCE_AGENT });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -362,7 +362,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                if (![flightConstent_1.FLIGHT_BOOKING_REQUEST, flightConstent_1.FLIGHT_BOOKING_IN_PROCESS].includes(booking_data.status)) {
+                if (![flightConstent_1.FLIGHT_BOOKING_PENDING, flightConstent_1.FLIGHT_BOOKING_IN_PROCESS].includes(booking_data.status)) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -371,7 +371,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 }
                 const body = req.body;
                 const { ticket_numbers, charge_credit } = body, rest = __rest(body, ["ticket_numbers", "charge_credit"]);
-                yield flightBookingModel.updateFlightBooking(Object.assign({}, rest), Number(id));
+                yield flightBookingModel.updateFlightBooking(Object.assign({}, rest), { id: Number(id), source_type: constants_1.SOURCE_AGENT });
                 if (ticket_numbers && ticket_numbers.length > 0) {
                     const flightBookingTravelerModel = this.Model.FlightBookingTravelerModel(trx);
                     yield Promise.all(ticket_numbers.map((ticket) => __awaiter(this, void 0, void 0, function* () {
@@ -443,7 +443,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 }
                 yield flightBookingModel.updateFlightBooking({
                     status: flightConstent_1.FLIGHT_TICKET_ISSUE,
-                }, Number(id));
+                }, { id: Number(id), source_type: constants_1.SOURCE_AGENT });
                 const { ticket_numbers, charge_credit } = req.body;
                 if (ticket_numbers && ticket_numbers.length > 0) {
                     const flightBookingTravelerModel = this.Model.FlightBookingTravelerModel(trx);

@@ -125,12 +125,13 @@ class FlightBookingModel extends schema_1.default {
                 .first();
         });
     }
-    updateFlightBooking(payload, id) {
-        return __awaiter(this, void 0, void 0, function* () {
+    updateFlightBooking(payload_1, _a) {
+        return __awaiter(this, arguments, void 0, function* (payload, { id, source_type }) {
             return yield this.db('flight_booking')
                 .withSchema(this.DBO_SCHEMA)
                 .update(payload)
-                .where({ id });
+                .andWhere({ id })
+                .andWhere({ source_type });
         });
     }
     checkFlightBooking(payload) {

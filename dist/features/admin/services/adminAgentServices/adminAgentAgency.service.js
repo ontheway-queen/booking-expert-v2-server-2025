@@ -237,7 +237,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     const checkFlightMarkupSet = yield MarkupSetModel.checkDynamicFareSet({
                         id: body.flight_markup_set,
                         status: true,
-                        type: constants_1.SET_TYPE_FLIGHT,
+                        type: constants_1.TYPE_FLIGHT,
                     });
                     if (!checkFlightMarkupSet) {
                         return {
@@ -249,7 +249,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     const checkHotelMarkupSet = yield MarkupSetModel.getSingleDynamicFareSet({
                         id: body.hotel_markup_set,
                         status: true,
-                        type: constants_1.SET_TYPE_HOTEL,
+                        type: constants_1.TYPE_HOTEL,
                     });
                     if (!checkHotelMarkupSet) {
                         return {

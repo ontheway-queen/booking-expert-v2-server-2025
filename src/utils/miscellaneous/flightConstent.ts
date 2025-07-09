@@ -21,7 +21,7 @@ export const CUSTOM_API = 'CUSTOM';
 export const CT_API = 'CHOLO_TRAVEL';
 
 //booking status
-export const FLIGHT_BOOKING_REQUEST = 'PENDING';
+export const FLIGHT_BOOKING_PENDING = 'PENDING';
 export const FLIGHT_BOOKING_CONFIRMED = 'BOOKED';
 export const FLIGHT_BOOKING_VOID = 'VOIDED';
 export const FLIGHT_BOOKING_IN_PROCESS = 'BOOKING IN PROCESS';

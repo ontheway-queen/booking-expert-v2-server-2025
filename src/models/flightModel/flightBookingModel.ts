@@ -14,6 +14,7 @@ import {
   IGetSingleFlightBookingParams,
   IInsertFlightBookingPayload,
   IUpdateFlightBookingPayload,
+  SourceType,
 } from '../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
 
 export default class FlightBookingModel extends Schema {
@@ -154,12 +155,13 @@ export default class FlightBookingModel extends Schema {
 
   public async updateFlightBooking(
     payload: IUpdateFlightBookingPayload,
-    id: number
+    { id, source_type }: { id: number; source_type: SourceType }
   ) {
     return await this.db('flight_booking')
       .withSchema(this.DBO_SCHEMA)
       .update(payload)
-      .where({ id });
+      .andWhere({ id })
+      .andWhere({ source_type });
   }
 
   public async checkFlightBooking(

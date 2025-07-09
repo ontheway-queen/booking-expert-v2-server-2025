@@ -45,9 +45,13 @@ export const OTP_EMAIL_SUBJECT = 'Your One Time Password For Verification';
 export const DATA_LIMIT = 100;
 export const OTP_DEFAULT_EXPIRY = 3;
 
-// markup set types
-export const SET_TYPE_FLIGHT = 'Flight';
-export const SET_TYPE_HOTEL = 'Hotel';
+// set types
+export const TYPE_FLIGHT = 'Flight';
+export const TYPE_HOTEL = 'Hotel';
+export const TYPE_VISA = 'Visa';
+export const TYPE_HOLIDAY = 'Holiday';
+export const TYPE_UMRAH = 'Umrah';
+export const TYPE_GROUP_FARE = 'Group Fare';
 
 //error logs level
 export const ERROR_LEVEL_DEBUG = 'DEBUG';

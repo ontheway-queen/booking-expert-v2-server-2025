@@ -7,11 +7,17 @@ import {
   MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET,
   SABRE_API,
 } from '../../miscellaneous/flightConstent';
-import { IFormattedFlightItinerary } from '../../supportTypes/flightTypes/commonFlightTypes';
+import {
+  IFlightSearchReqBody,
+  IFormattedFlightItinerary,
+  IPassengerTypeQuantityPayload,
+} from '../../supportTypes/flightTypes/commonFlightTypes';
 import SabreFlightService from './sabreFlightSupport.service';
 import WfttFlightService from './wfttFlightSupport.service';
 import CustomError from '../../lib/customError';
 import { IGetSupplierAirlinesDynamicFareQuery } from '../../modelTypes/dynamicFareRulesModelTypes/dynamicFareModelTypes';
+import { IFlightBookingPassengerReqBody } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
+import DateTimeLib from '../../lib/dateTimeLib';
 
 export class CommonFlightSupportService extends AbstractServices {
   private trx: Knex.Transaction;
@@ -92,6 +98,7 @@ export class CommonFlightSupportService extends AbstractServices {
       }
     });
   }
+
   private checkRevalidatePriceChange(payload: {
     flight_search_price: number;
     flight_revalidate_price: number;
@@ -110,12 +117,12 @@ export class CommonFlightSupportService extends AbstractServices {
     const retrievedData = await getRedis(
       `${FLIGHT_REVALIDATE_REDIS_KEY}${payload.flight_id}`
     );
+
     if (!retrievedData) {
       return null;
     }
-    if (
-      retrievedData.revalidate_data.fare.total_price === payload.booking_price
-    ) {
+
+    if (Number(retrievedData.fare.payable) === payload.booking_price) {
       return false;
     } else {
       return true;
@@ -267,5 +274,53 @@ export class CommonFlightSupportService extends AbstractServices {
       commission: Number(Number(commission).toFixed(2)),
       pax_markup: Number(Number(pax_markup).toFixed(2)),
     };
+  }
+
+  public crossCheckPax({
+    bookingPax,
+    searchPax,
+  }: {
+    bookingPax: IFlightBookingPassengerReqBody[];
+    searchPax: IPassengerTypeQuantityPayload[];
+  }) {
+    for (const reqPax of searchPax) {
+      const { Code, Quantity } = reqPax;
+
+      const found = bookingPax.filter((pax) => pax.type === Code);
+
+      if (!found.length) {
+        throw new CustomError(
+          'Passenger data is invalid.',
+          this.StatusCode.HTTP_BAD_REQUEST
+        );
+      }
+
+      if (found.length !== Quantity) {
+        throw new CustomError(
+          'Passenger data is invalid.',
+          this.StatusCode.HTTP_BAD_REQUEST
+        );
+      }
+
+      if (Code.startsWith('C')) {
+        const childAge = Number(Code.split('C')[1]);
+
+        if (!childAge || childAge > 11) {
+          throw new CustomError(
+            `Passenger data ${Code} is invalid.`,
+            this.StatusCode.HTTP_BAD_REQUEST
+          );
+        }
+
+        const DobAge = DateTimeLib.calculateAge(found[0].date_of_birth);
+
+        if (DobAge !== childAge) {
+          throw new CustomError(
+            `Passenger(${Code}) age and dob is invalid.`,
+            this.StatusCode.HTTP_BAD_REQUEST
+          );
+        }
+      }
+    }
   }
 }

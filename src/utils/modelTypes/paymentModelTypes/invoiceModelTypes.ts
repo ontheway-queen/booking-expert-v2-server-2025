@@ -88,3 +88,15 @@ export interface IGetSingleInvoiceParams {
     | typeof SOURCE_AGENT_B2C;
   source_id: number;
 }
+export interface IDeleteSingleInvoiceParams {
+  id?: number;
+  source_type?:
+    | typeof SOURCE_AGENT
+    | typeof SOURCE_B2C
+    | typeof SOURCE_AGENT_B2C;
+  source_id?: number;
+  ref?: {
+    id: number;
+    type: string;
+  };
+}
