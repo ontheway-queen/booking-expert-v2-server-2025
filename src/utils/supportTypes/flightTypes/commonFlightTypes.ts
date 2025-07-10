@@ -74,6 +74,7 @@ export interface IFormattedFlightItinerary {
   api_search_id: string;
   booking_block: boolean;
   api: string;
+  api_name: string;
   fare: IFormattedFare;
   carrier_code: string;
   carrier_name: string;

@@ -12,24 +12,25 @@ class AgentSubAgentRouter extends abstract_router_1.default {
         this.callRouter();
     }
     callRouter() {
-        this.router.route('/')
+        this.router
+            .route('/')
             .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_FILES, [
             'agency_logo',
             'civil_aviation',
             'trade_license',
-            'national_id'
+            'national_id',
         ]), this.controller.createSubAgency)
             .get(this.controller.getAllSubAgency);
-        this.router.route('/:id')
+        this.router
+            .route('/:id')
             .get(this.controller.getSingleSubAgency)
             .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_FILES, [
             'agency_logo',
             'civil_aviation',
             'trade_license',
-            'national_id'
+            'national_id',
         ]), this.controller.updateAgency);
-        this.router.route('/:id/users')
-            .get(this.controller.getAllUsersOfAgency);
+        this.router.route('/:id/users').get(this.controller.getAllUsersOfAgency);
     }
 }
 exports.default = AgentSubAgentRouter;

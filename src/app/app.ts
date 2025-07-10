@@ -31,7 +31,7 @@ class App {
   // Run cron jobs
   private async runCron() {
     // Run every 3 days at 12:00 AM
-    cron.schedule('0 0 */3 * *', async () => {
+    cron.schedule('0 0 */5 * *', async () => {
       // await services.getSabreToken();
     });
   }

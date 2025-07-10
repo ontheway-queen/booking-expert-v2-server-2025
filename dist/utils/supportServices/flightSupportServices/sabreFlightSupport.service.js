@@ -579,6 +579,7 @@ class SabreFlightService extends abstract_service_1.default {
                     }),
                     journey_type: reqBody.JourneyType,
                     api: flightConstent_1.SABRE_API,
+                    api_name: flightConstent_1.SABRE_API_NAME,
                     fare: new_fare,
                     refundable,
                     carrier_code: fare.validatingCarrierCode,

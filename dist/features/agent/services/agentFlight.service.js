@@ -568,10 +568,14 @@ class AgentFlightService extends abstract_service_1.default {
                                 },
                                 revalidate_data: data,
                             });
+                            if (gds_pnr) {
+                                payload.gds_pnr = gds_pnr;
+                            }
                             //get airline pnr, refundable status
                             const grnData = yield sabreSubService.GRNUpdate({
                                 pnr: String(gds_pnr),
                             });
+                            console.log({ gds_pnr, grnData });
                             refundable = grnData.refundable;
                             payload.status = flightConstent_1.FLIGHT_BOOKING_CONFIRMED;
                             if (grnData.airline_pnr) {

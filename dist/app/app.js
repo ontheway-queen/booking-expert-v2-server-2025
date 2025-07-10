@@ -40,7 +40,7 @@ class App {
     runCron() {
         return __awaiter(this, void 0, void 0, function* () {
             // Run every 3 days at 12:00 AM
-            node_cron_1.default.schedule('0 0 */3 * *', () => __awaiter(this, void 0, void 0, function* () {
+            node_cron_1.default.schedule('0 0 */5 * *', () => __awaiter(this, void 0, void 0, function* () {
                 // await services.getSabreToken();
             }));
         });

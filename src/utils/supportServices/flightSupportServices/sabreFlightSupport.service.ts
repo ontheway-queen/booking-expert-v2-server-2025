@@ -13,6 +13,7 @@ import {
   FLIGHT_TICKET_ISSUE,
   ROUTE_TYPE,
   SABRE_API,
+  SABRE_API_NAME,
   SABRE_FLIGHT_ITINS,
 } from '../../miscellaneous/flightConstent';
 
@@ -794,6 +795,7 @@ export default class SabreFlightService extends AbstractServices {
           }),
         journey_type: reqBody.JourneyType,
         api: SABRE_API,
+        api_name: SABRE_API_NAME,
         fare: new_fare,
         refundable,
         carrier_code: fare.validatingCarrierCode,

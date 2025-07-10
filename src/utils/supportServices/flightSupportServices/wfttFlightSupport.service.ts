@@ -13,7 +13,11 @@ import {
   IWFTTFlightSearchResBody,
   IWFTTFlightSearchResults,
 } from '../../supportTypes/flightTypes/wfttFlightTypes';
-import { CUSTOM_API, ROUTE_TYPE } from '../../miscellaneous/flightConstent';
+import {
+  CUSTOM_API,
+  CUSTOM_API_NAME,
+  ROUTE_TYPE,
+} from '../../miscellaneous/flightConstent';
 import Lib from '../../lib/lib';
 import CustomError from '../../lib/customError';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
@@ -326,6 +330,7 @@ export default class WfttFlightService extends AbstractServices {
           price_changed: false,
           api_search_id: search_id,
           api: CUSTOM_API,
+          api_name: CUSTOM_API_NAME,
           carrier_code,
           carrier_logo: career.logo,
           flights: newFlights,
