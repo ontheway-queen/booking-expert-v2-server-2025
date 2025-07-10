@@ -26,7 +26,7 @@ export interface IInsertFlightBookingPayload {
   source_id?: number;
   gds_pnr?: string | null;
   total_passenger: number;
-  status?: BookingStatus;
+  status: BookingStatus;
   base_fare: number | string;
   tax: number | string;
   ait?: number | string;

@@ -58,7 +58,6 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 flight_number: payload.flight_number,
                 passengers,
                 status: [
-                    flightConstent_1.FLIGHT_BOOKING_PENDING,
                     flightConstent_1.FLIGHT_BOOKING_CONFIRMED,
                     flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
                     flightConstent_1.FLIGHT_TICKET_IN_PROCESS,
@@ -108,18 +107,6 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                     message: this.ResMsg.SET_FLIGHT_API_ID_NOT_FOUND,
                 };
             }
-            const flightMarkupsModel = this.Model.DynamicFareModel(this.trx);
-            const flightMarkupData = yield flightMarkupsModel.getSupplierAirlinesFares({
-                dynamic_fare_supplier_id: set_flight_api[0].id,
-                airline: payload.airline,
-            });
-            if (!flightMarkupData.length) {
-                return {
-                    success: false,
-                    code: this.StatusCode.HTTP_NOT_FOUND,
-                    message: this.ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP,
-                };
-            }
             return {
                 booking_block: false,
             };
@@ -157,10 +144,10 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 ait: payload.flight_data.fare.ait,
                 payable_amount: payload.flight_data.fare.payable,
                 travel_date: payload.flight_data.flights[0].options[0].departure.date,
-                ticket_issue_last_time: payload.last_time,
+                ticket_issue_last_time: payload.ticket_issue_last_time,
                 airline_pnr: payload.airline_pnr,
                 created_by: payload.user_id,
-                vendor_fare: '',
+                vendor_fare: payload.vendor_fare,
             });
             //insert flight booking price breakdown data
             const passenger_fare = payload.flight_data.passengers.map((passenger) => {
@@ -312,7 +299,14 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             yield flightBookingTrackingModel.deleteFlightBookingTracking({
                 flight_booking_id: id,
             });
-            yield invoiceModel.createInvoice;
+            yield invoiceModel.deleteInvoiceInvoice({
+                ref: { id, type: constants_1.TYPE_FLIGHT },
+                source_type: source_type,
+            });
+            yield flightBookingSegmentModel.deleteFlightBookingSegment({
+                flight_booking_id: id,
+            });
+            yield flightBookingModel.deleteFlightBooking({ id, source_type });
         });
     }
     updateDataAfterBookingCancel(payload) {
@@ -325,7 +319,6 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 cancelled_by_type: payload.cancelled_by_type,
                 cancelled_by_user_id: payload.cancelled_by_user_id,
             }, { id: payload.booking_id, source_type: constants_1.SOURCE_AGENT });
-            //add tracking
             const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(this.trx);
             const tracking_data = [];
             tracking_data.push({

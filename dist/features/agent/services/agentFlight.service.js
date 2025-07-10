@@ -387,14 +387,14 @@ class AgentFlightService extends abstract_service_1.default {
             const { agency_id, ref_id, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
             const body = req.body;
             let booking_block = false;
-            let airline_pnr = null;
             let refundable = false;
-            let gds_pnr = null;
             let api_booking_ref = null;
             let data;
             let new_booking_id;
             let new_booking_ref;
-            let booking_status = flightConstent_1.FLIGHT_BOOKING_PENDING;
+            const payload = {
+                status: flightConstent_1.FLIGHT_BOOKING_PENDING,
+            };
             const preBookData = yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const booking_confirm = body.booking_confirm;
                 //get flight markup set id
@@ -503,7 +503,7 @@ class AgentFlightService extends abstract_service_1.default {
                     return directBookingPermission;
                 }
                 //insert the revalidate data as info log
-                yield this.Model.ErrorLogsModel().insertErrorLogs({
+                yield this.Model.ErrorLogsModel(trx).insertErrorLogs({
                     http_method: 'POST',
                     level: constants_1.ERROR_LEVEL_INFO,
                     message: 'Flight booking revalidate data',
@@ -522,8 +522,8 @@ class AgentFlightService extends abstract_service_1.default {
                 });
                 //insert booking data with invoice
                 const { booking_id, booking_ref } = yield bookingSupportService.insertFlightBookingData({
-                    gds_pnr,
-                    airline_pnr,
+                    gds_pnr: payload.gds_pnr,
+                    airline_pnr: payload.airline_pnr,
                     status: flightConstent_1.FLIGHT_BOOKING_PENDING,
                     api_booking_ref,
                     user_id,
@@ -531,15 +531,16 @@ class AgentFlightService extends abstract_service_1.default {
                     user_email,
                     files: req.files || [],
                     refundable,
-                    last_time: data.ticket_last_time,
+                    ticket_issue_last_time: data.ticket_last_time,
                     flight_data: data,
                     traveler_data: body.passengers,
                     type: 'Agent_Flight',
                     source_type: constants_1.SOURCE_AGENT,
                     source_id: agency_id,
-                    invoice_ref_type: constants_1.INVOICE_REF_TYPES.agent_flight_booking,
+                    invoice_ref_type: constants_1.TYPE_FLIGHT,
                     booking_block: directBookingPermission.booking_block,
                     api: data.api,
+                    vendor_fare: JSON.stringify(data.fare.vendor_price),
                 });
                 new_booking_id = booking_id;
                 new_booking_ref = booking_ref;
@@ -553,58 +554,107 @@ class AgentFlightService extends abstract_service_1.default {
                 return preBookData;
             }
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                if (booking_block === false) {
-                    if (data.api === flightConstent_1.SABRE_API) {
-                        const sabreSubService = new sabreFlightSupport_service_1.default(trx);
-                        const flightBookingModel = this.Model.FlightBookingModel(trx);
-                        gds_pnr = yield sabreSubService.FlightBookingService({
-                            body,
-                            user_info: {
-                                id: user_id,
-                                name,
-                                email: user_email,
-                                phone: phone_number || '',
-                            },
-                            revalidate_data: data,
-                        });
-                        //get airline pnr, refundable status
-                        const grnData = yield sabreSubService.GRNUpdate({
-                            pnr: String(gds_pnr),
-                        });
-                        airline_pnr = grnData.airline_pnr;
-                        refundable = grnData.refundable;
-                        booking_status = flightConstent_1.FLIGHT_BOOKING_CONFIRMED;
-                        const payload = {
-                            gds_pnr,
-                            status: flightConstent_1.FLIGHT_BOOKING_CONFIRMED,
-                        };
-                        if (airline_pnr) {
-                            payload.airline_pnr = airline_pnr;
+                try {
+                    if (booking_block === false) {
+                        if (data.api === flightConstent_1.SABRE_API) {
+                            const sabreSubService = new sabreFlightSupport_service_1.default(trx);
+                            const gds_pnr = yield sabreSubService.FlightBookingService({
+                                body,
+                                user_info: {
+                                    id: user_id,
+                                    name,
+                                    email: user_email,
+                                    phone: phone_number || '',
+                                },
+                                revalidate_data: data,
+                            });
+                            //get airline pnr, refundable status
+                            const grnData = yield sabreSubService.GRNUpdate({
+                                pnr: String(gds_pnr),
+                            });
+                            refundable = grnData.refundable;
+                            payload.status = flightConstent_1.FLIGHT_BOOKING_CONFIRMED;
+                            if (grnData.airline_pnr) {
+                                payload.airline_pnr = grnData.airline_pnr;
+                            }
                         }
-                        yield flightBookingModel.updateFlightBooking(payload, {
-                            id: new_booking_id,
-                            source_type: constants_1.SOURCE_AGENT,
-                        });
+                        else if (data.api === flightConstent_1.CUSTOM_API) {
+                            payload.status = flightConstent_1.FLIGHT_BOOKING_IN_PROCESS;
+                        }
                     }
-                    else if (data.api === flightConstent_1.CUSTOM_API) {
-                        booking_status = flightConstent_1.FLIGHT_BOOKING_IN_PROCESS;
+                    else {
+                        payload.status = flightConstent_1.FLIGHT_BOOKING_IN_PROCESS;
                     }
                 }
-                //send email
-                const bookingSubService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
-                yield bookingSubService.sendFlightBookingMail({
-                    booking_id: Number(preBookData),
-                    email: agency_email,
-                    booked_by: constants_1.SOURCE_AGENT,
-                    agency: {
+                catch (err) {
+                    console.log({ err });
+                    yield this.Model.ErrorLogsModel(trx).insertErrorLogs({
+                        http_method: 'POST',
+                        level: constants_1.ERROR_LEVEL_ERROR,
+                        message: 'Error on flight booking.' + err,
+                        url: '/flight/booking',
+                        user_id: user_id,
+                        source: 'AGENT',
+                        metadata: {
+                            api: data.api,
+                            request_body: {
+                                flight_id: body.flight_id,
+                                search_id: body.search_id,
+                                api_search_id: data.api_search_id,
+                            },
+                            response: data,
+                        },
+                    });
+                    //check eligibility of the booking
+                    const bookingSupportService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
+                    yield bookingSupportService.deleteFlightBookingData({
+                        id: new_booking_id,
+                        source_type: constants_1.SOURCE_AGENT,
+                    });
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'Cannot book the flight right now. Please try again.',
+                    };
+                }
+                try {
+                    const flightBookingModel = this.Model.FlightBookingModel(trx);
+                    yield flightBookingModel.updateFlightBooking(payload, {
+                        id: new_booking_id,
+                        source_type: constants_1.SOURCE_AGENT,
+                    });
+                    //send email
+                    const bookingSubService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
+                    yield bookingSubService.sendFlightBookingMail({
+                        booking_id: new_booking_id,
                         email: agency_email,
-                        name: agency_name,
-                        phone: String(phone_number),
-                        address: address,
-                        photo: agency_logo,
-                    },
-                    panel_link: `${constants_1.AGENT_PROJECT_LINK}${constants_1.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${new_booking_id}`,
-                });
+                        booked_by: constants_1.SOURCE_AGENT,
+                        agency: {
+                            email: agency_email,
+                            name: agency_name,
+                            phone: String(phone_number),
+                            address: address,
+                            photo: agency_logo,
+                        },
+                        panel_link: `${constants_1.AGENT_PROJECT_LINK}${constants_1.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${new_booking_id}`,
+                    });
+                }
+                catch (err) {
+                    console.log({ err });
+                    yield this.Model.ErrorLogsModel(trx).insertErrorLogs({
+                        http_method: 'POST',
+                        level: constants_1.ERROR_LEVEL_ERROR,
+                        message: 'Error update booking or Email send after booking.' + err,
+                        url: '/flight/booking',
+                        user_id: user_id,
+                        source: 'AGENT',
+                        metadata: {
+                            api: 'Update Booking or Email send.',
+                            request_body: err,
+                            response: data,
+                        },
+                    });
+                }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -612,8 +662,8 @@ class AgentFlightService extends abstract_service_1.default {
                     data: {
                         new_booking_id,
                         new_booking_ref,
-                        gds_pnr,
-                        status: booking_status,
+                        gds_pnr: payload.gds_pnr,
+                        status: payload.status,
                     },
                 };
             }));

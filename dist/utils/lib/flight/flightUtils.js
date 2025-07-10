@@ -199,5 +199,24 @@ class FlightUtils {
             return 'FIRST';
         }
     }
+    //get cabin code for sabre revalidate
+    getClassCodeFromId(cabin) {
+        if (cabin === '1') {
+            //economy
+            return 'Y';
+        }
+        else if (cabin === '2') {
+            //premium economy
+            return 'W';
+        }
+        else if (cabin === '3') {
+            //business
+            return 'J';
+        }
+        else {
+            //first
+            return 'F';
+        }
+    }
 }
 exports.default = FlightUtils;

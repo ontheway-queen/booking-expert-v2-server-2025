@@ -5,6 +5,12 @@ import {
   SOURCE_B2C,
   SOURCE_EXTERNAL,
   SOURCE_SUB_AGENT,
+  TYPE_FLIGHT,
+  TYPE_GROUP_FARE,
+  TYPE_HOLIDAY,
+  TYPE_HOTEL,
+  TYPE_UMRAH,
+  TYPE_VISA,
 } from '../../miscellaneous/constants';
 
 export interface ICreateInvoicePayload {
@@ -18,7 +24,13 @@ export interface ICreateInvoicePayload {
   source_id?: number;
   user_id: number;
   ref_id: number;
-  ref_type: string;
+  ref_type:
+    | typeof TYPE_FLIGHT
+    | typeof TYPE_HOTEL
+    | typeof TYPE_VISA
+    | typeof TYPE_UMRAH
+    | typeof TYPE_GROUP_FARE
+    | typeof TYPE_HOLIDAY;
   total_amount: number | string;
   due: number | string;
   details: string;
@@ -92,11 +104,18 @@ export interface IDeleteSingleInvoiceParams {
   id?: number;
   source_type?:
     | typeof SOURCE_AGENT
-    | typeof SOURCE_B2C
-    | typeof SOURCE_AGENT_B2C;
+    | typeof SOURCE_SUB_AGENT
+    | typeof SOURCE_AGENT_B2C
+    | typeof SOURCE_B2C;
   source_id?: number;
   ref?: {
     id: number;
-    type: string;
+    type:
+      | typeof TYPE_FLIGHT
+      | typeof TYPE_HOTEL
+      | typeof TYPE_VISA
+      | typeof TYPE_UMRAH
+      | typeof TYPE_GROUP_FARE
+      | typeof TYPE_HOLIDAY;
   };
 }

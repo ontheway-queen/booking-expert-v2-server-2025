@@ -179,7 +179,7 @@ class SabreFlightService extends abstract_service_1.default {
     }
     // Flight search Response formatter
     FlightSearchResFormatter(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ dynamic_fare_supplier_id, booking_block, data, reqBody, markup_amount, route_type, flight_id, }) {
+        return __awaiter(this, arguments, void 0, function* ({ dynamic_fare_supplier_id, booking_block, data, reqBody, markup_amount, route_type, flight_id, with_vendor_fare, }) {
             var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0;
             const commonModel = this.Model.CommonModel(this.trx);
             const AirlinesPreferenceModel = this.Model.AirlinesPreferenceModel(this.trx);
@@ -302,7 +302,9 @@ class SabreFlightService extends abstract_service_1.default {
                     ait,
                     discount: 0,
                     payable: fare.totalFare.equivalentAmount + fare.totalFare.totalTaxAmount + ait,
-                    vendor_price: {
+                };
+                if (with_vendor_fare) {
+                    new_fare.vendor_price = {
                         base_fare: fare.totalFare.equivalentAmount,
                         tax: fare.totalFare.totalTaxAmount,
                         ait: 0,
@@ -310,8 +312,8 @@ class SabreFlightService extends abstract_service_1.default {
                         discount: 0,
                         gross_fare: Number(fare.totalFare.totalPrice),
                         net_fare: Number(fare.totalFare.totalPrice),
-                    },
-                };
+                    };
+                }
                 let partial_payment = {
                     partial_payment: false,
                     payment_percentage: 100,
@@ -619,6 +621,7 @@ class SabreFlightService extends abstract_service_1.default {
                 flight_id,
                 markup_amount,
                 route_type,
+                with_vendor_fare: true,
             });
             return data[0];
         });
@@ -656,7 +659,8 @@ class SabreFlightService extends abstract_service_1.default {
                         const ArrivalDateTime = this.flightUtils.convertDateTime(option.arrival.date, option.arrival.time);
                         const flight_data = {
                             Number: Number(option === null || option === void 0 ? void 0 : option.carrier.carrier_marketing_flight_number),
-                            ClassOfService: 'V',
+                            ClassOfService: this.flightUtils.getClassCodeFromId(reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
+                                .Cabin),
                             DepartureDateTime,
                             ArrivalDateTime,
                             Type: 'A',
@@ -740,18 +744,9 @@ class SabreFlightService extends abstract_service_1.default {
                                 LCC: 'Disable',
                             },
                             VerificationItinCallLogic: {
+                                Value: 'M',
                                 AlwaysCheckAvailability: true,
-                                Value: 'L',
                             },
-                            // FlexibleFares: {
-                            //   FareParameters: [
-                            //     {
-                            //       Cabin: {
-                            //         Type: cabin,
-                            //       },
-                            //     },
-                            //   ],
-                            // },
                         },
                     },
                     Version: '5',
@@ -1068,7 +1063,9 @@ class SabreFlightService extends abstract_service_1.default {
                 phone: user_info.phone,
                 name: user_info.name,
             });
+            console.log({ requestBody });
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT, requestBody);
+            console.log({ response });
             if (!response) {
                 throw new customError_1.default('Something went wrong. Please try again later', 500);
             }

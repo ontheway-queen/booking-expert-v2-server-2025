@@ -4,9 +4,9 @@ import {
   AGENT_PROJECT_LINK,
   FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT,
   GENERATE_AUTO_UNIQUE_ID,
-  INVOICE_REF_TYPES,
   SOURCE_ADMIN,
   SOURCE_AGENT,
+  TYPE_FLIGHT,
 } from '../../../../utils/miscellaneous/constants';
 import {
   FLIGHT_BOOKING_CONFIRMED,
@@ -474,7 +474,7 @@ export class AdminAgentFlightService extends AbstractServices {
         const invoiceModel = this.Model.InvoiceModel(trx);
         const getInvoice = await invoiceModel.getInvoiceList({
           ref_id: booking_data.id,
-          ref_type: INVOICE_REF_TYPES.agent_flight_booking,
+          ref_type: TYPE_FLIGHT,
         });
         await invoiceModel.updateInvoice(
           {
@@ -568,7 +568,7 @@ export class AdminAgentFlightService extends AbstractServices {
         const invoiceModel = this.Model.InvoiceModel(trx);
         const getInvoice = await invoiceModel.getInvoiceList({
           ref_id: booking_data.id,
-          ref_type: INVOICE_REF_TYPES.agent_flight_booking,
+          ref_type: TYPE_FLIGHT,
         });
         await invoiceModel.updateInvoice(
           {

@@ -16,8 +16,8 @@ import {
 import Lib from '../../../lib/lib';
 import {
   GENERATE_AUTO_UNIQUE_ID,
-  INVOICE_REF_TYPES,
   SOURCE_AGENT,
+  TYPE_FLIGHT,
 } from '../../../miscellaneous/constants';
 import { IInsertFlightBookingTrackingPayload } from '../../../modelTypes/flightModelTypes/flightBookingTrackingModelTypes';
 import BalanceLib from '../../../lib/balanceLib';
@@ -178,7 +178,7 @@ export class AgentFlightBookingSupportService extends AbstractServices {
     const invoiceModel = this.Model.InvoiceModel(this.trx);
     const getInvoice = await invoiceModel.getInvoiceList({
       ref_id: payload.booking_id,
-      ref_type: INVOICE_REF_TYPES.agent_flight_booking,
+      ref_type: TYPE_FLIGHT,
     });
     if (!getInvoice.data.length) {
       return {

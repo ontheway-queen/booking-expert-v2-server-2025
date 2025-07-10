@@ -392,7 +392,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                     const invoiceModel = this.Model.InvoiceModel(trx);
                     const getInvoice = yield invoiceModel.getInvoiceList({
                         ref_id: booking_data.id,
-                        ref_type: constants_1.INVOICE_REF_TYPES.agent_flight_booking,
+                        ref_type: constants_1.TYPE_FLIGHT,
                     });
                     yield invoiceModel.updateInvoice({
                         due: 0,
@@ -465,7 +465,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                     const invoiceModel = this.Model.InvoiceModel(trx);
                     const getInvoice = yield invoiceModel.getInvoiceList({
                         ref_id: booking_data.id,
-                        ref_type: constants_1.INVOICE_REF_TYPES.agent_flight_booking,
+                        ref_type: constants_1.TYPE_FLIGHT,
                     });
                     yield invoiceModel.updateInvoice({
                         due: 0,

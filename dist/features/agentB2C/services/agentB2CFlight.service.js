@@ -408,8 +408,6 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 let refundable = data.refundable;
                 //insert booking data
                 const { booking_id, booking_ref } = yield bookingSupportService.insertFlightBookingData({
-                    gds_pnr: null,
-                    airline_pnr: null,
                     status: flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
                     api_booking_ref: null,
                     user_id,
@@ -417,30 +415,16 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     user_email,
                     files: req.files || [],
                     refundable,
-                    last_time: data.ticket_last_time,
+                    ticket_issue_last_time: data.ticket_last_time,
                     flight_data: data,
                     traveler_data: body.passengers,
                     type: 'Agent_Flight',
                     source_type: constants_1.SOURCE_AGENT_B2C,
                     source_id: agency_id,
-                    invoice_ref_type: constants_1.INVOICE_REF_TYPES.agent_b2c_flight_booking,
+                    invoice_ref_type: constants_1.TYPE_FLIGHT,
                     api: data.api,
+                    vendor_fare: JSON.stringify(data.fare.vendor_price),
                 });
-                // //send email
-                // const bookingSubService = new CommonFlightBookingSupportService(trx);
-                // await bookingSubService.sendFlightBookingMail({
-                //     booking_id: Number(booking_id),
-                //     email: agency_email,
-                //     booked_by: SOURCE_AGENT_B2C,
-                //     agency: {
-                //         email: agency_email,
-                //         name: agency_name,
-                //         phone: String(agency_number),
-                //         address: String(agency_address),
-                //         photo: agency_logo
-                //     },
-                //     panel_link: `${AGENT_PROJECT_LINK}${FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${booking_id}`,
-                // });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,

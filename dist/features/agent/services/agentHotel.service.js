@@ -368,7 +368,7 @@ class AgentHotelService extends abstract_service_1.default {
                     source_id: agency_id,
                     user_id: user_id,
                     ref_id: hotelBooking[0].id,
-                    ref_type: constants_1.INVOICE_REF_TYPES.agent_hotel_booking,
+                    ref_type: constants_1.TYPE_FLIGHT,
                     total_amount: recheck.fee.total_price,
                     due: 0,
                     details: `Auto invoice has been created for flight booking ref no. - ${booking_ref}`,

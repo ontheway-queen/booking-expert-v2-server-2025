@@ -39,10 +39,10 @@ export default class FlightBookingTravelerModel extends Schema {
   }: {
     flight_booking_id?: number;
     traveler_id?: number;
-  }): Promise<IGetFlightBookingTravelerData[]> {
+  }) {
     return await this.db('flight_booking_traveler')
       .withSchema(this.DBO_SCHEMA)
-      .select('*')
+      .delete()
       .where((qb) => {
         if (flight_booking_id) {
           qb.andWhere({ flight_booking_id });

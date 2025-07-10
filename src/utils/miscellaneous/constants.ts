@@ -121,14 +121,5 @@ export const INVOICE_TYPES = {
   REISSUE: 'REISSUE',
 };
 
-//invoice ref type
-export const INVOICE_REF_TYPES = {
-  agent_flight_booking: 'agent_flight_booking',
-  agent_hotel_booking: 'agent_hotel_booking',
-  b2c_flight_booking: 'b2c_flight_booking',
-  external_flight_booking: 'external_flight_booking',
-  agent_b2c_flight_booking: 'agent_b2c_flight_booking',
-};
-
 //frontend endpoints
 export const FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = '/dashboard/flights/';

@@ -12,6 +12,7 @@ import {
   SOURCE_AGENT_B2C,
   SOURCE_B2C,
   SOURCE_SUB_AGENT,
+  TYPE_FLIGHT,
 } from '../../../miscellaneous/constants';
 import {
   CUSTOM_API,
@@ -95,7 +96,6 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       flight_number: payload.flight_number,
       passengers,
       status: [
-        FLIGHT_BOOKING_PENDING,
         FLIGHT_BOOKING_CONFIRMED,
         FLIGHT_BOOKING_IN_PROCESS,
         FLIGHT_TICKET_IN_PROCESS,
@@ -153,20 +153,6 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       };
     }
 
-    const flightMarkupsModel = this.Model.DynamicFareModel(this.trx);
-    const flightMarkupData = await flightMarkupsModel.getSupplierAirlinesFares({
-      dynamic_fare_supplier_id: set_flight_api[0].id,
-      airline: payload.airline,
-    });
-
-    if (!flightMarkupData.length) {
-      return {
-        success: false,
-        code: this.StatusCode.HTTP_NOT_FOUND,
-        message: this.ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP,
-      };
-    }
-
     return {
       booking_block: false,
     };
@@ -221,10 +207,10 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       ait: payload.flight_data.fare.ait,
       payable_amount: payload.flight_data.fare.payable,
       travel_date: payload.flight_data.flights[0].options[0].departure.date,
-      ticket_issue_last_time: payload.last_time,
+      ticket_issue_last_time: payload.ticket_issue_last_time,
       airline_pnr: payload.airline_pnr,
       created_by: payload.user_id,
-      vendor_fare: '',
+      vendor_fare: payload.vendor_fare,
     });
 
     //insert flight booking price breakdown data
@@ -249,6 +235,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
     const { baggage_info, cabin_info } = flightUtils.mapFlightAvailability(
       payload.flight_data.availability
     );
+
     payload.flight_data.flights.forEach(async (flight) => {
       flight.options.forEach(async (option, ind) => {
         await flightBookingSegmentModel.insertFlightBookingSegment({
@@ -433,7 +420,16 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       flight_booking_id: id,
     });
 
-    await invoiceModel.createInvoice;
+    await invoiceModel.deleteInvoiceInvoice({
+      ref: { id, type: TYPE_FLIGHT },
+      source_type: source_type,
+    });
+
+    await flightBookingSegmentModel.deleteFlightBookingSegment({
+      flight_booking_id: id,
+    });
+
+    await flightBookingModel.deleteFlightBooking({ id, source_type });
   }
 
   public async updateDataAfterBookingCancel(
@@ -451,7 +447,6 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       { id: payload.booking_id, source_type: SOURCE_AGENT }
     );
 
-    //add tracking
     const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(
       this.trx
     );

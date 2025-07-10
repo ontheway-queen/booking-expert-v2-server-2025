@@ -240,4 +240,18 @@ export default class FlightBookingModel extends Schema {
     const result = await query.first();
     return Number(result?.total ?? 0);
   }
+
+  public async deleteFlightBooking({
+    id,
+    source_type,
+  }: {
+    id: number;
+    source_type: SourceType;
+  }) {
+    return await this.db('flight_booking')
+      .withSchema(this.DBO_SCHEMA)
+      .delete()
+      .andWhere('id', id)
+      .andWhere('source_type', source_type);
+  }
 }

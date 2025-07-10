@@ -20,17 +20,32 @@ class FlightBookingSegmentModel extends schema_1.default {
     }
     insertFlightBookingSegment(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("flight_booking_segment")
+            return yield this.db('flight_booking_segment')
                 .withSchema(this.DBO_SCHEMA)
                 .insert(payload, 'id');
         });
     }
     getFlightBookingSegment(flight_booking_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("flight_booking_segment")
+            return yield this.db('flight_booking_segment')
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
+                .select('*')
                 .where({ flight_booking_id });
+        });
+    }
+    deleteFlightBookingSegment(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ flight_booking_id, segment_id, }) {
+            return yield this.db('flight_booking_segment')
+                .withSchema(this.DBO_SCHEMA)
+                .delete()
+                .where((qb) => {
+                if (flight_booking_id) {
+                    qb.andWhere({ flight_booking_id });
+                }
+                if (segment_id) {
+                    qb.andWhere('id', segment_id);
+                }
+            });
         });
     }
 }

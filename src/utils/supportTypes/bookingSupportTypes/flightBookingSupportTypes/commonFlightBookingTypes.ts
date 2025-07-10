@@ -4,6 +4,12 @@ import {
   SOURCE_AGENT_B2C,
   SOURCE_B2C,
   SOURCE_SUB_AGENT,
+  TYPE_FLIGHT,
+  TYPE_GROUP_FARE,
+  TYPE_HOLIDAY,
+  TYPE_HOTEL,
+  TYPE_UMRAH,
+  TYPE_VISA,
 } from '../../../miscellaneous/constants';
 import {
   IGetSingleFlightBookingData,
@@ -66,39 +72,33 @@ export interface IFlightBookingPassengerReqBody {
 }
 
 export interface IInsertFlightBookingDataPayload {
-  gds_pnr: string | null;
-  airline_pnr: string | null;
+  gds_pnr?: string;
+  airline_pnr?: string;
   status: 'BOOKED' | 'BOOKING IN PROCESS' | 'PENDING';
   api_booking_ref?: string | null;
   user_id: number;
   user_name: string;
   user_email: string;
-  files?: any[];
+  files?: Express.Multer.File[];
+  ticket_issue_last_time: string | null;
   refundable: boolean;
-  last_time: string | null;
   flight_data: IFormattedFlightItinerary;
   traveler_data: IFlightBookingPassengerReqBody[];
-  type:
-    | 'Agent'
-    | 'Agent_Flight'
-    | 'Agent_Visa'
-    | 'Agent_Tour'
-    | 'Agent_Umrah'
-    | 'Agent_GroupFare'
-    | 'Agent_SupportTicket'
-    | 'Agent_Hotel'
-    | 'User_Flight'
-    | 'User_Visa'
-    | 'User_Tour'
-    | 'User_Umrah'
-    | 'User_SupportTicket';
+  type: 'Agent_Flight' | 'User_Flight';
   source_type: SourceType;
   source_id?: number;
   payable_amount?: number;
-  invoice_ref_type: string;
+  invoice_ref_type:
+    | typeof TYPE_FLIGHT
+    | typeof TYPE_HOTEL
+    | typeof TYPE_VISA
+    | typeof TYPE_UMRAH
+    | typeof TYPE_GROUP_FARE
+    | typeof TYPE_HOLIDAY;
   coupon_code?: string;
   booking_block?: boolean;
   api: string;
+  vendor_fare: string;
 }
 
 export interface IUpdateDataAfterFlightBookingCancelPayload {

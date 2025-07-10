@@ -276,4 +276,21 @@ export default class FlightUtils {
       return 'FIRST';
     }
   }
+
+  //get cabin code for sabre revalidate
+  public getClassCodeFromId(cabin: '1' | '2' | '3' | '4') {
+    if (cabin === '1') {
+      //economy
+      return 'Y';
+    } else if (cabin === '2') {
+      //premium economy
+      return 'W';
+    } else if (cabin === '3') {
+      //business
+      return 'J';
+    } else {
+      //first
+      return 'F';
+    }
+  }
 }

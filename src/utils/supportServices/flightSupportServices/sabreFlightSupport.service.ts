@@ -251,6 +251,7 @@ export default class SabreFlightService extends AbstractServices {
     markup_amount,
     route_type,
     flight_id,
+    with_vendor_fare,
   }: {
     data: ISabreResponseResult;
     reqBody: IFlightSearchReqBody;
@@ -258,6 +259,7 @@ export default class SabreFlightService extends AbstractServices {
     booking_block: boolean;
     flight_id?: string;
     route_type: 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' | 'SOTO';
+    with_vendor_fare?: boolean;
     markup_amount?: {
       markup: number;
       markup_type: 'PER' | 'FLAT';
@@ -440,7 +442,10 @@ export default class SabreFlightService extends AbstractServices {
         discount: 0,
         payable:
           fare.totalFare.equivalentAmount + fare.totalFare.totalTaxAmount + ait,
-        vendor_price: {
+      };
+
+      if (with_vendor_fare) {
+        new_fare.vendor_price = {
           base_fare: fare.totalFare.equivalentAmount,
           tax: fare.totalFare.totalTaxAmount,
           ait: 0,
@@ -448,8 +453,8 @@ export default class SabreFlightService extends AbstractServices {
           discount: 0,
           gross_fare: Number(fare.totalFare.totalPrice),
           net_fare: Number(fare.totalFare.totalPrice),
-        },
-      };
+        };
+      }
 
       let partial_payment: {
         partial_payment: boolean;
@@ -864,6 +869,7 @@ export default class SabreFlightService extends AbstractServices {
       flight_id,
       markup_amount,
       route_type,
+      with_vendor_fare: true,
     });
 
     return data[0];
@@ -916,7 +922,10 @@ export default class SabreFlightService extends AbstractServices {
 
             const flight_data = {
               Number: Number(option?.carrier.carrier_marketing_flight_number),
-              ClassOfService: 'V',
+              ClassOfService: this.flightUtils.getClassCodeFromId(
+                reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
+                  .Cabin
+              ),
               DepartureDateTime,
               ArrivalDateTime,
               Type: 'A',
@@ -1009,18 +1018,9 @@ export default class SabreFlightService extends AbstractServices {
               LCC: 'Disable',
             },
             VerificationItinCallLogic: {
+              Value: 'M',
               AlwaysCheckAvailability: true,
-              Value: 'L',
             },
-            // FlexibleFares: {
-            //   FareParameters: [
-            //     {
-            //       Cabin: {
-            //         Type: cabin,
-            //       },
-            //     },
-            //   ],
-            // },
           },
         },
         Version: '5',
@@ -1414,10 +1414,13 @@ export default class SabreFlightService extends AbstractServices {
       name: user_info.name,
     });
 
+    console.log({ requestBody });
+
     const response = await this.request.postRequest(
       SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
       requestBody
     );
+    console.log({ response });
 
     if (!response) {
       throw new CustomError(

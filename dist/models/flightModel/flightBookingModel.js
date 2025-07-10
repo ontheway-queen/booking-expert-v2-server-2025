@@ -194,5 +194,14 @@ class FlightBookingModel extends schema_1.default {
             return Number((_a = result === null || result === void 0 ? void 0 : result.total) !== null && _a !== void 0 ? _a : 0);
         });
     }
+    deleteFlightBooking(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ id, source_type, }) {
+            return yield this.db('flight_booking')
+                .withSchema(this.DBO_SCHEMA)
+                .delete()
+                .andWhere('id', id)
+                .andWhere('source_type', source_type);
+        });
+    }
 }
 exports.default = FlightBookingModel;

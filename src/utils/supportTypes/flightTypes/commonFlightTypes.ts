@@ -147,7 +147,7 @@ export interface IFormattedFare {
   ait: number | string;
   discount: number | string;
   payable: number | string;
-  vendor_price: {
+  vendor_price?: {
     base_fare: number;
     tax: number;
     ait: number;
