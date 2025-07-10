@@ -60,6 +60,7 @@ export default class FlightBookingModel extends Schema {
         'created_at',
         'travel_date',
         'gds_pnr',
+        'airline_pnr',
         'journey_type',
         'total_passenger',
         'status',

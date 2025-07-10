@@ -29,7 +29,7 @@ class FlightBookingPriceBreakdownModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('flight_booking_price_breakdown')
                 .withSchema(this.DBO_SCHEMA)
-                .select('id', 'type', 'total_passenger', 'base_fare', 'tax', 'total_fare')
+                .select('id', 'type', 'total_passenger', 'base_fare', 'tax', 'ait', 'discount', 'total_fare')
                 .where({ flight_booking_id });
         });
     }

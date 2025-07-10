@@ -37,66 +37,66 @@ export class CommonFlightSupportService extends AbstractServices {
     dynamic_fare_set_id: number;
     markup_amount?: number;
   }) {
-    return this.db.transaction(async (trx) => {
-      //get data from redis using the search id
-      const retrievedData = await getRedis(search_id);
+    //get data from redis using the search id
+    const retrievedData = await getRedis(search_id);
 
-      if (!retrievedData) {
-        return null;
-      }
+    if (!retrievedData) {
+      return null;
+    }
 
-      const retrieveResponse = retrievedData.response as {
-        results: IFormattedFlightItinerary[];
-      };
+    const retrieveResponse = retrievedData.response as {
+      results: IFormattedFlightItinerary[];
+    };
 
-      const foundItem = retrieveResponse.results.find(
-        (item) => item.flight_id === flight_id
-      );
+    const foundItem = retrieveResponse.results.find(
+      (item) => item.flight_id === flight_id
+    );
 
-      if (!foundItem) {
-        return null;
-      }
+    if (!foundItem) {
+      return null;
+    }
 
-      const dynamicFareModel = this.Model.DynamicFareModel(trx);
+    const dynamicFareModel = this.Model.DynamicFareModel(this.trx);
 
-      const apiData = await dynamicFareModel.getDynamicFareSuppliers({
-        status: true,
-        set_id: dynamic_fare_set_id,
-        api_name: foundItem.api,
+    const apiData = await dynamicFareModel.getDynamicFareSuppliers({
+      status: true,
+      set_id: dynamic_fare_set_id,
+      api_name: foundItem.api,
+    });
+
+    let booking_block = foundItem.booking_block;
+
+    if (foundItem.api === SABRE_API) {
+      //SABRE REVALIDATE
+      const sabreSubService = new SabreFlightService(this.trx);
+      const formattedResBody = await sabreSubService.SabreFlightRevalidate({
+        booking_block,
+        dynamic_fare_supplier_id: apiData[0].id,
+        flight_id,
+        reqBody: retrievedData.reqBody,
+        retrieved_response: foundItem,
       });
 
-      let booking_block = foundItem.booking_block;
+      formattedResBody.leg_description =
+        retrievedData.response.leg_descriptions;
 
-      if (foundItem.api === SABRE_API) {
-        //SABRE REVALIDATE
-        const sabreSubService = new SabreFlightService(trx);
-        const formattedResBody = await sabreSubService.SabreFlightRevalidate({
-          booking_block,
-          dynamic_fare_supplier_id: apiData[0].id,
-          flight_id,
-          reqBody: retrievedData.reqBody,
-          retrieved_response: foundItem,
-        });
-
-        formattedResBody.leg_description =
-          retrievedData.response.leg_descriptions;
-
-        return formattedResBody;
-      } else if (foundItem.api === CUSTOM_API) {
-        const customFlightService = new WfttFlightService(trx);
-        const formattedResBody = await customFlightService.FlightRevalidate({
-          reqBody: retrievedData.reqBody,
-          dynamic_fare_supplier_id: apiData[0].id,
-          revalidate_body: {
-            flight_id: foundItem.flight_id,
-            search_id: foundItem.api_search_id,
-          },
-        });
-        return formattedResBody;
-      } else {
-        return null;
-      }
-    });
+      return formattedResBody;
+    } else if (foundItem.api === CUSTOM_API) {
+      const customFlightService = new WfttFlightService(this.trx);
+      const formattedResBody = await customFlightService.FlightRevalidate({
+        reqBody: retrievedData.reqBody,
+        dynamic_fare_supplier_id: apiData[0].id,
+        revalidate_body: {
+          flight_id: foundItem.flight_id,
+          search_id: foundItem.api_search_id,
+        },
+      });
+      formattedResBody.leg_description =
+        retrievedData.response.leg_descriptions;
+      return formattedResBody;
+    } else {
+      return null;
+    }
   }
 
   private checkRevalidatePriceChange(payload: {

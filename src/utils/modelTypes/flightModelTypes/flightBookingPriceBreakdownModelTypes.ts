@@ -15,5 +15,7 @@ export interface IGetFlightBookingPriceBreakdownData {
   total_passenger: number;
   base_fare: number;
   tax: number;
+  ait: number;
+  discount: number;
   total_fare: number;
 }

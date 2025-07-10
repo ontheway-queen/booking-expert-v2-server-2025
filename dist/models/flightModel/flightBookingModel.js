@@ -40,7 +40,7 @@ class FlightBookingModel extends schema_1.default {
                             : undefined;
             const data = yield this.db(`${view_name}`)
                 .withSchema(this.DBO_SCHEMA)
-                .select('id', 'booking_ref', 'source_type', 'source_id', 'source_name', 'source_logo', 'api', 'created_at', 'travel_date', 'gds_pnr', 'journey_type', 'total_passenger', 'status', 'payable_amount', 'route')
+                .select('id', 'booking_ref', 'source_type', 'source_id', 'source_name', 'source_logo', 'api', 'created_at', 'travel_date', 'gds_pnr', 'airline_pnr', 'journey_type', 'total_passenger', 'status', 'payable_amount', 'route')
                 .where((qb) => {
                 if (query.status) {
                     qb.andWhere('status', query.status);

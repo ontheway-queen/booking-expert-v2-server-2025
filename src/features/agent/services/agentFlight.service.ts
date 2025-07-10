@@ -127,7 +127,7 @@ export class AgentFlightService extends AbstractServices {
 
       let sabreData: any[] = [];
       let customData: any[] = [];
-      console.log({ sabre_supplier_id, custom_supplier_id });
+
       if (sabre_supplier_id) {
         const sabreSubService = new SabreFlightService(trx);
         sabreData = await sabreSubService.FlightSearch({
@@ -146,6 +146,8 @@ export class AgentFlightService extends AbstractServices {
           dynamic_fare_supplier_id: custom_supplier_id,
           markup_amount,
         });
+
+        console.log({ customData });
       }
 
       //generate search ID
@@ -859,6 +861,7 @@ export class AgentFlightService extends AbstractServices {
         await flightPriceBreakdownModel.getFlightBookingPriceBreakdown(
           Number(id)
         );
+
       const segment_data = await flightSegmentModel.getFlightBookingSegment(
         Number(id)
       );

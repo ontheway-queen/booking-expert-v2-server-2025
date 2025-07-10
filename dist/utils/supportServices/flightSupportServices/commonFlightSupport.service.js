@@ -27,54 +27,54 @@ class CommonFlightSupportService extends abstract_service_1.default {
     }
     FlightRevalidate(_a) {
         return __awaiter(this, arguments, void 0, function* ({ dynamic_fare_set_id, flight_id, search_id, markup_amount, }) {
-            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                //get data from redis using the search id
-                const retrievedData = yield (0, redis_1.getRedis)(search_id);
-                if (!retrievedData) {
-                    return null;
-                }
-                const retrieveResponse = retrievedData.response;
-                const foundItem = retrieveResponse.results.find((item) => item.flight_id === flight_id);
-                if (!foundItem) {
-                    return null;
-                }
-                const dynamicFareModel = this.Model.DynamicFareModel(trx);
-                const apiData = yield dynamicFareModel.getDynamicFareSuppliers({
-                    status: true,
-                    set_id: dynamic_fare_set_id,
-                    api_name: foundItem.api,
+            //get data from redis using the search id
+            const retrievedData = yield (0, redis_1.getRedis)(search_id);
+            if (!retrievedData) {
+                return null;
+            }
+            const retrieveResponse = retrievedData.response;
+            const foundItem = retrieveResponse.results.find((item) => item.flight_id === flight_id);
+            if (!foundItem) {
+                return null;
+            }
+            const dynamicFareModel = this.Model.DynamicFareModel(this.trx);
+            const apiData = yield dynamicFareModel.getDynamicFareSuppliers({
+                status: true,
+                set_id: dynamic_fare_set_id,
+                api_name: foundItem.api,
+            });
+            let booking_block = foundItem.booking_block;
+            if (foundItem.api === flightConstent_1.SABRE_API) {
+                //SABRE REVALIDATE
+                const sabreSubService = new sabreFlightSupport_service_1.default(this.trx);
+                const formattedResBody = yield sabreSubService.SabreFlightRevalidate({
+                    booking_block,
+                    dynamic_fare_supplier_id: apiData[0].id,
+                    flight_id,
+                    reqBody: retrievedData.reqBody,
+                    retrieved_response: foundItem,
                 });
-                let booking_block = foundItem.booking_block;
-                if (foundItem.api === flightConstent_1.SABRE_API) {
-                    //SABRE REVALIDATE
-                    const sabreSubService = new sabreFlightSupport_service_1.default(trx);
-                    const formattedResBody = yield sabreSubService.SabreFlightRevalidate({
-                        booking_block,
-                        dynamic_fare_supplier_id: apiData[0].id,
-                        flight_id,
-                        reqBody: retrievedData.reqBody,
-                        retrieved_response: foundItem,
-                    });
-                    formattedResBody.leg_description =
-                        retrievedData.response.leg_descriptions;
-                    return formattedResBody;
-                }
-                else if (foundItem.api === flightConstent_1.CUSTOM_API) {
-                    const customFlightService = new wfttFlightSupport_service_1.default(trx);
-                    const formattedResBody = yield customFlightService.FlightRevalidate({
-                        reqBody: retrievedData.reqBody,
-                        dynamic_fare_supplier_id: apiData[0].id,
-                        revalidate_body: {
-                            flight_id: foundItem.flight_id,
-                            search_id: foundItem.api_search_id,
-                        },
-                    });
-                    return formattedResBody;
-                }
-                else {
-                    return null;
-                }
-            }));
+                formattedResBody.leg_description =
+                    retrievedData.response.leg_descriptions;
+                return formattedResBody;
+            }
+            else if (foundItem.api === flightConstent_1.CUSTOM_API) {
+                const customFlightService = new wfttFlightSupport_service_1.default(this.trx);
+                const formattedResBody = yield customFlightService.FlightRevalidate({
+                    reqBody: retrievedData.reqBody,
+                    dynamic_fare_supplier_id: apiData[0].id,
+                    revalidate_body: {
+                        flight_id: foundItem.flight_id,
+                        search_id: foundItem.api_search_id,
+                    },
+                });
+                formattedResBody.leg_description =
+                    retrievedData.response.leg_descriptions;
+                return formattedResBody;
+            }
+            else {
+                return null;
+            }
         });
     }
     checkRevalidatePriceChange(payload) {

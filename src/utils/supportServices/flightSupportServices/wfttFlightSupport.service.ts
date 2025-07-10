@@ -124,6 +124,7 @@ export default class WfttFlightService extends AbstractServices {
       reqBody,
       route_type,
     });
+
     const response: IWFTTFlightSearchResBody | undefined =
       await this.request.postRequest(
         WfttAPIEndpoints.FLIGHT_SEARCH_ENDPOINT,

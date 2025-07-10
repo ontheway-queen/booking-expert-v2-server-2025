@@ -98,7 +98,6 @@ class AgentFlightService extends abstract_service_1.default {
                 });
                 let sabreData = [];
                 let customData = [];
-                console.log({ sabre_supplier_id, custom_supplier_id });
                 if (sabre_supplier_id) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     sabreData = yield sabreSubService.FlightSearch({
@@ -116,6 +115,7 @@ class AgentFlightService extends abstract_service_1.default {
                         dynamic_fare_supplier_id: custom_supplier_id,
                         markup_amount,
                     });
+                    console.log({ customData });
                 }
                 //generate search ID
                 const search_id = (0, uuid_1.v4)();

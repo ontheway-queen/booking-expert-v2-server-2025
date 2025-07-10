@@ -73,6 +73,7 @@ export interface IGetFlightBookingList {
   created_at: Date;
   travel_date: Date;
   gds_pnr: string | null;
+  airline_pnr: string | null;
   journey_type: JourneyType;
   passenger: number;
   status: BookingStatus;
