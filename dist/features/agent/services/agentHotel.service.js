@@ -373,6 +373,7 @@ class AgentHotelService extends abstract_service_1.default {
                     due: 0,
                     details: `Auto invoice has been created for flight booking ref no. - ${booking_ref}`,
                     type: constants_1.INVOICE_TYPES.SALE,
+                    status: constants_1.INVOICE_STATUS_TYPES.ISSUED,
                 });
                 // Create money receipt
                 yield moneyReceiptModel.createMoneyReceipt({

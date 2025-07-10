@@ -6,6 +6,7 @@ import FlightUtils from '../../../lib/flight/flightUtils';
 import Lib from '../../../lib/lib';
 import {
   GENERATE_AUTO_UNIQUE_ID,
+  INVOICE_STATUS_TYPES,
   INVOICE_TYPES,
   SOURCE_ADMIN,
   SOURCE_AGENT,
@@ -371,6 +372,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       due: payload.flight_data.fare.payable,
       details: `Invoice has been created for flight booking ref no. - ${booking_ref}`,
       type: INVOICE_TYPES.SALE,
+      status: INVOICE_STATUS_TYPES.ISSUED,
     });
 
     return {
@@ -461,7 +463,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
     const invoiceModel = this.Model.InvoiceModel(this.trx);
     await invoiceModel.updateInvoice(
       {
-        status: false,
+        status: INVOICE_STATUS_TYPES.CANCELLED,
       },
       payload.booking_id
     );

@@ -276,6 +276,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 due: payload.flight_data.fare.payable,
                 details: `Invoice has been created for flight booking ref no. - ${booking_ref}`,
                 type: constants_1.INVOICE_TYPES.SALE,
+                status: constants_1.INVOICE_STATUS_TYPES.ISSUED,
             });
             return {
                 booking_id: booking_res[0].id,
@@ -329,7 +330,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             //delete invoice
             const invoiceModel = this.Model.InvoiceModel(this.trx);
             yield invoiceModel.updateInvoice({
-                status: false,
+                status: constants_1.INVOICE_STATUS_TYPES.CANCELLED,
             }, payload.booking_id);
         });
     }

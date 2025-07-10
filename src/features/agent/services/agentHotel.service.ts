@@ -14,6 +14,7 @@ import BalanceLib from '../../../utils/lib/balanceLib';
 import Lib from '../../../utils/lib/lib';
 import {
   GENERATE_AUTO_UNIQUE_ID,
+  INVOICE_STATUS_TYPES,
   INVOICE_TYPES,
   SOURCE_AGENT,
   TYPE_FLIGHT,
@@ -460,6 +461,7 @@ export class AgentHotelService extends AbstractServices {
         due: 0,
         details: `Auto invoice has been created for flight booking ref no. - ${booking_ref}`,
         type: INVOICE_TYPES.SALE,
+        status: INVOICE_STATUS_TYPES.ISSUED,
       });
 
       // Create money receipt

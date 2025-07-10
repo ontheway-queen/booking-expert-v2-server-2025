@@ -2,3 +2,5 @@
 -- new table visa, visa application
 -- dbo.type_invoice_ref new type, and change invoice ref_type column data type to this type.
 -- dbo.flight_booking discount default 0
+-- dbo.invoice status type changed 
+-- dbo.type_invoice_status new type created

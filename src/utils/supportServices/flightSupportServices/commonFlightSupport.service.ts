@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 import AbstractServices from '../../../abstract/abstract.service';
-import { getRedis, getRedisTTL } from '../../../app/redis';
+import { getRedis } from '../../../app/redis';
 import {
   CUSTOM_API,
   FLIGHT_REVALIDATE_REDIS_KEY,
@@ -8,7 +8,6 @@ import {
   SABRE_API,
 } from '../../miscellaneous/flightConstent';
 import {
-  IFlightSearchReqBody,
   IFormattedFlightItinerary,
   IPassengerTypeQuantityPayload,
 } from '../../supportTypes/flightTypes/commonFlightTypes';
@@ -91,8 +90,10 @@ export class CommonFlightSupportService extends AbstractServices {
           search_id: foundItem.api_search_id,
         },
       });
+
       formattedResBody.leg_description =
         retrievedData.response.leg_descriptions;
+
       return formattedResBody;
     } else {
       return null;

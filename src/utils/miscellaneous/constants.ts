@@ -120,6 +120,14 @@ export const INVOICE_TYPES = {
   REFUND: 'REFUND',
   REISSUE: 'REISSUE',
 };
+//invoice type
+export const INVOICE_STATUS_TYPES = {
+  PENDING: 'Pending',
+  ISSUED: 'Issued',
+  PAID: 'Paid',
+  CANCELLED: 'Cancelled',
+  REFUNDED: 'Refunded',
+};
 
 //frontend endpoints
 export const FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = '/dashboard/flights/';

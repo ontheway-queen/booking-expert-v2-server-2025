@@ -1,4 +1,5 @@
 import {
+  INVOICE_STATUS_TYPES,
   INVOICE_TYPES,
   SOURCE_AGENT,
   SOURCE_AGENT_B2C,
@@ -34,6 +35,12 @@ export interface ICreateInvoicePayload {
   total_amount: number | string;
   due: number | string;
   details: string;
+  status:
+    | typeof INVOICE_STATUS_TYPES.PENDING
+    | typeof INVOICE_STATUS_TYPES.PAID
+    | typeof INVOICE_STATUS_TYPES.CANCELLED
+    | typeof INVOICE_STATUS_TYPES.REFUNDED
+    | typeof INVOICE_STATUS_TYPES.ISSUED;
   type:
     | typeof INVOICE_TYPES.SALE
     | typeof INVOICE_TYPES.REFUND
@@ -46,7 +53,12 @@ export interface IUpdateInvoicePayload {
   net_amount?: number;
   due?: number;
   details?: string;
-  status?: false;
+  status?:
+    | typeof INVOICE_STATUS_TYPES.PENDING
+    | typeof INVOICE_STATUS_TYPES.PAID
+    | typeof INVOICE_STATUS_TYPES.CANCELLED
+    | typeof INVOICE_STATUS_TYPES.REFUNDED
+    | typeof INVOICE_STATUS_TYPES.ISSUED;
 }
 
 export interface IGetInvoiceData {
@@ -66,7 +78,12 @@ export interface IGetInvoiceData {
   net_amount: number;
   due: number;
   details: string | null;
-  status: boolean;
+  status:
+    | typeof INVOICE_STATUS_TYPES.PENDING
+    | typeof INVOICE_STATUS_TYPES.PAID
+    | typeof INVOICE_STATUS_TYPES.CANCELLED
+    | typeof INVOICE_STATUS_TYPES.REFUNDED
+    | typeof INVOICE_STATUS_TYPES.ISSUED;
   type: 'SALE' | 'REFUND' | string;
   created_at: Date;
 }
@@ -77,6 +94,12 @@ export interface IGetInvoiceQueryFilter {
   to_date?: Date;
   limit?: number;
   skip?: number;
+  status?:
+    | typeof INVOICE_STATUS_TYPES.PENDING
+    | typeof INVOICE_STATUS_TYPES.PAID
+    | typeof INVOICE_STATUS_TYPES.CANCELLED
+    | typeof INVOICE_STATUS_TYPES.REFUNDED
+    | typeof INVOICE_STATUS_TYPES.ISSUED;
   invoice_type?:
     | typeof INVOICE_TYPES.SALE
     | typeof INVOICE_TYPES.REFUND

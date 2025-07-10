@@ -34,11 +34,12 @@ export class AdminAirlinesPreferenceService extends AbstractServices {
           const check_duplicate = await model.getAirlinesPreferences({
             dynamic_fare_supplier_id: elm.dynamic_fare_supplier_id,
             airlines_code: code,
+            pref_type: elm.preference_type,
           });
 
           if (check_duplicate.length) {
             throw new CustomError(
-              `Airline (${code}) already exists for this set`,
+              `${elm.preference_type} Airlines(${code}) already exists on this set.`,
               this.StatusCode.HTTP_CONFLICT
             );
           } else {
@@ -69,7 +70,7 @@ export class AdminAirlinesPreferenceService extends AbstractServices {
     const { dynamic_fare_supplier_id, pref_type, filter, status } =
       req.query as {
         dynamic_fare_supplier_id: string;
-        pref_type?: string;
+        pref_type?: 'PREFERRED' | 'BLOCKED';
         status?: string;
         filter?: string;
       };

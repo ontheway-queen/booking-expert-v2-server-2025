@@ -33,9 +33,10 @@ class AdminAirlinesPreferenceService extends abstract_service_1.default {
                         const check_duplicate = yield model.getAirlinesPreferences({
                             dynamic_fare_supplier_id: elm.dynamic_fare_supplier_id,
                             airlines_code: code,
+                            pref_type: elm.preference_type,
                         });
                         if (check_duplicate.length) {
-                            throw new customError_1.default(`Airline (${code}) already exists for this set`, this.StatusCode.HTTP_CONFLICT);
+                            throw new customError_1.default(`${elm.preference_type} Airlines(${code}) already exists on this set.`, this.StatusCode.HTTP_CONFLICT);
                         }
                         else {
                             payload.push({

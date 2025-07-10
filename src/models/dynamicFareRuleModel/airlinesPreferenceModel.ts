@@ -46,7 +46,7 @@ export default class AirlinesPreferenceModel extends Schema {
   public async getAirlinesPreferences(query: {
     dynamic_fare_supplier_id: number;
     airlines_code?: string;
-    pref_type?: string;
+    pref_type?: 'PREFERRED' | 'BLOCKED';
     status?: string;
     filter?: string;
   }): Promise<IGetAirlinesPreferenceData[]> {
