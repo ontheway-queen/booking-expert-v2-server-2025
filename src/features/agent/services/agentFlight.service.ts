@@ -40,10 +40,7 @@ import {
   IAgentGetFlightBookingReqQuery,
 } from '../utils/types/agentFlight.types';
 import Lib from '../../../utils/lib/lib';
-import {
-  BookingStatus,
-  IUpdateFlightBookingPayload,
-} from '../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
+import { IUpdateFlightBookingPayload } from '../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
 
 export class AgentFlightService extends AbstractServices {
   constructor() {
@@ -52,7 +49,7 @@ export class AgentFlightService extends AbstractServices {
 
   public async flightSearch(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, ref_id } = req.agencyUser;
+      const { agency_id, agency_type, ref_agent_id } = req.agencyUser;
       const body = req.body as IFlightSearchReqBody;
 
       if (body.JourneyType === '3') {
@@ -78,7 +75,7 @@ export class AgentFlightService extends AbstractServices {
       const agencyModel = this.Model.AgencyModel(trx);
 
       const agency_details = await agencyModel.checkAgency({
-        agency_id: ref_id || agency_id,
+        agency_id: ref_agent_id || agency_id,
       });
 
       if (!agency_details?.flight_markup_set) {
@@ -91,12 +88,13 @@ export class AgentFlightService extends AbstractServices {
 
       //get sub agent markup
       let markup_amount = undefined;
-      if (ref_id) {
+      if (agency_type === 'Sub Agent') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Flight',
           agency_id,
         });
+
         if (!markup_amount) {
           return {
             success: false,
@@ -193,7 +191,7 @@ export class AgentFlightService extends AbstractServices {
 
   public async flightSearchSSE(req: Request, res: Response) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, ref_id } = req.agencyUser;
+      const { agency_id, agency_type, ref_agent_id } = req.agencyUser;
       const JourneyType = req.query.JourneyType as string;
       const OriginDestinationInformation = req.query
         .OriginDestinationInformation as unknown as IOriginDestinationInformationPayload[];
@@ -230,7 +228,7 @@ export class AgentFlightService extends AbstractServices {
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
       const agency_details = await agencyModel.checkAgency({
-        agency_id: ref_id || agency_id,
+        agency_id: ref_agent_id || agency_id,
       });
       if (!agency_details?.flight_markup_set) {
         return {
@@ -242,7 +240,7 @@ export class AgentFlightService extends AbstractServices {
 
       //get sub agent markup
       let markup_amount = undefined;
-      if (ref_id) {
+      if (agency_type === 'Sub Agent') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Flight',
@@ -402,7 +400,7 @@ export class AgentFlightService extends AbstractServices {
 
   public async flightRevalidate(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, ref_id } = req.agencyUser;
+      const { agency_id, ref_agent_id, agency_type } = req.agencyUser;
       const { flight_id, search_id } = req.query as {
         flight_id: string;
         search_id: string;
@@ -410,7 +408,7 @@ export class AgentFlightService extends AbstractServices {
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
       const agency_details = await agencyModel.checkAgency({
-        agency_id: ref_id || agency_id,
+        agency_id: ref_agent_id || agency_id,
       });
 
       if (!agency_details?.flight_markup_set) {
@@ -423,7 +421,7 @@ export class AgentFlightService extends AbstractServices {
 
       //get sub agent markup
       let markup_amount = undefined;
-      if (ref_id) {
+      if (agency_type === 'Sub Agent') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Flight',
@@ -450,6 +448,7 @@ export class AgentFlightService extends AbstractServices {
 
       if (data) {
         await setRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
+
         return {
           success: true,
           message: 'Flight has been revalidated successfully!',
@@ -469,7 +468,8 @@ export class AgentFlightService extends AbstractServices {
   public async flightBooking(req: Request) {
     const {
       agency_id,
-      ref_id,
+      ref_agent_id,
+      agency_type,
       user_id,
       user_email,
       name,
@@ -499,7 +499,7 @@ export class AgentFlightService extends AbstractServices {
       const agencyModel = this.Model.AgencyModel(trx);
 
       const agency_details = await agencyModel.checkAgency({
-        agency_id: ref_id || agency_id,
+        agency_id: ref_agent_id || agency_id,
       });
 
       if (!agency_details?.flight_markup_set) {
@@ -513,7 +513,7 @@ export class AgentFlightService extends AbstractServices {
       //get sub agent markup
       let markup_amount = undefined;
 
-      if (ref_id) {
+      if (agency_type === 'Sub Agent') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Flight',

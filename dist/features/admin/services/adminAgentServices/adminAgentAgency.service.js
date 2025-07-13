@@ -293,7 +293,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                const { status, email, id, username, name, photo, agency_status, phone_number, agency_email, agency_name, is_main_user, ref_id, agency_logo, address, } = checkUserAgency;
+                const { status, email, id, username, name, photo, agency_status, phone_number, agency_email, agency_name, is_main_user, agency_type, ref_agent_id, agency_logo, address, } = checkUserAgency;
                 if (agency_status === 'Inactive' ||
                     agency_status === 'Incomplete' ||
                     agency_status === 'Rejected') {
@@ -321,7 +321,8 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     is_main_user,
                     phone_number,
                     photo,
-                    ref_id,
+                    agency_type,
+                    ref_agent_id,
                     address,
                     agency_logo,
                 };
@@ -347,7 +348,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id } = req.admin;
                 const body = req.body;
-                const { white_label_permissions, user_name } = body, rest = __rest(body, ["white_label_permissions", "user_name"]);
+                const { white_label_permissions, user_name, ref_id } = body, rest = __rest(body, ["white_label_permissions", "user_name", "ref_id"]);
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agencyUserModel = this.Model.AgencyUserModel(trx);
                 const adminModel = this.Model.AdminModel(trx);
@@ -406,10 +407,20 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         message: 'Invalid KAM ID',
                     };
                 }
-                const newAgency = yield agencyModel.createAgency(Object.assign({ status: 'Active', agent_no: agent_no, agency_logo,
+                if (ref_id) {
+                    const checkRef = yield adminModel.checkUserAdmin({ id: ref_id });
+                    if (!checkRef) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Invalid Ref id',
+                        };
+                    }
+                }
+                const newAgency = yield agencyModel.createAgency(Object.assign(Object.assign({ status: 'Active', agent_no: agent_no, agency_logo,
                     civil_aviation,
                     trade_license,
-                    national_id, created_by: user_id }, rest));
+                    national_id, created_by: user_id }, rest), { agency_type: 'Agent', ref_id }));
                 const newRole = yield agencyUserModel.createRole({
                     agency_id: newAgency[0].id,
                     name: 'Super Admin',

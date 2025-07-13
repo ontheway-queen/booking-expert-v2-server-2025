@@ -5,7 +5,8 @@ export type TDB = Knex | Knex.Transaction;
 
 export interface ITokenParseAgencyUser {
   agency_id: number;
-  ref_id: number | null;
+  agency_type: 'Agent' | 'Sub Agent';
+  ref_agent_id: number | null;
   agency_name: string;
   agency_email: string;
   user_id: number;

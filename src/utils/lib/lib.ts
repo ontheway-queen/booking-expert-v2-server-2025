@@ -248,6 +248,7 @@ class Lib {
 
     return false;
   };
+
   public static async getSubAgentTotalMarkup({
     trx,
     type,

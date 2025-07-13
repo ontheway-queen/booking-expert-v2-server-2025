@@ -111,6 +111,9 @@ export default class AgencyModel extends Schema {
     email,
     name,
     agent_no,
+    agency_type,
+    ref_agent_id,
+    status,
     ref_id,
   }: ICheckAgencyQuery): Promise<ICheckAgencyData | undefined> {
     return await this.db('agency')
@@ -124,6 +127,8 @@ export default class AgencyModel extends Schema {
         'agent_no',
         'status',
         'kam_id',
+        'ref_agent_id',
+        'agency_type',
         'white_label',
         'allow_api',
         'civil_aviation',
@@ -150,6 +155,15 @@ export default class AgencyModel extends Schema {
         if (ref_id) {
           qb.andWhere('ref_id', ref_id);
         }
+        if (agency_type) {
+          qb.andWhere('agency_type', agency_type);
+        }
+        if (ref_agent_id) {
+          qb.andWhere('ref_agent_id', ref_agent_id);
+        }
+        if (status) {
+          qb.andWhere('status', status);
+        }
       })
       .first();
   }
@@ -169,6 +183,8 @@ export default class AgencyModel extends Schema {
         'ag.email',
         'ag.phone',
         'ag.address',
+        'ag.ref_agent_id',
+        'ag.agency_type',
         'ag.status',
         this.db.raw(`(
   SELECT 
@@ -196,6 +212,12 @@ export default class AgencyModel extends Schema {
         if (query.status) {
           qb.andWhere('ag.status', query.status);
         }
+        if (query.ref_agent_id) {
+          qb.andWhere('ag.ref_agent_id', query.ref_agent_id);
+        }
+        if (query.agency_type) {
+          qb.andWhere('ag.agency_type', query.agency_type);
+        }
       })
       .limit(Number(query.limit) || DATA_LIMIT)
       .offset(Number(query.skip) || 0)
@@ -215,6 +237,12 @@ export default class AgencyModel extends Schema {
           }
           if (query.status) {
             qb.andWhere('ag.status', query.status);
+          }
+          if (query.ref_agent_id) {
+            qb.andWhere('ag.ref_agent_id', query.ref_agent_id);
+          }
+          if (query.agency_type) {
+            qb.andWhere('ag.agency_type', query.agency_type);
           }
         });
     }
@@ -245,7 +273,7 @@ export default class AgencyModel extends Schema {
   // get single agency
   public async getSingleAgency(
     id: number,
-    ref_id?: number
+    ref_agent_id?: number
   ): Promise<IGetSingleAgencyData | null> {
     return await this.db('agency AS ag')
       .withSchema(this.AGENT_SCHEMA)
@@ -280,6 +308,8 @@ export default class AgencyModel extends Schema {
         'ag.national_id',
         'ua.name AS created_by',
         'ag.ref_id',
+        'ag.agency_type',
+        'ag.ref_agent_id',
         'ar.agency_name AS referred_by'
       )
       .joinRaw(
@@ -289,11 +319,11 @@ export default class AgencyModel extends Schema {
         'LEFT JOIN dbo.dynamic_fare_set AS hm ON ag.hotel_markup_set = hm.id'
       )
       .joinRaw('LEFT JOIN admin.user_admin AS ua ON ag.created_by = ua.id')
-      .joinRaw('LEFT JOIN agent.agency AS ar ON ag.ref_id = ar.id')
+      .joinRaw('LEFT JOIN agent.agency AS ar ON ag.ref_agent_id = ar.id')
       .where('ag.id', id)
       .andWhere((qb) => {
-        if (ref_id) {
-          qb.andWhere('ag.ref_id', ref_id);
+        if (ref_agent_id) {
+          qb.andWhere('ag.ref_agent_id', ref_agent_id);
         }
       })
       .first();

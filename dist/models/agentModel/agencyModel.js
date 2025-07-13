@@ -83,10 +83,10 @@ class AgencyModel extends schema_1.default {
     }
     // check Agency
     checkAgency(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ agency_id, email, name, agent_no, ref_id, }) {
+        return __awaiter(this, arguments, void 0, function* ({ agency_id, email, name, agent_no, agency_type, ref_agent_id, status, ref_id, }) {
             return yield this.db('agency')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('id', 'email', 'phone', 'agency_logo', 'agency_name', 'agent_no', 'status', 'kam_id', 'white_label', 'allow_api', 'civil_aviation', 'trade_license', 'national_id', 'usable_loan', 'flight_markup_set', 'hotel_markup_set', 'address')
+                .select('id', 'email', 'phone', 'agency_logo', 'agency_name', 'agent_no', 'status', 'kam_id', 'ref_agent_id', 'agency_type', 'white_label', 'allow_api', 'civil_aviation', 'trade_license', 'national_id', 'usable_loan', 'flight_markup_set', 'hotel_markup_set', 'address')
                 .where((qb) => {
                 if (agency_id) {
                     qb.where('id', agency_id);
@@ -103,6 +103,15 @@ class AgencyModel extends schema_1.default {
                 if (ref_id) {
                     qb.andWhere('ref_id', ref_id);
                 }
+                if (agency_type) {
+                    qb.andWhere('agency_type', agency_type);
+                }
+                if (ref_agent_id) {
+                    qb.andWhere('ref_agent_id', ref_agent_id);
+                }
+                if (status) {
+                    qb.andWhere('status', status);
+                }
             })
                 .first();
         });
@@ -113,7 +122,7 @@ class AgencyModel extends schema_1.default {
             var _a;
             const data = yield this.db('agency AS ag')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.phone', 'ag.address', 'ag.status', this.db.raw(`(
+                .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.phone', 'ag.address', 'ag.ref_agent_id', 'ag.agency_type', 'ag.status', this.db.raw(`(
   SELECT 
     COALESCE(SUM(CASE WHEN al.type = 'Credit' THEN amount ELSE 0 END), 0) - 
     COALESCE(SUM(CASE WHEN al.type = 'Debit' THEN amount ELSE 0 END), 0) 
@@ -133,6 +142,12 @@ class AgencyModel extends schema_1.default {
                 if (query.status) {
                     qb.andWhere('ag.status', query.status);
                 }
+                if (query.ref_agent_id) {
+                    qb.andWhere('ag.ref_agent_id', query.ref_agent_id);
+                }
+                if (query.agency_type) {
+                    qb.andWhere('ag.agency_type', query.agency_type);
+                }
             })
                 .limit(Number(query.limit) || constants_1.DATA_LIMIT)
                 .offset(Number(query.skip) || 0)
@@ -150,6 +165,12 @@ class AgencyModel extends schema_1.default {
                     }
                     if (query.status) {
                         qb.andWhere('ag.status', query.status);
+                    }
+                    if (query.ref_agent_id) {
+                        qb.andWhere('ag.ref_agent_id', query.ref_agent_id);
+                    }
+                    if (query.agency_type) {
+                        qb.andWhere('ag.agency_type', query.agency_type);
                     }
                 });
             }
@@ -176,7 +197,7 @@ class AgencyModel extends schema_1.default {
         });
     }
     // get single agency
-    getSingleAgency(id, ref_id) {
+    getSingleAgency(id, ref_agent_id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('agency AS ag')
                 .withSchema(this.AGENT_SCHEMA)
@@ -188,15 +209,15 @@ class AgencyModel extends schema_1.default {
   FROM agent.agency_ledger as al
   WHERE ag.id = al.agency_id
 ) AS balance
-`), 'fm.name AS flight_markup_set_name', 'hm.name AS hotel_markup_set_name', 'ag.usable_loan', 'ag.white_label', 'ag.allow_api', 'ag.civil_aviation', 'ag.trade_license', 'ag.national_id', 'ua.name AS created_by', 'ag.ref_id', 'ar.agency_name AS referred_by')
+`), 'fm.name AS flight_markup_set_name', 'hm.name AS hotel_markup_set_name', 'ag.usable_loan', 'ag.white_label', 'ag.allow_api', 'ag.civil_aviation', 'ag.trade_license', 'ag.national_id', 'ua.name AS created_by', 'ag.ref_id', 'ag.agency_type', 'ag.ref_agent_id', 'ar.agency_name AS referred_by')
                 .joinRaw('LEFT JOIN dbo.dynamic_fare_set AS fm ON ag.flight_markup_set = fm.id')
                 .joinRaw('LEFT JOIN dbo.dynamic_fare_set AS hm ON ag.hotel_markup_set = hm.id')
                 .joinRaw('LEFT JOIN admin.user_admin AS ua ON ag.created_by = ua.id')
-                .joinRaw('LEFT JOIN agent.agency AS ar ON ag.ref_id = ar.id')
+                .joinRaw('LEFT JOIN agent.agency AS ar ON ag.ref_agent_id = ar.id')
                 .where('ag.id', id)
                 .andWhere((qb) => {
-                if (ref_id) {
-                    qb.andWhere('ag.ref_id', ref_id);
+                if (ref_agent_id) {
+                    qb.andWhere('ag.ref_agent_id', ref_agent_id);
                 }
             })
                 .first();

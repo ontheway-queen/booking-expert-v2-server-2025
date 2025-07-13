@@ -357,7 +357,8 @@ export default class AdminAgentAgencyService extends AbstractServices {
         agency_email,
         agency_name,
         is_main_user,
-        ref_id,
+        agency_type,
+        ref_agent_id,
         agency_logo,
         address,
       } = checkUserAgency;
@@ -393,7 +394,8 @@ export default class AdminAgentAgencyService extends AbstractServices {
         is_main_user,
         phone_number,
         photo,
-        ref_id,
+        agency_type,
+        ref_agent_id,
         address,
         agency_logo,
       };
@@ -422,7 +424,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
       const { user_id } = req.admin;
 
       const body = req.body as IAdminCreateAgentReqBody;
-      const { white_label_permissions, user_name, ...rest } = body;
+      const { white_label_permissions, user_name, ref_id, ...rest } = body;
 
       const agencyModel = this.Model.AgencyModel(trx);
       const agencyUserModel = this.Model.AgencyUserModel(trx);
@@ -495,6 +497,17 @@ export default class AdminAgentAgencyService extends AbstractServices {
           message: 'Invalid KAM ID',
         };
       }
+      if (ref_id) {
+        const checkRef = await adminModel.checkUserAdmin({ id: ref_id });
+
+        if (!checkRef) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Invalid Ref id',
+          };
+        }
+      }
 
       const newAgency = await agencyModel.createAgency({
         status: 'Active',
@@ -505,6 +518,8 @@ export default class AdminAgentAgencyService extends AbstractServices {
         national_id,
         created_by: user_id,
         ...rest,
+        agency_type: 'Agent',
+        ref_id,
       });
 
       const newRole = await agencyUserModel.createRole({

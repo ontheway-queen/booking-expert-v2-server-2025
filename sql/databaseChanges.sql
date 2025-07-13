@@ -4,3 +4,5 @@
 -- dbo.flight_booking discount default 0
 -- dbo.invoice status type changed 
 -- dbo.type_invoice_status new type created
+-- new type agent.type_agency
+-- new column added agent.agency agency_type, ref_agent_id

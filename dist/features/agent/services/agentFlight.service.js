@@ -32,7 +32,7 @@ class AgentFlightService extends abstract_service_1.default {
     flightSearch(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, ref_id } = req.agencyUser;
+                const { agency_id, agency_type, ref_agent_id } = req.agencyUser;
                 const body = req.body;
                 if (body.JourneyType === '3') {
                     if (body.OriginDestinationInformation.length < 2) {
@@ -55,7 +55,7 @@ class AgentFlightService extends abstract_service_1.default {
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agency_details = yield agencyModel.checkAgency({
-                    agency_id: ref_id || agency_id,
+                    agency_id: ref_agent_id || agency_id,
                 });
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
@@ -66,7 +66,7 @@ class AgentFlightService extends abstract_service_1.default {
                 }
                 //get sub agent markup
                 let markup_amount = undefined;
-                if (ref_id) {
+                if (agency_type === 'Sub Agent') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Flight',
@@ -153,7 +153,7 @@ class AgentFlightService extends abstract_service_1.default {
     flightSearchSSE(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, ref_id } = req.agencyUser;
+                const { agency_id, agency_type, ref_agent_id } = req.agencyUser;
                 const JourneyType = req.query.JourneyType;
                 const OriginDestinationInformation = req.query
                     .OriginDestinationInformation;
@@ -188,7 +188,7 @@ class AgentFlightService extends abstract_service_1.default {
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agency_details = yield agencyModel.checkAgency({
-                    agency_id: ref_id || agency_id,
+                    agency_id: ref_agent_id || agency_id,
                 });
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
@@ -199,7 +199,7 @@ class AgentFlightService extends abstract_service_1.default {
                 }
                 //get sub agent markup
                 let markup_amount = undefined;
-                if (ref_id) {
+                if (agency_type === 'Sub Agent') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Flight',
@@ -328,12 +328,12 @@ class AgentFlightService extends abstract_service_1.default {
     flightRevalidate(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, ref_id } = req.agencyUser;
+                const { agency_id, ref_agent_id, agency_type } = req.agencyUser;
                 const { flight_id, search_id } = req.query;
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agency_details = yield agencyModel.checkAgency({
-                    agency_id: ref_id || agency_id,
+                    agency_id: ref_agent_id || agency_id,
                 });
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
@@ -344,7 +344,7 @@ class AgentFlightService extends abstract_service_1.default {
                 }
                 //get sub agent markup
                 let markup_amount = undefined;
-                if (ref_id) {
+                if (agency_type === 'Sub Agent') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Flight',
@@ -384,7 +384,7 @@ class AgentFlightService extends abstract_service_1.default {
     }
     flightBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id, ref_id, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
+            const { agency_id, ref_agent_id, agency_type, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
             const body = req.body;
             let booking_block = false;
             let refundable = false;
@@ -400,7 +400,7 @@ class AgentFlightService extends abstract_service_1.default {
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agency_details = yield agencyModel.checkAgency({
-                    agency_id: ref_id || agency_id,
+                    agency_id: ref_agent_id || agency_id,
                 });
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
@@ -411,7 +411,7 @@ class AgentFlightService extends abstract_service_1.default {
                 }
                 //get sub agent markup
                 let markup_amount = undefined;
-                if (ref_id) {
+                if (agency_type === 'Sub Agent') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Flight',

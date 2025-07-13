@@ -159,6 +159,8 @@ export default class AgencyUserModel extends Schema {
         'a.allow_api',
         'a.white_label',
         'a.ref_id',
+        'a.ref_agent_id',
+        'a.agency_type',
         'a.civil_aviation',
         'a.trade_license',
         'a.national_id',

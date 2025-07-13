@@ -96,6 +96,7 @@ export default class AuthAgentService extends AbstractServices {
         civil_aviation,
         trade_license,
         national_id,
+        agency_type: 'Agent',
       });
 
       const newRole = await AgencyUserModel.createRole({
@@ -197,7 +198,7 @@ export default class AuthAgentService extends AbstractServices {
 
       await AgentModel.updateAgency({ status: 'Pending' }, agency_id);
 
-      const password = Lib.generateRandomPassword(8);
+      const password = Lib.generateRandomPassword(12);
       const hashed_password = await Lib.hashValue(password);
 
       await AgencyUserModel.updateUser(
@@ -264,12 +265,14 @@ export default class AuthAgentService extends AbstractServices {
         agency_name,
         is_main_user,
         ref_id,
+        agency_type,
+        ref_agent_id,
         allow_api,
         civil_aviation,
         kam_id,
         national_id,
         trade_license,
-        address
+        address,
       } = checkUserAgency;
 
       if (
@@ -338,9 +341,9 @@ export default class AuthAgentService extends AbstractServices {
       };
 
       if (white_label) {
-        const wPermissions = await AgentModel.getWhiteLabelPermission(
-          {agency_id}
-        );
+        const wPermissions = await AgentModel.getWhiteLabelPermission({
+          agency_id,
+        });
 
         if (wPermissions) {
           const { token, ...rest } = wPermissions;
@@ -359,9 +362,10 @@ export default class AuthAgentService extends AbstractServices {
         is_main_user,
         phone_number,
         photo,
-        ref_id,
+        agency_type,
+        ref_agent_id,
         address,
-        agency_logo
+        agency_logo,
       };
 
       const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
@@ -397,7 +401,9 @@ export default class AuthAgentService extends AbstractServices {
             civil_aviation,
             kam_id,
             national_id,
-            trade_license
+            trade_license,
+            agency_type,
+            ref_agent_id,
           },
           role,
           white_label,
@@ -446,7 +452,13 @@ export default class AuthAgentService extends AbstractServices {
         agency_logo,
         agency_name,
         is_main_user,
-        ref_id,
+        agency_type,
+        allow_api,
+        civil_aviation,
+        kam_id,
+        national_id,
+        trade_license,
+        ref_agent_id,
         address,
       } = checkAgencyUser;
 
@@ -487,9 +499,9 @@ export default class AuthAgentService extends AbstractServices {
       };
 
       if (white_label) {
-        const wPermissions = await AgencyModel.getWhiteLabelPermission(
-          {agency_id}
-        );
+        const wPermissions = await AgencyModel.getWhiteLabelPermission({
+          agency_id,
+        });
 
         if (wPermissions) {
           const { token, ...rest } = wPermissions;
@@ -508,9 +520,10 @@ export default class AuthAgentService extends AbstractServices {
         phone_number,
         is_main_user,
         photo,
-        ref_id,
+        agency_type,
+        ref_agent_id,
         address,
-        agency_logo
+        agency_logo,
       };
 
       const authToken = Lib.createToken(
@@ -546,6 +559,13 @@ export default class AuthAgentService extends AbstractServices {
             agency_status,
             phone_number: agency_phone_number,
             agency_logo,
+            allow_api,
+            civil_aviation,
+            kam_id,
+            national_id,
+            trade_license,
+            agency_type,
+            ref_agent_id,
           },
           role,
           white_label,

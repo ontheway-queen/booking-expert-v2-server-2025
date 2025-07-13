@@ -35,9 +35,9 @@ class SubAgentMarkupModel extends schema_1.default {
     }
     getSubAgentMarkup(agency_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("sub_agent_markup")
+            return yield this.db('sub_agent_markup')
                 .withSchema(this.AGENT_SCHEMA)
-                .select("*")
+                .select('*')
                 .where({ agency_id })
                 .first();
         });

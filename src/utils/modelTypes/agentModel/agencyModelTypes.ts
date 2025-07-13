@@ -7,6 +7,8 @@ export interface ICreateAgencyPayload {
   email: string;
   phone: string;
   address: string;
+  ref_agent_id?: number;
+  agency_type: 'Agent' | 'Sub Agent';
   national_id?: string;
   civil_aviation?: string;
   trade_license?: string;
@@ -44,6 +46,8 @@ export interface IGetAgencyListQuery {
   filter?: string;
   status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   ref_id?: number;
+  ref_agent_id?: number;
+  agency_type?: 'Agent' | 'Sub Agent';
   order?: 'asc' | 'desc';
 }
 export interface IGetAgencyListWithBalanceQuery {
@@ -52,6 +56,8 @@ export interface IGetAgencyListWithBalanceQuery {
   search_value?: string;
   status?: string;
   ref_id?: number;
+  ref_agent_id?: number;
+  agency_type?: 'Agent' | 'Sub Agent';
 }
 
 export interface IGetAgencyListData {
@@ -65,6 +71,7 @@ export interface IGetAgencyListData {
   status: string;
   white_label: boolean;
   allow_api: boolean;
+  agency_type: 'Agent' | 'Sub Agent';
 }
 
 export interface IGetAgencyListWithBalanceData {
@@ -82,6 +89,7 @@ export interface IGetAgencyListWithBalanceData {
   allow_api: boolean;
   flight_markup_set: string;
   hotel_markup_set: string;
+  agency_type: 'Agent' | 'Sub Agent';
 }
 
 export interface IGetSingleAgencyData {
@@ -99,7 +107,9 @@ export interface IGetSingleAgencyData {
   allow_api: boolean;
   flight_markup_set: string;
   hotel_markup_set: string;
-  ref_id: number;
+  ref_id?: number;
+  ref_agent_id?: number;
+  agency_type: 'Agent' | 'Sub Agent';
   kam_id?: number;
   civil_aviation: string;
   referred_by: string;
@@ -114,6 +124,8 @@ export interface ICheckAgencyQuery {
   agent_no?: string;
   status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   ref_id?: number;
+  ref_agent_id?: number;
+  agency_type?: 'Agent' | 'Sub Agent';
 }
 
 export interface ICheckAgencyData {
@@ -134,6 +146,8 @@ export interface ICheckAgencyData {
   usable_loan: number;
   kam_id?: number;
   address: string;
+  ref_agent_id?: number;
+  agency_type: 'Agent' | 'Sub Agent';
 }
 
 export interface ICreateWhiteLabelPermissionPayload {

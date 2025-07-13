@@ -36,37 +36,37 @@ class AgentSubAgentService extends abstract_service_1.default {
     createSubAgency(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { user_id, agency_id, ref_id } = req.agencyUser;
-                if (ref_id) {
+                const { user_id, agency_id, agency_type } = req.agencyUser;
+                if (agency_type === 'Sub Agent') {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_FORBIDDEN,
-                        message: "No authority has been found to create a sub agent"
+                        message: 'No authority has been found to create a sub agent',
                     };
                 }
                 const body = req.body;
-                const { email, agency_name, user_name, address, phone, flight_markup_type, hotel_markup_type, flight_markup_mode, hotel_markup_mode, flight_markup, hotel_markup } = body;
+                const { email, agency_name, user_name, address, phone, flight_markup_type, hotel_markup_type, flight_markup_mode, hotel_markup_mode, flight_markup, hotel_markup, } = body;
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agencyUserModel = this.Model.AgencyUserModel(trx);
                 const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
                 const checkSubAgentName = yield agencyModel.checkAgency({
-                    name: agency_name
+                    name: agency_name,
                 });
                 if (checkSubAgentName) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: "Duplicate agency name! Agency already exists with this name"
+                        message: 'Duplicate agency name! Agency already exists with this name',
                     };
                 }
                 const checkAgentUser = yield agencyUserModel.checkUser({
-                    email
+                    email,
                 });
                 if (checkAgentUser) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: "Email already exists. Please use another email"
+                        message: 'Email already exists. Please use another email',
                     };
                 }
                 let agency_logo = '';
@@ -92,7 +92,10 @@ class AgentSubAgentService extends abstract_service_1.default {
                             throw new customError_1.default('Invalid files. Please provide valid trade license, civil aviation, NID, logo', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                 });
-                const sub_agent_no = yield lib_1.default.generateNo({ trx, type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent });
+                const sub_agent_no = yield lib_1.default.generateNo({
+                    trx,
+                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent,
+                });
                 const newSubAgency = yield agencyModel.createAgency({
                     address,
                     status: 'Active',
@@ -104,13 +107,14 @@ class AgentSubAgentService extends abstract_service_1.default {
                     civil_aviation,
                     trade_license,
                     national_id,
-                    ref_id: agency_id,
-                    created_by: user_id
+                    ref_agent_id: agency_id,
+                    created_by: user_id,
+                    agency_type: 'Sub Agent',
                 });
                 const newRole = yield agencyUserModel.createRole({
                     agency_id: newSubAgency[0].id,
                     name: 'Super Admin',
-                    is_main_role: true
+                    is_main_role: true,
                 });
                 let username = lib_1.default.generateUsername(user_name);
                 let suffix = 1;
@@ -128,7 +132,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                     name: user_name,
                     phone_number: phone,
                     role_id: newRole[0].id,
-                    username
+                    username,
                 });
                 yield subAgentMarkupModel.createSubAgentMarkup({
                     agency_id: newSubAgency[0].id,
@@ -137,28 +141,28 @@ class AgentSubAgentService extends abstract_service_1.default {
                     flight_markup_type,
                     hotel_markup_type,
                     flight_markup,
-                    hotel_markup
+                    hotel_markup,
                 });
                 yield emailSendLib_1.default.sendEmail({
                     email,
                     emailSub: `Booking Expert Agency Credentials`,
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(agency_name, {
                         email: email,
-                        password: password
-                    })
+                        password: password,
+                    }),
                 });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "Sub Agent has been created",
+                    message: 'Sub Agent has been created',
                     data: {
                         agency_id: newSubAgency[0].id,
                         user_id: newUser[0].id,
                         agency_logo,
                         civil_aviation,
                         trade_license,
-                        national_id
-                    }
+                        national_id,
+                    },
                 };
             }));
         });
@@ -212,7 +216,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                 const agencyUserModel = this.Model.AgencyUserModel(trx);
                 const checkAgency = yield AgentModel.checkAgency({
                     agency_id: Number(id),
-                    ref_id: agency_id
+                    ref_id: agency_id,
                 });
                 if (!checkAgency) {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
@@ -227,18 +231,18 @@ class AgentSubAgentService extends abstract_service_1.default {
                 const payload = rest;
                 if (payload.agency_name) {
                     const checkSubAgentName = yield AgentModel.checkAgency({
-                        name: payload.agency_name
+                        name: payload.agency_name,
                     });
                     if (checkSubAgentName) {
-                        throw new customError_1.default("Duplicate agency name! Agency already exists with this name", this.StatusCode.HTTP_CONFLICT);
+                        throw new customError_1.default('Duplicate agency name! Agency already exists with this name', this.StatusCode.HTTP_CONFLICT);
                     }
                 }
                 if (payload.email) {
                     const checkAgentUser = yield agencyUserModel.checkUser({
-                        email: payload.email
+                        email: payload.email,
                     });
                     if (checkAgentUser) {
-                        throw new customError_1.default("Email already exists. Please use another email", this.StatusCode.HTTP_CONFLICT);
+                        throw new customError_1.default('Email already exists. Please use another email', this.StatusCode.HTTP_CONFLICT);
                     }
                 }
                 files.forEach((file) => {
@@ -278,7 +282,12 @@ class AgentSubAgentService extends abstract_service_1.default {
                 if (deleteFiles.length) {
                     yield this.manageFile.deleteFromCloud(deleteFiles);
                 }
-                if (flight_markup || hotel_markup || flight_markup_mode || hotel_markup_mode || flight_markup_type || hotel_markup_type) {
+                if (flight_markup ||
+                    hotel_markup ||
+                    flight_markup_mode ||
+                    hotel_markup_mode ||
+                    flight_markup_type ||
+                    hotel_markup_type) {
                     const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
                     yield subAgentMarkupModel.updateSubAgentMarkup({
                         flight_markup_mode,
@@ -286,7 +295,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                         flight_markup_type,
                         hotel_markup_type,
                         flight_markup,
-                        hotel_markup
+                        hotel_markup,
                     }, Number(id));
                 }
                 // await this.insertAdminAudit(trx, {
@@ -314,7 +323,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
                 data: users.data,
-                total: users.total
+                total: users.total,
             };
         });
     }

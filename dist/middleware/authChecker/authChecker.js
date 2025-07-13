@@ -185,7 +185,8 @@ class AuthChecker {
                             user_id,
                             username: checkAgencyUser.username,
                             phone_number: checkAgencyUser.phone_number,
-                            ref_id: checkAgencyUser.ref_id,
+                            ref_agent_id: checkAgencyUser.ref_agent_id,
+                            agency_type: checkAgencyUser.agency_type,
                             address: checkAgencyUser.address,
                             agency_logo: checkAgencyUser.agency_logo,
                         };

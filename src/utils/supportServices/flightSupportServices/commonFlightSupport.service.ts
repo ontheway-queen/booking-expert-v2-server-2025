@@ -76,6 +76,11 @@ export class CommonFlightSupportService extends AbstractServices {
         retrieved_response: foundItem,
       });
 
+      formattedResBody.price_changed = this.checkRevalidatePriceChange({
+        flight_revalidate_price: formattedResBody.fare.payable,
+        flight_search_price: foundItem.fare.payable,
+      });
+
       formattedResBody.leg_description =
         retrievedData.response.leg_descriptions;
 
@@ -91,6 +96,11 @@ export class CommonFlightSupportService extends AbstractServices {
         },
       });
 
+      formattedResBody.price_changed = this.checkRevalidatePriceChange({
+        flight_revalidate_price: formattedResBody.fare.payable,
+        flight_search_price: foundItem.fare.payable,
+      });
+
       formattedResBody.leg_description =
         retrievedData.response.leg_descriptions;
 
@@ -101,10 +111,13 @@ export class CommonFlightSupportService extends AbstractServices {
   }
 
   private checkRevalidatePriceChange(payload: {
-    flight_search_price: number;
-    flight_revalidate_price: number;
+    flight_search_price: string | number;
+    flight_revalidate_price: string | number;
   }) {
-    if (payload.flight_search_price === payload.flight_revalidate_price) {
+    if (
+      Number(payload.flight_search_price) ===
+      Number(payload.flight_revalidate_price)
+    ) {
       return false;
     } else {
       return true;
@@ -123,7 +136,7 @@ export class CommonFlightSupportService extends AbstractServices {
       return null;
     }
 
-    if (Number(retrievedData.fare.payable) === payload.booking_price) {
+    if (Number(retrievedData.fare.payable) !== payload.booking_price) {
       return false;
     } else {
       return true;
