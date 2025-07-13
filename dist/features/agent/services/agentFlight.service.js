@@ -364,6 +364,7 @@ class AgentFlightService extends abstract_service_1.default {
                     search_id,
                     flight_id,
                     dynamic_fare_set_id: agency_details.flight_markup_set,
+                    markup_amount,
                 });
                 if (data) {
                     yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
@@ -531,7 +532,6 @@ class AgentFlightService extends abstract_service_1.default {
                     user_email,
                     files: req.files || [],
                     refundable,
-                    ticket_issue_last_time: data.ticket_last_time,
                     flight_data: data,
                     traveler_data: body.passengers,
                     type: 'Agent_Flight',
@@ -539,8 +539,6 @@ class AgentFlightService extends abstract_service_1.default {
                     source_id: agency_id,
                     invoice_ref_type: constants_1.TYPE_FLIGHT,
                     booking_block: directBookingPermission.booking_block,
-                    api: data.api,
-                    vendor_fare: JSON.stringify(data.fare.vendor_price),
                 });
                 new_booking_id = booking_id;
                 new_booking_ref = booking_ref;

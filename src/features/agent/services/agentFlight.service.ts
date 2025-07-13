@@ -427,6 +427,7 @@ export class AgentFlightService extends AbstractServices {
           type: 'Flight',
           agency_id,
         });
+
         if (!markup_amount) {
           return {
             success: false,
@@ -444,6 +445,7 @@ export class AgentFlightService extends AbstractServices {
           search_id,
           flight_id,
           dynamic_fare_set_id: agency_details.flight_markup_set,
+          markup_amount,
         });
 
       if (data) {
@@ -656,7 +658,6 @@ export class AgentFlightService extends AbstractServices {
           user_email,
           files: (req.files as Express.Multer.File[]) || [],
           refundable,
-          ticket_issue_last_time: data.ticket_last_time,
           flight_data: data,
           traveler_data: body.passengers,
           type: 'Agent_Flight',
@@ -664,8 +665,6 @@ export class AgentFlightService extends AbstractServices {
           source_id: agency_id,
           invoice_ref_type: TYPE_FLIGHT,
           booking_block: directBookingPermission.booking_block,
-          api: data.api,
-          vendor_fare: JSON.stringify(data.fare.vendor_price),
         });
 
       new_booking_id = booking_id;

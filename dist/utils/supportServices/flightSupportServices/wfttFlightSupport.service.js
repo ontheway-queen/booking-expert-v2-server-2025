@@ -117,7 +117,7 @@ class WfttFlightService extends abstract_service_1.default {
     }
     // Flight search response formatter
     FlightSearchResFormatter(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ data, reqBody, dynamic_fare_supplier_id, search_id, markup_amount, route_type, }) {
+        return __awaiter(this, arguments, void 0, function* ({ data, reqBody, dynamic_fare_supplier_id, search_id, markup_amount, route_type, with_modified_fare, with_vendor_fare, }) {
             // const result: IFormattedFlightItinerary[] = [];
             const airports = [];
             const OriginDest = reqBody.OriginDestinationInformation;
@@ -132,14 +132,59 @@ class WfttFlightService extends abstract_service_1.default {
             });
             const formattedData = yield Promise.all(data.map((item) => __awaiter(this, void 0, void 0, function* () {
                 const domestic_flight = route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC;
-                const { isDomesticFlight, fare: vendor_fare, api, carrier_code, carrier_logo, api_search_id, flights, passengers } = item, rest = __rest(item, ["isDomesticFlight", "fare", "api", "carrier_code", "carrier_logo", "api_search_id", "flights", "passengers"]);
+                const { isDomesticFlight, fare: vendor_fare, api, carrier_code, carrier_logo, api_search_id, flights, passengers, refundable } = item, rest = __rest(item, ["isDomesticFlight", "fare", "api", "carrier_code", "carrier_logo", "api_search_id", "flights", "passengers", "refundable"]);
+                let partial_payment = {
+                    partial_payment: false,
+                    payment_percentage: 0,
+                    travel_date_from_now: '',
+                };
+                if (route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC) {
+                    //domestic
+                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
+                        flight_api_name: flightConstent_1.CUSTOM_API,
+                        airline: carrier_code,
+                        refundable,
+                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
+                        domestic: true,
+                    });
+                }
+                else if (route_type === flightConstent_1.ROUTE_TYPE.FROM_DAC) {
+                    //from dac
+                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
+                        flight_api_name: flightConstent_1.CUSTOM_API,
+                        airline: carrier_code,
+                        from_dac: true,
+                        refundable,
+                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
+                    });
+                }
+                else if (route_type === flightConstent_1.ROUTE_TYPE.TO_DAC) {
+                    //to dac
+                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
+                        flight_api_name: flightConstent_1.CUSTOM_API,
+                        airline: carrier_code,
+                        to_dac: true,
+                        refundable,
+                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
+                    });
+                }
+                else {
+                    //soto
+                    partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
+                        flight_api_name: flightConstent_1.CUSTOM_API,
+                        airline: carrier_code,
+                        refundable,
+                        travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
+                        soto: true,
+                    });
+                }
                 let total_segments = 0;
                 flights.map((elm) => {
-                    elm.options.map((elm2) => {
+                    elm.options.forEach((elm2) => {
                         total_segments++;
                     });
                 });
-                const { markup, commission, pax_markup } = yield this.flightSupport.calculateFlightMarkup({
+                const { markup, commission, pax_markup, agent_discount, agent_markup } = yield this.flightSupport.calculateFlightMarkup({
                     dynamic_fare_supplier_id,
                     airline: carrier_code,
                     flight_class: this.flightUtils.getClassFromId(reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
@@ -147,19 +192,22 @@ class WfttFlightService extends abstract_service_1.default {
                     base_fare: vendor_fare.base_fare,
                     total_segments,
                     route_type,
+                    markup_amount,
                 });
                 const total_pax_markup = pax_markup * pax_count;
                 let fare = {
-                    base_fare: vendor_fare.base_fare + markup + total_pax_markup,
+                    base_fare: vendor_fare.base_fare + markup + agent_markup + total_pax_markup,
                     total_tax: vendor_fare.total_tax,
-                    discount: commission,
+                    discount: commission + agent_discount,
                     ait: vendor_fare.ait,
                     payable: (vendor_fare.base_fare +
                         markup +
+                        agent_markup +
                         total_pax_markup +
                         vendor_fare.total_tax +
                         vendor_fare.ait -
-                        commission).toFixed(2),
+                        commission -
+                        agent_discount).toFixed(2),
                     vendor_price: {
                         base_fare: vendor_fare.base_fare,
                         charge: 0,
@@ -171,8 +219,8 @@ class WfttFlightService extends abstract_service_1.default {
                     },
                 };
                 const newPassenger = passengers.map((oldPax) => {
-                    const per_pax_discount = commission / pax_count;
-                    const per_pax_markup = markup / pax_count;
+                    const per_pax_discount = (commission + agent_discount) / pax_count;
+                    const per_pax_markup = (markup + agent_markup) / pax_count;
                     const total_pax_markup = pax_markup + per_pax_markup;
                     const per_pax_ait = Number(fare.ait) / pax_count;
                     const per_pax_tax = oldPax.fare.tax / oldPax.number;
@@ -215,7 +263,8 @@ class WfttFlightService extends abstract_service_1.default {
                 })));
                 const career = yield commonModel.getAirlineByCode(carrier_code);
                 return Object.assign(Object.assign({ domestic_flight,
-                    fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API, api_name: flightConstent_1.CUSTOM_API_NAME, carrier_code, carrier_logo: career.logo, flights: newFlights, passengers: newPassenger }, rest), { leg_description: [] });
+                    fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API, api_name: flightConstent_1.CUSTOM_API_NAME, carrier_code, carrier_logo: career.logo, flights: newFlights, passengers: newPassenger, refundable,
+                    partial_payment }, rest), { leg_description: [] });
             })));
             return formattedData;
         });

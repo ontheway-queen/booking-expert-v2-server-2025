@@ -144,10 +144,10 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 ait: payload.flight_data.fare.ait,
                 payable_amount: payload.flight_data.fare.payable,
                 travel_date: payload.flight_data.flights[0].options[0].departure.date,
-                ticket_issue_last_time: payload.ticket_issue_last_time,
+                ticket_issue_last_time: payload.flight_data.ticket_last_time,
                 airline_pnr: payload.airline_pnr,
                 created_by: payload.user_id,
-                vendor_fare: payload.vendor_fare,
+                vendor_fare: JSON.stringify(payload.flight_data.fare.vendor_price),
             });
             //insert flight booking price breakdown data
             const passenger_fare = payload.flight_data.passengers.map((passenger) => {
@@ -253,7 +253,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                     description: `${payload.payable_amount} BDT has been paid for the booking`,
                 });
             }
-            if (payload.api === flightConstent_1.CUSTOM_API) {
+            if (payload.flight_data.api === flightConstent_1.CUSTOM_API) {
                 tracking_data.push({
                     flight_booking_id: booking_res[0].id,
                     description: `This was a custom API`,

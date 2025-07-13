@@ -6,6 +6,10 @@ import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import CommonModel from '../../models/commonModel/commonModel';
 import AgencyModel from '../../models/agentModel/agencyModel';
 import SubAgentMarkupModel from '../../models/agentModel/subAgentMarkupModel';
+import {
+  MarkupMode,
+  MarkupType,
+} from '../modelTypes/flightModelTypes/flightBookingModelTypes';
 
 class Lib {
   // Create hash string
@@ -257,7 +261,11 @@ class Lib {
     trx: TDB;
     type: 'Hotel' | 'Flight';
     agency_id: number;
-  }) {
+  }): Promise<{
+    markup: number;
+    markup_type: MarkupType;
+    markup_mode: MarkupMode;
+  } | null> {
     const model = new SubAgentMarkupModel(trx);
     const get_markup = await model.getSubAgentMarkup(agency_id);
     if (!get_markup) {

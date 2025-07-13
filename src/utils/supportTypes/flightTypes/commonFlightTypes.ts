@@ -85,6 +85,18 @@ export interface IFormattedFlightItinerary {
   flights: IFormattedFlight[];
   passengers: IFormattedPassenger[];
   availability: IFlightAvailability[];
+  partial_payment?: {
+    partial_payment: boolean;
+    payment_percentage: number | string;
+    travel_date_from_now: string;
+  };
+  modifiedFare?: {
+    markup: number;
+    commission: number;
+    pax_markup: number;
+    agent_markup: number;
+    agent_discount: number;
+  };
 }
 
 export interface IFormattedFlight {

@@ -53,6 +53,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
                     flight_id,
                     reqBody: retrievedData.reqBody,
                     retrieved_response: foundItem,
+                    markup_amount,
                 });
                 formattedResBody.price_changed = this.checkRevalidatePriceChange({
                     flight_revalidate_price: formattedResBody.fare.payable,
@@ -100,7 +101,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
             if (!retrievedData) {
                 return null;
             }
-            if (Number(retrievedData.fare.payable) !== payload.booking_price) {
+            if (Number(retrievedData.fare.payable) === payload.booking_price) {
                 return false;
             }
             else {
@@ -116,7 +117,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
     }
     //calculate convenience fee and discount
     calculateFlightMarkup(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ airline, base_fare, flight_class, dynamic_fare_supplier_id, route_type, total_segments, }) {
+        return __awaiter(this, arguments, void 0, function* ({ airline, base_fare, flight_class, dynamic_fare_supplier_id, route_type, total_segments, markup_amount, }) {
             const dynamicFareModel = this.Model.DynamicFareModel(this.trx);
             let markup = 0;
             let commission = 0;
@@ -228,10 +229,29 @@ class CommonFlightSupportService extends abstract_service_1.default {
                     }
                 }
             }
+            let agent_markup = 0;
+            let agent_discount = 0;
+            if (markup_amount) {
+                let extra_amount = 0;
+                if (markup_amount.markup_type === 'FLAT') {
+                    extra_amount = markup_amount.markup;
+                }
+                if (markup_amount.markup_type === 'PER') {
+                    extra_amount = Number(base_fare) * (Number(markup_amount.markup) / 100);
+                }
+                if (markup_amount.markup_mode === 'INCREASE') {
+                    agent_markup = extra_amount;
+                }
+                if (markup_amount.markup_mode === 'DECREASE') {
+                    agent_discount = extra_amount;
+                }
+            }
             return {
                 markup: Number(Number(markup).toFixed(2)),
                 commission: Number(Number(commission).toFixed(2)),
                 pax_markup: Number(Number(pax_markup).toFixed(2)),
+                agent_discount: Number(agent_discount.toFixed(2)),
+                agent_markup: Number(agent_markup.toFixed(2)),
             };
         });
     }

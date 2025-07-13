@@ -492,15 +492,12 @@ export class AgentB2CFlightService extends AbstractServices {
           user_email,
           files: (req.files as Express.Multer.File[]) || [],
           refundable,
-          ticket_issue_last_time: data.ticket_last_time,
           flight_data: data,
           traveler_data: body.passengers,
           type: 'Agent_Flight',
           source_type: SOURCE_AGENT_B2C,
           source_id: agency_id,
           invoice_ref_type: TYPE_FLIGHT,
-          api: data.api,
-          vendor_fare: JSON.stringify(data.fare.vendor_price),
         });
 
       return {

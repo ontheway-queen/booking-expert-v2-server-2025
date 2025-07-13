@@ -16,7 +16,9 @@ export type BookingStatus =
   | 'REISSUED'
   | 'BOOKING IN PROCESS'
   | 'TICKET IN PROCESS';
-export type MarkupType = 'INCREASE' | 'DECREASE';
+
+export type MarkupType = 'PER' | 'FLAT';
+export type MarkupMode = 'INCREASE' | 'DECREASE';
 export type JourneyType = 'ONE WAY' | 'ROUND TRIP' | 'MULTI CITY';
 export type ActionUserType = SourceType | 'ADMIN';
 

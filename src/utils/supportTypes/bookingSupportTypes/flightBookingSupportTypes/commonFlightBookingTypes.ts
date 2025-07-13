@@ -80,7 +80,6 @@ export interface IInsertFlightBookingDataPayload {
   user_name: string;
   user_email: string;
   files?: Express.Multer.File[];
-  ticket_issue_last_time: string | null;
   refundable: boolean;
   flight_data: IFormattedFlightItinerary;
   traveler_data: IFlightBookingPassengerReqBody[];
@@ -97,8 +96,6 @@ export interface IInsertFlightBookingDataPayload {
     | typeof TYPE_HOLIDAY;
   coupon_code?: string;
   booking_block?: boolean;
-  api: string;
-  vendor_fare: string;
 }
 
 export interface IUpdateDataAfterFlightBookingCancelPayload {

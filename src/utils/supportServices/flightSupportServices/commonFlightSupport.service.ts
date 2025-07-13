@@ -34,7 +34,11 @@ export class CommonFlightSupportService extends AbstractServices {
     search_id: string;
     flight_id: string;
     dynamic_fare_set_id: number;
-    markup_amount?: number;
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
   }) {
     //get data from redis using the search id
     const retrievedData = await getRedis(search_id);
@@ -74,6 +78,7 @@ export class CommonFlightSupportService extends AbstractServices {
         flight_id,
         reqBody: retrievedData.reqBody,
         retrieved_response: foundItem,
+        markup_amount,
       });
 
       formattedResBody.price_changed = this.checkRevalidatePriceChange({
@@ -136,7 +141,7 @@ export class CommonFlightSupportService extends AbstractServices {
       return null;
     }
 
-    if (Number(retrievedData.fare.payable) !== payload.booking_price) {
+    if (Number(retrievedData.fare.payable) === payload.booking_price) {
       return false;
     } else {
       return true;
@@ -159,6 +164,7 @@ export class CommonFlightSupportService extends AbstractServices {
     dynamic_fare_supplier_id,
     route_type,
     total_segments,
+    markup_amount,
   }: {
     dynamic_fare_supplier_id: number;
     airline: string;
@@ -166,7 +172,18 @@ export class CommonFlightSupportService extends AbstractServices {
     base_fare: number;
     total_segments: number;
     route_type: 'SOTO' | 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC';
-  }) {
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
+  }): Promise<{
+    markup: number;
+    commission: number;
+    pax_markup: number;
+    agent_discount: number;
+    agent_markup: number;
+  }> {
     const dynamicFareModel = this.Model.DynamicFareModel(this.trx);
 
     let markup = 0;
@@ -283,10 +300,32 @@ export class CommonFlightSupportService extends AbstractServices {
       }
     }
 
+    let agent_markup = 0;
+    let agent_discount = 0;
+    if (markup_amount) {
+      let extra_amount = 0;
+      if (markup_amount.markup_type === 'FLAT') {
+        extra_amount = markup_amount.markup;
+      }
+
+      if (markup_amount.markup_type === 'PER') {
+        extra_amount = Number(base_fare) * (Number(markup_amount.markup) / 100);
+      }
+
+      if (markup_amount.markup_mode === 'INCREASE') {
+        agent_markup = extra_amount;
+      }
+      if (markup_amount.markup_mode === 'DECREASE') {
+        agent_discount = extra_amount;
+      }
+    }
+
     return {
       markup: Number(Number(markup).toFixed(2)),
       commission: Number(Number(commission).toFixed(2)),
       pax_markup: Number(Number(pax_markup).toFixed(2)),
+      agent_discount: Number(agent_discount.toFixed(2)),
+      agent_markup: Number(agent_markup.toFixed(2)),
     };
   }
 

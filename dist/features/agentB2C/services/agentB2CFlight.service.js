@@ -415,15 +415,12 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     user_email,
                     files: req.files || [],
                     refundable,
-                    ticket_issue_last_time: data.ticket_last_time,
                     flight_data: data,
                     traveler_data: body.passengers,
                     type: 'Agent_Flight',
                     source_type: constants_1.SOURCE_AGENT_B2C,
                     source_id: agency_id,
                     invoice_ref_type: constants_1.TYPE_FLIGHT,
-                    api: data.api,
-                    vendor_fare: JSON.stringify(data.fare.vendor_price),
                 });
                 return {
                     success: true,

@@ -253,6 +253,7 @@ export default class SabreFlightService extends AbstractServices {
     route_type,
     flight_id,
     with_vendor_fare,
+    with_modified_fare,
   }: {
     data: ISabreResponseResult;
     reqBody: IFlightSearchReqBody;
@@ -261,6 +262,7 @@ export default class SabreFlightService extends AbstractServices {
     flight_id?: string;
     route_type: 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' | 'SOTO';
     with_vendor_fare?: boolean;
+    with_modified_fare?: boolean;
     markup_amount?: {
       markup: number;
       markup_type: 'PER' | 'FLAT';
@@ -457,74 +459,14 @@ export default class SabreFlightService extends AbstractServices {
         };
       }
 
-      let partial_payment: {
-        partial_payment: boolean;
-        payment_percentage: any;
-        travel_date_from_now: any;
-      } = {
-        partial_payment: false,
-        payment_percentage: 100,
-        travel_date_from_now: 0,
-      };
-
-      if (route_type === ROUTE_TYPE.DOMESTIC) {
-        //domestic
-        partial_payment = await this.Model.PartialPaymentRuleModel(
-          this.trx
-        ).getPartialPaymentCondition({
-          flight_api_name: SABRE_API,
-          airline: fare.validatingCarrierCode,
-          refundable,
-          travel_date:
-            reqBody.OriginDestinationInformation[0].DepartureDateTime,
-          domestic: true,
-        });
-      } else if (route_type === ROUTE_TYPE.FROM_DAC) {
-        //from dac
-        partial_payment = await this.Model.PartialPaymentRuleModel(
-          this.trx
-        ).getPartialPaymentCondition({
-          flight_api_name: SABRE_API,
-          airline: fare.validatingCarrierCode,
-          from_dac: true,
-          refundable,
-          travel_date:
-            reqBody.OriginDestinationInformation[0].DepartureDateTime,
-        });
-      } else if (route_type === ROUTE_TYPE.TO_DAC) {
-        //to dac
-        partial_payment = await this.Model.PartialPaymentRuleModel(
-          this.trx
-        ).getPartialPaymentCondition({
-          flight_api_name: SABRE_API,
-          airline: fare.validatingCarrierCode,
-          to_dac: true,
-          refundable,
-          travel_date:
-            reqBody.OriginDestinationInformation[0].DepartureDateTime,
-        });
-      } else {
-        //soto
-        partial_payment = await this.Model.PartialPaymentRuleModel(
-          this.trx
-        ).getPartialPaymentCondition({
-          flight_api_name: SABRE_API,
-          airline: fare.validatingCarrierCode,
-          refundable,
-          travel_date:
-            reqBody.OriginDestinationInformation[0].DepartureDateTime,
-          soto: true,
-        });
-      }
-
       let total_segments = 0;
       legsDesc.map((elm) => {
-        elm.options.map((elm2) => {
+        elm.options.forEach((elm2) => {
           total_segments++;
         });
       });
 
-      const { markup, commission, pax_markup } =
+      const { markup, commission, pax_markup, agent_discount, agent_markup } =
         await this.flightSupport.calculateFlightMarkup({
           dynamic_fare_supplier_id,
           airline: fare.validatingCarrierCode,
@@ -535,6 +477,7 @@ export default class SabreFlightService extends AbstractServices {
           base_fare: fare.totalFare.equivalentAmount,
           total_segments,
           route_type,
+          markup_amount,
         });
 
       let pax_count = 0;
@@ -638,8 +581,8 @@ export default class SabreFlightService extends AbstractServices {
           segmentDetails,
         });
 
-        const per_pax_discount = commission / pax_count;
-        const per_pax_markup = markup / pax_count;
+        const per_pax_discount = (commission + agent_discount) / pax_count;
+        const per_pax_markup = (markup + agent_markup) / pax_count;
 
         const total_pax_markup = pax_markup + per_pax_markup;
 
@@ -669,6 +612,66 @@ export default class SabreFlightService extends AbstractServices {
         };
 
         passenger_lists.push(new_passenger);
+      }
+
+      let partial_payment: {
+        partial_payment: boolean;
+        payment_percentage: any;
+        travel_date_from_now: any;
+      } = {
+        partial_payment: false,
+        payment_percentage: 0,
+        travel_date_from_now: '',
+      };
+
+      if (route_type === ROUTE_TYPE.DOMESTIC) {
+        //domestic
+        partial_payment = await this.Model.PartialPaymentRuleModel(
+          this.trx
+        ).getPartialPaymentCondition({
+          flight_api_name: SABRE_API,
+          airline: fare.validatingCarrierCode,
+          refundable,
+          travel_date:
+            reqBody.OriginDestinationInformation[0].DepartureDateTime,
+          domestic: true,
+        });
+      } else if (route_type === ROUTE_TYPE.FROM_DAC) {
+        //from dac
+        partial_payment = await this.Model.PartialPaymentRuleModel(
+          this.trx
+        ).getPartialPaymentCondition({
+          flight_api_name: SABRE_API,
+          airline: fare.validatingCarrierCode,
+          from_dac: true,
+          refundable,
+          travel_date:
+            reqBody.OriginDestinationInformation[0].DepartureDateTime,
+        });
+      } else if (route_type === ROUTE_TYPE.TO_DAC) {
+        //to dac
+        partial_payment = await this.Model.PartialPaymentRuleModel(
+          this.trx
+        ).getPartialPaymentCondition({
+          flight_api_name: SABRE_API,
+          airline: fare.validatingCarrierCode,
+          to_dac: true,
+          refundable,
+          travel_date:
+            reqBody.OriginDestinationInformation[0].DepartureDateTime,
+        });
+      } else {
+        //soto
+        partial_payment = await this.Model.PartialPaymentRuleModel(
+          this.trx
+        ).getPartialPaymentCondition({
+          flight_api_name: SABRE_API,
+          airline: fare.validatingCarrierCode,
+          refundable,
+          travel_date:
+            reqBody.OriginDestinationInformation[0].DepartureDateTime,
+          soto: true,
+        });
       }
 
       const availability: IFlightAvailability[] = [];
@@ -769,11 +772,16 @@ export default class SabreFlightService extends AbstractServices {
 
       new_fare.base_fare = (
         markup +
+        agent_markup +
         total_pax_markup +
         Number(new_fare.base_fare)
       ).toFixed(2);
 
-      new_fare.discount = (Number(new_fare.discount) + commission).toFixed(2);
+      new_fare.discount = (
+        Number(new_fare.discount) +
+        agent_discount +
+        commission
+      ).toFixed(2);
 
       new_fare.payable = (
         Number(new_fare.base_fare) +
@@ -806,6 +814,16 @@ export default class SabreFlightService extends AbstractServices {
         flights: legsDesc,
         passengers: passenger_lists,
         availability,
+        modifiedFare: with_modified_fare
+          ? {
+              agent_discount,
+              agent_markup,
+              commission,
+              markup,
+              pax_markup,
+            }
+          : undefined,
+        partial_payment,
         leg_description: [],
       };
 
