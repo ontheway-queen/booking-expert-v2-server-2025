@@ -56,7 +56,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
                 const apiData = yield markupSetFlightApiModel.getDynamicFareSuppliers({
                     status: true,
-                    set_id: agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set,
+                    set_id: agency_details.flight_markup_set,
                 });
                 //extract API IDs
                 let sabre_set_flight_api_id = 0;
@@ -308,6 +308,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     search_id,
                     flight_id,
                     dynamic_fare_set_id: agency_details.flight_markup_set,
+                    markup_amount,
                 });
                 if (data) {
                     yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
@@ -329,8 +330,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
     flightBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyB2CWhiteLabel;
-                const { user_id, name, user_email, agency_email, agency_address, agency_logo, agency_name, agency_number, } = req.agencyB2CUser;
+                const { user_id, name, user_email, agency_email, agency_address, agency_id, agency_logo, agency_name, agency_number, } = req.agencyB2CUser;
                 const body = req.body;
                 const booking_confirm = req.query.booking_confirm;
                 //get flight markup set id

@@ -451,10 +451,13 @@ export class AgentFlightService extends AbstractServices {
       if (data) {
         await setRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
 
+        const { fare, modifiedFare, ...restData } = data;
+
+        const { vendor_price, ...restFare } = fare;
         return {
           success: true,
           message: 'Flight has been revalidated successfully!',
-          data,
+          data: { ...restData, fare: restFare },
           code: this.StatusCode.HTTP_OK,
         };
       }
@@ -560,6 +563,7 @@ export class AgentFlightService extends AbstractServices {
           search_id: body.search_id,
           flight_id: body.flight_id,
           dynamic_fare_set_id: agency_details.flight_markup_set,
+          markup_amount,
         });
 
       if (!rev_data) {

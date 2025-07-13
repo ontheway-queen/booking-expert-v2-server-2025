@@ -163,6 +163,9 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 };
             });
             yield flightBookingPriceBreakdownModel.insertFlightBookingPriceBreakdown(passenger_fare);
+            if (payload.flight_data.modifiedFare) {
+                yield flightBookingPriceBreakdownModel.insertFlightBookingModifiedAmount(Object.assign({ booking_id: booking_res[0].id }, payload.flight_data.modifiedFare));
+            }
             //insert flight booking segment data
             const { baggage_info, cabin_info } = flightUtils.mapFlightAvailability(payload.flight_data.availability);
             payload.flight_data.flights.forEach((flight) => __awaiter(this, void 0, void 0, function* () {

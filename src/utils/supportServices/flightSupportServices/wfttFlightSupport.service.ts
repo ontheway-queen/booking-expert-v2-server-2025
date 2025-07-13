@@ -307,15 +307,17 @@ export default class WfttFlightService extends AbstractServices {
             commission -
             agent_discount
           ).toFixed(2),
-          vendor_price: {
-            base_fare: vendor_fare.base_fare,
-            charge: 0,
-            discount: vendor_fare.discount,
-            ait: vendor_fare.ait,
-            gross_fare: vendor_fare.total_price,
-            net_fare: vendor_fare.payable,
-            tax: vendor_fare.total_tax,
-          },
+          vendor_price: with_vendor_fare
+            ? {
+                base_fare: vendor_fare.base_fare,
+                charge: 0,
+                discount: vendor_fare.discount,
+                ait: vendor_fare.ait,
+                gross_fare: vendor_fare.total_price,
+                net_fare: vendor_fare.payable,
+                tax: vendor_fare.total_tax,
+              }
+            : undefined,
         };
 
         const newPassenger = passengers.map((oldPax) => {
@@ -407,6 +409,15 @@ export default class WfttFlightService extends AbstractServices {
           passengers: newPassenger,
           refundable,
           partial_payment,
+          modifiedFare: with_modified_fare
+            ? {
+                agent_discount,
+                agent_markup,
+                commission,
+                markup,
+                pax_markup,
+              }
+            : undefined,
           ...rest,
           leg_description: [],
         };
@@ -467,6 +478,8 @@ export default class WfttFlightService extends AbstractServices {
       search_id: '',
       markup_amount,
       route_type,
+      with_modified_fare: true,
+      with_vendor_fare: true,
     });
     return result[0];
   }

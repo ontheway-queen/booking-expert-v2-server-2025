@@ -19,3 +19,12 @@ export interface IGetFlightBookingPriceBreakdownData {
   discount: number;
   total_fare: number;
 }
+export interface IGetFlightBookingModifiedAmountData {
+  id: number;
+  flight_booking_id: number;
+  markup: number;
+  commission: number;
+  pax_markup: number;
+  agent_markup: number;
+  total_fare: number;
+}

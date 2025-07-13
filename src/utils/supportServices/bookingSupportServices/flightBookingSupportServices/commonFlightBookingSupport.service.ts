@@ -232,6 +232,13 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       passenger_fare
     );
 
+    if (payload.flight_data.modifiedFare) {
+      await flightBookingPriceBreakdownModel.insertFlightBookingModifiedAmount({
+        booking_id: booking_res[0].id,
+        ...payload.flight_data.modifiedFare,
+      });
+    }
+
     //insert flight booking segment data
     const { baggage_info, cabin_info } = flightUtils.mapFlightAvailability(
       payload.flight_data.availability

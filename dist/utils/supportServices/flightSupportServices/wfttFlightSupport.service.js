@@ -208,15 +208,17 @@ class WfttFlightService extends abstract_service_1.default {
                         vendor_fare.ait -
                         commission -
                         agent_discount).toFixed(2),
-                    vendor_price: {
-                        base_fare: vendor_fare.base_fare,
-                        charge: 0,
-                        discount: vendor_fare.discount,
-                        ait: vendor_fare.ait,
-                        gross_fare: vendor_fare.total_price,
-                        net_fare: vendor_fare.payable,
-                        tax: vendor_fare.total_tax,
-                    },
+                    vendor_price: with_vendor_fare
+                        ? {
+                            base_fare: vendor_fare.base_fare,
+                            charge: 0,
+                            discount: vendor_fare.discount,
+                            ait: vendor_fare.ait,
+                            gross_fare: vendor_fare.total_price,
+                            net_fare: vendor_fare.payable,
+                            tax: vendor_fare.total_tax,
+                        }
+                        : undefined,
                 };
                 const newPassenger = passengers.map((oldPax) => {
                     const per_pax_discount = (commission + agent_discount) / pax_count;
@@ -264,7 +266,15 @@ class WfttFlightService extends abstract_service_1.default {
                 const career = yield commonModel.getAirlineByCode(carrier_code);
                 return Object.assign(Object.assign({ domestic_flight,
                     fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API, api_name: flightConstent_1.CUSTOM_API_NAME, carrier_code, carrier_logo: career.logo, flights: newFlights, passengers: newPassenger, refundable,
-                    partial_payment }, rest), { leg_description: [] });
+                    partial_payment, modifiedFare: with_modified_fare
+                        ? {
+                            agent_discount,
+                            agent_markup,
+                            commission,
+                            markup,
+                            pax_markup,
+                        }
+                        : undefined }, rest), { leg_description: [] });
             })));
             return formattedData;
         });
@@ -298,6 +308,8 @@ class WfttFlightService extends abstract_service_1.default {
                 search_id: '',
                 markup_amount,
                 route_type,
+                with_modified_fare: true,
+                with_vendor_fare: true,
             });
             return result[0];
         });

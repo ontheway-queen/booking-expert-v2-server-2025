@@ -51,6 +51,7 @@ export class AgentB2CFlightService extends AbstractServices {
         type: 'Flight',
         agency_id,
       });
+
       if (!markup_amount) {
         return {
           success: false,
@@ -62,7 +63,7 @@ export class AgentB2CFlightService extends AbstractServices {
       const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
       const apiData = await markupSetFlightApiModel.getDynamicFareSuppliers({
         status: true,
-        set_id: agency_details?.flight_markup_set,
+        set_id: agency_details.flight_markup_set,
       });
 
       //extract API IDs
@@ -333,6 +334,7 @@ export class AgentB2CFlightService extends AbstractServices {
         flight_id: string;
         search_id: string;
       };
+
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
       const agency_details = await agencyModel.checkAgency({ agency_id });
@@ -364,6 +366,7 @@ export class AgentB2CFlightService extends AbstractServices {
           search_id,
           flight_id,
           dynamic_fare_set_id: agency_details.flight_markup_set,
+          markup_amount,
         });
 
       if (data) {
@@ -386,13 +389,13 @@ export class AgentB2CFlightService extends AbstractServices {
 
   public async flightBooking(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyB2CWhiteLabel;
       const {
         user_id,
         name,
         user_email,
         agency_email,
         agency_address,
+        agency_id,
         agency_logo,
         agency_name,
         agency_number,
@@ -400,6 +403,7 @@ export class AgentB2CFlightService extends AbstractServices {
 
       const body = req.body as IFlightBookingRequestBody;
       const booking_confirm = req.query.booking_confirm;
+
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
       const agency_details = await agencyModel.checkAgency({ agency_id });

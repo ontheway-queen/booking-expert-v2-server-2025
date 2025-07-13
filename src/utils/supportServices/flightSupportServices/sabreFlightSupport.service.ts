@@ -890,6 +890,7 @@ export default class SabreFlightService extends AbstractServices {
       markup_amount,
       route_type,
       with_vendor_fare: true,
+      with_modified_fare: true,
     });
 
     return data[0];
