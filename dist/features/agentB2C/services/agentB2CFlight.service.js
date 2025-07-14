@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -311,11 +322,12 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     markup_amount,
                 });
                 if (data) {
-                    yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
+                    const { fare, modifiedFare } = data, restData = __rest(data, ["fare", "modifiedFare"]);
+                    const { vendor_price } = fare, restFare = __rest(fare, ["vendor_price"]);
                     return {
                         success: true,
-                        message: 'Ticket has been revalidated successfully!',
-                        data: data,
+                        message: 'Flight has been revalidated successfully!',
+                        data: Object.assign(Object.assign({}, restData), { fare: restFare }),
                         code: this.StatusCode.HTTP_OK,
                     };
                 }

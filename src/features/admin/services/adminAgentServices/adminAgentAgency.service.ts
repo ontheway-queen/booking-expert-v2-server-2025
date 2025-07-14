@@ -115,7 +115,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
       }
 
       const { user_id } = req.admin;
-      const { white_label_permissions, kam_id, ...restBody } =
+      const { white_label_permissions, kam_id, ref_id, ...restBody } =
         req.body as IAdminAgentUpdateAgencyReqBody;
 
       const files = (req.files as Express.Multer.File[]) || [];
@@ -133,6 +133,20 @@ export default class AdminAgentAgencyService extends AbstractServices {
           };
         } else {
           payload.kam_id = kam_id;
+        }
+      }
+
+      if (ref_id) {
+        const adminModel = this.Model.AdminModel(trx);
+        const checkKam = await adminModel.checkUserAdmin({ id: ref_id });
+        if (!checkKam) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Invalid KAM ID',
+          };
+        } else {
+          payload.ref_id = ref_id;
         }
       }
 

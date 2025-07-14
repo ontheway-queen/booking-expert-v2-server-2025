@@ -108,7 +108,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
                 }
                 const { user_id } = req.admin;
-                const _a = req.body, { white_label_permissions, kam_id } = _a, restBody = __rest(_a, ["white_label_permissions", "kam_id"]);
+                const _a = req.body, { white_label_permissions, kam_id, ref_id } = _a, restBody = __rest(_a, ["white_label_permissions", "kam_id", "ref_id"]);
                 const files = req.files || [];
                 const payload = Object.assign({}, restBody);
                 if (kam_id) {
@@ -123,6 +123,20 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     }
                     else {
                         payload.kam_id = kam_id;
+                    }
+                }
+                if (ref_id) {
+                    const adminModel = this.Model.AdminModel(trx);
+                    const checkKam = yield adminModel.checkUserAdmin({ id: ref_id });
+                    if (!checkKam) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Invalid KAM ID',
+                        };
+                    }
+                    else {
+                        payload.ref_id = ref_id;
                     }
                 }
                 files.forEach((file) => {

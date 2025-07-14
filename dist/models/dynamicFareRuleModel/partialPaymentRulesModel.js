@@ -47,7 +47,7 @@ class PartialPaymentRuleModel extends schema_1.default {
             const data = yield this.db('partial_payment_rules')
                 .withSchema(this.DBO_SCHEMA)
                 .select('partial_payment_rules.id', 'partial_payment_rules.flight_api_id', 'supplier.api as flight_api_name', 'partial_payment_rules.airline', 'partial_payment_rules.from_dac', 'partial_payment_rules.to_dac', 'partial_payment_rules.one_way', 'partial_payment_rules.round_trip', 'partial_payment_rules.domestic', 'partial_payment_rules.soto', 'partial_payment_rules.travel_date_from_now', 'partial_payment_rules.payment_before', 'partial_payment_rules.payment_percentage', 'partial_payment_rules.status', 'partial_payment_rules.created_by', 'partial_payment_rules.created_at')
-                .leftJoin('supplier', 'supplier.id', 'partial_payment_rules.flight_api_id')
+                .leftJoin('flight_supplier AS supplier', 'supplier.id', 'partial_payment_rules.flight_api_id')
                 .where((qb) => {
                 if (query.flight_api_id !== undefined) {
                     qb.andWhere('partial_payment_rules.flight_api_id', query.flight_api_id);
@@ -132,7 +132,7 @@ class PartialPaymentRuleModel extends schema_1.default {
             const data = yield this.db('partial_payment_rules')
                 .withSchema(this.DBO_SCHEMA)
                 .select('partial_payment_rules.*')
-                .leftJoin('supplier', 'supplier.id', 'partial_payment_rules.flight_api_id')
+                .leftJoin('flight_supplier AS supplier', 'supplier.id', 'partial_payment_rules.flight_api_id')
                 .where((qb) => {
                 qb.where('supplier.api', payload.flight_api_name).andWhere((builder) => {
                     builder

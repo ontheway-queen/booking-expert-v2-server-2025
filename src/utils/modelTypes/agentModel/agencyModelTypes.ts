@@ -32,6 +32,7 @@ export interface IUpdateAgencyPayload {
   phone?: string;
   address?: string;
   kam_id?: number;
+  ref_id?: number;
   status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   flight_markup_set?: number;
   hotel_markup_set?: number;

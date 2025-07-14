@@ -59,7 +59,7 @@ class PartialPaymentRuleModel extends Schema {
         'partial_payment_rules.created_at'
       )
       .leftJoin(
-        'supplier',
+        'flight_supplier AS supplier',
         'supplier.id',
         'partial_payment_rules.flight_api_id'
       )
@@ -162,7 +162,7 @@ class PartialPaymentRuleModel extends Schema {
       .withSchema(this.DBO_SCHEMA)
       .select('partial_payment_rules.*')
       .leftJoin(
-        'supplier',
+        'flight_supplier AS supplier',
         'supplier.id',
         'partial_payment_rules.flight_api_id'
       )

@@ -12,6 +12,7 @@ export interface IAdminAgentUpdateAgencyReqBody {
   flight_markup_set?: number;
   hotel_markup_set?: number;
   kam_id?: number;
+  ref_id?: number;
   address?: string;
   white_label?: boolean;
   allow_api?: boolean;

@@ -22,6 +22,7 @@ class AdminAgentAgencyValidator {
             flight_markup_set: joi_1.default.number().optional(),
             hotel_markup_set: joi_1.default.number().optional(),
             kam_id: joi_1.default.number().optional(),
+            ref_id: joi_1.default.number().optional(),
             white_label: joi_1.default.boolean().optional(),
             allow_api: joi_1.default.boolean().optional(),
             status: joi_1.default.string().valid('Active', 'Inactive').optional(),

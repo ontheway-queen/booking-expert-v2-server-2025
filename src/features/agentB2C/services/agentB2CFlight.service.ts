@@ -370,11 +370,12 @@ export class AgentB2CFlightService extends AbstractServices {
         });
 
       if (data) {
-        await setRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
+        const { fare, modifiedFare, ...restData } = data;
+        const { vendor_price, ...restFare } = fare;
         return {
           success: true,
-          message: 'Ticket has been revalidated successfully!',
-          data: data,
+          message: 'Flight has been revalidated successfully!',
+          data: { ...restData, fare: restFare },
           code: this.StatusCode.HTTP_OK,
         };
       }
