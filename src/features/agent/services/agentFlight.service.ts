@@ -125,6 +125,7 @@ export class AgentFlightService extends AbstractServices {
 
       let sabreData: any[] = [];
       let customData: any[] = [];
+      console.log({ set: agency_details.flight_markup_set, markup_amount });
 
       if (sabre_supplier_id) {
         const sabreSubService = new SabreFlightService(trx);
@@ -144,8 +145,6 @@ export class AgentFlightService extends AbstractServices {
           dynamic_fare_supplier_id: custom_supplier_id,
           markup_amount,
         });
-
-        console.log({ customData });
       }
 
       //generate search ID
@@ -439,7 +438,7 @@ export class AgentFlightService extends AbstractServices {
 
       //revalidate using the flight support service
       const flightSupportService = new CommonFlightSupportService(trx);
-
+      console.log({ set: agency_details.flight_markup_set, markup_amount });
       const data: IFormattedFlightItinerary | null =
         await flightSupportService.FlightRevalidate({
           search_id,

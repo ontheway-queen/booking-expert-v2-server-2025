@@ -2,9 +2,4 @@
 -- new table visa, visa application
 -- dbo.type_invoice_ref new type, and change invoice ref_type column data type to this type.
 -- dbo.flight_booking discount default 0
--- dbo.invoice status type changed 
--- dbo.type_invoice_status new type created
--- new type agent.type_agency
--- new column added agent.agency agency_type, ref_agent_id
--- delete column dbo.flight_booking agent_markup, also from all views
 -- new table dbo.flight_booking_modified_amount

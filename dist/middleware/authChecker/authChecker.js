@@ -270,6 +270,7 @@ class AuthChecker {
             let { token } = req.headers;
             if (!token)
                 token = req.query.agencyToken;
+            token = req.query.token;
             if (!token) {
                 res
                     .status(statusCode_1.default.HTTP_UNAUTHORIZED)

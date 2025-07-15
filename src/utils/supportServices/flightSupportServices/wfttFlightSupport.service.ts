@@ -291,6 +291,7 @@ export default class WfttFlightService extends AbstractServices {
 
         const total_pax_markup = pax_markup * pax_count;
 
+        console.log({ vendor_fare });
         let fare: IFormattedFare = {
           base_fare:
             vendor_fare.base_fare + markup + agent_markup + total_pax_markup,
@@ -395,7 +396,14 @@ export default class WfttFlightService extends AbstractServices {
         );
 
         const career = await commonModel.getAirlineByCode(carrier_code);
-
+        // console.log({
+        //   agent_discount,
+        //   agent_markup,
+        //   commission,
+        //   markup,
+        //   pax_markup,
+        // });
+        // console.log({ fare });
         return {
           domestic_flight,
           fare,

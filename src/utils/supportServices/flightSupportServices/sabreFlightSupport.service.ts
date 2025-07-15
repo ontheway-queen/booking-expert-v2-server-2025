@@ -790,6 +790,16 @@ export default class SabreFlightService extends AbstractServices {
         Number(new_fare.discount)
       ).toFixed(2);
 
+      console.log({
+        agent_discount,
+        agent_markup,
+        commission,
+        markup,
+        pax_markup,
+      });
+
+      console.log({ new_fare });
+
       const newItinerary: IFormattedFlightItinerary = {
         flight_id: flight_id || uuidv4(),
         api_search_id: '',
@@ -921,6 +931,7 @@ export default class SabreFlightService extends AbstractServices {
       default:
         break;
     }
+    console.log({ cabin });
     const OriginDestinationInformation =
       reqBody.OriginDestinationInformation.map((item, index) => {
         const req_depart_air = item.OriginLocation.LocationCode;
@@ -943,10 +954,7 @@ export default class SabreFlightService extends AbstractServices {
 
             const flight_data = {
               Number: Number(option?.carrier.carrier_marketing_flight_number),
-              ClassOfService: this.flightUtils.getClassCodeFromId(
-                reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
-                  .Cabin
-              ),
+              ClassOfService: cabin,
               DepartureDateTime,
               ArrivalDateTime,
               Type: 'A',
@@ -1435,13 +1443,10 @@ export default class SabreFlightService extends AbstractServices {
       name: user_info.name,
     });
 
-    console.log({ requestBody });
-
     const response = await this.request.postRequest(
       SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
       requestBody
     );
-    console.log({ response });
 
     if (!response) {
       throw new CustomError(

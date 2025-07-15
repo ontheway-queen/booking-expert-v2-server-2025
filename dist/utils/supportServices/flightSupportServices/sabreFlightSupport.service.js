@@ -572,6 +572,14 @@ class SabreFlightService extends abstract_service_1.default {
                     Number(new_fare.total_tax) +
                     Number(new_fare.ait) -
                     Number(new_fare.discount)).toFixed(2);
+                console.log({
+                    agent_discount,
+                    agent_markup,
+                    commission,
+                    markup,
+                    pax_markup,
+                });
+                console.log({ new_fare });
                 const newItinerary = {
                     flight_id: flight_id || (0, uuid_1.v4)(),
                     api_search_id: '',
@@ -663,6 +671,7 @@ class SabreFlightService extends abstract_service_1.default {
                 default:
                     break;
             }
+            console.log({ cabin });
             const OriginDestinationInformation = reqBody.OriginDestinationInformation.map((item, index) => {
                 const req_depart_air = item.OriginLocation.LocationCode;
                 const flights = [];
@@ -675,8 +684,7 @@ class SabreFlightService extends abstract_service_1.default {
                         const ArrivalDateTime = this.flightUtils.convertDateTime(option.arrival.date, option.arrival.time);
                         const flight_data = {
                             Number: Number(option === null || option === void 0 ? void 0 : option.carrier.carrier_marketing_flight_number),
-                            ClassOfService: this.flightUtils.getClassCodeFromId(reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
-                                .Cabin),
+                            ClassOfService: cabin,
                             DepartureDateTime,
                             ArrivalDateTime,
                             Type: 'A',
@@ -1079,9 +1087,7 @@ class SabreFlightService extends abstract_service_1.default {
                 phone: user_info.phone,
                 name: user_info.name,
             });
-            console.log({ requestBody });
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT, requestBody);
-            console.log({ response });
             if (!response) {
                 throw new customError_1.default('Something went wrong. Please try again later', 500);
             }

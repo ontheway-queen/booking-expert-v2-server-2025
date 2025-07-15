@@ -195,6 +195,7 @@ class WfttFlightService extends abstract_service_1.default {
                     markup_amount,
                 });
                 const total_pax_markup = pax_markup * pax_count;
+                console.log({ vendor_fare });
                 let fare = {
                     base_fare: vendor_fare.base_fare + markup + agent_markup + total_pax_markup,
                     total_tax: vendor_fare.total_tax,
@@ -264,6 +265,14 @@ class WfttFlightService extends abstract_service_1.default {
                     return Object.assign(Object.assign({}, flight), { options: newOptions });
                 })));
                 const career = yield commonModel.getAirlineByCode(carrier_code);
+                // console.log({
+                //   agent_discount,
+                //   agent_markup,
+                //   commission,
+                //   markup,
+                //   pax_markup,
+                // });
+                // console.log({ fare });
                 return Object.assign(Object.assign({ domestic_flight,
                     fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API, api_name: flightConstent_1.CUSTOM_API_NAME, carrier_code, carrier_logo: career.logo, flights: newFlights, passengers: newPassenger, refundable,
                     partial_payment, modifiedFare: with_modified_fare
