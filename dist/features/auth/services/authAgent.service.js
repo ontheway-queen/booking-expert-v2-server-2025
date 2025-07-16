@@ -331,11 +331,12 @@ class AuthAgentService extends abstract_service_1.default {
     login2FA(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { email: user_email, otp } = req.body;
+                const { user_or_email, otp } = req.body;
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
                 const AgencyModel = this.Model.AgencyModel(trx);
                 const checkAgencyUser = yield AgencyUserModel.checkUser({
-                    email: user_email,
+                    email: user_or_email,
+                    username: user_or_email,
                 });
                 if (!checkAgencyUser) {
                     return {
@@ -388,7 +389,7 @@ class AuthAgentService extends abstract_service_1.default {
                 const tokenData = {
                     user_id: id,
                     username,
-                    user_email,
+                    user_email: email,
                     name,
                     agency_id,
                     agency_email,

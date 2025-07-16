@@ -12,15 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AgentTravelerService = void 0;
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
-class AgentTravelerService extends abstract_service_1.default {
+class AgentB2CTravelerService extends abstract_service_1.default {
+    constructor() {
+        super();
+    }
     createTraveler(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
-                const { agency_id, user_id } = req.agencyUser;
+                const { agency_id, user_id } = req.agencyB2CUser;
                 const travelerModel = this.Model.TravelerModel(trx);
                 const body = req.body;
                 const files = req.files || [];
@@ -34,7 +36,7 @@ class AgentTravelerService extends abstract_service_1.default {
                         }
                     });
                 }
-                const res = yield travelerModel.insertTraveler(Object.assign(Object.assign({}, body), { created_by: user_id, source_type: constants_1.SOURCE_AGENT, source_id: agency_id }));
+                const res = yield travelerModel.insertTraveler(Object.assign(Object.assign({}, body), { created_by: user_id, source_type: constants_1.SOURCE_AGENT_B2C, source_id: agency_id }));
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -49,10 +51,10 @@ class AgentTravelerService extends abstract_service_1.default {
     getAllTraveler(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id, user_id } = req.agencyB2CUser;
                 const travelerModel = this.Model.TravelerModel(trx);
                 const query = req.query;
-                const data = yield travelerModel.getTravelerList(Object.assign({ source_type: constants_1.SOURCE_AGENT, source_id: agency_id }, query), true);
+                const data = yield travelerModel.getTravelerList(Object.assign({ source_type: constants_1.SOURCE_AGENT_B2C, source_id: agency_id, created_by: user_id }, query), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -65,12 +67,13 @@ class AgentTravelerService extends abstract_service_1.default {
     getSingleTraveler(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const travelerModel = this.Model.TravelerModel(trx);
                 const { id } = req.params;
                 const data = yield travelerModel.getSingleTraveler({
-                    source_type: constants_1.SOURCE_AGENT,
+                    source_type: constants_1.SOURCE_AGENT_B2C,
                     source_id: agency_id,
+                    created_by: user_id,
                     id: Number(id),
                 });
                 if (!data) {
@@ -91,12 +94,13 @@ class AgentTravelerService extends abstract_service_1.default {
     updateTraveler(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const travelerModel = this.Model.TravelerModel(trx);
                 const { id } = req.params;
                 const data = yield travelerModel.getSingleTraveler({
-                    source_type: constants_1.SOURCE_AGENT,
+                    source_type: constants_1.SOURCE_AGENT_B2C,
                     source_id: agency_id,
+                    created_by: user_id,
                     id: Number(id),
                 });
                 if (!data) {
@@ -130,12 +134,13 @@ class AgentTravelerService extends abstract_service_1.default {
     deleteTraveler(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const travelerModel = this.Model.TravelerModel(trx);
                 const { id } = req.params;
                 const data = yield travelerModel.getSingleTraveler({
-                    source_type: constants_1.SOURCE_AGENT,
+                    source_type: constants_1.SOURCE_AGENT_B2C,
                     source_id: agency_id,
+                    created_by: user_id,
                     id: Number(id),
                 });
                 if (!data) {
@@ -155,4 +160,4 @@ class AgentTravelerService extends abstract_service_1.default {
         });
     }
 }
-exports.AgentTravelerService = AgentTravelerService;
+exports.default = AgentB2CTravelerService;

@@ -9,13 +9,16 @@ export default class AgentB2CProfileRouter extends AbstractRouter {
   }
 
   private callRouter() {
-    this.router.route('/')
+    this.router
+      .route('/')
       .get(this.controller.getProfile)
-      .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_FILES,[
-        'photo'
-      ]),this.controller.updateProfile);
+      .patch(
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_FILES, [
+          'photo',
+        ]),
+        this.controller.updateProfile
+      );
 
-      this.router.route('/change-password')
-      .post(this.controller.changePassword);
+    this.router.route('/change-password').post(this.controller.changePassword);
   }
 }

@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import AbstractController from '../../../abstract/abstract.controller';
-import { AgentTravelerService } from '../services/agentTraveler.service';
-import AgentTravelerValidator from '../utils/validators/agentTraveler.validator';
+import AgentB2CTravelerService from '../services/agentB2CTraveler.service';
+import AgentB2CTravelerValidator from '../utils/validators/agentB2CTraveler.validator';
 
-export default class AgentTravelerController extends AbstractController {
-  private service = new AgentTravelerService();
-  private validator = new AgentTravelerValidator();
+export class AgentB2CTravelerController extends AbstractController {
+  private service = new AgentB2CTravelerService();
+  private validator = new AgentB2CTravelerValidator();
   constructor() {
     super();
   }

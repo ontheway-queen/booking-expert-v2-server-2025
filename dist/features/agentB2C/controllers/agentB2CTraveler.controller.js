@@ -23,14 +23,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AgentB2CTravelerController = void 0;
 const abstract_controller_1 = __importDefault(require("../../../abstract/abstract.controller"));
-const agentTraveler_service_1 = require("../services/agentTraveler.service");
-const agentTraveler_validator_1 = __importDefault(require("../utils/validators/agentTraveler.validator"));
-class AgentTravelerController extends abstract_controller_1.default {
+const agentB2CTraveler_service_1 = __importDefault(require("../services/agentB2CTraveler.service"));
+const agentB2CTraveler_validator_1 = __importDefault(require("../utils/validators/agentB2CTraveler.validator"));
+class AgentB2CTravelerController extends abstract_controller_1.default {
     constructor() {
         super();
-        this.service = new agentTraveler_service_1.AgentTravelerService();
-        this.validator = new agentTraveler_validator_1.default();
+        this.service = new agentB2CTraveler_service_1.default();
+        this.validator = new agentB2CTraveler_validator_1.default();
         this.createTraveler = this.asyncWrapper.wrap({
             bodySchema: this.validator.create,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -61,4 +62,4 @@ class AgentTravelerController extends abstract_controller_1.default {
         }));
     }
 }
-exports.default = AgentTravelerController;
+exports.AgentB2CTravelerController = AgentB2CTravelerController;

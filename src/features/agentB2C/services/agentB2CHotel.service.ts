@@ -178,4 +178,10 @@ export default class AgentB2CHotelService extends AbstractServices {
       };
     });
   }
+
+  public async hotelBook(req: Request) {}
+
+  public async hotelHotelBookingList(req: Request) {}
+
+  public async singleHotelBooking(req: Request) {}
 }

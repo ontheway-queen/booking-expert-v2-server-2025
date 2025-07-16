@@ -1,13 +1,18 @@
-import AbstractServices from '../../../abstract/abstract.service';
 import { Request } from 'express';
-import { ICreateAgentTravelerReqBody } from '../utils/types/agentTraveler.types';
-import { SOURCE_AGENT } from '../../../utils/miscellaneous/constants';
-export class AgentTravelerService extends AbstractServices {
+import AbstractServices from '../../../abstract/abstract.service';
+import { SOURCE_AGENT_B2C } from '../../../utils/miscellaneous/constants';
+import { ICreateAgentB2CTravelerReqBody } from '../utils/types/agentB2CTraveler.types';
+
+export default class AgentB2CTravelerService extends AbstractServices {
+  constructor() {
+    super();
+  }
+
   public async createTraveler(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyUser;
+      const { agency_id, user_id } = req.agencyB2CUser;
       const travelerModel = this.Model.TravelerModel(trx);
-      const body = req.body as ICreateAgentTravelerReqBody;
+      const body = req.body as ICreateAgentB2CTravelerReqBody;
       const files = (req.files as Express.Multer.File[]) || [];
       if (files?.length) {
         files.forEach((file) => {
@@ -18,10 +23,11 @@ export class AgentTravelerService extends AbstractServices {
           }
         });
       }
+
       const res = await travelerModel.insertTraveler({
         ...body,
         created_by: user_id,
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_AGENT_B2C,
         source_id: agency_id,
       });
 
@@ -38,13 +44,14 @@ export class AgentTravelerService extends AbstractServices {
 
   public async getAllTraveler(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id, user_id } = req.agencyB2CUser;
       const travelerModel = this.Model.TravelerModel(trx);
       const query = req.query;
       const data = await travelerModel.getTravelerList(
         {
-          source_type: SOURCE_AGENT,
+          source_type: SOURCE_AGENT_B2C,
           source_id: agency_id,
+          created_by: user_id,
           ...query,
         },
         true
@@ -61,12 +68,13 @@ export class AgentTravelerService extends AbstractServices {
 
   public async getSingleTraveler(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id, user_id } = req.agencyUser;
       const travelerModel = this.Model.TravelerModel(trx);
       const { id } = req.params;
       const data = await travelerModel.getSingleTraveler({
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_AGENT_B2C,
         source_id: agency_id,
+        created_by: user_id,
         id: Number(id),
       });
       if (!data) {
@@ -87,12 +95,13 @@ export class AgentTravelerService extends AbstractServices {
 
   public async updateTraveler(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id, user_id } = req.agencyUser;
       const travelerModel = this.Model.TravelerModel(trx);
       const { id } = req.params;
       const data = await travelerModel.getSingleTraveler({
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_AGENT_B2C,
         source_id: agency_id,
+        created_by: user_id,
         id: Number(id),
       });
       if (!data) {
@@ -126,12 +135,13 @@ export class AgentTravelerService extends AbstractServices {
 
   public async deleteTraveler(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id, user_id } = req.agencyUser;
       const travelerModel = this.Model.TravelerModel(trx);
       const { id } = req.params;
       const data = await travelerModel.getSingleTraveler({
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_AGENT_B2C,
         source_id: agency_id,
+        created_by: user_id,
         id: Number(id),
       });
       if (!data) {

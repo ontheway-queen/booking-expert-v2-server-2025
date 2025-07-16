@@ -130,10 +130,11 @@ class AuthAdminService extends abstract_service_1.default {
     login2FA(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { email, otp } = req.body;
+                const { user_or_email, otp } = req.body;
                 const AdminModel = this.Model.AdminModel(trx);
                 const checkUserAdmin = yield AdminModel.checkUserAdmin({
-                    email: email,
+                    email: user_or_email,
+                    username: user_or_email,
                 });
                 if (!checkUserAdmin) {
                     return {
@@ -142,7 +143,7 @@ class AuthAdminService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { status, two_fa, id, username, name, role_id, photo, phone_number, gender, is_main_user, } = checkUserAdmin;
+                const { status, two_fa, id, username, name, role_id, photo, phone_number, gender, is_main_user, email, } = checkUserAdmin;
                 if (!status) {
                     return {
                         success: false,

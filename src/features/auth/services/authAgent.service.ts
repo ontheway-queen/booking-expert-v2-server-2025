@@ -416,13 +416,14 @@ export default class AuthAgentService extends AbstractServices {
 
   public async login2FA(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { email: user_email, otp } = req.body as ILogin2FAReqBody;
+      const { user_or_email, otp } = req.body as ILogin2FAReqBody;
 
       const AgencyUserModel = this.Model.AgencyUserModel(trx);
       const AgencyModel = this.Model.AgencyModel(trx);
 
       const checkAgencyUser = await AgencyUserModel.checkUser({
-        email: user_email,
+        email: user_or_email,
+        username: user_or_email,
       });
 
       if (!checkAgencyUser) {
@@ -512,7 +513,7 @@ export default class AuthAgentService extends AbstractServices {
       const tokenData: ITokenParseAgencyUser = {
         user_id: id,
         username,
-        user_email,
+        user_email: email,
         name,
         agency_id,
         agency_email,

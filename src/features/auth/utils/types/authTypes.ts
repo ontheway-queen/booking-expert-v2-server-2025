@@ -12,7 +12,7 @@ export interface IResetPassReqBody {
 
 export interface ILogin2FAReqBody {
   otp: string;
-  email: string;
+  user_or_email: string;
 }
 
 export interface IRegisterAgentReqBody {

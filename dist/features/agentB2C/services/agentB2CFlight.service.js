@@ -324,6 +324,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 if (data) {
                     const { fare, modifiedFare } = data, restData = __rest(data, ["fare", "modifiedFare"]);
                     const { vendor_price } = fare, restFare = __rest(fare, ["vendor_price"]);
+                    yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
                     return {
                         success: true,
                         message: 'Flight has been revalidated successfully!',
@@ -342,13 +343,13 @@ class AgentB2CFlightService extends abstract_service_1.default {
     flightBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, ref_agent_id, agency_type, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
+                const { agency_id, user_id, user_email, name } = req.agencyB2CUser;
                 const body = req.body;
                 const booking_confirm = body.booking_confirm;
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agency_details = yield agencyModel.checkAgency({
-                    agency_id: ref_agent_id || agency_id,
+                    agency_id: agency_id,
                 });
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
@@ -535,10 +536,11 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 const price_breakdown_data = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(Number(id));
                 const segment_data = yield flightSegmentModel.getFlightBookingSegment(Number(id));
                 const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(Number(id));
+                const { vendor_fare, source_type, source_id, source_email, api, api_booking_ref } = booking_data, restData = __rest(booking_data, ["vendor_fare", "source_type", "source_id", "source_email", "api", "api_booking_ref"]);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    data: Object.assign(Object.assign({}, booking_data), { price_breakdown_data,
+                    data: Object.assign(Object.assign({}, restData), { price_breakdown_data,
                         segment_data,
                         traveler_data }),
                 };

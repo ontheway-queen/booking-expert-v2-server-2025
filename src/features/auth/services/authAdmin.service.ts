@@ -152,12 +152,13 @@ export default class AuthAdminService extends AbstractServices {
 
   public async login2FA(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { email, otp } = req.body as ILogin2FAReqBody;
+      const { user_or_email, otp } = req.body as ILogin2FAReqBody;
 
       const AdminModel = this.Model.AdminModel(trx);
 
       const checkUserAdmin = await AdminModel.checkUserAdmin({
-        email: email,
+        email: user_or_email,
+        username: user_or_email,
       });
 
       if (!checkUserAdmin) {
@@ -179,6 +180,7 @@ export default class AuthAdminService extends AbstractServices {
         phone_number,
         gender,
         is_main_user,
+        email,
       } = checkUserAdmin;
 
       if (!status) {

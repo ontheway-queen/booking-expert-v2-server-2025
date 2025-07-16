@@ -12,7 +12,7 @@ export default class AuthValidator {
   });
 
   public login2FAValidator = Joi.object({
-    email: Joi.string().required().lowercase().trim(),
+    user_or_email: Joi.string().required().lowercase().trim(),
     otp: Joi.string().length(6).trim().required(),
   });
 
@@ -39,7 +39,7 @@ export default class AuthValidator {
     phone_number: Joi.string().trim().min(10).max(14).required(),
     email: Joi.string().email().trim().lowercase().max(255).required(),
     gender: Joi.string().valid('Male', 'Female', 'Other').required(),
-    password: Joi.string().min(8).max(50).required()
+    password: Joi.string().min(8).max(50).required(),
   });
 
   //Complete Registration Validator

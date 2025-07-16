@@ -326,6 +326,7 @@ export default class AuthChecker {
       token = req.query.token as string;
     }
 
+    console.log({ token });
     if (!token) {
       res
         .status(StatusCode.HTTP_UNAUTHORIZED)
@@ -357,6 +358,8 @@ export default class AuthChecker {
 
       const module = req.originalUrl.split('/')[4] || '';
 
+      console.log({ module });
+
       req.agencyB2CWhiteLabel = {
         agency_id: Number(check_token?.agency_id),
         flight: Boolean(check_token?.flight),
@@ -376,6 +379,7 @@ export default class AuthChecker {
         | 'holiday'
         | 'umrah'
         | 'group_fare'
+        | 'group_fare'
         | 'blog';
 
       const endpoint = module as WhiteLabelEndpoint;
@@ -384,7 +388,12 @@ export default class AuthChecker {
         endpoint in req.agencyB2CWhiteLabel &&
         req.agencyB2CWhiteLabel[endpoint] === true;
 
-      if (!hasPermission && module !== 'agent-b2c') {
+      if (
+        !hasPermission &&
+        module !== 'agent-b2c' &&
+        module !== 'profile' &&
+        module !== 'email-otp'
+      ) {
         res
           .status(StatusCode.HTTP_UNAUTHORIZED)
           .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });

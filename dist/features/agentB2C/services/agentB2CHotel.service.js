@@ -167,5 +167,14 @@ class AgentB2CHotelService extends abstract_service_1.default {
             }));
         });
     }
+    hotelBook(req) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    hotelHotelBookingList(req) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    singleHotelBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
 }
 exports.default = AgentB2CHotelService;

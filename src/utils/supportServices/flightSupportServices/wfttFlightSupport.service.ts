@@ -291,7 +291,6 @@ export default class WfttFlightService extends AbstractServices {
 
         const total_pax_markup = pax_markup * pax_count;
 
-        console.log({ vendor_fare });
         let fare: IFormattedFare = {
           base_fare:
             vendor_fare.base_fare + markup + agent_markup + total_pax_markup,

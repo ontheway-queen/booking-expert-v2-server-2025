@@ -208,7 +208,9 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       ait: payload.flight_data.fare.ait,
       payable_amount: payload.flight_data.fare.payable,
       travel_date: payload.flight_data.flights[0].options[0].departure.date,
-      ticket_issue_last_time: payload.flight_data.ticket_last_time,
+      ticket_issue_last_time:
+        payload.flight_data.ticket_last_date +
+        payload.flight_data.ticket_last_time,
       airline_pnr: payload.airline_pnr,
       created_by: payload.user_id,
       vendor_fare: JSON.stringify(payload.flight_data.fare.vendor_price),
@@ -234,7 +236,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
 
     if (payload.flight_data.modifiedFare) {
       await flightBookingPriceBreakdownModel.insertFlightBookingModifiedAmount({
-        booking_id: booking_res[0].id,
+        flight_booking_id: booking_res[0].id,
         ...payload.flight_data.modifiedFare,
       });
     }

@@ -123,12 +123,13 @@ export default class AuthB2CService extends AbstractServices {
 
   public async login2FA(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { email: user_email, otp } = req.body as ILogin2FAReqBody;
+      const { user_or_email, otp } = req.body as ILogin2FAReqBody;
 
       const UserModel = this.Model.B2CUserModel(trx);
 
       const checkUser = await UserModel.checkUser({
-        email: user_email,
+        email: user_or_email,
+        username: user_or_email,
       });
 
       if (!checkUser) {

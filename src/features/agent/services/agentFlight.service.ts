@@ -125,7 +125,6 @@ export class AgentFlightService extends AbstractServices {
 
       let sabreData: any[] = [];
       let customData: any[] = [];
-      console.log({ set: agency_details.flight_markup_set, markup_amount });
 
       if (sabre_supplier_id) {
         const sabreSubService = new SabreFlightService(trx);

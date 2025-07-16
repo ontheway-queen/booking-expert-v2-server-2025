@@ -78,11 +78,12 @@ class AuthAgentB2CService extends abstract_service_1.default {
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: `Registration has been completed`,
                     data: {
-                        user_id: tokenData.user_id,
-                        user_email: tokenData.user_email,
+                        id: tokenData.user_id,
+                        username,
+                        email: tokenData.user_email,
                         name: tokenData.name,
-                        phone_number: tokenData.phone_number,
                         photo: tokenData.photo,
+                        gender,
                     },
                     token: AuthToken,
                 };
@@ -158,11 +159,12 @@ class AuthAgentB2CService extends abstract_service_1.default {
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.LOGIN_SUCCESSFUL,
                     data: {
-                        user_id: tokenData.user_id,
-                        user_email: tokenData.user_email,
+                        id: tokenData.user_id,
+                        username: checkAgentB2C.username,
+                        email: tokenData.user_email,
                         name: tokenData.name,
-                        phone_number: tokenData.phone_number,
                         photo: tokenData.photo,
+                        gender: checkAgentB2C.gender,
                     },
                     token: AuthToken,
                 };

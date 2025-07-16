@@ -25,7 +25,10 @@ class AgentB2CProfileService extends abstract_service_1.default {
                 const { blog, flight, group_fare, holiday, hotel, umrah, visa } = req.agencyB2CWhiteLabel;
                 const AgencyB2CUserModel = this.Model.AgencyB2CUserModel(trx);
                 const AgentModel = this.Model.AgencyModel(trx);
-                const checkAgentB2C = yield AgencyB2CUserModel.checkUser({ id: user_id, agency_id });
+                const checkAgentB2C = yield AgencyB2CUserModel.checkUser({
+                    id: user_id,
+                    agency_id,
+                });
                 if (!checkAgentB2C) {
                     return {
                         success: false,
@@ -47,6 +50,7 @@ class AgentB2CProfileService extends abstract_service_1.default {
                         photo: checkAgentB2C.photo,
                         user_email: checkAgentB2C.email,
                         username: checkAgentB2C.username,
+                        gender: checkAgentB2C.gender,
                         name: checkAgentB2C.name,
                         phone_number: checkAgentB2C.phone_number,
                         blog,
@@ -55,7 +59,7 @@ class AgentB2CProfileService extends abstract_service_1.default {
                         holiday,
                         hotel,
                         umrah,
-                        visa
+                        visa,
                     },
                 };
             }));
@@ -67,7 +71,10 @@ class AgentB2CProfileService extends abstract_service_1.default {
                 const { user_id, agency_id } = req.agencyB2CUser;
                 const body = req.body;
                 const AgencyB2CUserModel = this.Model.AgencyB2CUserModel(trx);
-                const checkAgentB2C = yield AgencyB2CUserModel.checkUser({ id: user_id, agency_id });
+                const checkAgentB2C = yield AgencyB2CUserModel.checkUser({
+                    id: user_id,
+                    agency_id,
+                });
                 if (!checkAgentB2C) {
                     return {
                         success: false,

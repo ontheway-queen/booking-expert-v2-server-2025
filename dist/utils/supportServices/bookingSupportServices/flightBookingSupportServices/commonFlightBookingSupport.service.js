@@ -144,7 +144,8 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 ait: payload.flight_data.fare.ait,
                 payable_amount: payload.flight_data.fare.payable,
                 travel_date: payload.flight_data.flights[0].options[0].departure.date,
-                ticket_issue_last_time: payload.flight_data.ticket_last_time,
+                ticket_issue_last_time: payload.flight_data.ticket_last_date +
+                    payload.flight_data.ticket_last_time,
                 airline_pnr: payload.airline_pnr,
                 created_by: payload.user_id,
                 vendor_fare: JSON.stringify(payload.flight_data.fare.vendor_price),
@@ -164,7 +165,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             });
             yield flightBookingPriceBreakdownModel.insertFlightBookingPriceBreakdown(passenger_fare);
             if (payload.flight_data.modifiedFare) {
-                yield flightBookingPriceBreakdownModel.insertFlightBookingModifiedAmount(Object.assign({ booking_id: booking_res[0].id }, payload.flight_data.modifiedFare));
+                yield flightBookingPriceBreakdownModel.insertFlightBookingModifiedAmount(Object.assign({ flight_booking_id: booking_res[0].id }, payload.flight_data.modifiedFare));
             }
             //insert flight booking segment data
             const { baggage_info, cabin_info } = flightUtils.mapFlightAvailability(payload.flight_data.availability);

@@ -9,10 +9,7 @@ class AgentB2CMainValidator {
     constructor() {
         // send email otp input validator
         this.sendOtpInputValidator = joi_1.default.object({
-            type: joi_1.default.string()
-                .valid(constants_1.OTP_TYPES.reset_agent_b2c)
-                .required()
-                .messages({
+            type: joi_1.default.string().valid(constants_1.OTP_TYPES.reset_agent_b2c).required().messages({
                 'string.base': 'Please enter valid OTP type',
                 'any.only': 'Please enter valid OTP type',
                 'any.required': 'OTP type is required',
@@ -34,10 +31,7 @@ class AgentB2CMainValidator {
                 'string.base': 'Enter valid otp',
                 'any.required': 'OTP is required',
             }),
-            type: joi_1.default.string()
-                .valid(constants_1.OTP_TYPES.reset_agent_b2c)
-                .required()
-                .messages({
+            type: joi_1.default.string().valid(constants_1.OTP_TYPES.reset_agent_b2c).required().messages({
                 'string.base': 'Enter valid otp type',
                 'any.only': 'Enter valid otp type',
                 'any.required': 'OTP type is required',

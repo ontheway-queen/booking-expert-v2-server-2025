@@ -4,16 +4,11 @@ import { OTP_TYPES } from '../../../../utils/miscellaneous/constants';
 export default class AgentB2CMainValidator {
   // send email otp input validator
   public sendOtpInputValidator = Joi.object({
-    type: Joi.string()
-      .valid(
-        OTP_TYPES.reset_agent_b2c
-      )
-      .required()
-      .messages({
-        'string.base': 'Please enter valid OTP type',
-        'any.only': 'Please enter valid OTP type',
-        'any.required': 'OTP type is required',
-      }),
+    type: Joi.string().valid(OTP_TYPES.reset_agent_b2c).required().messages({
+      'string.base': 'Please enter valid OTP type',
+      'any.only': 'Please enter valid OTP type',
+      'any.required': 'OTP type is required',
+    }),
     email: Joi.string().email().trim().lowercase().required().messages({
       'string.base': 'Enter valid email address',
       'string.email': 'Enter valid email address',
@@ -32,15 +27,10 @@ export default class AgentB2CMainValidator {
       'string.base': 'Enter valid otp',
       'any.required': 'OTP is required',
     }),
-    type: Joi.string()
-      .valid(
-        OTP_TYPES.reset_agent_b2c
-      )
-      .required()
-      .messages({
-        'string.base': 'Enter valid otp type',
-        'any.only': 'Enter valid otp type',
-        'any.required': 'OTP type is required',
-      }),
+    type: Joi.string().valid(OTP_TYPES.reset_agent_b2c).required().messages({
+      'string.base': 'Enter valid otp type',
+      'any.only': 'Enter valid otp type',
+      'any.required': 'OTP type is required',
+    }),
   });
 }

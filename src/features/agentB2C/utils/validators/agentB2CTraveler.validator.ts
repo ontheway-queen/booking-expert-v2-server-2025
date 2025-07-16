@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-export default class AgentTravelerValidator {
+export default class AgentB2CTravelerValidator {
   public create = Joi.object({
     reference: Joi.string().required().valid('Mr', 'Mrs', 'Ms', 'Miss', 'MSTR'),
     first_name: Joi.string()

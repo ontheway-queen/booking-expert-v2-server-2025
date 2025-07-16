@@ -16,7 +16,7 @@ class AuthValidator {
             }),
         });
         this.login2FAValidator = joi_1.default.object({
-            email: joi_1.default.string().required().lowercase().trim(),
+            user_or_email: joi_1.default.string().required().lowercase().trim(),
             otp: joi_1.default.string().length(6).trim().required(),
         });
         //agency register validator
@@ -40,7 +40,7 @@ class AuthValidator {
             phone_number: joi_1.default.string().trim().min(10).max(14).required(),
             email: joi_1.default.string().email().trim().lowercase().max(255).required(),
             gender: joi_1.default.string().valid('Male', 'Female', 'Other').required(),
-            password: joi_1.default.string().min(8).max(50).required()
+            password: joi_1.default.string().min(8).max(50).required(),
         });
         //Complete Registration Validator
         this.agencyRegisterCompleteValidator = joi_1.default.object({

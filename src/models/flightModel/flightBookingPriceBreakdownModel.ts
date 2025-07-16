@@ -50,7 +50,7 @@ export default class FlightBookingPriceBreakdownModel extends Schema {
   }
 
   public async insertFlightBookingModifiedAmount(payload: {
-    booking_id: number;
+    flight_booking_id: number;
     markup: number;
     commission: number;
     pax_markup: number;

@@ -97,12 +97,18 @@ export interface IGetSingleFlightBookingData {
   base_fare: number;
   tax: number;
   ait: number;
-  ticket_price: number;
-  markup_price: number;
   markup_type: JourneyType | null;
   payable_amount: number;
-  agent_markup: number | null;
   journey_type: JourneyType;
+  vendor_fare: {
+    base_fare: number;
+    tax: number;
+    ait: number;
+    charge: number;
+    discount: number;
+    gross_fare: number;
+    net_fare: number;
+  };
   refundable: boolean;
   api: string;
   api_booking_ref: string | null;

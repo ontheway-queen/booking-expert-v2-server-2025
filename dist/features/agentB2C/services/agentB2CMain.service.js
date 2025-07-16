@@ -32,7 +32,7 @@ class AgentB2CMainService extends abstract_service_1.default {
                         const agentB2CModel = this.Model.AgencyB2CUserModel(trx);
                         const check_user = yield agentB2CModel.checkUser({
                             email,
-                            agency_id
+                            agency_id,
                         });
                         if (!check_user) {
                             return {
@@ -49,7 +49,7 @@ class AgentB2CMainService extends abstract_service_1.default {
                 const checkOtp = yield commonModel.getOTP({
                     email: email,
                     type: type,
-                    agency_id
+                    agency_id,
                 });
                 if (checkOtp.length) {
                     return {
@@ -75,7 +75,7 @@ class AgentB2CMainService extends abstract_service_1.default {
                             hashed_otp: hashed_otp,
                             email: email,
                             type: type,
-                            agency_id
+                            agency_id,
                         });
                         return {
                             success: true,
@@ -115,7 +115,7 @@ class AgentB2CMainService extends abstract_service_1.default {
                 const checkOtp = yield commonModel.getOTP({
                     email,
                     type,
-                    agency_id
+                    agency_id,
                 });
                 if (!checkOtp.length) {
                     return {
@@ -138,7 +138,7 @@ class AgentB2CMainService extends abstract_service_1.default {
                         tried: tried + 1,
                         matched: 1,
                     }, { id: email_otp_id });
-                    //--change it 
+                    //--change it
                     let secret = config_1.default.JWT_SECRET_AGENT_B2C;
                     let tokenValidity = '3m';
                     switch (type) {
@@ -151,7 +151,7 @@ class AgentB2CMainService extends abstract_service_1.default {
                     const token = lib_1.default.createToken({
                         email: email,
                         type: type,
-                        agency_id
+                        agency_id,
                     }, secret + type, tokenValidity);
                     return {
                         success: true,
@@ -165,7 +165,7 @@ class AgentB2CMainService extends abstract_service_1.default {
                         tried: tried + 1,
                     }, {
                         id: email_otp_id,
-                        agency_id
+                        agency_id,
                     });
                     return {
                         success: false,

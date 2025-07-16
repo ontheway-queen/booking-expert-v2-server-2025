@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("joi"));
-class AgentTravelerValidator {
+class AgentB2CTravelerValidator {
     constructor() {
         this.create = joi_1.default.object({
             reference: joi_1.default.string().required().valid('Mr', 'Mrs', 'Ms', 'Miss', 'MSTR'),
@@ -122,4 +122,4 @@ class AgentTravelerValidator {
         });
     }
 }
-exports.default = AgentTravelerValidator;
+exports.default = AgentB2CTravelerValidator;

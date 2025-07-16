@@ -109,7 +109,6 @@ class AgentFlightService extends abstract_service_1.default {
                 });
                 let sabreData = [];
                 let customData = [];
-                console.log({ set: agency_details.flight_markup_set, markup_amount });
                 if (sabre_supplier_id) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     sabreData = yield sabreSubService.FlightSearch({

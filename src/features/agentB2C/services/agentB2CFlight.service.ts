@@ -10,7 +10,6 @@ import {
 import {
   CUSTOM_API,
   FLIGHT_BOOKING_IN_PROCESS,
-  FLIGHT_BOOKING_PENDING,
   FLIGHT_FARE_RESPONSE,
   FLIGHT_REVALIDATE_REDIS_KEY,
   SABRE_API,
@@ -186,6 +185,7 @@ export class AgentB2CFlightService extends AbstractServices {
         type: 'Flight',
         agency_id,
       });
+
       if (!markup_amount) {
         return {
           success: false,
@@ -241,6 +241,7 @@ export class AgentB2CFlightService extends AbstractServices {
         total: 0,
         results: [],
       };
+
       await setRedis(search_id, { reqBody: body, response: responseData });
 
       const data: any[] = [];
@@ -374,6 +375,8 @@ export class AgentB2CFlightService extends AbstractServices {
       if (data) {
         const { fare, modifiedFare, ...restData } = data;
         const { vendor_price, ...restFare } = fare;
+
+        await setRedis(`${FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
         return {
           success: true,
           message: 'Flight has been revalidated successfully!',
@@ -392,19 +395,7 @@ export class AgentB2CFlightService extends AbstractServices {
 
   public async flightBooking(req: Request) {
     return this.db.transaction(async (trx) => {
-      const {
-        agency_id,
-        ref_agent_id,
-        agency_type,
-        user_id,
-        user_email,
-        name,
-        phone_number,
-        agency_email,
-        agency_name,
-        agency_logo,
-        address,
-      } = req.agencyUser;
+      const { agency_id, user_id, user_email, name } = req.agencyB2CUser;
       const body = req.body as IFlightBookingRequestBody;
       const booking_confirm = body.booking_confirm;
 
@@ -412,7 +403,7 @@ export class AgentB2CFlightService extends AbstractServices {
       const agencyModel = this.Model.AgencyModel(trx);
 
       const agency_details = await agencyModel.checkAgency({
-        agency_id: ref_agent_id || agency_id,
+        agency_id: agency_id,
       });
 
       if (!agency_details?.flight_markup_set) {
@@ -643,11 +634,21 @@ export class AgentB2CFlightService extends AbstractServices {
         Number(id)
       );
 
+      const {
+        vendor_fare,
+        source_type,
+        source_id,
+        source_email,
+        api,
+        api_booking_ref,
+        ...restData
+      } = booking_data;
+
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
         data: {
-          ...booking_data,
+          ...restData,
           price_breakdown_data,
           segment_data,
           traveler_data,
