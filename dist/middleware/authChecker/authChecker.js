@@ -269,7 +269,7 @@ class AuthChecker {
         this.whiteLabelAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             let { token } = req.headers;
             if (!token) {
-                token = req.query.agencyToken;
+                token = req.query.token;
             }
             if (!token) {
                 res

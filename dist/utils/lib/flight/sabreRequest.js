@@ -60,7 +60,6 @@ class SabreRequests {
                     data: requestData,
                     validateStatus: () => true,
                 });
-                console.log({ response });
                 if (response.status !== 200) {
                     yield new rootModel_1.default().ErrorLogsModel().insertErrorLogs({
                         level: constants_1.ERROR_LEVEL_WARNING,
@@ -76,7 +75,6 @@ class SabreRequests {
                     });
                     return false;
                 }
-                console.log('response again', response);
                 return response.data;
             }
             catch (error) {

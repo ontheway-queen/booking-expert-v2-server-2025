@@ -138,8 +138,7 @@ class AgentB2CFlightValidator {
                 'any.required': 'Provide valid passenger code and quantity data',
                 'any.invalid': 'Invalid format for passenger code and quantity data',
             }),
-            token: joi_1.default.string().optional(),
-            agencyToken: joi_1.default.string().required(),
+            token: joi_1.default.string().required(),
             airline_code: joi_1.default.alternatives().try(joi_1.default.array().optional(), joi_1.default.string().custom((value, helpers) => {
                 try {
                     const parsedValue = JSON.parse(value);

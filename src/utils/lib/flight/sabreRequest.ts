@@ -52,7 +52,6 @@ export default class SabreRequests {
         validateStatus: () => true,
       });
 
-      console.log({ response });
       if (response.status !== 200) {
         await new Models().ErrorLogsModel().insertErrorLogs({
           level: ERROR_LEVEL_WARNING,
@@ -68,7 +67,6 @@ export default class SabreRequests {
         });
         return false;
       }
-      console.log('response again', response);
       return response.data;
     } catch (error: any) {
       console.log({ error });

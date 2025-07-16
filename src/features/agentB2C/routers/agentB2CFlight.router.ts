@@ -10,24 +10,36 @@ export default class AgentB2CFlightRouter extends AbstractRouter {
   }
 
   private callRouter() {
-    this.router.route('/search')
-      .post(this.controller.flightSearch);
+    this.router.route('/search').post(this.controller.flightSearch);
 
-    this.router.route('/search/sse')
-      .get(this.controller.FlightSearchSSE);
+    this.router.route('/search/sse').get(this.controller.FlightSearchSSE);
 
-    this.router.route('/search/fare-rules')
+    this.router
+      .route('/search/fare-rules')
       .get(this.controller.getFlightFareRule);
 
-    this.router.route('/revalidate')
-      .post(this.controller.flightRevalidate);
+    this.router.route('/revalidate').post(this.controller.flightRevalidate);
 
-    this.router.route('/booking')
-      .post(new AuthChecker().agencyB2CUserAuthChecker, this.uploader.cloudUploadRaw(this.fileFolders.AGENT_B2C_FLIGHT_BOOKING_FILES, ['visa', 'passport']),
-        this.controller.flightBooking)
-      .get(new AuthChecker().agencyB2CUserAuthChecker, this.controller.getAllBookingList);
+    this.router
+      .route('/booking')
+      .post(
+        new AuthChecker().agencyB2CUserAuthChecker,
+        this.uploader.cloudUploadRaw(
+          this.fileFolders.AGENT_B2C_FLIGHT_BOOKING_FILES,
+          ['visa', 'passport']
+        ),
+        this.controller.flightBooking
+      )
+      .get(
+        new AuthChecker().agencyB2CUserAuthChecker,
+        this.controller.getAllBookingList
+      );
 
-    this.router.route('/booking/:id')
-      .get(new AuthChecker().agencyB2CUserAuthChecker, this.controller.getSingleBooking);
+    this.router
+      .route('/booking/:id')
+      .get(
+        new AuthChecker().agencyB2CUserAuthChecker,
+        this.controller.getSingleBooking
+      );
   }
 }
