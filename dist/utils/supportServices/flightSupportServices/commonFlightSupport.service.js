@@ -229,8 +229,8 @@ class CommonFlightSupportService extends abstract_service_1.default {
                     }
                 }
             }
-            let agent_markup = 0;
-            let agent_discount = 0;
+            let agent_markup = 0.0;
+            let agent_discount = 0.0;
             if (markup_amount) {
                 let extra_amount = 0;
                 if (markup_amount.markup_type === 'FLAT') {
@@ -250,8 +250,8 @@ class CommonFlightSupportService extends abstract_service_1.default {
                 markup: Number(Number(markup).toFixed(2)),
                 commission: Number(Number(commission).toFixed(2)),
                 pax_markup: Number(Number(pax_markup).toFixed(2)),
-                agent_discount: Number(agent_discount.toFixed(2)),
-                agent_markup: Number(agent_markup.toFixed(2)),
+                agent_discount: Number(Number(agent_discount).toFixed(2)),
+                agent_markup: Number(Number(agent_markup).toFixed(2)),
             };
         });
     }
