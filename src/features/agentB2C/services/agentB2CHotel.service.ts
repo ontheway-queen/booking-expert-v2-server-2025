@@ -2,6 +2,7 @@ import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 import { CTHotelSupportService } from '../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service';
 import { IAgentB2CHotelSearchReqBody } from '../utils/types/agentB2CHotel.types';
+import Lib from '../../../utils/lib/lib';
 
 export default class AgentB2CHotelService extends AbstractServices {
   constructor() {
@@ -51,10 +52,26 @@ export default class AgentB2CHotelService extends AbstractServices {
         };
       }
 
-      const result = await ctHotelSupport.HotelSearch(
+      //get b2c markup
+      const markup_amount = await Lib.getAgentB2CTotalMarkup({
+        trx,
+        type: 'Hotel',
+        agency_id,
+      });
+
+      if (!markup_amount) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Markup information is empty. Contact with the authority',
+        };
+      }
+
+      const result = await ctHotelSupport.HotelSearch({
         payload,
-        agent.hotel_markup_set
-      );
+        markup_set: agent.hotel_markup_set,
+        markup_amount,
+      });
 
       if (result) {
         return {
@@ -100,12 +117,28 @@ export default class AgentB2CHotelService extends AbstractServices {
         };
       }
 
+      //get b2c markup
+      const markup_amount = await Lib.getAgentB2CTotalMarkup({
+        trx,
+        type: 'Hotel',
+        agency_id,
+      });
+
+      if (!markup_amount) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Markup information is empty. Contact with the authority',
+        };
+      }
+
       const payload = req.body as { hcode: number; search_id: string };
 
-      const result = await ctHotelSupport.HotelRooms(
+      const result = await ctHotelSupport.HotelRooms({
         payload,
-        agent.hotel_markup_set
-      );
+        markup_set: agent.hotel_markup_set,
+        markup_amount,
+      });
 
       if (result) {
         return {
@@ -157,10 +190,26 @@ export default class AgentB2CHotelService extends AbstractServices {
         };
       }
 
-      const data = await ctHotelSupport.HotelRecheck(
+      //get b2c markup
+      const markup_amount = await Lib.getAgentB2CTotalMarkup({
+        trx,
+        type: 'Hotel',
+        agency_id,
+      });
+
+      if (!markup_amount) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Markup information is empty. Contact with the authority',
+        };
+      }
+
+      const data = await ctHotelSupport.HotelRecheck({
         payload,
-        agent.hotel_markup_set
-      );
+        markup_set: agent.hotel_markup_set,
+        markup_amount,
+      });
 
       if (!data) {
         return {

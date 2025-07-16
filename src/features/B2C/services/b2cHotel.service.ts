@@ -37,10 +37,10 @@ export default class B2CHotelService extends AbstractServices {
         };
       }
 
-      const result = await ctHotelSupport.HotelSearch(
+      const result = await ctHotelSupport.HotelSearch({
         payload,
-        markup[0].markup_set_id
-      );
+        markup_set: markup[0].markup_set_id,
+      });
 
       if (result) {
         return {
@@ -75,10 +75,10 @@ export default class B2CHotelService extends AbstractServices {
 
       const payload = req.body as { hcode: number; search_id: string };
 
-      const result = await ctHotelSupport.HotelRooms(
+      const result = await ctHotelSupport.HotelRooms({
         payload,
-        markup[0].markup_set_id
-      );
+        markup_set: markup[0].markup_set_id,
+      });
 
       if (result) {
         return {
@@ -118,10 +118,10 @@ export default class B2CHotelService extends AbstractServices {
         };
       }
 
-      const data = await ctHotelSupport.HotelRecheck(
+      const data = await ctHotelSupport.HotelRecheck({
         payload,
-        markup[0].markup_set_id
-      );
+        markup_set: markup[0].markup_set_id,
+      });
 
       if (!data) {
         return {

@@ -67,7 +67,15 @@ class AgentFlightService extends abstract_service_1.default {
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agency_details = yield agencyModel.checkAgency({
                     agency_id: ref_agent_id || agency_id,
+                    status: 'Active',
                 });
+                if (!agency_details) {
+                    return {
+                        success: false,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                    };
+                }
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
                         success: false,

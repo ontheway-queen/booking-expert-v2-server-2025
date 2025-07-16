@@ -290,6 +290,37 @@ class Lib {
       markup_mode,
     };
   }
+
+  public static markupCalculation({
+    amount,
+    markup,
+  }: {
+    amount: number;
+    markup: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
+  }) {
+    let modifiedAmount = 0;
+
+    if (markup.markup_type === 'FLAT') {
+      modifiedAmount = markup.markup;
+    }
+
+    if (markup.markup_type === 'PER') {
+      modifiedAmount = (amount * markup.markup) / 100;
+    }
+
+    if (markup.markup_mode === 'INCREASE') {
+      amount += modifiedAmount;
+    }
+    if (markup.markup_mode === 'DECREASE') {
+      amount -= modifiedAmount;
+    }
+
+    return amount;
+  }
 }
 export default Lib;
 

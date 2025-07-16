@@ -29,6 +29,7 @@ const ctHotelRequest_1 = __importDefault(require("../../lib/hotel/ctHotelRequest
 const ctHotelApiEndpoints_1 = __importDefault(require("../../miscellaneous/endpoints/ctHotelApiEndpoints"));
 const hotelMarkupsModel_1 = __importDefault(require("../../../models/dynamicFareRuleModel/hotelMarkupsModel"));
 const constants_1 = require("../../miscellaneous/constants");
+const lib_1 = __importDefault(require("../../lib/lib"));
 class CTHotelSupportService extends abstract_service_1.default {
     constructor(trx) {
         super();
@@ -74,8 +75,8 @@ class CTHotelSupportService extends abstract_service_1.default {
         });
     }
     // Hotel Search
-    HotelSearch(payload, markup_set) {
-        return __awaiter(this, void 0, void 0, function* () {
+    HotelSearch(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ markup_set, payload, markup_amount, }) {
             const { code, destination } = payload, restBody = __rest(payload, ["code", "destination"]);
             const response = (yield this.request.postRequest(ctHotelApiEndpoints_1.default.HOTEL_SEARCH, Object.assign(Object.assign({}, restBody), { code: `${destination === 'City' ? 'location' : 'hotel'}-${code}` })));
             if (!response.success) {
@@ -90,17 +91,25 @@ class CTHotelSupportService extends abstract_service_1.default {
             if (!markupSet.length || markupSet[0].set_status === false) {
                 return response.data;
             }
-            const _a = response.data, { hotels } = _a, restData = __rest(_a, ["hotels"]);
+            const _b = response.data, { hotels } = _b, restData = __rest(_b, ["hotels"]);
             if (!hotels) {
                 return false;
             }
             const modifiedHotels = [];
             const { markup, mode, type } = markupSet[0];
             for (const hotel of hotels) {
-                modifiedHotels.push(Object.assign(Object.assign({}, hotel), { price_details: this.getMarkupPrice({
-                        prices: hotel.price_details,
-                        markup: { markup: Number(markup), mode, type },
-                    }) }));
+                const price_details = this.getMarkupPrice({
+                    prices: hotel.price_details,
+                    markup: { markup: Number(markup), mode, type },
+                });
+                if (markup_amount) {
+                    price_details.price = lib_1.default.markupCalculation({
+                        amount: price_details.total_price,
+                        markup: markup_amount,
+                    });
+                    price_details.total_price = price_details.price + price_details.tax;
+                }
+                modifiedHotels.push(Object.assign(Object.assign({}, hotel), { price_details }));
             }
             if (!modifiedHotels.length) {
                 return false;
@@ -108,8 +117,8 @@ class CTHotelSupportService extends abstract_service_1.default {
             return Object.assign(Object.assign({}, restData), { hotels: modifiedHotels });
         });
     }
-    HotelRooms(payload, markup_set) {
-        return __awaiter(this, void 0, void 0, function* () {
+    HotelRooms(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ markup_set, payload, markup_amount, }) {
             const response = yield this.request.postRequest(ctHotelApiEndpoints_1.default.HOTEL_ROOMS, payload);
             if (!response.success) {
                 return false;
@@ -159,6 +168,13 @@ class CTHotelSupportService extends abstract_service_1.default {
                             markup: bookMarkup,
                         });
                         hotel.price_details = modifiedPrice;
+                        if (markup_amount) {
+                            price_details.price = lib_1.default.markupCalculation({
+                                amount: price_details.total_price,
+                                markup: markup_amount,
+                            });
+                            price_details.total_price = price_details.price + price_details.tax;
+                        }
                         if (cancellation_policy) {
                             const modifiedCancellationPolicy = this.getCancellationMarkupPrice({
                                 markup: cancelMarkup,
@@ -172,8 +188,8 @@ class CTHotelSupportService extends abstract_service_1.default {
             }
         });
     }
-    HotelRecheck(payload, markup_set) {
-        return __awaiter(this, void 0, void 0, function* () {
+    HotelRecheck(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ markup_set, payload, markup_amount, }) {
             const response = yield this.request.postRequest(ctHotelApiEndpoints_1.default.ROOM_RECHECK, payload);
             if (!response) {
                 return false;

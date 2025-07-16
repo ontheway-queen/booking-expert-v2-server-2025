@@ -54,7 +54,10 @@ class B2CHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                const result = yield ctHotelSupport.HotelSearch(payload, markup[0].markup_set_id);
+                const result = yield ctHotelSupport.HotelSearch({
+                    payload,
+                    markup_set: markup[0].markup_set_id,
+                });
                 if (result) {
                     return {
                         success: true,
@@ -85,7 +88,10 @@ class B2CHotelService extends abstract_service_1.default {
                     };
                 }
                 const payload = req.body;
-                const result = yield ctHotelSupport.HotelRooms(payload, markup[0].markup_set_id);
+                const result = yield ctHotelSupport.HotelRooms({
+                    payload,
+                    markup_set: markup[0].markup_set_id,
+                });
                 if (result) {
                     return {
                         success: true,
@@ -116,7 +122,10 @@ class B2CHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                const data = yield ctHotelSupport.HotelRecheck(payload, markup[0].markup_set_id);
+                const data = yield ctHotelSupport.HotelRecheck({
+                    payload,
+                    markup_set: markup[0].markup_set_id,
+                });
                 if (!data) {
                     return {
                         success: false,

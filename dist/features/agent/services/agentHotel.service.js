@@ -38,12 +38,12 @@ class AgentHotelService extends abstract_service_1.default {
     hotelSearch(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyUser;
+                const { agency_id, user_id, ref_agent_id, agency_type } = req.agencyUser;
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const agencyModel = this.Model.AgencyModel(trx);
                 const OthersModel = this.Model.OthersModel(trx);
                 const agent = yield agencyModel.checkAgency({
-                    agency_id,
+                    agency_id: ref_agent_id || agency_id,
                     status: 'Active',
                 });
                 if (!agent) {
@@ -60,6 +60,22 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
+                //get sub agent markup
+                let markup_amount = undefined;
+                if (agency_type === 'Sub Agent') {
+                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
+                        trx,
+                        type: 'Hotel',
+                        agency_id,
+                    });
+                    if (!markup_amount) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Markup information is empty. Contact with the authority',
+                        };
+                    }
+                }
                 const _a = req.body, { name } = _a, payload = __rest(_a, ["name"]);
                 yield OthersModel.insertHotelSearchHistory({
                     check_in_date: payload.checkin,
@@ -73,7 +89,11 @@ class AgentHotelService extends abstract_service_1.default {
                     code: payload.code,
                     name: name,
                 });
-                const result = yield ctHotelSupport.HotelSearch(payload, agent.hotel_markup_set);
+                const result = yield ctHotelSupport.HotelSearch({
+                    payload,
+                    markup_set: agent.hotel_markup_set,
+                    markup_amount,
+                });
                 if (result) {
                     return {
                         success: true,
@@ -107,11 +127,11 @@ class AgentHotelService extends abstract_service_1.default {
     getHotelRooms(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id, ref_agent_id, agency_type } = req.agencyUser;
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agent = yield agencyModel.checkAgency({
-                    agency_id,
+                    agency_id: ref_agent_id || agency_id,
                     status: 'Active',
                 });
                 if (!agent) {
@@ -128,8 +148,28 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
+                //get sub agent markup
+                let markup_amount = undefined;
+                if (agency_type === 'Sub Agent') {
+                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
+                        trx,
+                        type: 'Hotel',
+                        agency_id,
+                    });
+                    if (!markup_amount) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Markup information is empty. Contact with the authority',
+                        };
+                    }
+                }
                 const payload = req.body;
-                const result = yield ctHotelSupport.HotelRooms(payload, agent.hotel_markup_set);
+                const result = yield ctHotelSupport.HotelRooms({
+                    payload,
+                    markup_set: agent.hotel_markup_set,
+                    markup_amount,
+                });
                 if (result) {
                     return {
                         success: true,
@@ -149,11 +189,11 @@ class AgentHotelService extends abstract_service_1.default {
     hotelRoomRecheck(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
+                const { agency_id, ref_agent_id, agency_type } = req.agencyUser;
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agent = yield agencyModel.checkAgency({
-                    agency_id,
+                    agency_id: ref_agent_id || agency_id,
                     status: 'Active',
                 });
                 if (!agent) {
@@ -170,8 +210,28 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
+                //get sub agent markup
+                let markup_amount = undefined;
+                if (agency_type === 'Sub Agent') {
+                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
+                        trx,
+                        type: 'Hotel',
+                        agency_id,
+                    });
+                    if (!markup_amount) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Markup information is empty. Contact with the authority',
+                        };
+                    }
+                }
                 const payload = req.body;
-                const data = yield ctHotelSupport.HotelRecheck(payload, agent.hotel_markup_set);
+                const data = yield ctHotelSupport.HotelRecheck({
+                    payload,
+                    markup_set: agent.hotel_markup_set,
+                    markup_amount,
+                });
                 if (!data) {
                     return {
                         success: false,
@@ -193,7 +253,7 @@ class AgentHotelService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 var _a, _b, _c;
-                const { agency_id, user_id } = req.agencyUser;
+                const { agency_id, user_id, ref_agent_id, agency_type } = req.agencyUser;
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const agencyModel = this.Model.AgencyModel(trx);
                 const hotelBookingModel = this.Model.HotelBookingModel(trx);
@@ -217,6 +277,22 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
+                //get sub agent markup
+                let markup_amount = undefined;
+                if (agency_type === 'Sub Agent') {
+                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
+                        trx,
+                        type: 'Hotel',
+                        agency_id,
+                    });
+                    if (!markup_amount) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Markup information is empty. Contact with the authority',
+                        };
+                    }
+                }
                 const files = req.files || [];
                 const body = req.body;
                 const recheckRoomsPayload = body.booking_items.map((item) => {
@@ -228,10 +304,14 @@ class AgentHotelService extends abstract_service_1.default {
                 // Calculate nights and recheck Hotel
                 const nights = dateTimeLib_1.default.nightsCount(body.checkin, body.checkout);
                 const recheck = yield ctHotelSupport.HotelRecheck({
-                    search_id: body.search_id,
-                    rooms: recheckRoomsPayload,
-                    nights: nights,
-                }, agent.hotel_markup_set);
+                    payload: {
+                        search_id: body.search_id,
+                        rooms: recheckRoomsPayload,
+                        nights: nights,
+                    },
+                    markup_set: agent.hotel_markup_set,
+                    markup_amount,
+                });
                 if (!recheck) {
                     return {
                         success: false,

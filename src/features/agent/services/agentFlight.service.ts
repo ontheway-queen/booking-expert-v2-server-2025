@@ -76,7 +76,16 @@ export class AgentFlightService extends AbstractServices {
 
       const agency_details = await agencyModel.checkAgency({
         agency_id: ref_agent_id || agency_id,
+        status: 'Active',
       });
+
+      if (!agency_details) {
+        return {
+          success: false,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+        };
+      }
 
       if (!agency_details?.flight_markup_set) {
         return {

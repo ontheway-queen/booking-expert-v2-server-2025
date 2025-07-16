@@ -31,13 +31,13 @@ export class AgentHotelService extends AbstractServices {
 
   public async hotelSearch(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyUser;
+      const { agency_id, user_id, ref_agent_id, agency_type } = req.agencyUser;
       const ctHotelSupport = new CTHotelSupportService(trx);
       const agencyModel = this.Model.AgencyModel(trx);
       const OthersModel = this.Model.OthersModel(trx);
 
       const agent = await agencyModel.checkAgency({
-        agency_id,
+        agency_id: ref_agent_id || agency_id,
         status: 'Active',
       });
 
@@ -57,6 +57,24 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
+      //get sub agent markup
+      let markup_amount = undefined;
+      if (agency_type === 'Sub Agent') {
+        markup_amount = await Lib.getSubAgentTotalMarkup({
+          trx,
+          type: 'Hotel',
+          agency_id,
+        });
+
+        if (!markup_amount) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Markup information is empty. Contact with the authority',
+          };
+        }
+      }
+
       const { name, ...payload } = req.body as IAgentHotelSearchReqBody;
 
       await OthersModel.insertHotelSearchHistory({
@@ -72,10 +90,11 @@ export class AgentHotelService extends AbstractServices {
         name: name,
       });
 
-      const result = await ctHotelSupport.HotelSearch(
+      const result = await ctHotelSupport.HotelSearch({
         payload,
-        agent.hotel_markup_set
-      );
+        markup_set: agent.hotel_markup_set,
+        markup_amount,
+      });
 
       if (result) {
         return {
@@ -115,12 +134,12 @@ export class AgentHotelService extends AbstractServices {
 
   public async getHotelRooms(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id, ref_agent_id, agency_type } = req.agencyUser;
       const ctHotelSupport = new CTHotelSupportService(trx);
       const agencyModel = this.Model.AgencyModel(trx);
 
       const agent = await agencyModel.checkAgency({
-        agency_id,
+        agency_id: ref_agent_id || agency_id,
         status: 'Active',
       });
 
@@ -139,12 +158,32 @@ export class AgentHotelService extends AbstractServices {
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
+
+      //get sub agent markup
+      let markup_amount = undefined;
+      if (agency_type === 'Sub Agent') {
+        markup_amount = await Lib.getSubAgentTotalMarkup({
+          trx,
+          type: 'Hotel',
+          agency_id,
+        });
+
+        if (!markup_amount) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Markup information is empty. Contact with the authority',
+          };
+        }
+      }
+
       const payload = req.body as { hcode: number; search_id: string };
 
-      const result = await ctHotelSupport.HotelRooms(
+      const result = await ctHotelSupport.HotelRooms({
         payload,
-        agent.hotel_markup_set
-      );
+        markup_set: agent.hotel_markup_set,
+        markup_amount,
+      });
 
       if (result) {
         return {
@@ -165,12 +204,12 @@ export class AgentHotelService extends AbstractServices {
 
   public async hotelRoomRecheck(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
+      const { agency_id, ref_agent_id, agency_type } = req.agencyUser;
       const ctHotelSupport = new CTHotelSupportService(trx);
       const agencyModel = this.Model.AgencyModel(trx);
 
       const agent = await agencyModel.checkAgency({
-        agency_id,
+        agency_id: ref_agent_id || agency_id,
         status: 'Active',
       });
 
@@ -190,16 +229,35 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
+      //get sub agent markup
+      let markup_amount = undefined;
+      if (agency_type === 'Sub Agent') {
+        markup_amount = await Lib.getSubAgentTotalMarkup({
+          trx,
+          type: 'Hotel',
+          agency_id,
+        });
+
+        if (!markup_amount) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Markup information is empty. Contact with the authority',
+          };
+        }
+      }
+
       const payload = req.body as {
         search_id: string;
         nights: number;
         rooms: { rate_key: string; group_code: string }[];
       };
 
-      const data = await ctHotelSupport.HotelRecheck(
+      const data = await ctHotelSupport.HotelRecheck({
         payload,
-        agent.hotel_markup_set
-      );
+        markup_set: agent.hotel_markup_set,
+        markup_amount,
+      });
 
       if (!data) {
         return {
@@ -222,7 +280,7 @@ export class AgentHotelService extends AbstractServices {
 
   public async hotelBooking(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyUser;
+      const { agency_id, user_id, ref_agent_id, agency_type } = req.agencyUser;
       const ctHotelSupport = new CTHotelSupportService(trx);
       const agencyModel = this.Model.AgencyModel(trx);
       const hotelBookingModel = this.Model.HotelBookingModel(trx);
@@ -250,6 +308,24 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
+      //get sub agent markup
+      let markup_amount = undefined;
+      if (agency_type === 'Sub Agent') {
+        markup_amount = await Lib.getSubAgentTotalMarkup({
+          trx,
+          type: 'Hotel',
+          agency_id,
+        });
+
+        if (!markup_amount) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Markup information is empty. Contact with the authority',
+          };
+        }
+      }
+
       const files = (req.files as Express.Multer.File[]) || [];
 
       const body = req.body as IAgentHotelBookingReqBody;
@@ -264,14 +340,15 @@ export class AgentHotelService extends AbstractServices {
       // Calculate nights and recheck Hotel
       const nights = DateTimeLib.nightsCount(body.checkin, body.checkout);
 
-      const recheck = await ctHotelSupport.HotelRecheck(
-        {
+      const recheck = await ctHotelSupport.HotelRecheck({
+        payload: {
           search_id: body.search_id,
           rooms: recheckRoomsPayload,
           nights: nights,
         },
-        agent.hotel_markup_set
-      );
+        markup_set: agent.hotel_markup_set,
+        markup_amount,
+      });
 
       if (!recheck) {
         return {

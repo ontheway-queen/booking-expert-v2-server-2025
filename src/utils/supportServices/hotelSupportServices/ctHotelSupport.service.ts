@@ -22,6 +22,7 @@ import {
   MARKUP_TYPE_PER,
 } from '../../miscellaneous/constants';
 import DateTimeLib from '../../lib/dateTimeLib';
+import Lib from '../../lib/lib';
 
 export class CTHotelSupportService extends AbstractServices {
   private trx: Knex.Transaction;
@@ -74,10 +75,19 @@ export class CTHotelSupportService extends AbstractServices {
   }
 
   // Hotel Search
-  public async HotelSearch(
-    payload: ICTHotelSearchPayload,
-    markup_set: number
-  ): Promise<false | ICTHotelSearchData> {
+  public async HotelSearch({
+    markup_set,
+    payload,
+    markup_amount,
+  }: {
+    payload: ICTHotelSearchPayload;
+    markup_set: number;
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
+  }): Promise<false | ICTHotelSearchData> {
     const { code, destination, ...restBody } = payload;
 
     const response = (await this.request.postRequest(
@@ -118,12 +128,23 @@ export class CTHotelSupportService extends AbstractServices {
 
     const { markup, mode, type } = markupSet[0];
     for (const hotel of hotels) {
+      const price_details = this.getMarkupPrice({
+        prices: hotel.price_details,
+        markup: { markup: Number(markup), mode, type },
+      });
+
+      if (markup_amount) {
+        price_details.price = Lib.markupCalculation({
+          amount: price_details.total_price,
+          markup: markup_amount,
+        });
+
+        price_details.total_price = price_details.price + price_details.tax;
+      }
+
       modifiedHotels.push({
         ...hotel,
-        price_details: this.getMarkupPrice({
-          prices: hotel.price_details,
-          markup: { markup: Number(markup), mode, type },
-        }),
+        price_details,
       });
     }
 
@@ -137,10 +158,19 @@ export class CTHotelSupportService extends AbstractServices {
     };
   }
 
-  public async HotelRooms(
-    payload: { hcode: number; search_id: string },
-    markup_set: number
-  ): Promise<ICTHotelRoomsResponse[] | false> {
+  public async HotelRooms({
+    markup_set,
+    payload,
+    markup_amount,
+  }: {
+    payload: { hcode: number; search_id: string };
+    markup_set: number;
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
+  }): Promise<ICTHotelRoomsResponse[] | false> {
     const response = await this.request.postRequest(
       CTHotelAPIEndpoints.HOTEL_ROOMS,
       payload
@@ -206,6 +236,15 @@ export class CTHotelSupportService extends AbstractServices {
 
           hotel.price_details = modifiedPrice;
 
+          if (markup_amount) {
+            price_details.price = Lib.markupCalculation({
+              amount: price_details.total_price,
+              markup: markup_amount,
+            });
+
+            price_details.total_price = price_details.price + price_details.tax;
+          }
+
           if (cancellation_policy) {
             const modifiedCancellationPolicy = this.getCancellationMarkupPrice({
               markup: cancelMarkup,
@@ -221,14 +260,25 @@ export class CTHotelSupportService extends AbstractServices {
     }
   }
 
-  public async HotelRecheck(
+  public async HotelRecheck({
+    markup_set,
+    payload,
+    markup_amount,
+  }: {
     payload: {
       search_id: string;
       nights: number;
       rooms: { rate_key: string; group_code: string }[];
-    },
-    markup_set: number
-  ): Promise<ICTHotelRoomRecheckData | false> {
+    };
+    markup_set: number;
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
+    with_vendor_price?: boolean;
+    with_agent_markup?: boolean;
+  }): Promise<ICTHotelRoomRecheckData | false> {
     const response = await this.request.postRequest(
       CTHotelAPIEndpoints.ROOM_RECHECK,
       payload

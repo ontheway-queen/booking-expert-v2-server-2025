@@ -233,6 +233,22 @@ class Lib {
             };
         });
     }
+    static markupCalculation({ amount, markup, }) {
+        let modifiedAmount = 0;
+        if (markup.markup_type === 'FLAT') {
+            modifiedAmount = markup.markup;
+        }
+        if (markup.markup_type === 'PER') {
+            modifiedAmount = (amount * markup.markup) / 100;
+        }
+        if (markup.markup_mode === 'INCREASE') {
+            amount += modifiedAmount;
+        }
+        if (markup.markup_mode === 'DECREASE') {
+            amount -= modifiedAmount;
+        }
+        return amount;
+    }
 }
 Lib.gibberishChecker = (value) => {
     var _a;
