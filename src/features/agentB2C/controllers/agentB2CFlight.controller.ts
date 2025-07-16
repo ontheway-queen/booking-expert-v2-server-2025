@@ -40,7 +40,10 @@ export default class AgentB2CFlightController extends AbstractController {
         sendEvent('end', { message: 'Flight search completed successfully.' });
         res.end();
       } catch (error) {
-        sendEvent('error', { message: 'An error occurred during flight search.', error });
+        sendEvent('error', {
+          message: 'An error occurred during flight search.',
+          error,
+        });
         res.end();
       }
     }
@@ -86,20 +89,19 @@ export default class AgentB2CFlightController extends AbstractController {
     }
   );
 
-//   public issueTicket = this.asyncWrapper.wrap(
-//     { bodySchema: this.validator.issueTicketSchema },
-//     async (req: Request, res: Response) => {
-//       const { code, ...rest } = await this.service.issueTicket(req);
-//       res.status(code).json(rest);
-//     }
-//   );
+  //   public issueTicket = this.asyncWrapper.wrap(
+  //     { bodySchema: this.validator.issueTicketSchema },
+  //     async (req: Request, res: Response) => {
+  //       const { code, ...rest } = await this.service.issueTicket(req);
+  //       res.status(code).json(rest);
+  //     }
+  //   );
 
-//   public cancelBooking = this.asyncWrapper.wrap(
-//     { paramSchema: this.commonValidator.singleParamNumValidator() },
-//     async (req: Request, res: Response) => {
-//       const { code, ...rest } = await this.service.cancelBooking(req);
-//       res.status(code).json(rest);
-//     }
-//   );
-
+  //   public cancelBooking = this.asyncWrapper.wrap(
+  //     { paramSchema: this.commonValidator.singleParamNumValidator() },
+  //     async (req: Request, res: Response) => {
+  //       const { code, ...rest } = await this.service.cancelBooking(req);
+  //       res.status(code).json(rest);
+  //     }
+  //   );
 }

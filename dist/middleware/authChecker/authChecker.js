@@ -268,8 +268,9 @@ class AuthChecker {
         // Agency B2C White label Auth Checker
         this.whiteLabelAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             let { token } = req.headers;
-            if (!token)
+            if (!token) {
                 token = req.query.agencyToken;
+            }
             if (!token) {
                 res
                     .status(statusCode_1.default.HTTP_UNAUTHORIZED)

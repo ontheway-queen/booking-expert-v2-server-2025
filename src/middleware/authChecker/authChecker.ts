@@ -322,7 +322,11 @@ export default class AuthChecker {
     next: NextFunction
   ) => {
     let { token } = req.headers as { token: string };
-    if (!token) token = req.query.agencyToken as string;
+
+    if (!token) {
+      token = req.query.agencyToken as string;
+    }
+
     if (!token) {
       res
         .status(StatusCode.HTTP_UNAUTHORIZED)

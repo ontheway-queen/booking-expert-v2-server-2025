@@ -389,55 +389,89 @@ export class AgentB2CFlightService extends AbstractServices {
   }
 
   public async flightBooking(req: Request) {
-    return await this.db.transaction(async (trx) => {
+    return this.db.transaction(async (trx) => {
       const {
-        user_id,
-        name,
-        user_email,
-        agency_email,
-        agency_address,
         agency_id,
-        agency_logo,
+        ref_agent_id,
+        agency_type,
+        user_id,
+        user_email,
+        name,
+        phone_number,
+        agency_email,
         agency_name,
-        agency_number,
-      } = req.agencyB2CUser;
-
+        agency_logo,
+        address,
+      } = req.agencyUser;
       const body = req.body as IFlightBookingRequestBody;
-      const booking_confirm = req.query.booking_confirm;
+      const booking_confirm = body.booking_confirm;
 
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
-      const agency_details = await agencyModel.checkAgency({ agency_id });
+
+      const agency_details = await agencyModel.checkAgency({
+        agency_id: ref_agent_id || agency_id,
+      });
+
       if (!agency_details?.flight_markup_set) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: 'No commission set has been found for the agency',
+          message: 'No markup set has been found for the agency',
         };
       }
 
-      //get b2c markup
-      const markup_amount = await Lib.getAgentB2CTotalMarkup({
-        trx,
-        type: 'Flight',
-        agency_id,
-      });
-      if (!markup_amount) {
+      //get sub agent markup
+      let markup_amount = undefined;
+
+      if (agency_type === 'Sub Agent') {
+        markup_amount = await Lib.getSubAgentTotalMarkup({
+          trx,
+          type: 'Flight',
+          agency_id,
+        });
+
+        if (!markup_amount) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Markup information is empty. Contact with the authority',
+          };
+        }
+      }
+
+      //get data from redis using the search id
+      const retrievedData = await getRedis(body.search_id);
+
+      if (!retrievedData) {
         return {
           success: false,
-          code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: 'Markup information is empty. Contact with the authority',
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
 
-      //revalidate
+      //revalidate the flight
       const flightSupportService = new CommonFlightSupportService(trx);
+
+      // Match search request pax and booking request pax details=====
+      const searchReqBody = retrievedData.reqBody as IFlightSearchReqBody;
+
+      flightSupportService.crossCheckPax({
+        bookingPax: body.passengers,
+        searchPax: searchReqBody.PassengerTypeQuantity,
+      });
+
+      // ============================================================
+
       let rev_data: IFormattedFlightItinerary | null =
         await flightSupportService.FlightRevalidate({
           search_id: body.search_id,
           flight_id: body.flight_id,
           dynamic_fare_set_id: agency_details.flight_markup_set,
+          markup_amount,
         });
+
       if (!rev_data) {
         return {
           success: false,
@@ -446,19 +480,24 @@ export class AgentB2CFlightService extends AbstractServices {
         };
       }
 
-      const data = rev_data;
+      data = rev_data;
+      refundable = data.refundable;
 
-      //if price has been changed and no confirmation of booking then return
+      // if price has been changed and no confirmation of booking then return
       if (!booking_confirm) {
         const price_changed =
           await flightSupportService.checkBookingPriceChange({
             flight_id: body.flight_id,
             booking_price: Number(data.fare.payable),
           });
+
         if (price_changed === true) {
           return {
             success: false,
             code: this.StatusCode.HTTP_CONFLICT,
+            data: {
+              new_fare: data.fare.payable,
+            },
             message: this.ResMsg.BOOKING_PRICE_CHANGED,
           };
         } else if (price_changed === null) {
@@ -472,6 +511,7 @@ export class AgentB2CFlightService extends AbstractServices {
 
       //check eligibility of the booking
       const bookingSupportService = new CommonFlightBookingSupportService(trx);
+
       const checkEligibilityOfBooking =
         await bookingSupportService.checkEligibilityOfBooking({
           route: new FlightUtils().getRouteOfFlight(data.leg_description),
@@ -480,18 +520,49 @@ export class AgentB2CFlightService extends AbstractServices {
           domestic_flight: data.domestic_flight,
           passenger: body.passengers,
         });
+
       if (!checkEligibilityOfBooking.success) {
         return checkEligibilityOfBooking;
       }
 
-      //if booking is not blocked then book the flight using API
-      let refundable = data.refundable;
+      //check if the booking is block
+      const directBookingPermission =
+        await bookingSupportService.checkDirectFlightBookingPermission({
+          markup_set_id: agency_details.flight_markup_set,
+          api_name: data.api,
+          airline: data.carrier_code,
+        });
 
-      //insert booking data
+      if (directBookingPermission.success === false) {
+        return directBookingPermission;
+      }
+
+      //insert the revalidate data as info log
+      await this.Model.ErrorLogsModel(trx).insertErrorLogs({
+        http_method: 'POST',
+        level: ERROR_LEVEL_INFO,
+        message: 'Flight booking revalidate data',
+        url: '/flight/booking',
+        user_id: user_id,
+        source: 'AGENT',
+        metadata: {
+          api: data.api,
+          request_body: {
+            flight_id: body.flight_id,
+            search_id: body.search_id,
+            api_search_id: data.api_search_id,
+          },
+          response: data,
+        },
+      });
+
+      //insert booking data with invoice
       const { booking_id, booking_ref } =
         await bookingSupportService.insertFlightBookingData({
-          status: FLIGHT_BOOKING_IN_PROCESS,
-          api_booking_ref: null,
+          gds_pnr: payload.gds_pnr,
+          airline_pnr: payload.airline_pnr,
+          status: FLIGHT_BOOKING_PENDING,
+          api_booking_ref,
           user_id,
           user_name: name,
           user_email,
@@ -500,20 +571,19 @@ export class AgentB2CFlightService extends AbstractServices {
           flight_data: data,
           traveler_data: body.passengers,
           type: 'Agent_Flight',
-          source_type: SOURCE_AGENT_B2C,
+          source_type: SOURCE_AGENT,
           source_id: agency_id,
           invoice_ref_type: TYPE_FLIGHT,
+          booking_block: directBookingPermission.booking_block,
         });
+
+      new_booking_id = booking_id;
+      new_booking_ref = booking_ref;
 
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: 'The flight has been booked successfully!',
-        data: {
-          booking_id,
-          booking_ref,
-          status: FLIGHT_BOOKING_IN_PROCESS,
-        },
+        message: this.ResMsg.HTTP_SUCCESSFUL,
       };
     });
   }

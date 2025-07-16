@@ -341,39 +341,61 @@ class AgentB2CFlightService extends abstract_service_1.default {
     }
     flightBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { user_id, name, user_email, agency_email, agency_address, agency_id, agency_logo, agency_name, agency_number, } = req.agencyB2CUser;
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id, ref_agent_id, agency_type, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
                 const body = req.body;
-                const booking_confirm = req.query.booking_confirm;
+                const booking_confirm = body.booking_confirm;
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
-                const agency_details = yield agencyModel.checkAgency({ agency_id });
+                const agency_details = yield agencyModel.checkAgency({
+                    agency_id: ref_agent_id || agency_id,
+                });
                 if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: 'No commission set has been found for the agency',
+                        message: 'No markup set has been found for the agency',
                     };
                 }
-                //get b2c markup
-                const markup_amount = yield lib_1.default.getAgentB2CTotalMarkup({
-                    trx,
-                    type: 'Flight',
-                    agency_id,
-                });
-                if (!markup_amount) {
+                //get sub agent markup
+                let markup_amount = undefined;
+                if (agency_type === 'Sub Agent') {
+                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
+                        trx,
+                        type: 'Flight',
+                        agency_id,
+                    });
+                    if (!markup_amount) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Markup information is empty. Contact with the authority',
+                        };
+                    }
+                }
+                //get data from redis using the search id
+                const retrievedData = yield (0, redis_1.getRedis)(body.search_id);
+                if (!retrievedData) {
                     return {
                         success: false,
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: 'Markup information is empty. Contact with the authority',
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                //revalidate
+                //revalidate the flight
                 const flightSupportService = new commonFlightSupport_service_1.CommonFlightSupportService(trx);
+                // Match search request pax and booking request pax details=====
+                const searchReqBody = retrievedData.reqBody;
+                flightSupportService.crossCheckPax({
+                    bookingPax: body.passengers,
+                    searchPax: searchReqBody.PassengerTypeQuantity,
+                });
+                // ============================================================
                 let rev_data = yield flightSupportService.FlightRevalidate({
                     search_id: body.search_id,
                     flight_id: body.flight_id,
                     dynamic_fare_set_id: agency_details.flight_markup_set,
+                    markup_amount,
                 });
                 if (!rev_data) {
                     return {
@@ -382,8 +404,9 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                const data = rev_data;
-                //if price has been changed and no confirmation of booking then return
+                data = rev_data;
+                refundable = data.refundable;
+                // if price has been changed and no confirmation of booking then return
                 if (!booking_confirm) {
                     const price_changed = yield flightSupportService.checkBookingPriceChange({
                         flight_id: body.flight_id,
@@ -393,6 +416,9 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_CONFLICT,
+                            data: {
+                                new_fare: data.fare.payable,
+                            },
                             message: this.ResMsg.BOOKING_PRICE_CHANGED,
                         };
                     }
@@ -416,12 +442,39 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 if (!checkEligibilityOfBooking.success) {
                     return checkEligibilityOfBooking;
                 }
-                //if booking is not blocked then book the flight using API
-                let refundable = data.refundable;
-                //insert booking data
+                //check if the booking is block
+                const directBookingPermission = yield bookingSupportService.checkDirectFlightBookingPermission({
+                    markup_set_id: agency_details.flight_markup_set,
+                    api_name: data.api,
+                    airline: data.carrier_code,
+                });
+                if (directBookingPermission.success === false) {
+                    return directBookingPermission;
+                }
+                //insert the revalidate data as info log
+                yield this.Model.ErrorLogsModel(trx).insertErrorLogs({
+                    http_method: 'POST',
+                    level: ERROR_LEVEL_INFO,
+                    message: 'Flight booking revalidate data',
+                    url: '/flight/booking',
+                    user_id: user_id,
+                    source: 'AGENT',
+                    metadata: {
+                        api: data.api,
+                        request_body: {
+                            flight_id: body.flight_id,
+                            search_id: body.search_id,
+                            api_search_id: data.api_search_id,
+                        },
+                        response: data,
+                    },
+                });
+                //insert booking data with invoice
                 const { booking_id, booking_ref } = yield bookingSupportService.insertFlightBookingData({
-                    status: flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
-                    api_booking_ref: null,
+                    gds_pnr: payload.gds_pnr,
+                    airline_pnr: payload.airline_pnr,
+                    status: FLIGHT_BOOKING_PENDING,
+                    api_booking_ref,
                     user_id,
                     user_name: name,
                     user_email,
@@ -430,19 +483,17 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     flight_data: data,
                     traveler_data: body.passengers,
                     type: 'Agent_Flight',
-                    source_type: constants_1.SOURCE_AGENT_B2C,
+                    source_type: SOURCE_AGENT,
                     source_id: agency_id,
                     invoice_ref_type: constants_1.TYPE_FLIGHT,
+                    booking_block: directBookingPermission.booking_block,
                 });
+                new_booking_id = booking_id;
+                new_booking_ref = booking_ref;
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: 'The flight has been booked successfully!',
-                    data: {
-                        booking_id,
-                        booking_ref,
-                        status: flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
-                    },
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
                 };
             }));
         });

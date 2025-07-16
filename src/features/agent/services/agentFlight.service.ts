@@ -710,8 +710,6 @@ export class AgentFlightService extends AbstractServices {
               pnr: String(gds_pnr),
             });
 
-            console.log({ gds_pnr, grnData });
-
             refundable = grnData.refundable;
             payload.status = FLIGHT_BOOKING_CONFIRMED;
 
