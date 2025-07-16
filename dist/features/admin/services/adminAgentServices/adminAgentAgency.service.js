@@ -472,31 +472,19 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     role_id: newRole[0].id,
                     username,
                 });
-                if (body.white_label && !white_label_permissions) {
-                    const checkPermission = yield agencyModel.getWhiteLabelPermission(newAgency[0].id);
-                    if (!checkPermission) {
-                        const uuid = (0, uuid_1.v4)();
-                        yield agencyModel.createWhiteLabelPermission({
+                if (body.white_label && white_label_permissions) {
+                    const uuid = (0, uuid_1.v4)();
+                    yield agencyModel.createWhiteLabelPermission(Object.assign(Object.assign({ agency_id: newAgency[0].id }, white_label_permissions), { token: uuid }));
+                    if (white_label_permissions.flight || white_label_permissions.hotel) {
+                        yield agencyModel.createAgentB2CMarkup({
                             agency_id: newAgency[0].id,
-                            token: uuid,
-                            blog: false,
-                            flight: false,
-                            group_fare: false,
-                            holiday: false,
-                            hotel: false,
-                            umrah: false,
-                            visa: false,
+                            flight_markup: 200,
+                            flight_markup_mode: 'INCREASE',
+                            flight_markup_type: 'FLAT',
+                            hotel_markup: 200,
+                            hotel_markup_mode: 'INCREASE',
+                            hotel_markup_type: 'FLAT',
                         });
-                    }
-                }
-                if (white_label_permissions) {
-                    const checkPermission = yield agencyModel.getWhiteLabelPermission(newAgency[0].id);
-                    if (checkPermission && white_label_permissions) {
-                        yield agencyModel.updateWhiteLabelPermission(white_label_permissions, newAgency[0].id);
-                    }
-                    else {
-                        const uuid = (0, uuid_1.v4)();
-                        yield agencyModel.createWhiteLabelPermission(Object.assign({ agency_id: newAgency[0].id, token: uuid }, white_label_permissions));
                     }
                 }
                 yield emailSendLib_1.default.sendEmail({

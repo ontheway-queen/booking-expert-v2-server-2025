@@ -583,43 +583,23 @@ export default class AdminAgentAgencyService extends AbstractServices {
         username,
       });
 
-      if (body.white_label && !white_label_permissions) {
-        const checkPermission = await agencyModel.getWhiteLabelPermission(
-          newAgency[0].id
-        );
+      if (body.white_label && white_label_permissions) {
+        const uuid = uuidv4();
+        await agencyModel.createWhiteLabelPermission({
+          agency_id: newAgency[0].id,
+          ...white_label_permissions,
+          token: uuid,
+        });
 
-        if (!checkPermission) {
-          const uuid = uuidv4();
-          await agencyModel.createWhiteLabelPermission({
+        if (white_label_permissions.flight || white_label_permissions.hotel) {
+          await agencyModel.createAgentB2CMarkup({
             agency_id: newAgency[0].id,
-            token: uuid,
-            blog: false,
-            flight: false,
-            group_fare: false,
-            holiday: false,
-            hotel: false,
-            umrah: false,
-            visa: false,
-          });
-        }
-      }
-
-      if (white_label_permissions) {
-        const checkPermission = await agencyModel.getWhiteLabelPermission(
-          newAgency[0].id
-        );
-
-        if (checkPermission && white_label_permissions) {
-          await agencyModel.updateWhiteLabelPermission(
-            white_label_permissions,
-            newAgency[0].id
-          );
-        } else {
-          const uuid = uuidv4();
-          await agencyModel.createWhiteLabelPermission({
-            agency_id: newAgency[0].id,
-            token: uuid,
-            ...white_label_permissions,
+            flight_markup: 200,
+            flight_markup_mode: 'INCREASE',
+            flight_markup_type: 'FLAT',
+            hotel_markup: 200,
+            hotel_markup_mode: 'INCREASE',
+            hotel_markup_type: 'FLAT',
           });
         }
       }
