@@ -28,7 +28,7 @@ export interface IInsertHotelBookingPayload {
   sell_price: string;
   supplier_cancellation_data?: string;
   confirmation_no?: string;
-  supplier_ref: string;
+  supplier_ref?: string;
   refundable: boolean;
   free_cancellation?: boolean;
   free_cancellation_last_date?: string;

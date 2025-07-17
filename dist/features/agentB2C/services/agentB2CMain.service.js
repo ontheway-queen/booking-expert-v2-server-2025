@@ -176,5 +176,32 @@ class AgentB2CMainService extends abstract_service_1.default {
             }));
         });
     }
+    createEmailSubscriber(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyB2CWhiteLabel;
+                const { email } = req.body;
+                const commonModel = this.Model.CommonModel(trx);
+                const check = yield commonModel.getEmailSubscriber({
+                    agency_id,
+                    source_type: 'AGENT B2C',
+                    email,
+                    with_total: false,
+                });
+                if (!check.data.length) {
+                    yield commonModel.insertEmailSubscriber({
+                        email,
+                        source: 'AGENT B2C',
+                        agency_id,
+                    });
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                };
+            }));
+        });
+    }
 }
 exports.AgentB2CMainService = AgentB2CMainService;

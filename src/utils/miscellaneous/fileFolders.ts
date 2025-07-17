@@ -22,6 +22,8 @@ class FileFolder {
   static readonly AGENT_SUPPORT_TICKET_FILES = 'agent/support-ticket-files';
   static readonly AGENT_B2C_FLIGHT_BOOKING_FILES =
     'agent-b2c/flight-booking-files';
+  static readonly AGENT_B2C_HOTEL_BOOKING_FILES =
+    'agent-b2c/hotel-booking-files';
   static readonly AGENT_HOTEL_BOOKING_FILES = 'agent/hotel-booking-files';
   static readonly AGENCY_REGISTRATION_REQUEST = 'agency-registration-request';
 }

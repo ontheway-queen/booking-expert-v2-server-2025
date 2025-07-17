@@ -105,13 +105,22 @@ class HotelBookingModel extends schema_1.default {
             };
         });
     }
-    getSingleAgentBookingForAdmin(booking_id) {
-        return __awaiter(this, void 0, void 0, function* () {
+    getSingleAgentBooking(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ booking_id, source_type, source_id, user_id, }) {
             return yield this.db('agent_hotel_booking_view AS hb')
                 .withSchema(this.DBO_SCHEMA)
                 .select('hb.*')
                 .where((qb) => {
                 qb.andWhere('hb.id', booking_id);
+                if (source_type) {
+                    qb.andWhere('hb.source_type', source_type);
+                }
+                if (source_id) {
+                    qb.andWhere('hb.source_type', source_type);
+                }
+                if (user_id) {
+                    qb.andWhere('hb.created_by', user_id);
+                }
             })
                 .first();
         });

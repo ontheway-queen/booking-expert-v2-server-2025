@@ -80,7 +80,7 @@ class AuthAgentB2CService extends abstract_service_1.default {
                     data: {
                         id: tokenData.user_id,
                         username,
-                        email: tokenData.user_email,
+                        email,
                         name: tokenData.name,
                         photo: tokenData.photo,
                         gender,

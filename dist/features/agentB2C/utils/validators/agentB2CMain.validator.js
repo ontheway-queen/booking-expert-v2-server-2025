@@ -37,6 +37,9 @@ class AgentB2CMainValidator {
                 'any.required': 'OTP type is required',
             }),
         });
+        this.createEmailSubscriber = joi_1.default.object({
+            email: joi_1.default.string().email().lowercase().trim().required(),
+        });
     }
 }
 exports.default = AgentB2CMainValidator;

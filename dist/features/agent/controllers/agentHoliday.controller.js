@@ -33,37 +33,42 @@ class AgentHolidayController extends abstract_controller_1.default {
         this.service = new agentHoliday_service_1.AgentHolidayService();
         this.validator = new agentHoliday_validator_1.AgentHolidayValidator();
         this.searchHolidayPackage = this.asyncWrapper.wrap({
-            querySchema: this.validator.holidayPackageSearchFilterQuerySchema
+            querySchema: this.validator.holidayPackageSearchFilterQuerySchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.searchHolidayPackage(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.getSingleHolidayPackage = this.asyncWrapper.wrap({
-            paramSchema: this.commonValidator.singleParamStringValidator("slug")
+            paramSchema: this.commonValidator.singleParamStringValidator('slug'),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getSingleHolidayPackage(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.bookHolidayPackage = this.asyncWrapper.wrap({
-            bodySchema: this.validator.holidayPackageCreateBookingSchema
+            bodySchema: this.validator.holidayPackageCreateBookingSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.bookHolidayPackage(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
         }));
         this.getHolidayPackageBookingList = this.asyncWrapper.wrap({
-            querySchema: this.validator.holidayPackageBookingListFilterQuery
+            querySchema: this.validator.holidayPackageBookingListFilterQuery,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getHolidayPackageBookingList(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.getSingleHolidayPackageBooking = this.asyncWrapper.wrap({
-            paramSchema: this.commonValidator.singleParamNumValidator()
+            paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getSingleHolidayPackageBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.cancelHolidayPackageBooking = this.asyncWrapper.wrap({
-            paramSchema: this.commonValidator.singleParamNumValidator()
+            paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.cancelHolidayPackageBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);

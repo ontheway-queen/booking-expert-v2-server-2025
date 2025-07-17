@@ -25,8 +25,7 @@ export default class AgentB2CFlightRouter extends AbstractRouter {
       .post(
         new AuthChecker().agencyB2CUserAuthChecker,
         this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENT_B2C_FLIGHT_BOOKING_FILES,
-          ['visa', 'passport']
+          this.fileFolders.AGENT_B2C_FLIGHT_BOOKING_FILES
         ),
         this.controller.flightBooking
       )

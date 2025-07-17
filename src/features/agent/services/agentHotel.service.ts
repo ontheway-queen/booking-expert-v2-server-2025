@@ -288,7 +288,7 @@ export class AgentHotelService extends AbstractServices {
 
       // Check agent and markup set
       const agent = await agencyModel.checkAgency({
-        agency_id,
+        agency_id: ref_agent_id || agency_id,
         status: 'Active',
       });
 
@@ -536,7 +536,7 @@ export class AgentHotelService extends AbstractServices {
         ref_type: TYPE_FLIGHT,
         total_amount: recheck.fee.total_price,
         due: 0,
-        details: `Auto invoice has been created for flight booking ref no. - ${booking_ref}`,
+        details: `Auto invoice has been created for hotel booking ref no. - ${booking_ref}`,
         type: INVOICE_TYPES.SALE,
         status: INVOICE_STATUS_TYPES.ISSUED,
       });
@@ -579,7 +579,7 @@ export class AgentHotelService extends AbstractServices {
 
     const data = await hotelBookingModel.getHotelBooking(
       {
-        source_type: 'AGENT',
+        source_type: SOURCE_AGENT,
         filter,
         from_date,
         to_date,

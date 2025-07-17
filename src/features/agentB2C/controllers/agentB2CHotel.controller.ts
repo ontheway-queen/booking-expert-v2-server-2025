@@ -33,4 +33,35 @@ export class AgentB2CHotelController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public hotelBooking = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.hotelBooking },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.hotelBook(req);
+
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
+    }
+  );
+
+  public getHotelBooking = this.asyncWrapper.wrap(
+    { querySchema: this.validator.getHotelBooking },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.hotelHotelBookingList(req);
+
+      res.status(code).json(rest);
+    }
+  );
+
+  public getSingleHotelBooking = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.singleHotelBooking(req);
+
+      res.status(code).json(rest);
+    }
+  );
 }

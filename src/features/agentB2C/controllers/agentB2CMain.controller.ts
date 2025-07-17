@@ -21,4 +21,11 @@ export class AgentB2CMainController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+  public createEmailSubscriber = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.createEmailSubscriber },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.createEmailSubscriber(req);
+      res.status(code).json(rest);
+    }
+  );
 }

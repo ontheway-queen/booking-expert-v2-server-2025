@@ -45,7 +45,7 @@ class AdminAgentHotelService extends abstract_service_1.default {
             const { id } = req.params;
             const booking_id = Number(id);
             const hotelBookingModel = this.Model.HotelBookingModel();
-            const data = yield hotelBookingModel.getSingleAgentBookingForAdmin(booking_id);
+            const data = yield hotelBookingModel.getSingleAgentBooking({ booking_id });
             if (!data) {
                 return {
                     success: false,

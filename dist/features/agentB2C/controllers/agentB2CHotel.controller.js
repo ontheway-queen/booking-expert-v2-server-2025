@@ -44,6 +44,23 @@ class AgentB2CHotelController extends abstract_controller_1.default {
             const _a = yield this.service.hotelRoomRecheck(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.hotelBooking = this.asyncWrapper.wrap({ bodySchema: this.validator.hotelBooking }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.hotelBook(req), { code } = _a, rest = __rest(_a, ["code"]);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
+        }));
+        this.getHotelBooking = this.asyncWrapper.wrap({ querySchema: this.validator.getHotelBooking }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.hotelHotelBookingList(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.getSingleHotelBooking = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.singleHotelBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.AgentB2CHotelController = AgentB2CHotelController;

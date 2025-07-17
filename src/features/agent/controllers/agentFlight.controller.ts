@@ -69,7 +69,12 @@ export default class AgentFlightController extends AbstractController {
     { bodySchema: this.validator.flightBookingSchema },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.service.flightBooking(req);
-      res.status(code).json(rest);
+
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
     }
   );
 

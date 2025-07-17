@@ -70,7 +70,12 @@ class AgentB2CFlightController extends abstract_controller_1.default {
         }));
         this.flightBooking = this.asyncWrapper.wrap({ bodySchema: this.validator.flightBookingSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.flightBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
         }));
         this.getAllBookingList = this.asyncWrapper.wrap({ bodySchema: this.validator.getFlightListSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getAllBookingList(req), { code } = _a, rest = __rest(_a, ["code"]);

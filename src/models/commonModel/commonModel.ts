@@ -1,13 +1,19 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { OTP_DEFAULT_EXPIRY } from '../../utils/miscellaneous/constants';
+import {
+  DATA_LIMIT,
+  OTP_DEFAULT_EXPIRY,
+} from '../../utils/miscellaneous/constants';
 import { PRIORITY_AIRPORTS } from '../../utils/miscellaneous/flightConstent';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   ICreateAirlinesPayload,
   ICreateAirportPayload,
+  IGetEmailSubscriberData,
+  IGetEmailSubscriberPayload,
   IGetLastIdData,
   IGetLastIdParams,
   IGetOTPPayload,
+  IInsertEmailSubscriberPayload,
   IInsertLastNoPayload,
   IInsertOTPPayload,
   IUpdateAirlinesPayload,
@@ -471,6 +477,71 @@ class CommonModel extends Schema {
       .withSchema(this.PUBLIC_SCHEMA)
       .delete()
       .where({ id });
+  }
+
+  // Insert email subscriber
+  public async insertEmailSubscriber(payload: IInsertEmailSubscriberPayload) {
+    return await this.db('email_subscriber')
+      .withSchema(this.DBO_SCHEMA)
+      .insert(payload);
+  }
+
+  public async getEmailSubscriber({
+    agency_id,
+    email,
+    from_date,
+    source_type,
+    to_date,
+    with_total,
+    limit,
+    skip,
+  }: IGetEmailSubscriberPayload): Promise<{
+    data: IGetEmailSubscriberData[];
+    total?: number;
+  }> {
+    const data = await this.db('email_subscriber')
+      .withSchema(this.DBO_SCHEMA)
+      .select('*')
+      .where((qb) => {
+        if (agency_id) {
+          qb.andWhere('agency_id', agency_id);
+        }
+        if (email) {
+          qb.andWhere('email', email);
+        }
+        if (from_date && to_date) {
+          qb.andWhereBetween('created_at', [from_date, to_date]);
+        }
+        if (source_type) {
+          qb.andWhere('source_type', source_type);
+        }
+      })
+      .limit(Number(limit) || DATA_LIMIT)
+      .offset(Number(skip) || 0);
+
+    let total: any[] = [];
+
+    if (with_total) {
+      total = await this.db('email_subscriber')
+        .withSchema(this.DBO_SCHEMA)
+        .count('id AS total')
+        .where((qb) => {
+          if (agency_id) {
+            qb.andWhere('agency_id', agency_id);
+          }
+          if (email) {
+            qb.andWhere('email', email);
+          }
+          if (from_date && to_date) {
+            qb.andWhereBetween('created_at', [from_date, to_date]);
+          }
+          if (source_type) {
+            qb.andWhere('source_type', source_type);
+          }
+        });
+    }
+
+    return { data, total: total[0]?.total };
   }
 }
 export default CommonModel;

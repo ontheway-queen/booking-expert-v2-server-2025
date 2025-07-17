@@ -99,3 +99,25 @@ export interface IGetLastIdData {
   id: number;
   last_id: number;
 }
+
+export interface IInsertEmailSubscriberPayload {
+  email: string;
+  source: 'B2C' | 'AGENT B2C';
+  agency_id?: number;
+}
+export interface IGetEmailSubscriberPayload {
+  email?: string;
+  source_type?: 'B2C' | 'AGENT B2C';
+  agency_id?: number;
+  from_date?: string;
+  to_date?: string;
+  limit?: string;
+  skip?: string;
+  with_total: boolean;
+}
+export interface IGetEmailSubscriberData {
+  email: string;
+  source_type: 'B2C' | 'AGENT B2C';
+  agency_id?: number;
+  created_at: string;
+}

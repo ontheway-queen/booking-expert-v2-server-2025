@@ -197,4 +197,34 @@ export class AgentB2CMainService extends AbstractServices {
       }
     });
   }
+
+  public async createEmailSubscriber(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyB2CWhiteLabel;
+      const { email } = req.body as { email: string };
+
+      const commonModel = this.Model.CommonModel(trx);
+
+      const check = await commonModel.getEmailSubscriber({
+        agency_id,
+        source_type: 'AGENT B2C',
+        email,
+        with_total: false,
+      });
+
+      if (!check.data.length) {
+        await commonModel.insertEmailSubscriber({
+          email,
+          source: 'AGENT B2C',
+          agency_id,
+        });
+      }
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
+      };
+    });
+  }
 }

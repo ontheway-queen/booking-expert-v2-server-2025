@@ -23,5 +23,8 @@ export default class AgentHotelRouter extends AbstractRouter {
         this.controller.hotelBooking
       )
       .get(this.controller.getHotelBooking);
+    this.router
+      .route('/booking/:id')
+      .get(this.controller.getSingleHotelBooking);
   }
 }

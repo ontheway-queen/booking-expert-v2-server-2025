@@ -40,6 +40,10 @@ class AgentB2CMainController extends abstract_controller_1.default {
             const _a = yield this.service.matchEmailOtpService(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.createEmailSubscriber = this.asyncWrapper.wrap({ bodySchema: this.validator.createEmailSubscriber }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.createEmailSubscriber(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.AgentB2CMainController = AgentB2CMainController;

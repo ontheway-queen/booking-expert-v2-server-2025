@@ -14,6 +14,9 @@ class AgentB2CMainRouter extends abstract_router_1.default {
     callRouter() {
         this.router.route('/email-otp/send').post(this.controller.sendEmailOTP);
         this.router.route('/email-otp/match').post(this.controller.matchEmailOTP);
+        this.router
+            .route('/email-subscriber')
+            .post(this.controller.createEmailSubscriber);
     }
 }
 exports.default = AgentB2CMainRouter;

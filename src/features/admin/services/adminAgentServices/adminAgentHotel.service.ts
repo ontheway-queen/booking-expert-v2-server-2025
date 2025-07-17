@@ -43,9 +43,7 @@ export default class AdminAgentHotelService extends AbstractServices {
 
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    const data = await hotelBookingModel.getSingleAgentBookingForAdmin(
-      booking_id
-    );
+    const data = await hotelBookingModel.getSingleAgentBooking({ booking_id });
 
     if (!data) {
       return {

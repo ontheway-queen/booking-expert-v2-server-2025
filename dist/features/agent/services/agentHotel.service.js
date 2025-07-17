@@ -260,7 +260,7 @@ class AgentHotelService extends abstract_service_1.default {
                 const balanceLib = new balanceLib_1.default(trx);
                 // Check agent and markup set
                 const agent = yield agencyModel.checkAgency({
-                    agency_id,
+                    agency_id: ref_agent_id || agency_id,
                     status: 'Active',
                 });
                 if (!agent) {
@@ -451,7 +451,7 @@ class AgentHotelService extends abstract_service_1.default {
                     ref_type: constants_1.TYPE_FLIGHT,
                     total_amount: recheck.fee.total_price,
                     due: 0,
-                    details: `Auto invoice has been created for flight booking ref no. - ${booking_ref}`,
+                    details: `Auto invoice has been created for hotel booking ref no. - ${booking_ref}`,
                     type: constants_1.INVOICE_TYPES.SALE,
                     status: constants_1.INVOICE_STATUS_TYPES.ISSUED,
                 });
@@ -489,7 +489,7 @@ class AgentHotelService extends abstract_service_1.default {
             const { filter, from_date, limit, skip, to_date } = req.query;
             const hotelBookingModel = this.Model.HotelBookingModel();
             const data = yield hotelBookingModel.getHotelBooking({
-                source_type: 'AGENT',
+                source_type: constants_1.SOURCE_AGENT,
                 filter,
                 from_date,
                 to_date,

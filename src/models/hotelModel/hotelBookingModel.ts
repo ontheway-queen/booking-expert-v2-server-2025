@@ -140,14 +140,31 @@ export default class HotelBookingModel extends Schema {
     };
   }
 
-  public async getSingleAgentBookingForAdmin(
-    booking_id: number
-  ): Promise<IGetSingleBookingModelData | null> {
+  public async getSingleAgentBooking({
+    booking_id,
+    source_type,
+    source_id,
+    user_id,
+  }: {
+    booking_id: number;
+    source_id?: number;
+    user_id?: number;
+    source_type?: 'AGENT' | 'AGENT B2C';
+  }): Promise<IGetSingleBookingModelData | null> {
     return await this.db('agent_hotel_booking_view AS hb')
       .withSchema(this.DBO_SCHEMA)
       .select('hb.*')
       .where((qb) => {
         qb.andWhere('hb.id', booking_id);
+        if (source_type) {
+          qb.andWhere('hb.source_type', source_type);
+        }
+        if (source_id) {
+          qb.andWhere('hb.source_type', source_type);
+        }
+        if (user_id) {
+          qb.andWhere('hb.created_by', user_id);
+        }
       })
       .first();
   }

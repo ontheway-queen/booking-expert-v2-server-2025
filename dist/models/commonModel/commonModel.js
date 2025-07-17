@@ -407,5 +407,58 @@ class CommonModel extends schema_1.default {
                 .where({ id });
         });
     }
+    // Insert email subscriber
+    insertEmailSubscriber(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('email_subscriber')
+                .withSchema(this.DBO_SCHEMA)
+                .insert(payload);
+        });
+    }
+    getEmailSubscriber(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ agency_id, email, from_date, source_type, to_date, with_total, limit, skip, }) {
+            var _b;
+            const data = yield this.db('email_subscriber')
+                .withSchema(this.DBO_SCHEMA)
+                .select('*')
+                .where((qb) => {
+                if (agency_id) {
+                    qb.andWhere('agency_id', agency_id);
+                }
+                if (email) {
+                    qb.andWhere('email', email);
+                }
+                if (from_date && to_date) {
+                    qb.andWhereBetween('created_at', [from_date, to_date]);
+                }
+                if (source_type) {
+                    qb.andWhere('source_type', source_type);
+                }
+            })
+                .limit(Number(limit) || constants_1.DATA_LIMIT)
+                .offset(Number(skip) || 0);
+            let total = [];
+            if (with_total) {
+                total = yield this.db('email_subscriber')
+                    .withSchema(this.DBO_SCHEMA)
+                    .count('id AS total')
+                    .where((qb) => {
+                    if (agency_id) {
+                        qb.andWhere('agency_id', agency_id);
+                    }
+                    if (email) {
+                        qb.andWhere('email', email);
+                    }
+                    if (from_date && to_date) {
+                        qb.andWhereBetween('created_at', [from_date, to_date]);
+                    }
+                    if (source_type) {
+                        qb.andWhere('source_type', source_type);
+                    }
+                });
+            }
+            return { data, total: (_b = total[0]) === null || _b === void 0 ? void 0 : _b.total };
+        });
+    }
 }
 exports.default = CommonModel;

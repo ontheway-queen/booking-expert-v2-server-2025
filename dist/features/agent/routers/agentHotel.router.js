@@ -20,6 +20,9 @@ class AgentHotelRouter extends abstract_router_1.default {
             .route('/booking')
             .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENT_HOTEL_BOOKING_FILES), this.controller.hotelBooking)
             .get(this.controller.getHotelBooking);
+        this.router
+            .route('/booking/:id')
+            .get(this.controller.getSingleHotelBooking);
     }
 }
 exports.default = AgentHotelRouter;
