@@ -5,7 +5,6 @@ import config from '../../../config/config';
 import CustomError from '../../lib/customError';
 import FlightUtils from '../../lib/flight/flightUtils';
 import SabreRequests from '../../lib/flight/sabreRequest';
-
 import {
   FLIGHT_BOOKING_CANCELLED,
   FLIGHT_BOOKING_REFUNDED,
@@ -15,7 +14,7 @@ import {
   SABRE_API,
   SABRE_API_NAME,
   SABRE_FLIGHT_ITINS,
-} from '../../miscellaneous/flightConstent';
+} from '../../miscellaneous/flightConstant';
 
 import {
   ERROR_LEVEL_WARNING,
@@ -919,10 +918,10 @@ export default class SabreFlightService extends AbstractServices {
         cabin = 'Y';
         break;
       case '2':
-        cabin = 'S';
+        cabin = 'W';
         break;
       case '3':
-        cabin = 'C';
+        cabin = 'J';
         break;
       case '4':
         cabin = 'F';
@@ -931,7 +930,7 @@ export default class SabreFlightService extends AbstractServices {
       default:
         break;
     }
-    console.log({ cabin });
+
     const OriginDestinationInformation =
       reqBody.OriginDestinationInformation.map((item, index) => {
         const req_depart_air = item.OriginLocation.LocationCode;
@@ -1047,7 +1046,7 @@ export default class SabreFlightService extends AbstractServices {
               LCC: 'Disable',
             },
             VerificationItinCallLogic: {
-              Value: 'M',
+              Value: 'L',
               AlwaysCheckAvailability: true,
             },
           },

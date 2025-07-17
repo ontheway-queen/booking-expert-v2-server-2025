@@ -3,7 +3,7 @@ import {
   DATA_LIMIT,
   OTP_DEFAULT_EXPIRY,
 } from '../../utils/miscellaneous/constants';
-import { PRIORITY_AIRPORTS } from '../../utils/miscellaneous/flightConstent';
+import { PRIORITY_AIRPORTS } from '../../utils/miscellaneous/flightConstant';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   ICreateAirlinesPayload,

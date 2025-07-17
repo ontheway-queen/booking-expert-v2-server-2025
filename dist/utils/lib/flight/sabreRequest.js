@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const rootModel_1 = __importDefault(require("../../../models/rootModel"));
-const flightConstent_1 = require("../../miscellaneous/flightConstent");
+const flightConstant_1 = require("../../miscellaneous/flightConstant");
 const config_1 = __importDefault(require("../../../config/config"));
 const constants_1 = require("../../miscellaneous/constants");
 const BASE_URL = config_1.default.SABRE_URL;
@@ -24,7 +24,7 @@ class SabreRequests {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const authModel = new rootModel_1.default().CommonModel();
-                const token = yield authModel.getEnv(flightConstent_1.SABRE_TOKEN_ENV);
+                const token = yield authModel.getEnv(flightConstant_1.SABRE_TOKEN_ENV);
                 const headers = {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ class SabreRequests {
             try {
                 const apiUrl = BASE_URL + endpoint;
                 const authModel = new rootModel_1.default().CommonModel();
-                const token = yield authModel.getEnv(flightConstent_1.SABRE_TOKEN_ENV);
+                const token = yield authModel.getEnv(flightConstant_1.SABRE_TOKEN_ENV);
                 // console.log(token)
                 const headers = {
                     Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ class SabreRequests {
                         url: apiUrl,
                         http_method: 'POST',
                         metadata: {
-                            api: flightConstent_1.SABRE_API,
+                            api: flightConstant_1.SABRE_API,
                             endpoint: apiUrl,
                             payload: requestData,
                             response: response.data,

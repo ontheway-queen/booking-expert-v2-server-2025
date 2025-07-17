@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentFlightBookingSupportService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
-const flightConstent_1 = require("../../../miscellaneous/flightConstent");
+const flightConstant_1 = require("../../../miscellaneous/flightConstant");
 const lib_1 = __importDefault(require("../../../lib/lib"));
 const constants_1 = require("../../../miscellaneous/constants");
 const balanceLib_1 = __importDefault(require("../../../lib/balanceLib"));
@@ -71,7 +71,7 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
             const flightBookingModel = this.Model.FlightBookingModel(this.trx);
             yield flightBookingModel.updateFlightBooking({
                 status: payload.status,
-                api: payload.status === flightConstent_1.FLIGHT_TICKET_IN_PROCESS ? flightConstent_1.CUSTOM_API : undefined,
+                api: payload.status === flightConstant_1.FLIGHT_TICKET_IN_PROCESS ? flightConstant_1.CUSTOM_API : undefined,
                 issued_at: new Date(),
                 issued_by_type: payload.issued_by_type,
                 issued_by_user_id: payload.issued_by_user_id,
@@ -81,7 +81,7 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
             const tracking_data = [];
             tracking_data.push({
                 flight_booking_id: payload.booking_id,
-                description: `Ticket ${payload.status === flightConstent_1.FLIGHT_TICKET_IN_PROCESS
+                description: `Ticket ${payload.status === flightConstant_1.FLIGHT_TICKET_IN_PROCESS
                     ? 'has been issued'
                     : 'is in process'}. Issued by ${payload.issued_by_type}`,
             });
@@ -97,7 +97,7 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                     description: `${payload.paid_amount} amount has been paid for the booking (loan amount - ${payload.loan_amount}, balance amount - ${payload.paid_amount - payload.loan_amount}). Due amount is ${payload.due}`,
                 });
             }
-            if (payload.api === flightConstent_1.CUSTOM_API) {
+            if (payload.api === flightConstant_1.CUSTOM_API) {
                 tracking_data.push({
                     flight_booking_id: payload.booking_id,
                     description: `This was a custom API`,
@@ -158,7 +158,7 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
             }
             if (price_deduction) {
                 //check if the payment is eligible for partial payment
-                if (payload.payment_type === flightConstent_1.PAYMENT_TYPE_PARTIAL) {
+                if (payload.payment_type === flightConstant_1.PAYMENT_TYPE_PARTIAL) {
                     //case 1: refundable
                     if (!payload.refundable) {
                         return {
@@ -171,7 +171,7 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                     const departureDate = new Date(payload.departure_date);
                     const currentDate = new Date();
                     const timeDiff = departureDate.getTime() - currentDate.getTime();
-                    const minDiffInMilliSeconds = flightConstent_1.PARTIAL_PAYMENT_DEPARTURE_DATE * 24 * 60 * 60 * 1000;
+                    const minDiffInMilliSeconds = flightConstant_1.PARTIAL_PAYMENT_DEPARTURE_DATE * 24 * 60 * 60 * 1000;
                     if (timeDiff < minDiffInMilliSeconds) {
                         return {
                             success: false,
@@ -181,8 +181,8 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                     }
                 }
                 //check balance
-                let payable_amount = payload.payment_type === flightConstent_1.PAYMENT_TYPE_PARTIAL
-                    ? (payload.ticket_price * flightConstent_1.PARTIAL_PAYMENT_PERCENTAGE) / 100
+                let payable_amount = payload.payment_type === flightConstant_1.PAYMENT_TYPE_PARTIAL
+                    ? (payload.ticket_price * flightConstant_1.PARTIAL_PAYMENT_PERCENTAGE) / 100
                     : payload.ticket_price;
                 const balanceLib = new balanceLib_1.default(this.trx);
                 const check_balance = yield balanceLib.AgencyBalanceAvailabilityCheck({

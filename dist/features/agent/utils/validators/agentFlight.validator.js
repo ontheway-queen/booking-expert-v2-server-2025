@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("joi"));
-const flightConstent_1 = require("../../../../utils/miscellaneous/flightConstent");
+const flightConstant_1 = require("../../../../utils/miscellaneous/flightConstant");
 const lib_1 = __importDefault(require("../../../../utils/lib/lib"));
 class AgentFlightValidator {
     constructor() {
@@ -280,7 +280,7 @@ class AgentFlightValidator {
         });
         //GET FLIGHT LIST SCHEMA
         this.getFlightListSchema = joi_1.default.object({
-            status: joi_1.default.string().valid(flightConstent_1.FLIGHT_BOOKING_PENDING, flightConstent_1.FLIGHT_BOOKING_CONFIRMED, flightConstent_1.FLIGHT_BOOKING_VOID, flightConstent_1.FLIGHT_BOOKING_IN_PROCESS, flightConstent_1.FLIGHT_TICKET_IN_PROCESS, flightConstent_1.FLIGHT_BOOKING_ON_HOLD, flightConstent_1.FLIGHT_TICKET_ISSUE, flightConstent_1.FLIGHT_BOOKING_EXPIRED, flightConstent_1.FLIGHT_BOOKING_CANCELLED, flightConstent_1.FLIGHT_BOOKING_REFUNDED, flightConstent_1.FLIGHT_BOOKING_REISSUED),
+            status: joi_1.default.string().valid(flightConstant_1.FLIGHT_BOOKING_PENDING, flightConstant_1.FLIGHT_BOOKING_CONFIRMED, flightConstant_1.FLIGHT_BOOKING_VOID, flightConstant_1.FLIGHT_BOOKING_IN_PROCESS, flightConstant_1.FLIGHT_TICKET_IN_PROCESS, flightConstant_1.FLIGHT_BOOKING_ON_HOLD, flightConstant_1.FLIGHT_TICKET_ISSUE, flightConstant_1.FLIGHT_BOOKING_EXPIRED, flightConstant_1.FLIGHT_BOOKING_CANCELLED, flightConstant_1.FLIGHT_BOOKING_REFUNDED, flightConstant_1.FLIGHT_BOOKING_REISSUED),
             from_date: joi_1.default.date(),
             to_date: joi_1.default.date(),
             filter: joi_1.default.string(),
@@ -290,7 +290,7 @@ class AgentFlightValidator {
         //ISSUE TICKET SCHEMA
         this.issueTicketSchema = joi_1.default.object({
             payment_type: joi_1.default.string()
-                .valid(flightConstent_1.PAYMENT_TYPE_FULL, flightConstent_1.PAYMENT_TYPE_PARTIAL)
+                .valid(flightConstant_1.PAYMENT_TYPE_FULL, flightConstant_1.PAYMENT_TYPE_PARTIAL)
                 .required(),
         });
     }

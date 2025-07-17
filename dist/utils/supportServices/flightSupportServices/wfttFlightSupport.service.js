@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const wfttRequest_1 = __importDefault(require("../../lib/flight/wfttRequest"));
 const wfttApiEndpoints_1 = __importDefault(require("../../miscellaneous/wfttApiEndpoints"));
-const flightConstent_1 = require("../../miscellaneous/flightConstent");
+const flightConstant_1 = require("../../miscellaneous/flightConstant");
 const lib_1 = __importDefault(require("../../lib/lib"));
 const customError_1 = __importDefault(require("../../lib/customError"));
 const constants_1 = require("../../miscellaneous/constants");
@@ -49,16 +49,16 @@ class WfttFlightService extends abstract_service_1.default {
                 pref_type: 'PREFERRED',
                 status: true,
             };
-            if (route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC) {
+            if (route_type === flightConstant_1.ROUTE_TYPE.DOMESTIC) {
                 prefAirlinesQuery.domestic = true;
             }
-            else if (route_type === flightConstent_1.ROUTE_TYPE.FROM_DAC) {
+            else if (route_type === flightConstant_1.ROUTE_TYPE.FROM_DAC) {
                 prefAirlinesQuery.from_dac = true;
             }
-            else if (route_type === flightConstent_1.ROUTE_TYPE.TO_DAC) {
+            else if (route_type === flightConstant_1.ROUTE_TYPE.TO_DAC) {
                 prefAirlinesQuery.to_dac = true;
             }
-            else if (route_type === flightConstent_1.ROUTE_TYPE.SOTO) {
+            else if (route_type === flightConstant_1.ROUTE_TYPE.SOTO) {
                 prefAirlinesQuery.soto = true;
             }
             // Get preferred airlines
@@ -131,37 +131,37 @@ class WfttFlightService extends abstract_service_1.default {
                 pax_count += reqPax.Quantity;
             });
             const formattedData = yield Promise.all(data.map((item) => __awaiter(this, void 0, void 0, function* () {
-                const domestic_flight = route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC;
+                const domestic_flight = route_type === flightConstant_1.ROUTE_TYPE.DOMESTIC;
                 const { isDomesticFlight, fare: vendor_fare, api, carrier_code, carrier_logo, api_search_id, flights, passengers, refundable } = item, rest = __rest(item, ["isDomesticFlight", "fare", "api", "carrier_code", "carrier_logo", "api_search_id", "flights", "passengers", "refundable"]);
                 let partial_payment = {
                     partial_payment: false,
                     payment_percentage: 0,
                     travel_date_from_now: '',
                 };
-                if (route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC) {
+                if (route_type === flightConstant_1.ROUTE_TYPE.DOMESTIC) {
                     //domestic
                     partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.CUSTOM_API,
+                        flight_api_name: flightConstant_1.CUSTOM_API,
                         airline: carrier_code,
                         refundable,
                         travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
                         domestic: true,
                     });
                 }
-                else if (route_type === flightConstent_1.ROUTE_TYPE.FROM_DAC) {
+                else if (route_type === flightConstant_1.ROUTE_TYPE.FROM_DAC) {
                     //from dac
                     partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.CUSTOM_API,
+                        flight_api_name: flightConstant_1.CUSTOM_API,
                         airline: carrier_code,
                         from_dac: true,
                         refundable,
                         travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
                     });
                 }
-                else if (route_type === flightConstent_1.ROUTE_TYPE.TO_DAC) {
+                else if (route_type === flightConstant_1.ROUTE_TYPE.TO_DAC) {
                     //to dac
                     partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.CUSTOM_API,
+                        flight_api_name: flightConstant_1.CUSTOM_API,
                         airline: carrier_code,
                         to_dac: true,
                         refundable,
@@ -171,7 +171,7 @@ class WfttFlightService extends abstract_service_1.default {
                 else {
                     //soto
                     partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.CUSTOM_API,
+                        flight_api_name: flightConstant_1.CUSTOM_API,
                         airline: carrier_code,
                         refundable,
                         travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
@@ -273,7 +273,7 @@ class WfttFlightService extends abstract_service_1.default {
                 // });
                 // console.log({ fare });
                 return Object.assign(Object.assign({ domestic_flight,
-                    fare, price_changed: false, api_search_id: search_id, api: flightConstent_1.CUSTOM_API, api_name: flightConstent_1.CUSTOM_API_NAME, carrier_code, carrier_logo: career.logo, flights: newFlights, passengers: newPassenger, refundable,
+                    fare, price_changed: false, api_search_id: search_id, api: flightConstant_1.CUSTOM_API, api_name: flightConstant_1.CUSTOM_API_NAME, carrier_code, carrier_logo: career.logo, flights: newFlights, passengers: newPassenger, refundable,
                     partial_payment, modifiedFare: with_modified_fare
                         ? {
                             agent_discount,
@@ -300,7 +300,7 @@ class WfttFlightService extends abstract_service_1.default {
                 lib_1.default.writeJsonFile('wftt_revalidate_request', revalidate_body);
                 lib_1.default.writeJsonFile('wftt_revalidate_response', response);
                 throw new customError_1.default('External API Error', 500, constants_1.ERROR_LEVEL_WARNING, {
-                    api: flightConstent_1.CUSTOM_API,
+                    api: flightConstant_1.CUSTOM_API,
                     endpoint: wfttApiEndpoints_1.default.FLIGHT_REVALIDATE_ENDPOINT,
                     payload: revalidate_body,
                     response,

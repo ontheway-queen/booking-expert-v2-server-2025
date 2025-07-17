@@ -16,7 +16,7 @@ const axios_1 = __importDefault(require("axios"));
 const config_1 = __importDefault(require("../../../config/config"));
 const rootModel_1 = __importDefault(require("../../../models/rootModel"));
 const constants_1 = require("../../miscellaneous/constants");
-const flightConstent_1 = require("../../miscellaneous/flightConstent");
+const flightConstant_1 = require("../../miscellaneous/flightConstant");
 const BASE_URL = config_1.default.CT_URL;
 const API_KEY = config_1.default.CT_API_KEY;
 class CTHotelRequests {
@@ -41,7 +41,7 @@ class CTHotelRequests {
                         url: apiUrl,
                         http_method: 'GET',
                         metadata: {
-                            api: flightConstent_1.CT_API,
+                            api: flightConstant_1.CT_API,
                             endpoint: apiUrl,
                             payload: '',
                             response: data.message,
@@ -57,7 +57,7 @@ class CTHotelRequests {
                     url: apiUrl,
                     http_method: 'GET',
                     metadata: {
-                        api: flightConstent_1.CT_API,
+                        api: flightConstant_1.CT_API,
                         endpoint: apiUrl,
                         payload: '',
                         response: error,
@@ -92,7 +92,7 @@ class CTHotelRequests {
                         url: apiUrl,
                         http_method: 'POST',
                         metadata: {
-                            api: flightConstent_1.CT_API,
+                            api: flightConstant_1.CT_API,
                             endpoint: apiUrl,
                             payload: requestData,
                             response: response.data,
@@ -109,7 +109,7 @@ class CTHotelRequests {
                     url: apiUrl,
                     http_method: 'POST',
                     metadata: {
-                        api: flightConstent_1.CT_API,
+                        api: flightConstant_1.CT_API,
                         endpoint: apiUrl,
                         payload: requestData,
                         response: error,
@@ -144,7 +144,7 @@ class CTHotelRequests {
                         url: apiUrl,
                         http_method: 'POST',
                         metadata: {
-                            api: flightConstent_1.CT_API,
+                            api: flightConstant_1.CT_API,
                             endpoint: apiUrl,
                             payload: requestData,
                             response: response.data,
@@ -161,7 +161,7 @@ class CTHotelRequests {
                     url: apiUrl,
                     http_method: 'POST',
                     metadata: {
-                        api: flightConstent_1.CT_API,
+                        api: flightConstant_1.CT_API,
                         endpoint: apiUrl,
                         payload: requestData,
                         response: error,

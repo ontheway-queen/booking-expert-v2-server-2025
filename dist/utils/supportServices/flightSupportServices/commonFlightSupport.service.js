@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommonFlightSupportService = void 0;
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const redis_1 = require("../../../app/redis");
-const flightConstent_1 = require("../../miscellaneous/flightConstent");
+const flightConstant_1 = require("../../miscellaneous/flightConstant");
 const sabreFlightSupport_service_1 = __importDefault(require("./sabreFlightSupport.service"));
 const wfttFlightSupport_service_1 = __importDefault(require("./wfttFlightSupport.service"));
 const customError_1 = __importDefault(require("../../lib/customError"));
@@ -44,7 +44,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
                 api_name: foundItem.api,
             });
             let booking_block = foundItem.booking_block;
-            if (foundItem.api === flightConstent_1.SABRE_API) {
+            if (foundItem.api === flightConstant_1.SABRE_API) {
                 //SABRE REVALIDATE
                 const sabreSubService = new sabreFlightSupport_service_1.default(this.trx);
                 const formattedResBody = yield sabreSubService.SabreFlightRevalidate({
@@ -63,7 +63,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
                     retrievedData.response.leg_descriptions;
                 return formattedResBody;
             }
-            else if (foundItem.api === flightConstent_1.CUSTOM_API) {
+            else if (foundItem.api === flightConstant_1.CUSTOM_API) {
                 const customFlightService = new wfttFlightSupport_service_1.default(this.trx);
                 const formattedResBody = yield customFlightService.FlightRevalidate({
                     reqBody: retrievedData.reqBody,
@@ -97,7 +97,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
     }
     checkBookingPriceChange(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            const retrievedData = yield (0, redis_1.getRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${payload.flight_id}`);
+            const retrievedData = yield (0, redis_1.getRedis)(`${flightConstant_1.FLIGHT_REVALIDATE_REDIS_KEY}${payload.flight_id}`);
             if (!retrievedData) {
                 return null;
             }
@@ -113,7 +113,7 @@ class CommonFlightSupportService extends abstract_service_1.default {
         const now = new Date();
         const diffInMs = new Date(payload.journey_date).getTime() - now.getTime();
         const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-        return diffInDays < flightConstent_1.MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET;
+        return diffInDays < flightConstant_1.MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET;
     }
     //calculate convenience fee and discount
     calculateFlightMarkup(_a) {

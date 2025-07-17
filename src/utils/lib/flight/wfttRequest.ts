@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Models from '../../../models/rootModel';
-import { CUSTOM_API, WFTT_TOKEN_ENV } from '../../miscellaneous/flightConstent';
+import { CUSTOM_API, WFTT_TOKEN_ENV } from '../../miscellaneous/flightConstant';
 import config from '../../../config/config';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
 const BASE_URL = config.WFTT_URL;

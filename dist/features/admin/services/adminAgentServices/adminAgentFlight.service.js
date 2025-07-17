@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminAgentFlightService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
 const constants_1 = require("../../../../utils/miscellaneous/constants");
-const flightConstent_1 = require("../../../../utils/miscellaneous/flightConstent");
+const flightConstant_1 = require("../../../../utils/miscellaneous/flightConstant");
 const sabreFlightSupport_service_1 = __importDefault(require("../../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service"));
 const commonFlightBookingSupport_service_1 = require("../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service");
 const agentFlightBookingSupport_service_1 = require("../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service");
@@ -129,9 +129,9 @@ class AdminAgentFlightService extends abstract_service_1.default {
                     };
                 }
                 if (![
-                    flightConstent_1.FLIGHT_BOOKING_CONFIRMED,
-                    flightConstent_1.FLIGHT_BOOKING_PENDING,
-                    flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
+                    flightConstant_1.FLIGHT_BOOKING_CONFIRMED,
+                    flightConstant_1.FLIGHT_BOOKING_PENDING,
+                    flightConstant_1.FLIGHT_BOOKING_IN_PROCESS,
                 ].includes(booking_data.status)) {
                     return {
                         success: false,
@@ -140,7 +140,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                     };
                 }
                 let status = false;
-                if (booking_data.api === flightConstent_1.SABRE_API) {
+                if (booking_data.api === flightConstant_1.SABRE_API) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     const res = yield sabreSubService.SabreBookingCancelService({
                         pnr: String(booking_data.gds_pnr),
@@ -202,7 +202,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                if (booking_data.status !== flightConstent_1.FLIGHT_BOOKING_CONFIRMED) {
+                if (booking_data.status !== flightConstant_1.FLIGHT_BOOKING_CONFIRMED) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -216,7 +216,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 const agentBookingSubService = new agentFlightBookingSupport_service_1.AgentFlightBookingSupportService(trx);
                 const payment_data = yield agentBookingSubService.getPaymentInformation({
                     booking_id: Number(id),
-                    payment_type: flightConstent_1.PAYMENT_TYPE_FULL,
+                    payment_type: flightConstant_1.PAYMENT_TYPE_FULL,
                     refundable: booking_data.refundable,
                     departure_date: booking_data.travel_date,
                     agency_id: Number(booking_data.source_id),
@@ -239,11 +239,11 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 }
                 let status = null;
                 if (ticketIssuePermission.issue_block === true) {
-                    status = flightConstent_1.FLIGHT_TICKET_IN_PROCESS;
+                    status = flightConstant_1.FLIGHT_TICKET_IN_PROCESS;
                 }
                 else {
                     //issue ticket using API
-                    if (booking_data.api === flightConstent_1.SABRE_API) {
+                    if (booking_data.api === flightConstant_1.SABRE_API) {
                         const travelerSet = new Set(get_travelers.map((elem) => elem.type));
                         const unique_traveler = travelerSet.size;
                         const sabreSubService = new sabreFlightSupport_service_1.default(trx);
@@ -252,7 +252,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                             unique_traveler,
                         });
                         if (res === null || res === void 0 ? void 0 : res.success) {
-                            status = flightConstent_1.FLIGHT_TICKET_ISSUE;
+                            status = flightConstant_1.FLIGHT_TICKET_ISSUE;
                         }
                     }
                 }
@@ -362,7 +362,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                if (![flightConstent_1.FLIGHT_BOOKING_PENDING, flightConstent_1.FLIGHT_BOOKING_IN_PROCESS].includes(booking_data.status)) {
+                if (![flightConstant_1.FLIGHT_BOOKING_PENDING, flightConstant_1.FLIGHT_BOOKING_IN_PROCESS].includes(booking_data.status)) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -434,7 +434,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                if (booking_data.status !== flightConstent_1.FLIGHT_TICKET_IN_PROCESS) {
+                if (booking_data.status !== flightConstant_1.FLIGHT_TICKET_IN_PROCESS) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -442,7 +442,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                     };
                 }
                 yield flightBookingModel.updateFlightBooking({
-                    status: flightConstent_1.FLIGHT_TICKET_ISSUE,
+                    status: flightConstant_1.FLIGHT_TICKET_ISSUE,
                 }, { id: Number(id), source_type: constants_1.SOURCE_AGENT });
                 const { ticket_numbers, charge_credit } = req.body;
                 if (ticket_numbers && ticket_numbers.length > 0) {

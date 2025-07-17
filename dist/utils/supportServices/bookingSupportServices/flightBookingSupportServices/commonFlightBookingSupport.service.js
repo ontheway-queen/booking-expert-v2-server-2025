@@ -19,7 +19,7 @@ const emailSendLib_1 = __importDefault(require("../../../lib/emailSendLib"));
 const flightUtils_1 = __importDefault(require("../../../lib/flight/flightUtils"));
 const lib_1 = __importDefault(require("../../../lib/lib"));
 const constants_1 = require("../../../miscellaneous/constants");
-const flightConstent_1 = require("../../../miscellaneous/flightConstent");
+const flightConstant_1 = require("../../../miscellaneous/flightConstant");
 const flightBookingCancelTemplate_1 = require("../../../templates/flightBookingCancelTemplate");
 const flightBookingTemplate_1 = require("../../../templates/flightBookingTemplate");
 const flightTicketIssueTemplate_1 = require("../../../templates/flightTicketIssueTemplate");
@@ -58,11 +58,11 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 flight_number: payload.flight_number,
                 passengers,
                 status: [
-                    flightConstent_1.FLIGHT_BOOKING_CONFIRMED,
-                    flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
-                    flightConstent_1.FLIGHT_TICKET_IN_PROCESS,
-                    flightConstent_1.FLIGHT_BOOKING_ON_HOLD,
-                    flightConstent_1.FLIGHT_TICKET_ISSUE,
+                    flightConstant_1.FLIGHT_BOOKING_CONFIRMED,
+                    flightConstant_1.FLIGHT_BOOKING_IN_PROCESS,
+                    flightConstant_1.FLIGHT_TICKET_IN_PROCESS,
+                    flightConstant_1.FLIGHT_BOOKING_ON_HOLD,
+                    flightConstant_1.FLIGHT_TICKET_ISSUE,
                 ],
             });
             if (existingBooking > 0) {
@@ -78,7 +78,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 departure_date: payload.departure_date,
                 flight_number: payload.flight_number,
                 passengers,
-                status: [flightConstent_1.FLIGHT_BOOKING_CANCELLED],
+                status: [flightConstant_1.FLIGHT_BOOKING_CANCELLED],
             });
             if (cancelledBooking >= 2) {
                 return {
@@ -127,8 +127,8 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             });
             const booking_res = yield flightBookingModel.insertFlightBooking({
                 booking_ref,
-                api: payload.status === flightConstent_1.FLIGHT_BOOKING_IN_PROCESS
-                    ? flightConstent_1.CUSTOM_API
+                api: payload.status === flightConstant_1.FLIGHT_BOOKING_IN_PROCESS
+                    ? flightConstant_1.CUSTOM_API
                     : payload.flight_data.api,
                 api_booking_ref: payload.api_booking_ref,
                 refundable: payload.refundable,
@@ -201,11 +201,11 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 let passport_file = traveler.passport_file;
                 if ((_a = payload.files) === null || _a === void 0 ? void 0 : _a.length) {
                     for (const file of payload.files) {
-                        if (((_b = file.fieldname) === null || _b === void 0 ? void 0 : _b.split('-')[0]) === flightConstent_1.TRAVELER_FILE_TYPE_VISA &&
+                        if (((_b = file.fieldname) === null || _b === void 0 ? void 0 : _b.split('-')[0]) === flightConstant_1.TRAVELER_FILE_TYPE_VISA &&
                             ((_c = file.fieldname) === null || _c === void 0 ? void 0 : _c.split('-')[1]) == traveler.key) {
                             visa_file = file.filename;
                         }
-                        else if (((_d = file.fieldname) === null || _d === void 0 ? void 0 : _d.split('-')[0]) === flightConstent_1.TRAVELER_FILE_TYPE_PASSPORT &&
+                        else if (((_d = file.fieldname) === null || _d === void 0 ? void 0 : _d.split('-')[0]) === flightConstant_1.TRAVELER_FILE_TYPE_PASSPORT &&
                             ((_e = file.fieldname) === null || _e === void 0 ? void 0 : _e.split('-')[1]) == traveler.key) {
                             passport_file = file.filename;
                         }
@@ -257,7 +257,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                     description: `${payload.payable_amount} BDT has been paid for the booking`,
                 });
             }
-            if (payload.flight_data.api === flightConstent_1.CUSTOM_API) {
+            if (payload.flight_data.api === flightConstant_1.CUSTOM_API) {
                 tracking_data.push({
                     flight_booking_id: booking_res[0].id,
                     description: `This was a custom API`,
@@ -319,7 +319,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             //update booking
             const flightBookingModel = this.Model.FlightBookingModel(this.trx);
             yield flightBookingModel.updateFlightBooking({
-                status: flightConstent_1.FLIGHT_BOOKING_CANCELLED,
+                status: flightConstant_1.FLIGHT_BOOKING_CANCELLED,
                 cancelled_at: new Date(),
                 cancelled_by_type: payload.cancelled_by_type,
                 cancelled_by_user_id: payload.cancelled_by_user_id,

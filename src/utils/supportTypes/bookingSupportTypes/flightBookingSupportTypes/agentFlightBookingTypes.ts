@@ -9,7 +9,7 @@ import {
   FLIGHT_TICKET_ISSUE,
   PAYMENT_TYPE_FULL,
   PAYMENT_TYPE_PARTIAL,
-} from '../../../miscellaneous/flightConstent';
+} from '../../../miscellaneous/flightConstant';
 
 export interface ICheckAgentDirectTicketIssuePermissionPayload {
   agency_id: number;

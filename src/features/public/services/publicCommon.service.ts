@@ -3,7 +3,7 @@ import qs from 'qs';
 import AbstractServices from '../../../abstract/abstract.service';
 import config from '../../../config/config';
 import SabreAPIEndpoints from '../../../utils/miscellaneous/endpoints/sabreApiEndpoints';
-import { SABRE_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstent';
+import { SABRE_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstant';
 import { Request } from 'express';
 import { CTHotelSupportService } from '../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service';
 

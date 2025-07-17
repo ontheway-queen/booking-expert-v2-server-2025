@@ -13,7 +13,7 @@ import {
   FLIGHT_FARE_RESPONSE,
   FLIGHT_REVALIDATE_REDIS_KEY,
   SABRE_API,
-} from '../../../utils/miscellaneous/flightConstent';
+} from '../../../utils/miscellaneous/flightConstant';
 import SabreFlightService from '../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service';
 import WfttFlightService from '../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service';
 import Lib from '../../../utils/lib/lib';

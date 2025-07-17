@@ -2,7 +2,7 @@ import axios from 'axios';
 import config from '../../../config/config';
 import Models from '../../../models/rootModel';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
-import { CT_API } from '../../miscellaneous/flightConstent';
+import { CT_API } from '../../miscellaneous/flightConstant';
 const BASE_URL = config.CT_URL;
 const API_KEY = config.CT_API_KEY;
 

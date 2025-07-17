@@ -13,7 +13,7 @@ import {
   FLIGHT_TICKET_ISSUE,
   PAYMENT_TYPE_FULL,
   PAYMENT_TYPE_PARTIAL,
-} from '../../../../utils/miscellaneous/flightConstent';
+} from '../../../../utils/miscellaneous/flightConstant';
 
 export default class AgentB2CFlightValidator {
   // Cabin Pref Schema

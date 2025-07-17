@@ -12,7 +12,7 @@ import {
   PARTIAL_PAYMENT_DEPARTURE_DATE,
   PARTIAL_PAYMENT_PERCENTAGE,
   PAYMENT_TYPE_PARTIAL,
-} from '../../../miscellaneous/flightConstent';
+} from '../../../miscellaneous/flightConstant';
 import Lib from '../../../lib/lib';
 import {
   GENERATE_AUTO_UNIQUE_ID,

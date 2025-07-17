@@ -16,7 +16,7 @@ import {
   FLIGHT_TICKET_ISSUE,
   PAYMENT_TYPE_FULL,
   SABRE_API,
-} from '../../../../utils/miscellaneous/flightConstent';
+} from '../../../../utils/miscellaneous/flightConstant';
 import SabreFlightService from '../../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service';
 import { CommonFlightBookingSupportService } from '../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service';
 import { AgentFlightBookingSupportService } from '../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service';

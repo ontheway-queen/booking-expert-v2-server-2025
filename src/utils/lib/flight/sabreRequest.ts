@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Models from '../../../models/rootModel';
-import { SABRE_API, SABRE_TOKEN_ENV } from '../../miscellaneous/flightConstent';
+import { SABRE_API, SABRE_TOKEN_ENV } from '../../miscellaneous/flightConstant';
 import config from '../../../config/config';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';
 const BASE_URL = config.SABRE_URL;

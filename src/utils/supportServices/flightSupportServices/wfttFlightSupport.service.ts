@@ -17,7 +17,7 @@ import {
   CUSTOM_API,
   CUSTOM_API_NAME,
   ROUTE_TYPE,
-} from '../../miscellaneous/flightConstent';
+} from '../../miscellaneous/flightConstant';
 import Lib from '../../lib/lib';
 import CustomError from '../../lib/customError';
 import { ERROR_LEVEL_WARNING } from '../../miscellaneous/constants';

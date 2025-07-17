@@ -18,7 +18,7 @@ const config_1 = __importDefault(require("../../../config/config"));
 const customError_1 = __importDefault(require("../../lib/customError"));
 const flightUtils_1 = __importDefault(require("../../lib/flight/flightUtils"));
 const sabreRequest_1 = __importDefault(require("../../lib/flight/sabreRequest"));
-const flightConstent_1 = require("../../miscellaneous/flightConstent");
+const flightConstant_1 = require("../../miscellaneous/flightConstant");
 const constants_1 = require("../../miscellaneous/constants");
 const sabreApiEndpoints_1 = __importDefault(require("../../miscellaneous/endpoints/sabreApiEndpoints"));
 const commonFlightSupport_service_1 = require("./commonFlightSupport.service");
@@ -41,16 +41,16 @@ class SabreFlightService extends abstract_service_1.default {
                 pref_type: 'PREFERRED',
                 status: true,
             };
-            if (route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC) {
+            if (route_type === flightConstant_1.ROUTE_TYPE.DOMESTIC) {
                 prefAirlinesQuery.domestic = true;
             }
-            else if (route_type === flightConstent_1.ROUTE_TYPE.FROM_DAC) {
+            else if (route_type === flightConstant_1.ROUTE_TYPE.FROM_DAC) {
                 prefAirlinesQuery.from_dac = true;
             }
-            else if (route_type === flightConstent_1.ROUTE_TYPE.TO_DAC) {
+            else if (route_type === flightConstant_1.ROUTE_TYPE.TO_DAC) {
                 prefAirlinesQuery.to_dac = true;
             }
-            else if (route_type === flightConstent_1.ROUTE_TYPE.SOTO) {
+            else if (route_type === flightConstant_1.ROUTE_TYPE.SOTO) {
                 prefAirlinesQuery.soto = true;
             }
             // Get preferred airlines
@@ -142,7 +142,7 @@ class SabreFlightService extends abstract_service_1.default {
                     TPA_Extensions: {
                         IntelliSellTransaction: {
                             RequestType: {
-                                Name: flightConstent_1.SABRE_FLIGHT_ITINS,
+                                Name: flightConstant_1.SABRE_FLIGHT_ITINS,
                             },
                         },
                     },
@@ -187,13 +187,13 @@ class SabreFlightService extends abstract_service_1.default {
                 dynamic_fare_supplier_id,
                 pref_type: 'BLOCKED',
             };
-            if (route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC) {
+            if (route_type === flightConstant_1.ROUTE_TYPE.DOMESTIC) {
                 getBlockedAirlinesPayload.domestic = true;
             }
-            else if (route_type === flightConstent_1.ROUTE_TYPE.FROM_DAC) {
+            else if (route_type === flightConstant_1.ROUTE_TYPE.FROM_DAC) {
                 getBlockedAirlinesPayload.from_dac = true;
             }
-            else if (route_type === flightConstent_1.ROUTE_TYPE.TO_DAC) {
+            else if (route_type === flightConstant_1.ROUTE_TYPE.TO_DAC) {
                 getBlockedAirlinesPayload.to_dac = true;
             }
             else {
@@ -437,30 +437,30 @@ class SabreFlightService extends abstract_service_1.default {
                     payment_percentage: 0,
                     travel_date_from_now: '',
                 };
-                if (route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC) {
+                if (route_type === flightConstant_1.ROUTE_TYPE.DOMESTIC) {
                     //domestic
                     partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.SABRE_API,
+                        flight_api_name: flightConstant_1.SABRE_API,
                         airline: fare.validatingCarrierCode,
                         refundable,
                         travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
                         domestic: true,
                     });
                 }
-                else if (route_type === flightConstent_1.ROUTE_TYPE.FROM_DAC) {
+                else if (route_type === flightConstant_1.ROUTE_TYPE.FROM_DAC) {
                     //from dac
                     partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.SABRE_API,
+                        flight_api_name: flightConstant_1.SABRE_API,
                         airline: fare.validatingCarrierCode,
                         from_dac: true,
                         refundable,
                         travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
                     });
                 }
-                else if (route_type === flightConstent_1.ROUTE_TYPE.TO_DAC) {
+                else if (route_type === flightConstant_1.ROUTE_TYPE.TO_DAC) {
                     //to dac
                     partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.SABRE_API,
+                        flight_api_name: flightConstant_1.SABRE_API,
                         airline: fare.validatingCarrierCode,
                         to_dac: true,
                         refundable,
@@ -470,7 +470,7 @@ class SabreFlightService extends abstract_service_1.default {
                 else {
                     //soto
                     partial_payment = yield this.Model.PartialPaymentRuleModel(this.trx).getPartialPaymentCondition({
-                        flight_api_name: flightConstent_1.SABRE_API,
+                        flight_api_name: flightConstant_1.SABRE_API,
                         airline: fare.validatingCarrierCode,
                         refundable,
                         travel_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
@@ -584,14 +584,14 @@ class SabreFlightService extends abstract_service_1.default {
                     flight_id: flight_id || (0, uuid_1.v4)(),
                     api_search_id: '',
                     booking_block,
-                    domestic_flight: route_type === flightConstent_1.ROUTE_TYPE.DOMESTIC,
+                    domestic_flight: route_type === flightConstant_1.ROUTE_TYPE.DOMESTIC,
                     price_changed: false,
                     direct_ticket_issue: new commonFlightSupport_service_1.CommonFlightSupportService().checkDirectTicketIssue({
                         journey_date: reqBody.OriginDestinationInformation[0].DepartureDateTime,
                     }),
                     journey_type: reqBody.JourneyType,
-                    api: flightConstent_1.SABRE_API,
-                    api_name: flightConstent_1.SABRE_API_NAME,
+                    api: flightConstant_1.SABRE_API,
+                    api_name: flightConstant_1.SABRE_API_NAME,
                     fare: new_fare,
                     refundable,
                     carrier_code: fare.validatingCarrierCode,
@@ -660,10 +660,10 @@ class SabreFlightService extends abstract_service_1.default {
                     cabin = 'Y';
                     break;
                 case '2':
-                    cabin = 'S';
+                    cabin = 'W';
                     break;
                 case '3':
-                    cabin = 'C';
+                    cabin = 'J';
                     break;
                 case '4':
                     cabin = 'F';
@@ -671,7 +671,6 @@ class SabreFlightService extends abstract_service_1.default {
                 default:
                     break;
             }
-            console.log({ cabin });
             const OriginDestinationInformation = reqBody.OriginDestinationInformation.map((item, index) => {
                 const req_depart_air = item.OriginLocation.LocationCode;
                 const flights = [];
@@ -768,7 +767,7 @@ class SabreFlightService extends abstract_service_1.default {
                                 LCC: 'Disable',
                             },
                             VerificationItinCallLogic: {
-                                Value: 'M',
+                                Value: 'L',
                                 AlwaysCheckAvailability: true,
                             },
                         },
@@ -1094,7 +1093,7 @@ class SabreFlightService extends abstract_service_1.default {
             if (((_c = (_b = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _b === void 0 ? void 0 : _b.ApplicationResults) === null || _c === void 0 ? void 0 : _c.status) !==
                 'Complete') {
                 throw new customError_1.default('This flight is already booked. Please try booking another flight', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR, constants_1.ERROR_LEVEL_WARNING, {
-                    api: flightConstent_1.SABRE_API,
+                    api: flightConstant_1.SABRE_API,
                     endpoint: sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT,
                     payload: requestBody,
                     response: (_d = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _d === void 0 ? void 0 : _d.ApplicationResults,
@@ -1189,7 +1188,7 @@ class SabreFlightService extends abstract_service_1.default {
                         url: sabreApiEndpoints_1.default.GET_BOOKING_ENDPOINT,
                         http_method: 'POST',
                         metadata: {
-                            api: flightConstent_1.SABRE_API,
+                            api: flightConstant_1.SABRE_API,
                             endpoint: sabreApiEndpoints_1.default.GET_BOOKING_ENDPOINT,
                             payload: { confirmationId: pnr },
                             response: retrieve_booking,
@@ -1220,7 +1219,7 @@ class SabreFlightService extends abstract_service_1.default {
                     url: sabreApiEndpoints_1.default.TICKET_ISSUE_ENDPOINT,
                     http_method: 'POST',
                     metadata: {
-                        api: flightConstent_1.SABRE_API,
+                        api: flightConstant_1.SABRE_API,
                         endpoint: sabreApiEndpoints_1.default.TICKET_ISSUE_ENDPOINT,
                         payload: ticketReqBody,
                         response: response,
@@ -1268,7 +1267,7 @@ class SabreFlightService extends abstract_service_1.default {
                 //   source,
                 // });
                 throw new customError_1.default('An error occurred while cancelling the booking', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR, constants_1.ERROR_LEVEL_WARNING, {
-                    api: flightConstent_1.SABRE_API,
+                    api: flightConstant_1.SABRE_API,
                     endpoint: sabreApiEndpoints_1.default.CANCEL_BOOKING_ENDPOINT,
                     payload: cancelBookingBody,
                     response: response,
@@ -1301,15 +1300,15 @@ class SabreFlightService extends abstract_service_1.default {
             if (response) {
                 //pnr status
                 if (((_d = (_c = (_b = response === null || response === void 0 ? void 0 : response.flightTickets) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.ticketStatusName) === null || _d === void 0 ? void 0 : _d.toLowerCase()) ===
-                    flightConstent_1.FLIGHT_BOOKING_VOID) {
-                    status = flightConstent_1.FLIGHT_BOOKING_VOID;
+                    flightConstant_1.FLIGHT_BOOKING_VOID) {
+                    status = flightConstant_1.FLIGHT_BOOKING_VOID;
                 }
                 else if (((_g = (_f = (_e = response === null || response === void 0 ? void 0 : response.flightTickets) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.ticketStatusName) === null || _g === void 0 ? void 0 : _g.toLowerCase()) ===
-                    flightConstent_1.FLIGHT_BOOKING_REFUNDED) {
-                    status = flightConstent_1.FLIGHT_BOOKING_REFUNDED;
+                    flightConstant_1.FLIGHT_BOOKING_REFUNDED) {
+                    status = flightConstant_1.FLIGHT_BOOKING_REFUNDED;
                 }
                 else if (response === null || response === void 0 ? void 0 : response.isTicketed) {
-                    status = flightConstent_1.FLIGHT_TICKET_ISSUE;
+                    status = flightConstant_1.FLIGHT_TICKET_ISSUE;
                     //get ticket number
                     for (let i = 0; i < ((_h = response === null || response === void 0 ? void 0 : response.flightTickets) === null || _h === void 0 ? void 0 : _h.length); i++) {
                         ticket_number.push(response === null || response === void 0 ? void 0 : response.flightTickets[i].number);
@@ -1319,7 +1318,7 @@ class SabreFlightService extends abstract_service_1.default {
                     if ((response === null || response === void 0 ? void 0 : response.bookingId) &&
                         (response === null || response === void 0 ? void 0 : response.startDate) === undefined &&
                         (response === null || response === void 0 ? void 0 : response.endDate) === undefined) {
-                        status = flightConstent_1.FLIGHT_BOOKING_CANCELLED;
+                        status = flightConstant_1.FLIGHT_BOOKING_CANCELLED;
                     }
                 }
                 //get last time of ticket issue

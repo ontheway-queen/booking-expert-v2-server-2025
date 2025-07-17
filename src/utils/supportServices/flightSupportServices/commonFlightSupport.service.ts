@@ -6,7 +6,7 @@ import {
   FLIGHT_REVALIDATE_REDIS_KEY,
   MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET,
   SABRE_API,
-} from '../../miscellaneous/flightConstent';
+} from '../../miscellaneous/flightConstant';
 import {
   IFormattedFlightItinerary,
   IPassengerTypeQuantityPayload,

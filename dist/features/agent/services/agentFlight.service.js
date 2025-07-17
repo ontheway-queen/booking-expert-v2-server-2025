@@ -29,7 +29,7 @@ const abstract_service_1 = __importDefault(require("../../../abstract/abstract.s
 const redis_1 = require("../../../app/redis");
 const flightUtils_1 = __importDefault(require("../../../utils/lib/flight/flightUtils"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
-const flightConstent_1 = require("../../../utils/miscellaneous/flightConstent");
+const flightConstant_1 = require("../../../utils/miscellaneous/flightConstant");
 const agentFlightBookingSupport_service_1 = require("../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service");
 const commonFlightBookingSupport_service_1 = require("../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service");
 const commonFlightSupport_service_1 = require("../../../utils/supportServices/flightSupportServices/commonFlightSupport.service");
@@ -108,10 +108,10 @@ class AgentFlightService extends abstract_service_1.default {
                 let sabre_supplier_id = 0;
                 let custom_supplier_id = 0;
                 apiData.forEach((api) => {
-                    if (api.sup_api === flightConstent_1.SABRE_API) {
+                    if (api.sup_api === flightConstant_1.SABRE_API) {
                         sabre_supplier_id = api.id;
                     }
-                    if (api.sup_api === flightConstent_1.CUSTOM_API) {
+                    if (api.sup_api === flightConstant_1.CUSTOM_API) {
                         custom_supplier_id = api.id;
                     }
                 });
@@ -240,10 +240,10 @@ class AgentFlightService extends abstract_service_1.default {
                 let sabre_supplier_id = 0;
                 let custom_supplier_id = 0;
                 apiData.forEach((api) => {
-                    if (api.sup_api === flightConstent_1.SABRE_API) {
+                    if (api.sup_api === flightConstant_1.SABRE_API) {
                         sabre_supplier_id = api.id;
                     }
-                    if (api.sup_api === flightConstent_1.CUSTOM_API) {
+                    if (api.sup_api === flightConstant_1.CUSTOM_API) {
                         custom_supplier_id = api.id;
                     }
                 });
@@ -338,7 +338,7 @@ class AgentFlightService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: res ? res : flightConstent_1.FLIGHT_FARE_RESPONSE,
+                    data: res ? res : flightConstant_1.FLIGHT_FARE_RESPONSE,
                 };
             }));
         });
@@ -386,7 +386,7 @@ class AgentFlightService extends abstract_service_1.default {
                     markup_amount,
                 });
                 if (data) {
-                    yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
+                    yield (0, redis_1.setRedis)(`${flightConstant_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
                     const { fare, modifiedFare } = data, restData = __rest(data, ["fare", "modifiedFare"]);
                     const { vendor_price } = fare, restFare = __rest(fare, ["vendor_price"]);
                     return {
@@ -415,7 +415,7 @@ class AgentFlightService extends abstract_service_1.default {
             let new_booking_id;
             let new_booking_ref;
             const payload = {
-                status: flightConstent_1.FLIGHT_BOOKING_PENDING,
+                status: flightConstant_1.FLIGHT_BOOKING_PENDING,
             };
             const preBookData = yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const booking_confirm = body.booking_confirm;
@@ -547,7 +547,7 @@ class AgentFlightService extends abstract_service_1.default {
                 const { booking_id, booking_ref } = yield bookingSupportService.insertFlightBookingData({
                     gds_pnr: payload.gds_pnr,
                     airline_pnr: payload.airline_pnr,
-                    status: flightConstent_1.FLIGHT_BOOKING_PENDING,
+                    status: flightConstant_1.FLIGHT_BOOKING_PENDING,
                     api_booking_ref,
                     user_id,
                     user_name: name,
@@ -576,7 +576,7 @@ class AgentFlightService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 try {
                     if (booking_block === false) {
-                        if (data.api === flightConstent_1.SABRE_API) {
+                        if (data.api === flightConstant_1.SABRE_API) {
                             const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                             const gds_pnr = yield sabreSubService.FlightBookingService({
                                 body,
@@ -596,17 +596,17 @@ class AgentFlightService extends abstract_service_1.default {
                                 pnr: String(gds_pnr),
                             });
                             refundable = grnData.refundable;
-                            payload.status = flightConstent_1.FLIGHT_BOOKING_CONFIRMED;
+                            payload.status = flightConstant_1.FLIGHT_BOOKING_CONFIRMED;
                             if (grnData.airline_pnr) {
                                 payload.airline_pnr = grnData.airline_pnr;
                             }
                         }
-                        else if (data.api === flightConstent_1.CUSTOM_API) {
-                            payload.status = flightConstent_1.FLIGHT_BOOKING_IN_PROCESS;
+                        else if (data.api === flightConstant_1.CUSTOM_API) {
+                            payload.status = flightConstant_1.FLIGHT_BOOKING_IN_PROCESS;
                         }
                     }
                     else {
-                        payload.status = flightConstent_1.FLIGHT_BOOKING_IN_PROCESS;
+                        payload.status = flightConstant_1.FLIGHT_BOOKING_IN_PROCESS;
                     }
                 }
                 catch (err) {
@@ -793,14 +793,14 @@ class AgentFlightService extends abstract_service_1.default {
                 }
                 let status = null;
                 if (ticketIssuePermission.issue_block === true) {
-                    status = flightConstent_1.FLIGHT_TICKET_IN_PROCESS;
+                    status = flightConstant_1.FLIGHT_TICKET_IN_PROCESS;
                 }
-                else if (booking_data.api === flightConstent_1.CUSTOM_API) {
-                    status = flightConstent_1.FLIGHT_TICKET_IN_PROCESS;
+                else if (booking_data.api === flightConstant_1.CUSTOM_API) {
+                    status = flightConstant_1.FLIGHT_TICKET_IN_PROCESS;
                 }
                 else {
                     //issue ticket using API
-                    if (booking_data.api === flightConstent_1.SABRE_API) {
+                    if (booking_data.api === flightConstant_1.SABRE_API) {
                         const travelerSet = new Set(get_travelers.map((elem) => elem.type));
                         const unique_traveler = travelerSet.size;
                         const sabreSubService = new sabreFlightSupport_service_1.default(trx);
@@ -809,7 +809,7 @@ class AgentFlightService extends abstract_service_1.default {
                             unique_traveler,
                         });
                         if (res === null || res === void 0 ? void 0 : res.success) {
-                            status = flightConstent_1.FLIGHT_TICKET_ISSUE;
+                            status = flightConstant_1.FLIGHT_TICKET_ISSUE;
                         }
                     }
                 }
@@ -884,9 +884,9 @@ class AgentFlightService extends abstract_service_1.default {
                     };
                 }
                 if (![
-                    flightConstent_1.FLIGHT_BOOKING_CONFIRMED,
-                    flightConstent_1.FLIGHT_BOOKING_PENDING,
-                    flightConstent_1.FLIGHT_BOOKING_IN_PROCESS,
+                    flightConstant_1.FLIGHT_BOOKING_CONFIRMED,
+                    flightConstant_1.FLIGHT_BOOKING_PENDING,
+                    flightConstant_1.FLIGHT_BOOKING_IN_PROCESS,
                 ].includes(booking_data.status)) {
                     return {
                         success: false,
@@ -895,7 +895,7 @@ class AgentFlightService extends abstract_service_1.default {
                     };
                 }
                 let status = false;
-                if (booking_data.api === flightConstent_1.SABRE_API) {
+                if (booking_data.api === flightConstant_1.SABRE_API) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     const res = yield sabreSubService.SabreBookingCancelService({
                         pnr: String(booking_data.gds_pnr),
@@ -904,7 +904,7 @@ class AgentFlightService extends abstract_service_1.default {
                         status = true;
                     }
                 }
-                else if (booking_data.api === flightConstent_1.CUSTOM_API) {
+                else if (booking_data.api === flightConstant_1.CUSTOM_API) {
                     status = true;
                 }
                 if (status) {

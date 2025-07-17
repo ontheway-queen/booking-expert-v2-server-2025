@@ -11,7 +11,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const flightConstent_1 = require("../../miscellaneous/flightConstent");
+const flightConstant_1 = require("../../miscellaneous/flightConstant");
 const staticData_1 = require("../../miscellaneous/staticData");
 class FlightUtils {
     constructor() {
@@ -124,13 +124,13 @@ class FlightUtils {
     //get journey type
     getJourneyType(journey_type) {
         if (journey_type === '1') {
-            return flightConstent_1.JOURNEY_TYPE_ONE_WAY;
+            return flightConstant_1.JOURNEY_TYPE_ONE_WAY;
         }
         else if (journey_type === '2') {
-            return flightConstent_1.JOURNEY_TYPE_ROUND_TRIP;
+            return flightConstant_1.JOURNEY_TYPE_ROUND_TRIP;
         }
         else {
-            return flightConstent_1.JOURNEY_TYPE_MULTI_CITY;
+            return flightConstant_1.JOURNEY_TYPE_MULTI_CITY;
         }
     }
     //map flight availability
@@ -160,7 +160,7 @@ class FlightUtils {
     }
     // find route type
     routeTypeFinder({ airportsPayload, originDest, }) {
-        let route_type = flightConstent_1.ROUTE_TYPE.SOTO;
+        let route_type = flightConstant_1.ROUTE_TYPE.SOTO;
         let airports = [];
         if (originDest) {
             originDest.forEach((item) => {
@@ -172,16 +172,16 @@ class FlightUtils {
             airports = airportsPayload;
         }
         if (airports.every((airport) => staticData_1.BD_AIRPORT.includes(airport))) {
-            route_type = flightConstent_1.ROUTE_TYPE.DOMESTIC;
+            route_type = flightConstant_1.ROUTE_TYPE.DOMESTIC;
         }
         else if (staticData_1.BD_AIRPORT.includes(airports[0])) {
-            route_type = flightConstent_1.ROUTE_TYPE.FROM_DAC;
+            route_type = flightConstant_1.ROUTE_TYPE.FROM_DAC;
         }
         else if (airports.some((code) => staticData_1.BD_AIRPORT.includes(code))) {
-            route_type = flightConstent_1.ROUTE_TYPE.TO_DAC;
+            route_type = flightConstant_1.ROUTE_TYPE.TO_DAC;
         }
         else {
-            route_type = flightConstent_1.ROUTE_TYPE.SOTO;
+            route_type = flightConstant_1.ROUTE_TYPE.SOTO;
         }
         return route_type;
     }

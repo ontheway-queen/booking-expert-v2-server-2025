@@ -26,7 +26,7 @@ import {
   FLIGHT_TICKET_ISSUE,
   TRAVELER_FILE_TYPE_PASSPORT,
   TRAVELER_FILE_TYPE_VISA,
-} from '../../../miscellaneous/flightConstent';
+} from '../../../miscellaneous/flightConstant';
 import { MarkupType } from '../../../modelTypes/flightModelTypes/flightBookingModelTypes';
 import {
   MARKUP_MODE_DECREASE,

@@ -11,7 +11,7 @@ import {
   FLIGHT_BOOKING_VOID,
   FLIGHT_TICKET_IN_PROCESS,
   FLIGHT_TICKET_ISSUE,
-} from '../../../../../utils/miscellaneous/flightConstent';
+} from '../../../../../utils/miscellaneous/flightConstant';
 
 export class AdminAgentFlightValidator {
   public getFlightListSchema = Joi.object({

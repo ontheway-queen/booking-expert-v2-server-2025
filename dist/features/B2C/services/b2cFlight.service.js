@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.B2CFlightService = void 0;
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
-const flightConstent_1 = require("../../../utils/miscellaneous/flightConstent");
+const flightConstant_1 = require("../../../utils/miscellaneous/flightConstant");
 const sabreFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service"));
 const wfttFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service"));
 const uuid_1 = require("uuid");
@@ -49,10 +49,10 @@ class B2CFlightService extends abstract_service_1.default {
                 let sabre_set_flight_api_id = 0;
                 let wftt_set_flight_api_id = 0;
                 apiData.forEach((api) => {
-                    if (api.sup_api === flightConstent_1.SABRE_API) {
+                    if (api.sup_api === flightConstant_1.SABRE_API) {
                         sabre_set_flight_api_id = api.id;
                     }
-                    if (api.sup_api === flightConstent_1.CUSTOM_API) {
+                    if (api.sup_api === flightConstant_1.CUSTOM_API) {
                         wftt_set_flight_api_id = api.id;
                     }
                 });
@@ -142,10 +142,10 @@ class B2CFlightService extends abstract_service_1.default {
                 let sabre_set_flight_api_id = 0;
                 let custom_set_flight_api_id = 0;
                 apiData.forEach((api) => {
-                    if (api.sup_api === flightConstent_1.SABRE_API) {
+                    if (api.sup_api === flightConstant_1.SABRE_API) {
                         sabre_set_flight_api_id = api.id;
                     }
-                    if (api.sup_api === flightConstent_1.CUSTOM_API) {
+                    if (api.sup_api === flightConstant_1.CUSTOM_API) {
                         custom_set_flight_api_id = api.id;
                     }
                 });
@@ -240,7 +240,7 @@ class B2CFlightService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: res ? res : flightConstent_1.FLIGHT_FARE_RESPONSE,
+                    data: res ? res : flightConstant_1.FLIGHT_FARE_RESPONSE,
                 };
             }));
         });
@@ -267,7 +267,7 @@ class B2CFlightService extends abstract_service_1.default {
                     dynamic_fare_set_id: flight_markup_set,
                 });
                 if (data) {
-                    yield (0, redis_1.setRedis)(`${flightConstent_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
+                    yield (0, redis_1.setRedis)(`${flightConstant_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
                     return {
                         success: true,
                         message: 'Ticket has been revalidated successfully!',

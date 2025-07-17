@@ -3,7 +3,7 @@ import {
   JOURNEY_TYPE_ONE_WAY,
   JOURNEY_TYPE_ROUND_TRIP,
   ROUTE_TYPE,
-} from '../../miscellaneous/flightConstent';
+} from '../../miscellaneous/flightConstant';
 import {
   BD_AIRPORT,
   SABRE_CABIN_CODE,
