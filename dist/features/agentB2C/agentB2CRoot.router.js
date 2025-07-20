@@ -17,6 +17,7 @@ const authChecker_1 = __importDefault(require("../../middleware/authChecker/auth
 class AgentB2CRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
+        this.authChecker = new authChecker_1.default();
         // Router classes
         this.mainRouter = new agentB2CMain_router_1.default();
         this.flightRouter = new agentB2CFlight_router_1.default();
@@ -34,9 +35,9 @@ class AgentB2CRootRouter {
         this.Router.use('/flight', this.flightRouter.router);
         this.Router.use('/holiday', this.holidayRouter.router);
         this.Router.use('/hotel', this.hotelRouter.router);
-        this.Router.use('/profile', new authChecker_1.default().agencyB2CUserAuthChecker, this.profileRouter.router);
-        this.Router.use('/support-ticket', this.supportTicketRouter.router);
-        this.Router.use('/traveler', this.travelerRouter.router);
+        this.Router.use('/profile', this.authChecker.agencyB2CUserAuthChecker, this.profileRouter.router);
+        this.Router.use('/support-ticket', this.authChecker.agencyB2CUserAuthChecker, this.supportTicketRouter.router);
+        this.Router.use('/traveler', this.authChecker.agencyB2CUserAuthChecker, this.travelerRouter.router);
         this.Router.use('/umrah', this.umrahRouter.router);
         this.Router.use('/visa', this.visaRouter.router);
     }

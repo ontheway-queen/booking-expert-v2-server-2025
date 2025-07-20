@@ -10,6 +10,7 @@ class AgentB2CFlightRouter extends abstract_router_1.default {
     constructor() {
         super();
         this.controller = new agentB2CFlight_controller_1.default();
+        this.authChecker = new authChecker_1.default();
         this.callRouter();
     }
     callRouter() {
@@ -21,11 +22,11 @@ class AgentB2CFlightRouter extends abstract_router_1.default {
         this.router.route('/revalidate').post(this.controller.flightRevalidate);
         this.router
             .route('/booking')
-            .post(new authChecker_1.default().agencyB2CUserAuthChecker, this.uploader.cloudUploadRaw(this.fileFolders.AGENT_B2C_FLIGHT_BOOKING_FILES), this.controller.flightBooking)
-            .get(new authChecker_1.default().agencyB2CUserAuthChecker, this.controller.getAllBookingList);
+            .post(this.authChecker.agencyB2CUserAuthChecker, this.uploader.cloudUploadRaw(this.fileFolders.AGENT_B2C_FLIGHT_BOOKING_FILES), this.controller.flightBooking)
+            .get(this.authChecker.agencyB2CUserAuthChecker, this.controller.getAllBookingList);
         this.router
             .route('/booking/:id')
-            .get(new authChecker_1.default().agencyB2CUserAuthChecker, this.controller.getSingleBooking);
+            .get(this.authChecker.agencyB2CUserAuthChecker, this.controller.getSingleBooking);
     }
 }
 exports.default = AgentB2CFlightRouter;

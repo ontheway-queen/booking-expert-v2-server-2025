@@ -14,12 +14,18 @@ class AgentTravelerRouter extends abstract_router_1.default {
     callRouter() {
         this.router
             .route('/')
-            .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_TRAVELER_FILES, ['visa_file', 'passport_file']), this.controller.createTraveler)
+            .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_Traveler_FILES, [
+            'visa_file',
+            'passport_file',
+        ]), this.controller.createTraveler)
             .get(this.controller.getAllTraveler);
         this.router
             .route('/:id')
             .get(this.controller.getSingleTraveler)
-            .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_TRAVELER_FILES, ['visa_file', 'passport_file']), this.controller.updateTraveler)
+            .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_Traveler_FILES, [
+            'visa_file',
+            'passport_file',
+        ]), this.controller.updateTraveler)
             .delete(this.controller.deleteTraveler);
     }
 }
