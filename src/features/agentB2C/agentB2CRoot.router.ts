@@ -13,6 +13,8 @@ import AuthChecker from '../../middleware/authChecker/authChecker';
 export default class AgentB2CRootRouter {
   public Router = Router();
 
+  private authChecker = new AuthChecker();
+
   // Router classes
   private mainRouter = new AgentB2CMainRouter();
   private flightRouter = new AgentB2CFlightRouter();
@@ -35,11 +37,19 @@ export default class AgentB2CRootRouter {
     this.Router.use('/hotel', this.hotelRouter.router);
     this.Router.use(
       '/profile',
-      new AuthChecker().agencyB2CUserAuthChecker,
+      this.authChecker.agencyB2CUserAuthChecker,
       this.profileRouter.router
     );
-    this.Router.use('/support-ticket', this.supportTicketRouter.router);
-    this.Router.use('/traveler', this.travelerRouter.router);
+    this.Router.use(
+      '/support-ticket',
+      this.authChecker.agencyB2CUserAuthChecker,
+      this.supportTicketRouter.router
+    );
+    this.Router.use(
+      '/traveler',
+      this.authChecker.agencyB2CUserAuthChecker,
+      this.travelerRouter.router
+    );
     this.Router.use('/umrah', this.umrahRouter.router);
     this.Router.use('/visa', this.visaRouter.router);
   }

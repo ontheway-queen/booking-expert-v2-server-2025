@@ -4,6 +4,7 @@ import AgentB2CFlightController from '../controllers/agentB2CFlight.controller';
 
 export default class AgentB2CFlightRouter extends AbstractRouter {
   private controller = new AgentB2CFlightController();
+  private authChecker = new AuthChecker();
   constructor() {
     super();
     this.callRouter();
@@ -23,21 +24,21 @@ export default class AgentB2CFlightRouter extends AbstractRouter {
     this.router
       .route('/booking')
       .post(
-        new AuthChecker().agencyB2CUserAuthChecker,
+        this.authChecker.agencyB2CUserAuthChecker,
         this.uploader.cloudUploadRaw(
           this.fileFolders.AGENT_B2C_FLIGHT_BOOKING_FILES
         ),
         this.controller.flightBooking
       )
       .get(
-        new AuthChecker().agencyB2CUserAuthChecker,
+        this.authChecker.agencyB2CUserAuthChecker,
         this.controller.getAllBookingList
       );
 
     this.router
       .route('/booking/:id')
       .get(
-        new AuthChecker().agencyB2CUserAuthChecker,
+        this.authChecker.agencyB2CUserAuthChecker,
         this.controller.getSingleBooking
       );
   }

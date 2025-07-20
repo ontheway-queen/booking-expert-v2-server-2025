@@ -326,7 +326,6 @@ export default class AuthChecker {
       token = req.query.token as string;
     }
 
-    console.log({ token });
     if (!token) {
       res
         .status(StatusCode.HTTP_UNAUTHORIZED)
@@ -372,28 +371,24 @@ export default class AuthChecker {
       };
 
       // Check permission
-      type WhiteLabelEndpoint =
-        | 'flight'
-        | 'hotel'
-        | 'visa'
-        | 'holiday'
-        | 'umrah'
-        | 'group_fare'
-        | 'group_fare'
-        | 'blog';
+      const agencyB2CModules = [
+        'flight',
+        'hotel',
+        'visa',
+        'holiday',
+        'umrah',
+        'group_fare',
+        'group_fare',
+        'blog',
+        'agent-b2c',
+        'profile',
+        'email-otp',
+        'traveler',
+      ];
 
-      const endpoint = module as WhiteLabelEndpoint;
+      let hasPermission = agencyB2CModules.includes(module);
 
-      const hasPermission =
-        endpoint in req.agencyB2CWhiteLabel &&
-        req.agencyB2CWhiteLabel[endpoint] === true;
-
-      if (
-        !hasPermission &&
-        module !== 'agent-b2c' &&
-        module !== 'profile' &&
-        module !== 'email-otp'
-      ) {
+      if (!hasPermission) {
         res
           .status(StatusCode.HTTP_UNAUTHORIZED)
           .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
