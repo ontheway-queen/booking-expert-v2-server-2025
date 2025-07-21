@@ -472,6 +472,7 @@ class AgentB2CHotelService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
+            const {} = data;
             const traveler = yield hotelBookingModel.getHotelBookingTraveler(Number(id));
             return {
                 success: true,

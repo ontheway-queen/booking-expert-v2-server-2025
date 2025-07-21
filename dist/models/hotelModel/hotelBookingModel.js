@@ -107,16 +107,17 @@ class HotelBookingModel extends schema_1.default {
     }
     getSingleAgentBooking(_a) {
         return __awaiter(this, arguments, void 0, function* ({ booking_id, source_type, source_id, user_id, }) {
-            return yield this.db('agent_hotel_booking_view AS hb')
+            let tableName = 'agent_hotel_booking_view AS hb';
+            if (source_type === 'AGENT B2C') {
+                tableName = 'agent_b2c_hotel_booking_view AS hb';
+            }
+            return yield this.db(tableName)
                 .withSchema(this.DBO_SCHEMA)
                 .select('hb.*')
                 .where((qb) => {
                 qb.andWhere('hb.id', booking_id);
-                if (source_type) {
-                    qb.andWhere('hb.source_type', source_type);
-                }
                 if (source_id) {
-                    qb.andWhere('hb.source_type', source_type);
+                    qb.andWhere('hb.agency_id', source_id);
                 }
                 if (user_id) {
                     qb.andWhere('hb.created_by', user_id);
@@ -133,6 +134,22 @@ class HotelBookingModel extends schema_1.default {
                 .where((qb) => {
                 qb.andWhere('hbt.booking_id', booking_id);
             });
+        });
+    }
+    insertHotelBookingModifiedAmount(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('hotel_booking_modified_amount')
+                .withSchema(this.DBO_SCHEMA)
+                .insert(payload, 'id');
+        });
+    }
+    getHotelBookingModifiedAmount(booking_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('hotel_booking_modified_amount')
+                .withSchema(this.DBO_SCHEMA)
+                .select('*')
+                .where('booking_id', booking_id)
+                .first();
         });
     }
 }

@@ -322,6 +322,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
                 const { user_id } = req.admin;
+                const { status, airline_pnr, charge_credit, gds_pnr, ticket_issue_last_time, ticket_numbers, } = req.body;
                 const flightBookingModel = this.Model.FlightBookingModel(trx);
                 const booking_data = yield flightBookingModel.getSingleFlightBooking({
                     id: Number(id),

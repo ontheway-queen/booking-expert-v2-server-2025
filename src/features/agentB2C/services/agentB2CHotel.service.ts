@@ -557,6 +557,8 @@ export default class AgentB2CHotelService extends AbstractServices {
       };
     }
 
+    const {} = data;
+
     const traveler = await hotelBookingModel.getHotelBookingTraveler(
       Number(id)
     );
