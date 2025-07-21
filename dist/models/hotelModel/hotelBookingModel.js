@@ -56,7 +56,7 @@ class HotelBookingModel extends schema_1.default {
                     qb.andWhere('hb.source_id', source_id);
                 }
                 if (user_id) {
-                    qb.andWhere('hb.user_id', user_id);
+                    qb.andWhere('hb.created_by', user_id);
                 }
                 if (filter) {
                     qb.andWhere((qqb) => {
@@ -86,7 +86,7 @@ class HotelBookingModel extends schema_1.default {
                         qb.andWhere('hb.source_id', source_id);
                     }
                     if (user_id) {
-                        qb.andWhere('hb.user_id', user_id);
+                        qb.andWhere('hb.created_by', user_id);
                     }
                     if (filter) {
                         qb.andWhere((qqb) => {

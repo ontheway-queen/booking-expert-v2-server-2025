@@ -357,8 +357,6 @@ export default class AuthChecker {
 
       const module = req.originalUrl.split('/')[4] || '';
 
-      console.log({ module });
-
       req.agencyB2CWhiteLabel = {
         agency_id: Number(check_token?.agency_id),
         flight: Boolean(check_token?.flight),
@@ -378,7 +376,6 @@ export default class AuthChecker {
         'holiday',
         'umrah',
         'group_fare',
-        'group_fare',
         'blog',
         'agent-b2c',
         'profile',
@@ -394,6 +391,7 @@ export default class AuthChecker {
           .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
         return;
       }
+
       next();
     }
   };

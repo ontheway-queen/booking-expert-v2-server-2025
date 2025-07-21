@@ -83,7 +83,7 @@ export default class HotelBookingModel extends Schema {
         }
 
         if (user_id) {
-          qb.andWhere('hb.user_id', user_id);
+          qb.andWhere('hb.created_by', user_id);
         }
 
         if (filter) {
@@ -119,7 +119,7 @@ export default class HotelBookingModel extends Schema {
           }
 
           if (user_id) {
-            qb.andWhere('hb.user_id', user_id);
+            qb.andWhere('hb.created_by', user_id);
           }
 
           if (filter) {

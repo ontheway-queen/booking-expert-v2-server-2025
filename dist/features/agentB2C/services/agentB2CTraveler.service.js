@@ -67,7 +67,7 @@ class AgentB2CTravelerService extends abstract_service_1.default {
     getSingleTraveler(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyUser;
+                const { agency_id, user_id } = req.agencyB2CUser;
                 const travelerModel = this.Model.TravelerModel(trx);
                 const { id } = req.params;
                 const data = yield travelerModel.getSingleTraveler({
@@ -94,7 +94,7 @@ class AgentB2CTravelerService extends abstract_service_1.default {
     updateTraveler(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyUser;
+                const { agency_id, user_id } = req.agencyB2CUser;
                 const travelerModel = this.Model.TravelerModel(trx);
                 const { id } = req.params;
                 const data = yield travelerModel.getSingleTraveler({
@@ -134,7 +134,7 @@ class AgentB2CTravelerService extends abstract_service_1.default {
     deleteTraveler(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyUser;
+                const { agency_id, user_id } = req.agencyB2CUser;
                 const travelerModel = this.Model.TravelerModel(trx);
                 const { id } = req.params;
                 const data = yield travelerModel.getSingleTraveler({
@@ -147,7 +147,7 @@ class AgentB2CTravelerService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 yield travelerModel.deleteTraveler(Number(id));

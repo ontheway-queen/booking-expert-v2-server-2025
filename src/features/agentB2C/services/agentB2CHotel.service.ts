@@ -249,7 +249,8 @@ export default class AgentB2CHotelService extends AbstractServices {
 
   public async hotelBook(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id } = req.agencyB2CWhiteLabel;
+      const { user_id } = req.agencyB2CUser;
       const ctHotelSupport = new CTHotelSupportService(trx);
       const agencyModel = this.Model.AgencyModel(trx);
       const hotelBookingModel = this.Model.HotelBookingModel(trx);
@@ -335,7 +336,7 @@ export default class AgentB2CHotelService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: 'Insufficient credit. Please add funds to continue.',
+          message: 'Insufficient Agent credit. Please add funds to continue.',
         };
       }
 
@@ -481,7 +482,7 @@ export default class AgentB2CHotelService extends AbstractServices {
         invoice_no,
         source_type: SOURCE_AGENT_B2C,
         source_id: agency_id,
-        user_id: user_id,
+        user_id,
         ref_id: hotelBooking[0].id,
         ref_type: TYPE_HOTEL,
         total_amount: recheck.fee.total_price,
@@ -504,7 +505,9 @@ export default class AgentB2CHotelService extends AbstractServices {
   }
 
   public async hotelHotelBookingList(req: Request) {
-    const { agency_id, user_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyB2CWhiteLabel;
+    const { user_id } = req.agencyB2CUser;
+
     const { filter, from_date, limit, skip, to_date } =
       req.query as IAgentB2CGetHotelBookingQuery;
     const hotelBookingModel = this.Model.HotelBookingModel();
@@ -533,7 +536,9 @@ export default class AgentB2CHotelService extends AbstractServices {
   }
 
   public async singleHotelBooking(req: Request) {
-    const { agency_id, user_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyB2CWhiteLabel;
+    const { user_id } = req.agencyB2CUser;
+
     const { id } = req.params;
     const hotelBookingModel = this.Model.HotelBookingModel();
 

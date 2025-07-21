@@ -68,7 +68,7 @@ export default class AgentB2CTravelerService extends AbstractServices {
 
   public async getSingleTraveler(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyUser;
+      const { agency_id, user_id } = req.agencyB2CUser;
       const travelerModel = this.Model.TravelerModel(trx);
       const { id } = req.params;
       const data = await travelerModel.getSingleTraveler({
@@ -95,7 +95,7 @@ export default class AgentB2CTravelerService extends AbstractServices {
 
   public async updateTraveler(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyUser;
+      const { agency_id, user_id } = req.agencyB2CUser;
       const travelerModel = this.Model.TravelerModel(trx);
       const { id } = req.params;
       const data = await travelerModel.getSingleTraveler({
@@ -135,7 +135,7 @@ export default class AgentB2CTravelerService extends AbstractServices {
 
   public async deleteTraveler(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyUser;
+      const { agency_id, user_id } = req.agencyB2CUser;
       const travelerModel = this.Model.TravelerModel(trx);
       const { id } = req.params;
       const data = await travelerModel.getSingleTraveler({
@@ -148,7 +148,7 @@ export default class AgentB2CTravelerService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
 

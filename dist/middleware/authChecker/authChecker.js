@@ -298,7 +298,6 @@ class AuthChecker {
                     return;
                 }
                 const module = req.originalUrl.split('/')[4] || '';
-                console.log({ module });
                 req.agencyB2CWhiteLabel = {
                     agency_id: Number(check_token === null || check_token === void 0 ? void 0 : check_token.agency_id),
                     flight: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.flight),
@@ -316,7 +315,6 @@ class AuthChecker {
                     'visa',
                     'holiday',
                     'umrah',
-                    'group_fare',
                     'group_fare',
                     'blog',
                     'agent-b2c',
