@@ -12,4 +12,8 @@ export default class AgentProfileValidator {
     old_password: Joi.string().trim().required().min(8).max(100),
     new_password: Joi.string().trim().required().min(8).max(100),
   });
+
+  public searchDataSchema = Joi.object({
+    filter: Joi.string().trim().required().max(100),
+  });
 }

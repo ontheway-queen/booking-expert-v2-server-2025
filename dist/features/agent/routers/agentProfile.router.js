@@ -20,6 +20,7 @@ class AgentProfileRouter extends abstract_router_1.default {
         // Change Password
         this.router.route('/change-password').post(this.controller.changePassword);
         this.router.route('/dashboard').get(this.controller.getDashboardData);
+        this.router.route('/search').get(this.controller.searchData);
     }
 }
 exports.default = AgentProfileRouter;

@@ -220,6 +220,17 @@ export default class AgentProfileService extends AbstractServices {
   public async searchData(req: Request) {
     return this.db.transaction(async (trx) => {
       const filter = req.query.filter as string;
+      const { agency_id } = req.agencyUser;
+
+      const agencyModel = this.Model.AgencyModel(trx);
+      const data = await agencyModel.searchModel(filter, agency_id);
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data,
+      };
     });
   }
 }

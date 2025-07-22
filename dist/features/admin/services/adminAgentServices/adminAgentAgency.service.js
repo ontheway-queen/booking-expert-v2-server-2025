@@ -489,7 +489,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     }
                 }
                 yield emailSendLib_1.default.sendEmail({
-                    email: body.email,
+                    email: `${body.email}, ${constants_1.ADMIN_NOTIFY_EMAIL}`,
                     emailSub: `Booking Expert Agency Credentials`,
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(body.agency_name, {
                         email: body.email,

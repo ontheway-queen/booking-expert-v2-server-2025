@@ -16,6 +16,9 @@ class AgentProfileValidator {
             old_password: joi_1.default.string().trim().required().min(8).max(100),
             new_password: joi_1.default.string().trim().required().min(8).max(100),
         });
+        this.searchDataSchema = joi_1.default.object({
+            filter: joi_1.default.string().trim().required().max(100),
+        });
     }
 }
 exports.default = AgentProfileValidator;

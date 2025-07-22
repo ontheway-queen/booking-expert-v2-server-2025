@@ -205,6 +205,15 @@ class AgentProfileService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const filter = req.query.filter;
+                const { agency_id } = req.agencyUser;
+                const agencyModel = this.Model.AgencyModel(trx);
+                const data = yield agencyModel.searchModel(filter, agency_id);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data,
+                };
             }));
         });
     }

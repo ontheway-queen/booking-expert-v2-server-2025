@@ -47,4 +47,12 @@ export default class AgentProfileController extends AbstractController {
       res.status(code).json(data);
     }
   );
+
+  public searchData = this.asyncWrapper.wrap(
+    { querySchema: this.validator.searchDataSchema },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.searchData(req);
+      res.status(code).json(data);
+    }
+  );
 }

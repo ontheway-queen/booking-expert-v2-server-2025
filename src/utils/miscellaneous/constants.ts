@@ -44,6 +44,7 @@ export const B2C_PROJECT_LINK = 'https://bookingexpert.us';
 export const PROJECT_EMAIL = 'support@bookingexpert.us';
 export const PROJECT_NUMBER = '+880 1958-398347';
 export const PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
+export const ADMIN_NOTIFY_EMAIL = 'ota.bookingexpert@gmail.com';
 
 // Email subject
 export const OTP_EMAIL_SUBJECT = 'Your One Time Password For Verification';

@@ -13,6 +13,7 @@ import { ITokenParseAgencyUser } from '../../../public/utils/types/publicCommon.
 import Lib from '../../../../utils/lib/lib';
 import config from '../../../../config/config';
 import {
+  ADMIN_NOTIFY_EMAIL,
   GENERATE_AUTO_UNIQUE_ID,
   TYPE_FLIGHT,
   TYPE_HOTEL,
@@ -606,7 +607,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
       }
 
       await EmailSendLib.sendEmail({
-        email: body.email,
+        email: `${body.email}, ${ADMIN_NOTIFY_EMAIL}`,
         emailSub: `Booking Expert Agency Credentials`,
         emailBody: registrationVerificationCompletedTemplate(body.agency_name, {
           email: body.email,

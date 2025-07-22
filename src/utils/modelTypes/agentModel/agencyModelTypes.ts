@@ -282,3 +282,11 @@ export interface IGetAgentDashboardData {
     total_issued: string;
   }[];
 }
+
+export interface ISearchAgentData {
+  source: string;
+  id: number;
+  title: string;
+  status: string;
+  description: string;
+}
