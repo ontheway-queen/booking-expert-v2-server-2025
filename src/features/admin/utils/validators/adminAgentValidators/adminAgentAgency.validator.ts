@@ -22,6 +22,7 @@ export default class AdminAgentAgencyValidator {
     white_label: Joi.boolean().optional(),
     allow_api: Joi.boolean().optional(),
     status: Joi.string().valid('Active', 'Inactive').optional(),
+    book_permission: Joi.boolean().optional(),
     white_label_permissions: Joi.string()
       .optional()
       .custom((value, helpers) => {
@@ -52,6 +53,7 @@ export default class AdminAgentAgencyValidator {
 
   public updateAgencyApplication = Joi.object({
     status: Joi.string().valid('Active', 'Rejected').required(),
+    book_permission: Joi.boolean().required(),
     flight_markup_set: Joi.alternatives().conditional('status', {
       is: 'Active',
       then: Joi.number().required(),
@@ -77,6 +79,7 @@ export default class AdminAgentAgencyValidator {
     kam_id: Joi.number().required(),
     ref_id: Joi.number().optional(),
     white_label: Joi.boolean().required(),
+    book_permission: Joi.boolean().required(),
     allow_api: Joi.boolean().required(),
     white_label_permissions: Joi.string()
       .optional()

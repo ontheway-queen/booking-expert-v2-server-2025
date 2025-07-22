@@ -32,7 +32,6 @@ export interface IInsertHotelBookingPayload {
   refundable: boolean;
   free_cancellation?: boolean;
   free_cancellation_last_date?: string;
-  agent_sell_price?: string;
   hotel_extra_charges?: string;
   status: string;
   hotel_data: string;
@@ -87,16 +86,65 @@ export interface IGetSingleBookingModelData {
   id: number;
   booking_ref: string;
   hotel_code: number;
-  sell_price: string;
+  hotel_name: string;
   checkin_date: string;
   checkout_date: string;
+  supplier: string;
+  source_type: string;
+  agency_id: number | null;
+  agency_name: string | null;
+  created_by: number;
+  created_by_name: string;
+  created_at: string;
+  holder: {
+    title: string;
+    name: string;
+    surname: string;
+    email: string;
+    phone: string;
+    client_nationality: string;
+  };
+  supplier_price: {
+    price: number;
+    tax: number;
+    total_price: number;
+  };
+  sell_price: {
+    price: number;
+    tax: number;
+    total_price: number;
+  };
+  confirmation_no?: string;
+  supplier_ref?: string;
+  refundable: boolean;
+  free_cancellation?: boolean;
+  agent_sell_price?: {};
   status: string;
   finalized: boolean;
-  created_at: string;
 }
 
 export interface IInsertHotelBookingCancellationPayload {
   booking_id: number;
   from_date: string;
   fee: number;
+}
+export interface IInsertHotelBookingModifiedAmountPayload {
+  booking_id: number;
+  markup?: number;
+  discount?: number;
+  agent_markup?: number;
+  agent_discount?: number;
+  cancel_markup?: number;
+  cancel_discount?: number;
+}
+
+export interface IInsertHotelBookingModifiedAmountData {
+  id: number;
+  booking_id: number;
+  markup?: string;
+  discount?: string;
+  agent_markup?: string;
+  agent_discount?: string;
+  cancel_markup?: string;
+  cancel_discount?: string;
 }

@@ -522,6 +522,15 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
+      if (!agency_details.book_permission) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_FORBIDDEN,
+          message:
+            'Booking permission is not allowed, please contact with the authority',
+        };
+      }
+
       //get sub agent markup
       let markup_amount = undefined;
 

@@ -6,6 +6,8 @@ import {
   IGetBookingModelQuery,
   IGetSingleBookingModelData,
   IInsertHotelBookingCancellationPayload,
+  IInsertHotelBookingModifiedAmountData,
+  IInsertHotelBookingModifiedAmountPayload,
   IInsertHotelBookingPayload,
   IInsertHotelBookingTravelerPayload,
 } from '../../utils/modelTypes/hotelModelTypes/hotelBookingModelTypes';
@@ -83,7 +85,7 @@ export default class HotelBookingModel extends Schema {
         }
 
         if (user_id) {
-          qb.andWhere('hb.user_id', user_id);
+          qb.andWhere('hb.created_by', user_id);
         }
 
         if (filter) {
@@ -119,7 +121,7 @@ export default class HotelBookingModel extends Schema {
           }
 
           if (user_id) {
-            qb.andWhere('hb.user_id', user_id);
+            qb.andWhere('hb.created_by', user_id);
           }
 
           if (filter) {
@@ -151,16 +153,19 @@ export default class HotelBookingModel extends Schema {
     user_id?: number;
     source_type?: 'AGENT' | 'AGENT B2C';
   }): Promise<IGetSingleBookingModelData | null> {
-    return await this.db('agent_hotel_booking_view AS hb')
+    let tableName = 'agent_hotel_booking_view AS hb';
+    if (source_type === 'AGENT B2C') {
+      tableName = 'agent_b2c_hotel_booking_view AS hb';
+    }
+
+    return await this.db(tableName)
       .withSchema(this.DBO_SCHEMA)
       .select('hb.*')
       .where((qb) => {
         qb.andWhere('hb.id', booking_id);
-        if (source_type) {
-          qb.andWhere('hb.source_type', source_type);
-        }
+
         if (source_id) {
-          qb.andWhere('hb.source_type', source_type);
+          qb.andWhere('hb.agency_id', source_id);
         }
         if (user_id) {
           qb.andWhere('hb.created_by', user_id);
@@ -176,5 +181,23 @@ export default class HotelBookingModel extends Schema {
       .where((qb) => {
         qb.andWhere('hbt.booking_id', booking_id);
       });
+  }
+
+  public async insertHotelBookingModifiedAmount(
+    payload: IInsertHotelBookingModifiedAmountPayload
+  ) {
+    return await this.db('hotel_booking_modified_amount')
+      .withSchema(this.DBO_SCHEMA)
+      .insert(payload, 'id');
+  }
+
+  public async getHotelBookingModifiedAmount(
+    booking_id: number
+  ): Promise<IInsertHotelBookingModifiedAmountData | null> {
+    return await this.db('hotel_booking_modified_amount')
+      .withSchema(this.DBO_SCHEMA)
+      .select('*')
+      .where('booking_id', booking_id)
+      .first();
   }
 }

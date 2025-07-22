@@ -227,7 +227,8 @@ class AgentB2CHotelService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 var _a, _b, _c;
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id } = req.agencyB2CWhiteLabel;
+                const { user_id } = req.agencyB2CUser;
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const agencyModel = this.Model.AgencyModel(trx);
                 const hotelBookingModel = this.Model.HotelBookingModel(trx);
@@ -299,7 +300,7 @@ class AgentB2CHotelService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: 'Insufficient credit. Please add funds to continue.',
+                        message: 'Insufficient Agent credit. Please add funds to continue.',
                     };
                 }
                 const payload = body;
@@ -406,7 +407,7 @@ class AgentB2CHotelService extends abstract_service_1.default {
                     invoice_no,
                     source_type: constants_1.SOURCE_AGENT_B2C,
                     source_id: agency_id,
-                    user_id: user_id,
+                    user_id,
                     ref_id: hotelBooking[0].id,
                     ref_type: constants_1.TYPE_HOTEL,
                     total_amount: recheck.fee.total_price,
@@ -429,7 +430,8 @@ class AgentB2CHotelService extends abstract_service_1.default {
     }
     hotelHotelBookingList(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id, user_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyB2CWhiteLabel;
+            const { user_id } = req.agencyB2CUser;
             const { filter, from_date, limit, skip, to_date } = req.query;
             const hotelBookingModel = this.Model.HotelBookingModel();
             const data = yield hotelBookingModel.getHotelBooking({
@@ -453,7 +455,8 @@ class AgentB2CHotelService extends abstract_service_1.default {
     }
     singleHotelBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id, user_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyB2CWhiteLabel;
+            const { user_id } = req.agencyB2CUser;
             const { id } = req.params;
             const hotelBookingModel = this.Model.HotelBookingModel();
             const data = yield hotelBookingModel.getSingleAgentBooking({
@@ -469,6 +472,7 @@ class AgentB2CHotelService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
+            const {} = data;
             const traveler = yield hotelBookingModel.getHotelBookingTraveler(Number(id));
             return {
                 success: true,

@@ -431,6 +431,13 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'No markup set has been found for the agency',
                     };
                 }
+                if (!agency_details.book_permission) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_FORBIDDEN,
+                        message: 'Booking permission is not allowed, please contact with the authority',
+                    };
+                }
                 //get sub agent markup
                 let markup_amount = undefined;
                 if (agency_type === 'Sub Agent') {

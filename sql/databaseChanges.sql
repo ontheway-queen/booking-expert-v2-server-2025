@@ -3,3 +3,6 @@
 -- dbo.type_invoice_ref new type, and change invoice ref_type column data type to this type.
 -- dbo.flight_booking discount default 0
 -- new table dbo.flight_booking_modified_amount
+-- new table dbo.hotel_booking_modified_amount
+-- remove column hotel_booking.agent_sell_price also from view
+-- agent.agency add column book_permission

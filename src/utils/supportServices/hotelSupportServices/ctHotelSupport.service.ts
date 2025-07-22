@@ -264,6 +264,8 @@ export class CTHotelSupportService extends AbstractServices {
     markup_set,
     payload,
     markup_amount,
+    with_agent_markup,
+    with_vendor_price,
   }: {
     payload: {
       search_id: string;
@@ -344,6 +346,7 @@ export class CTHotelSupportService extends AbstractServices {
         tax: fee.total_tax,
         total_price: fee.total_fee,
       },
+      markup_amount,
     });
 
     const newRates = rates.map((rate) => {
@@ -351,6 +354,7 @@ export class CTHotelSupportService extends AbstractServices {
         markup: bookMarkup,
         prices: rate.price_details,
       });
+
       delete rate.agency_price_details;
 
       if (rate.cancellation_policy) {
@@ -415,11 +419,17 @@ export class CTHotelSupportService extends AbstractServices {
   private getMarkupPrice({
     prices,
     markup,
+    markup_amount,
   }: {
     markup: {
       markup: number;
       type: 'PER' | 'FLAT';
       mode: 'INCREASE' | 'DECREASE';
+    };
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
     };
     prices: {
       price: number;
@@ -430,34 +440,66 @@ export class CTHotelSupportService extends AbstractServices {
     price: number;
     tax: number;
     total_price: number;
+    markup: number;
+    discount: number;
+    agent_markup: number;
+    agent_discount: number;
   } {
     let tax = Number(prices.tax);
     let main_price = Number(prices.price);
-
-    let amount = main_price;
+    let new_markup = 0;
+    let new_discount = 0;
+    let agent_discount = 0;
+    let agent_markup = 0;
 
     if (markup.markup > 0) {
       if (markup.type === MARKUP_TYPE_PER) {
         if (markup.mode === MARKUP_MODE_INCREASE) {
-          amount = Math.ceil((main_price * markup.markup) / 100);
-          amount = main_price + amount;
+          new_markup = Math.ceil((main_price * markup.markup) / 100);
         } else {
-          amount = Math.ceil((main_price * markup.markup) / 100);
-          amount = main_price - amount;
+          new_discount = Math.ceil((main_price * markup.markup) / 100);
         }
       } else {
         if (markup.mode === MARKUP_MODE_INCREASE) {
-          amount = main_price + markup.markup;
+          new_markup = markup.markup;
         } else {
-          amount = main_price - markup.markup;
+          new_discount = markup.markup;
         }
       }
     }
 
+    main_price += new_markup - new_discount;
+
+    if (markup_amount) {
+      if (markup_amount.markup > 0) {
+        if (markup_amount.markup_type === MARKUP_TYPE_PER) {
+          if (markup_amount.markup_mode === MARKUP_MODE_INCREASE) {
+            agent_markup = Math.ceil((main_price * markup_amount.markup) / 100);
+          } else {
+            agent_discount = Math.ceil(
+              (main_price * markup_amount.markup) / 100
+            );
+          }
+        } else {
+          if (markup_amount.markup_mode === MARKUP_MODE_INCREASE) {
+            agent_markup = markup_amount.markup;
+          } else {
+            agent_discount = markup_amount.markup;
+          }
+        }
+      }
+    }
+
+    main_price += agent_markup - agent_discount;
+
     return {
-      price: amount,
+      price: main_price,
       tax: tax,
-      total_price: amount + tax,
+      total_price: main_price + tax,
+      markup: new_markup,
+      discount: new_discount,
+      agent_markup,
+      agent_discount,
     };
   }
 

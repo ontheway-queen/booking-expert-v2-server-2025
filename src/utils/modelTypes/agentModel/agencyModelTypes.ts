@@ -39,6 +39,7 @@ export interface IUpdateAgencyPayload {
   white_label?: boolean;
   allow_api?: boolean;
   usable_loan?: number;
+  book_permission?: boolean;
 }
 
 export interface IGetAgencyListQuery {
@@ -116,6 +117,7 @@ export interface IGetSingleAgencyData {
   referred_by: string;
   trade_license: string;
   national_id: string;
+  book_permission: boolean;
 }
 
 export interface ICheckAgencyQuery {
@@ -149,6 +151,7 @@ export interface ICheckAgencyData {
   address: string;
   ref_agent_id?: number;
   agency_type: 'Agent' | 'Sub Agent';
+  book_permission: boolean;
 }
 
 export interface ICreateWhiteLabelPermissionPayload {
@@ -246,4 +249,36 @@ export interface IGetAgentAuditTrailQuery {
   skip?: number;
   from_date?: string;
   to_date?: string;
+}
+
+export interface IGetAgentDashboardData {
+  total_flight_booking: {
+    total: string;
+    total_expired: string;
+    total_refunded: string;
+    total_pending: string;
+    total_cancelled: string;
+    total_voided: string;
+    total_issued: string;
+    total_ticket_in_process: string;
+    total_booking_in_process: string;
+    total_booked: string;
+  };
+  total_hotel_booking: {
+    total: string;
+    total_cancelled: string;
+    total_issued: string;
+  };
+  flight_booking_graph: {
+    month_name: string;
+    total: string;
+    total_cancelled: string;
+    total_issued: string;
+  }[];
+  hotel_booking_graph: {
+    month_name: string;
+    total: string;
+    total_cancelled: string;
+    total_issued: string;
+  }[];
 }

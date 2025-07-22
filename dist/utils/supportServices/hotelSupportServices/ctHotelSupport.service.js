@@ -189,7 +189,7 @@ class CTHotelSupportService extends abstract_service_1.default {
         });
     }
     HotelRecheck(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ markup_set, payload, markup_amount, }) {
+        return __awaiter(this, arguments, void 0, function* ({ markup_set, payload, markup_amount, with_agent_markup, with_vendor_price, }) {
             const response = yield this.request.postRequest(ctHotelApiEndpoints_1.default.ROOM_RECHECK, payload);
             if (!response) {
                 return false;
@@ -236,6 +236,7 @@ class CTHotelSupportService extends abstract_service_1.default {
                     tax: fee.total_tax,
                     total_price: fee.total_fee,
                 },
+                markup_amount,
             });
             const newRates = rates.map((rate) => {
                 const newRate = this.getMarkupPrice({
@@ -282,34 +283,61 @@ class CTHotelSupportService extends abstract_service_1.default {
         });
     }
     // get markup price func
-    getMarkupPrice({ prices, markup, }) {
+    getMarkupPrice({ prices, markup, markup_amount, }) {
         let tax = Number(prices.tax);
         let main_price = Number(prices.price);
-        let amount = main_price;
+        let new_markup = 0;
+        let new_discount = 0;
+        let agent_discount = 0;
+        let agent_markup = 0;
         if (markup.markup > 0) {
             if (markup.type === constants_1.MARKUP_TYPE_PER) {
                 if (markup.mode === constants_1.MARKUP_MODE_INCREASE) {
-                    amount = Math.ceil((main_price * markup.markup) / 100);
-                    amount = main_price + amount;
+                    new_markup = Math.ceil((main_price * markup.markup) / 100);
                 }
                 else {
-                    amount = Math.ceil((main_price * markup.markup) / 100);
-                    amount = main_price - amount;
+                    new_discount = Math.ceil((main_price * markup.markup) / 100);
                 }
             }
             else {
                 if (markup.mode === constants_1.MARKUP_MODE_INCREASE) {
-                    amount = main_price + markup.markup;
+                    new_markup = markup.markup;
                 }
                 else {
-                    amount = main_price - markup.markup;
+                    new_discount = markup.markup;
                 }
             }
         }
+        main_price += new_markup - new_discount;
+        if (markup_amount) {
+            if (markup_amount.markup > 0) {
+                if (markup_amount.markup_type === constants_1.MARKUP_TYPE_PER) {
+                    if (markup_amount.markup_mode === constants_1.MARKUP_MODE_INCREASE) {
+                        agent_markup = Math.ceil((main_price * markup_amount.markup) / 100);
+                    }
+                    else {
+                        agent_discount = Math.ceil((main_price * markup_amount.markup) / 100);
+                    }
+                }
+                else {
+                    if (markup_amount.markup_mode === constants_1.MARKUP_MODE_INCREASE) {
+                        agent_markup = markup_amount.markup;
+                    }
+                    else {
+                        agent_discount = markup_amount.markup;
+                    }
+                }
+            }
+        }
+        main_price += agent_markup - agent_discount;
         return {
-            price: amount,
+            price: main_price,
             tax: tax,
-            total_price: amount + tax,
+            total_price: main_price + tax,
+            markup: new_markup,
+            discount: new_discount,
+            agent_markup,
+            agent_discount,
         };
     }
     getCancellationMarkupPrice({ markup, cancellation_policy, }) {

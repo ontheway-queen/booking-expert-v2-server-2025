@@ -26,6 +26,7 @@ class AdminAgentAgencyValidator {
             white_label: joi_1.default.boolean().optional(),
             allow_api: joi_1.default.boolean().optional(),
             status: joi_1.default.string().valid('Active', 'Inactive').optional(),
+            book_permission: joi_1.default.boolean().optional(),
             white_label_permissions: joi_1.default.string()
                 .optional()
                 .custom((value, helpers) => {
@@ -55,6 +56,7 @@ class AdminAgentAgencyValidator {
         });
         this.updateAgencyApplication = joi_1.default.object({
             status: joi_1.default.string().valid('Active', 'Rejected').required(),
+            book_permission: joi_1.default.boolean().required(),
             flight_markup_set: joi_1.default.alternatives().conditional('status', {
                 is: 'Active',
                 then: joi_1.default.number().required(),
@@ -79,6 +81,7 @@ class AdminAgentAgencyValidator {
             kam_id: joi_1.default.number().required(),
             ref_id: joi_1.default.number().optional(),
             white_label: joi_1.default.boolean().required(),
+            book_permission: joi_1.default.boolean().required(),
             allow_api: joi_1.default.boolean().required(),
             white_label_permissions: joi_1.default.string()
                 .optional()

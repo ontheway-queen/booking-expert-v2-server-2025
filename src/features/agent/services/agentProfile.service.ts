@@ -200,6 +200,8 @@ export default class AgentProfileService extends AbstractServices {
       }
     }
 
+    const dashboardData = await agencyModel.getDashboardData(agency_id);
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
@@ -210,8 +212,14 @@ export default class AgentProfileService extends AbstractServices {
           usable_loan: agency?.usable_loan,
         },
         kam,
-        dashboard: {},
+        dashboard: dashboardData,
       },
     };
+  }
+
+  public async searchData(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const filter = req.query.filter as string;
+    });
   }
 }

@@ -1,5 +1,5 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { DATA_LIMIT } from '../../utils/miscellaneous/constants';
+import { DATA_LIMIT, SOURCE_AGENT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   ICheckAgencyData,
@@ -15,6 +15,7 @@ import {
   IGetAgencyListWithBalanceQuery,
   IGetAgentAuditTrailQuery,
   IGetAgentB2CMarkupData,
+  IGetAgentDashboardData,
   IGetAPICredsData,
   IGetSingleAgencyData,
   IGetWhiteLabelPermissionData,
@@ -137,7 +138,8 @@ export default class AgencyModel extends Schema {
         'usable_loan',
         'flight_markup_set',
         'hotel_markup_set',
-        'address'
+        'address',
+        'book_permission'
       )
       .where((qb) => {
         if (agency_id) {
@@ -270,6 +272,152 @@ export default class AgencyModel extends Schema {
     return Number(data?.balance) || 0;
   }
 
+  // get dashboard data
+  public async getDashboardData(
+    agency_id: number
+  ): Promise<IGetAgentDashboardData> {
+    const currentYear = new Date().getFullYear();
+
+    const total_flight_booking = await this.db('flight_booking')
+      .withSchema(this.DBO_SCHEMA)
+      .select(
+        this.db.raw(`
+                  COUNT(*) AS total,
+                  COUNT(*) FILTER (WHERE status = 'EXPIRED') AS total_expired,
+                  COUNT(*) FILTER (WHERE status = 'REFUNDED') AS total_refunded,
+                  COUNT(*) FILTER (WHERE status = 'PENDING') AS total_pending,
+                  COUNT(*) FILTER (WHERE status = 'CANCELLED') AS total_cancelled,
+                  COUNT(*) FILTER (WHERE status = 'VOIDED') AS total_voided,
+                  COUNT(*) FILTER (WHERE status = 'ISSUED') AS total_issued,
+                  COUNT(*) FILTER (WHERE status = 'BOOKING IN PROCESS') AS total_booking_in_process,
+                  COUNT(*) FILTER (WHERE status = 'TICKET IN PROCESS') AS total_ticket_in_process,
+                  COUNT(*) FILTER (WHERE status = 'BOOKED') AS total_booked
+                  `)
+      )
+      .andWhere('source_id', agency_id)
+      .andWhere('source_type', SOURCE_AGENT)
+      .first();
+
+    const total_hotel_booking = await this.db('hotel_booking')
+      .withSchema(this.DBO_SCHEMA)
+      .select(
+        this.db.raw(`
+                  COUNT(*) AS total,
+                  COUNT(*) FILTER (WHERE status = 'CANCELLED') AS total_cancelled,
+                  COUNT(*) FILTER (WHERE status = 'ISSUED') AS total_issued
+                  `)
+      )
+      .andWhere('source_id', agency_id)
+      .andWhere('source_type', SOURCE_AGENT)
+      .first();
+
+    const flight_booking_graph = await this.db('flight_booking')
+      .withSchema(this.DBO_SCHEMA)
+      .select(
+        this.db.raw(`
+              TRIM(TO_CHAR(created_at, 'Month')) AS month_name,
+              COUNT(*) AS total,
+              COUNT(*) FILTER (WHERE status = 'CANCELLED') AS total_cancelled,
+              COUNT(*) FILTER (WHERE status = 'ISSUED') AS total_issued
+          `)
+      )
+      .whereRaw(`EXTRACT(YEAR FROM created_at) = ${currentYear}`)
+      .andWhere('source_id', agency_id)
+      .andWhere('source_type', SOURCE_AGENT)
+      .groupByRaw("TRIM(TO_CHAR(created_at, 'Month'))")
+      .orderByRaw('MIN(created_at)');
+
+    const hotel_booking_graph = await this.db('hotel_booking')
+      .withSchema(this.DBO_SCHEMA)
+      .select(
+        this.db.raw(`
+              TRIM(TO_CHAR(created_at, 'Month')) AS month_name,
+              COUNT(*) AS total,
+              COUNT(*) FILTER (WHERE status = 'CANCELLED') AS total_cancelled,
+              COUNT(*) FILTER (WHERE status = 'ISSUED') AS total_issued
+          `)
+      )
+      .whereRaw(`EXTRACT(YEAR FROM created_at) = ${currentYear}`)
+      .andWhere('source_id', agency_id)
+      .andWhere('source_type', SOURCE_AGENT)
+      .groupByRaw("TRIM(TO_CHAR(created_at, 'Month'))")
+      .orderByRaw('MIN(created_at)');
+
+    return {
+      total_flight_booking,
+      total_hotel_booking,
+      flight_booking_graph,
+      hotel_booking_graph,
+    };
+  }
+
+  // search model
+  public async searchModel(query: string, agency_id: number) {
+    const data = await this.db
+      .select(
+        this.db.raw(
+          `'flight_booking' AS source,
+           id,
+           booking_ref AS title,
+           status AS status,
+           CONCAT(journey_type,'-',route, ' GDS PNR ',gds_pnr,' AIRLINE PNR ', airline_pnr,  ' - ', payable_amount,'/-') AS description`
+        )
+      )
+      .from('flight_booking')
+      .withSchema(this.DBO_SCHEMA)
+      .andWhere('source_id', agency_id)
+      .andWhere('source_type', SOURCE_AGENT)
+      .orWhereILike('gds_pnr', query)
+      .orWhereILike('airline_pnr', query)
+      .orWhereILike('booking_ref', query)
+      .unionAll([
+        this.db
+          .select(
+            this.db.raw(
+              `'hotel_booking' AS source, 
+              id, 
+              booking_ref AS title, 
+              status AS status, 
+              CONCAT(hotel_name, '-', hotel_code, ', Checkin: ', checkin_date,', Checkout: ', checkout_date, ', Confirmation No: ',confirmation_no) AS description`
+            )
+          )
+          .from('hotel_booking')
+          .withSchema(this.DBO_SCHEMA)
+          .andWhere('source_id', agency_id)
+          .andWhere('source_type', SOURCE_AGENT)
+          .orWhereILike('hotel_code', query)
+          .orWhereILike('confirmation_no', query)
+          .orWhereILike('hotel_name', query)
+          .orWhereILike('booking_ref', query),
+
+        this.db
+          .select(
+            this.db.raw(
+              `'support_ticket' AS source, 
+              st.id, 
+              st.support_no AS title, 
+              st.status AS status, 
+              CONCAT(stm.reply_by,' reply: ',stm.message) AS description`
+            )
+          )
+          .from('support_tickets AS st')
+          .leftJoin('support_ticket_messages AS stm', 'st.id', 'stm.ticket_id')
+          .withSchema(this.DBO_SCHEMA)
+          .whereILike('invoice_number', query)
+          .orWhereILike('customer_name', query),
+
+        this.db
+          .select(
+            this.db.raw(
+              `'money_receipt' AS source, id, receipt_number AS title, payer_name AS description`
+            )
+          )
+          .from('money_receipt')
+          .whereILike('receipt_number', query)
+          .orWhereILike('payer_name', query),
+      ]);
+  }
+
   // get single agency
   public async getSingleAgency(
     id: number,
@@ -285,6 +433,7 @@ export default class AgencyModel extends Schema {
         'ag.email',
         'ag.kam_id',
         'ag.phone',
+        'ag.book_permission',
         'ag.address',
         'ag.status',
         'ag.flight_markup_set',

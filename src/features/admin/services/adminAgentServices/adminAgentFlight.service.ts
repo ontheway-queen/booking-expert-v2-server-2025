@@ -9,9 +9,13 @@ import {
   TYPE_FLIGHT,
 } from '../../../../utils/miscellaneous/constants';
 import {
+  FLIGHT_BOOKING_CANCELLED,
   FLIGHT_BOOKING_CONFIRMED,
+  FLIGHT_BOOKING_EXPIRED,
   FLIGHT_BOOKING_IN_PROCESS,
+  FLIGHT_BOOKING_ON_HOLD,
   FLIGHT_BOOKING_PENDING,
+  FLIGHT_BOOKING_REFUNDED,
   FLIGHT_TICKET_IN_PROCESS,
   FLIGHT_TICKET_ISSUE,
   PAYMENT_TYPE_FULL,
@@ -23,6 +27,7 @@ import { AgentFlightBookingSupportService } from '../../../../utils/supportServi
 import {
   IAdminUpdateAgentPendingBookingManuallyPayload,
   IAdminUpdateAgentProcessingTicketPayload,
+  IAdminUpdateFlightBookingReqBody,
 } from '../../utils/types/adminAgentTypes/adminAgentFlight.types';
 import Lib from '../../../../utils/lib/lib';
 
@@ -379,11 +384,21 @@ export class AdminAgentFlightService extends AbstractServices {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
       const { user_id } = req.admin;
+      const {
+        status,
+        airline_pnr,
+        charge_credit,
+        gds_pnr,
+        ticket_issue_last_time,
+        ticket_numbers,
+      } = req.body as IAdminUpdateFlightBookingReqBody;
+
       const flightBookingModel = this.Model.FlightBookingModel(trx);
       const booking_data = await flightBookingModel.getSingleFlightBooking({
         id: Number(id),
         booked_by: SOURCE_AGENT,
       });
+
       if (!booking_data) {
         return {
           success: false,
