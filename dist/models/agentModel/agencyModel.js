@@ -86,7 +86,7 @@ class AgencyModel extends schema_1.default {
         return __awaiter(this, arguments, void 0, function* ({ agency_id, email, name, agent_no, agency_type, ref_agent_id, status, ref_id, }) {
             return yield this.db('agency')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('id', 'email', 'phone', 'agency_logo', 'agency_name', 'agent_no', 'status', 'kam_id', 'ref_agent_id', 'agency_type', 'white_label', 'allow_api', 'civil_aviation', 'trade_license', 'national_id', 'usable_loan', 'flight_markup_set', 'hotel_markup_set', 'address')
+                .select('id', 'email', 'phone', 'agency_logo', 'agency_name', 'agent_no', 'status', 'kam_id', 'ref_agent_id', 'agency_type', 'white_label', 'allow_api', 'civil_aviation', 'trade_license', 'national_id', 'usable_loan', 'flight_markup_set', 'hotel_markup_set', 'address', 'book_permission')
                 .where((qb) => {
                 if (agency_id) {
                     qb.where('id', agency_id);
@@ -201,7 +201,7 @@ class AgencyModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('agency AS ag')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.kam_id', 'ag.phone', 'ag.address', 'ag.status', 'ag.flight_markup_set', 'ag.hotel_markup_set', this.db.raw(`(
+                .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.kam_id', 'ag.phone', 'ag.book_permission', 'ag.address', 'ag.status', 'ag.flight_markup_set', 'ag.hotel_markup_set', this.db.raw(`(
   SELECT 
     COALESCE(SUM(CASE WHEN al.type = 'Credit' THEN amount ELSE 0 END), 0) - 
     COALESCE(SUM(CASE WHEN al.type = 'Debit' THEN amount ELSE 0 END), 0) 

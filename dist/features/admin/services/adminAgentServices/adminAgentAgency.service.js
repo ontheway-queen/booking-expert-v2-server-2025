@@ -276,6 +276,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     payload.flight_markup_set = body.flight_markup_set;
                     payload.hotel_markup_set = body.hotel_markup_set;
                     payload.kam_id = body.kam_id;
+                    payload.book_permission = body.book_permission;
                 }
                 else {
                     payload.status = body.status;

@@ -16,6 +16,7 @@ export interface IAdminAgentUpdateAgencyReqBody {
   address?: string;
   white_label?: boolean;
   allow_api?: boolean;
+  book_permission?: boolean;
   status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   white_label_permissions?: {
     flight: boolean;
@@ -33,6 +34,7 @@ export interface IAdminAgentUpdateAgencyApplicationReqBody {
   hotel_markup_set?: number;
   flight_markup_set?: number;
   kam_id: number;
+  book_permission: boolean;
 }
 
 export interface IAdminCreateAgentReqBody {

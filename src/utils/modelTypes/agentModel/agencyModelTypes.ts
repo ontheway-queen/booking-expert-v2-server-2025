@@ -39,6 +39,7 @@ export interface IUpdateAgencyPayload {
   white_label?: boolean;
   allow_api?: boolean;
   usable_loan?: number;
+  book_permission?: boolean;
 }
 
 export interface IGetAgencyListQuery {
@@ -116,6 +117,7 @@ export interface IGetSingleAgencyData {
   referred_by: string;
   trade_license: string;
   national_id: string;
+  book_permission: boolean;
 }
 
 export interface ICheckAgencyQuery {
@@ -149,6 +151,7 @@ export interface ICheckAgencyData {
   address: string;
   ref_agent_id?: number;
   agency_type: 'Agent' | 'Sub Agent';
+  book_permission: boolean;
 }
 
 export interface ICreateWhiteLabelPermissionPayload {

@@ -137,7 +137,8 @@ export default class AgencyModel extends Schema {
         'usable_loan',
         'flight_markup_set',
         'hotel_markup_set',
-        'address'
+        'address',
+        'book_permission'
       )
       .where((qb) => {
         if (agency_id) {
@@ -285,6 +286,7 @@ export default class AgencyModel extends Schema {
         'ag.email',
         'ag.kam_id',
         'ag.phone',
+        'ag.book_permission',
         'ag.address',
         'ag.status',
         'ag.flight_markup_set',

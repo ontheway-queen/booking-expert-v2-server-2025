@@ -300,6 +300,15 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
+      if (!agent.book_permission) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_FORBIDDEN,
+          message:
+            'Booking permission is not allowed, please contact with the authority',
+        };
+      }
+
       if (!agent.hotel_markup_set) {
         return {
           success: false,

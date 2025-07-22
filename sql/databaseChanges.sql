@@ -5,3 +5,4 @@
 -- new table dbo.flight_booking_modified_amount
 -- new table dbo.hotel_booking_modified_amount
 -- remove column hotel_booking.agent_sell_price also from view
+-- agent.agency add column book_permission
