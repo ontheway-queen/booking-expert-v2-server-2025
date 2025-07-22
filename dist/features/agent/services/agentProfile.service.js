@@ -185,6 +185,7 @@ class AgentProfileService extends abstract_service_1.default {
                     kam.phone = admin.phone_number;
                 }
             }
+            const dashboardData = yield agencyModel.getDashboardData(agency_id);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -195,9 +196,16 @@ class AgentProfileService extends abstract_service_1.default {
                         usable_loan: agency === null || agency === void 0 ? void 0 : agency.usable_loan,
                     },
                     kam,
-                    dashboard: {},
+                    dashboard: dashboardData,
                 },
             };
+        });
+    }
+    searchData(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const filter = req.query.filter;
+            }));
         });
     }
 }

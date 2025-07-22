@@ -250,3 +250,35 @@ export interface IGetAgentAuditTrailQuery {
   from_date?: string;
   to_date?: string;
 }
+
+export interface IGetAgentDashboardData {
+  total_flight_booking: {
+    total: string;
+    total_expired: string;
+    total_refunded: string;
+    total_pending: string;
+    total_cancelled: string;
+    total_voided: string;
+    total_issued: string;
+    total_ticket_in_process: string;
+    total_booking_in_process: string;
+    total_booked: string;
+  };
+  total_hotel_booking: {
+    total: string;
+    total_cancelled: string;
+    total_issued: string;
+  };
+  flight_booking_graph: {
+    month_name: string;
+    total: string;
+    total_cancelled: string;
+    total_issued: string;
+  }[];
+  hotel_booking_graph: {
+    month_name: string;
+    total: string;
+    total_cancelled: string;
+    total_issued: string;
+  }[];
+}
