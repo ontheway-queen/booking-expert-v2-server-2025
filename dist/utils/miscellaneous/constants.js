@@ -19,6 +19,10 @@ exports.origin = [
     'http://localhost:5001',
     'https://sohiaviation.com',
     'https://www.sohiaviation.com',
+    'https://meherba.com',
+    'https://www.meherba.com',
+    'https://flyngo.xyz',
+    'https://www.flyngo.xyz',
 ];
 // OTP types constants
 exports.OTP_TYPES = {

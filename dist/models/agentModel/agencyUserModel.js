@@ -57,10 +57,11 @@ class AgencyUserModel extends schema_1.default {
                 qb.andWhere('au.agency_id', query.agency_id);
                 qb.andWhere((qbc) => {
                     if (query.filter) {
-                        qbc.where('au.name', 'ilike', `%${query.filter}%`);
-                        qbc.where('au.username', query.filter);
-                        qbc.orWhere('au.email', query.filter);
-                        qbc.orWhere('au.phone_number', query.filter);
+                        qbc
+                            .orWhere('au.name', 'ilike', `%${query.filter}%`)
+                            .orWhere('au.username', query.filter)
+                            .orWhere('au.email', query.filter)
+                            .orWhere('au.phone_number', query.filter);
                     }
                 });
                 if (query.role_id) {

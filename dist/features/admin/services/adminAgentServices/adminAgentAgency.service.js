@@ -121,6 +121,9 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
+                    data: {
+                        photo: payload.photo,
+                    },
                 };
             }));
         });

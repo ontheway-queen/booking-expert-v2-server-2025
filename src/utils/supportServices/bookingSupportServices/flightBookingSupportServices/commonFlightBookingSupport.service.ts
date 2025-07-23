@@ -206,6 +206,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       base_fare: payload.flight_data.fare.base_fare,
       tax: payload.flight_data.fare.total_tax,
       ait: payload.flight_data.fare.ait,
+      discount: payload.flight_data.fare.discount,
       payable_amount: payload.flight_data.fare.payable,
       travel_date: payload.flight_data.flights[0].options[0].departure.date,
       ticket_issue_last_time:

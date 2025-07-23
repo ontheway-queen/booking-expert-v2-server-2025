@@ -35,7 +35,6 @@ export interface IInsertFlightBookingPayload {
   discount?: number | string;
   vendor_fare: string;
   payable_amount: number | string;
-  agent_markup?: number;
   journey_type: JourneyType;
   refundable: boolean;
   api: string;

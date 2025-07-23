@@ -50,6 +50,7 @@ export class AgentB2CSubUsersService extends AbstractServices {
 
       const agentB2CModel = this.Model.AgencyB2CUserModel(trx);
       const data = await agentB2CModel.getSingleUser(Number(id), agency_id);
+
       if (!data) {
         return {
           success: false,
