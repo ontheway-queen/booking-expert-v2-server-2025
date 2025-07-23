@@ -55,6 +55,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const { id } = req.params;
                 const agency_id = Number(id);
                 const AgencyModel = this.Model.AgencyModel(trx);
+                const AgencyUserModel = this.Model.AgencyUserModel(trx);
                 const data = yield AgencyModel.getSingleAgency(agency_id);
                 if (!data) {
                     return {
@@ -63,6 +64,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
+                const users = yield AgencyUserModel.getUserList({ agency_id }, true);
                 let whiteLabelPermissions = {
                     flight: false,
                     hotel: false,
@@ -85,7 +87,40 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: Object.assign(Object.assign({}, data), { whiteLabelPermissions }),
+                    data: Object.assign(Object.assign({}, data), { users: users.data, total_user: users.total, whiteLabelPermissions }),
+                };
+            }));
+        });
+    }
+    updateAgencyUser(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id, user_id } = req.params;
+                const AgencyUserModel = this.Model.AgencyUserModel(trx);
+                const checkUser = yield AgencyUserModel.checkUser({
+                    id: Number(user_id),
+                    agency_id: Number(agency_id),
+                });
+                if (!checkUser) {
+                    throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
+                }
+                const body = req.body;
+                const files = req.files || [];
+                const payload = body;
+                if (files.length) {
+                    payload.photo = files[0].filename;
+                }
+                yield AgencyUserModel.updateUser(payload, {
+                    agency_id: Number(agency_id),
+                    id: Number(user_id),
+                });
+                if (checkUser.photo && payload.photo) {
+                    yield this.manageFile.deleteFromCloud([checkUser.photo]);
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
                 };
             }));
         });

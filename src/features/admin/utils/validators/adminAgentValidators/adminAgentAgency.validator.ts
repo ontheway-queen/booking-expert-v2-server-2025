@@ -68,6 +68,14 @@ export default class AdminAgentAgencyValidator {
     }),
   });
 
+  public updateAgencyUser = Joi.object({
+    name: Joi.string().trim().optional(),
+    email: Joi.string().lowercase().trim().optional(),
+    phone_number: Joi.string().optional().trim(),
+    status: Joi.boolean().optional(),
+    is_main_user: Joi.boolean().optional(),
+  });
+
   public createAgency = Joi.object({
     agency_name: Joi.string().trim().required(),
     email: Joi.string().trim().required(),

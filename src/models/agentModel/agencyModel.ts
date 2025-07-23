@@ -69,7 +69,7 @@ export default class AgencyModel extends Schema {
       )
       .where((qb) => {
         if (query.filter) {
-          qb.where('ag.agency_name', 'like', `%${query.filter}%`)
+          qb.where('ag.agency_name', 'ILIKE', `%${query.filter}%`)
             .orWhere('ag.agent_no', query.filter)
             .orWhere('ag.email', 'like', `%${query.filter}%`);
         }

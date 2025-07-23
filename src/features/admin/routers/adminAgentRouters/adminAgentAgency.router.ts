@@ -36,6 +36,13 @@ export default class AdminAgentAgencyRouter extends AbstractRouter {
       );
 
     this.router
+      .route('/:agency_id/user/:user_id')
+      .patch(
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_USER, ['photo']),
+        this.controller.updateAgencyUser
+      );
+
+    this.router
       .route('/:id/application')
       .patch(this.controller.updateAgencyApplication);
 

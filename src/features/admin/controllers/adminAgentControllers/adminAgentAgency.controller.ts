@@ -26,6 +26,21 @@ export default class AdminAgentAgencyController extends AbstractController {
     }
   );
 
+  public updateAgencyUser = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.multipleParamsNumValidator([
+        'agency_id',
+        'user_id',
+      ]),
+
+      bodySchema: this.validator.updateAgencyUser,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.updateAgencyUser(req);
+      res.status(code).json(rest);
+    }
+  );
+
   public updateAgencyApplication = this.asyncWrapper.wrap(
     {
       paramSchema: this.commonValidator.singleParamNumValidator('id'),

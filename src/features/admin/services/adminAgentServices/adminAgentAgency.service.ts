@@ -5,6 +5,7 @@ import {
   IAdminAgentUpdateAgencyReqBody,
   IAdminAgentUpdateAgencyApplicationReqBody,
   IAdminCreateAgentReqBody,
+  IAdminAgentUpdateAgencyUserReqBody,
 } from '../../utils/types/adminAgentTypes/adminAgentAgency.types';
 import CustomError from '../../../../utils/lib/customError';
 import { IUpdateAgencyPayload } from '../../../../utils/modelTypes/agentModel/agencyModelTypes';
@@ -20,7 +21,10 @@ import {
 } from '../../../../utils/miscellaneous/constants';
 import EmailSendLib from '../../../../utils/lib/emailSendLib';
 import { registrationVerificationCompletedTemplate } from '../../../../utils/templates/registrationVerificationCompletedTemplate';
-import { IInsertAgencyRolePermissionPayload } from '../../../../utils/modelTypes/agentModel/agencyUserModelTypes';
+import {
+  IInsertAgencyRolePermissionPayload,
+  IUpdateAgencyUserPayload,
+} from '../../../../utils/modelTypes/agentModel/agencyUserModelTypes';
 
 export default class AdminAgentAgencyService extends AbstractServices {
   constructor() {
@@ -47,6 +51,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
       const { id } = req.params;
       const agency_id = Number(id);
       const AgencyModel = this.Model.AgencyModel(trx);
+      const AgencyUserModel = this.Model.AgencyUserModel(trx);
 
       const data = await AgencyModel.getSingleAgency(agency_id);
 
@@ -57,6 +62,8 @@ export default class AdminAgentAgencyService extends AbstractServices {
           message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
+
+      const users = await AgencyUserModel.getUserList({ agency_id }, true);
 
       let whiteLabelPermissions = {
         flight: false,
@@ -83,7 +90,55 @@ export default class AdminAgentAgencyService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
-        data: { ...data, whiteLabelPermissions },
+        data: {
+          ...data,
+          users: users.data,
+          total_user: users.total,
+          whiteLabelPermissions,
+        },
+      };
+    });
+  }
+
+  public async updateAgencyUser(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id, user_id } = req.params;
+      const AgencyUserModel = this.Model.AgencyUserModel(trx);
+      const checkUser = await AgencyUserModel.checkUser({
+        id: Number(user_id),
+        agency_id: Number(agency_id),
+      });
+
+      if (!checkUser) {
+        throw new CustomError(
+          this.ResMsg.HTTP_NOT_FOUND,
+          this.StatusCode.HTTP_NOT_FOUND
+        );
+      }
+
+      const body = req.body as IAdminAgentUpdateAgencyUserReqBody;
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      const payload: IUpdateAgencyUserPayload = body;
+
+      if (files.length) {
+        payload.photo = files[0].filename;
+      }
+
+      await AgencyUserModel.updateUser(payload, {
+        agency_id: Number(agency_id),
+        id: Number(user_id),
+      });
+
+      if (checkUser.photo && payload.photo) {
+        await this.manageFile.deleteFromCloud([checkUser.photo]);
+      }
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
       };
     });
   }

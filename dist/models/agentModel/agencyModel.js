@@ -45,7 +45,7 @@ class AgencyModel extends schema_1.default {
                 .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.phone', 'ag.status', 'ag.white_label', 'ag.allow_api')
                 .where((qb) => {
                 if (query.filter) {
-                    qb.where('ag.agency_name', 'like', `%${query.filter}%`)
+                    qb.where('ag.agency_name', 'ILIKE', `%${query.filter}%`)
                         .orWhere('ag.agent_no', query.filter)
                         .orWhere('ag.email', 'like', `%${query.filter}%`);
                 }

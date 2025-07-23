@@ -70,6 +70,13 @@ class AdminAgentAgencyValidator {
                 then: joi_1.default.number().required(),
             }),
         });
+        this.updateAgencyUser = joi_1.default.object({
+            name: joi_1.default.string().trim().optional(),
+            email: joi_1.default.string().lowercase().trim().optional(),
+            phone_number: joi_1.default.string().optional().trim(),
+            status: joi_1.default.boolean().optional(),
+            is_main_user: joi_1.default.boolean().optional(),
+        });
         this.createAgency = joi_1.default.object({
             agency_name: joi_1.default.string().trim().required(),
             email: joi_1.default.string().trim().required(),

@@ -29,6 +29,14 @@ export interface IAdminAgentUpdateAgencyReqBody {
   };
 }
 
+export interface IAdminAgentUpdateAgencyUserReqBody {
+  name?: string;
+  email?: string;
+  phone_number?: string;
+  is_main_user?: boolean;
+  status?: boolean;
+}
+
 export interface IAdminAgentUpdateAgencyApplicationReqBody {
   status: 'Active' | 'Rejected';
   hotel_markup_set?: number;
