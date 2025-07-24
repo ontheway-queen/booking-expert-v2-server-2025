@@ -8,7 +8,6 @@ import {
   GENERATE_AUTO_UNIQUE_ID,
   INVOICE_STATUS_TYPES,
   INVOICE_TYPES,
-  SOURCE_ADMIN,
   SOURCE_AGENT,
   SOURCE_AGENT_B2C,
   SOURCE_B2C,
@@ -27,11 +26,7 @@ import {
   TRAVELER_FILE_TYPE_PASSPORT,
   TRAVELER_FILE_TYPE_VISA,
 } from '../../../miscellaneous/flightConstant';
-import { MarkupType } from '../../../modelTypes/flightModelTypes/flightBookingModelTypes';
-import {
-  MARKUP_MODE_DECREASE,
-  MARKUP_MODE_INCREASE,
-} from '../../../miscellaneous/constants';
+
 import { IInsertFlightBookingTrackingPayload } from '../../../modelTypes/flightModelTypes/flightBookingTrackingModelTypes';
 import {
   ICheckBookingEligibilityPayload,
@@ -98,6 +93,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       passengers,
       status: [
         FLIGHT_BOOKING_CONFIRMED,
+        FLIGHT_BOOKING_PENDING,
         FLIGHT_BOOKING_IN_PROCESS,
         FLIGHT_TICKET_IN_PROCESS,
         FLIGHT_BOOKING_ON_HOLD,

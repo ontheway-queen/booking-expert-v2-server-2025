@@ -59,6 +59,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 passengers,
                 status: [
                     flightConstant_1.FLIGHT_BOOKING_CONFIRMED,
+                    flightConstant_1.FLIGHT_BOOKING_PENDING,
                     flightConstant_1.FLIGHT_BOOKING_IN_PROCESS,
                     flightConstant_1.FLIGHT_TICKET_IN_PROCESS,
                     flightConstant_1.FLIGHT_BOOKING_ON_HOLD,

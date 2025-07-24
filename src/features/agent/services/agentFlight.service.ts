@@ -760,9 +760,9 @@ export class AgentFlightService extends AbstractServices {
         });
 
         return {
-          success: false,
-          code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: 'Cannot book the flight right now. Please try again.',
+          success: true,
+          code: this.StatusCode.HTTP_OK,
+          message: 'Flight booking is in process. Please check later.',
         };
       }
 
