@@ -158,6 +158,12 @@ class AuthChecker {
                 const agencyUserModel = new agencyUserModel_1.default(database_1.db);
                 const checkAgencyUser = yield agencyUserModel.checkUser({ id: user_id });
                 if (checkAgencyUser) {
+                    console.log({
+                        type: 'Agent',
+                        agency_id: checkAgencyUser.agency_id,
+                        user_id: checkAgencyUser.id,
+                        agency_name: checkAgencyUser.agency_name,
+                    });
                     if (!checkAgencyUser.status) {
                         res
                             .status(statusCode_1.default.HTTP_UNAUTHORIZED)
@@ -297,6 +303,11 @@ class AuthChecker {
                         .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
                     return;
                 }
+                console.log({
+                    type: 'White label',
+                    agency_id: check_agency.id,
+                    agency_name: check_agency.agency_name,
+                });
                 const module = req.originalUrl.split('/')[4] || '';
                 req.agencyB2CWhiteLabel = {
                     agency_id: Number(check_token === null || check_token === void 0 ? void 0 : check_token.agency_id),

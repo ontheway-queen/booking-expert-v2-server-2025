@@ -192,6 +192,13 @@ export default class AuthChecker {
       const checkAgencyUser = await agencyUserModel.checkUser({ id: user_id });
 
       if (checkAgencyUser) {
+        console.log({
+          type: 'Agent',
+          agency_id: checkAgencyUser.agency_id,
+          user_id: checkAgencyUser.id,
+          agency_name: checkAgencyUser.agency_name,
+        });
+
         if (!checkAgencyUser.status) {
           res
             .status(StatusCode.HTTP_UNAUTHORIZED)
@@ -354,6 +361,12 @@ export default class AuthChecker {
           .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
         return;
       }
+
+      console.log({
+        type: 'White label',
+        agency_id: check_agency.id,
+        agency_name: check_agency.agency_name,
+      });
 
       const module = req.originalUrl.split('/')[4] || '';
 
