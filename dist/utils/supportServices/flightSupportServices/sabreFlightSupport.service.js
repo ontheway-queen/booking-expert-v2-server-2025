@@ -572,14 +572,6 @@ class SabreFlightService extends abstract_service_1.default {
                     Number(new_fare.total_tax) +
                     Number(new_fare.ait) -
                     Number(new_fare.discount)).toFixed(2);
-                console.log({
-                    agent_discount,
-                    agent_markup,
-                    commission,
-                    markup,
-                    pax_markup,
-                });
-                console.log({ new_fare });
                 const newItinerary = {
                     flight_id: flight_id || (0, uuid_1.v4)(),
                     api_search_id: '',

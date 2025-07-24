@@ -491,6 +491,7 @@ export class AgentFlightService extends AbstractServices {
       agency_logo,
       address,
     } = req.agencyUser;
+
     const body = req.body as IFlightBookingRequestBody;
 
     let booking_block = false;
@@ -758,16 +759,6 @@ export class AgentFlightService extends AbstractServices {
           },
         });
 
-        //check eligibility of the booking
-        const bookingSupportService = new CommonFlightBookingSupportService(
-          trx
-        );
-
-        await bookingSupportService.deleteFlightBookingData({
-          id: new_booking_id,
-          source_type: SOURCE_AGENT,
-        });
-
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -821,8 +812,8 @@ export class AgentFlightService extends AbstractServices {
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: 'The flight has been booked successfully!',
         data: {
-          new_booking_id,
-          new_booking_ref,
+          booking_id: new_booking_id,
+          booking_ref: new_booking_ref,
           gds_pnr: payload.gds_pnr,
           status: payload.status,
         },

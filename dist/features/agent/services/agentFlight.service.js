@@ -635,12 +635,6 @@ class AgentFlightService extends abstract_service_1.default {
                             response: data,
                         },
                     });
-                    //check eligibility of the booking
-                    const bookingSupportService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
-                    yield bookingSupportService.deleteFlightBookingData({
-                        id: new_booking_id,
-                        source_type: constants_1.SOURCE_AGENT,
-                    });
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -690,8 +684,8 @@ class AgentFlightService extends abstract_service_1.default {
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: 'The flight has been booked successfully!',
                     data: {
-                        new_booking_id,
-                        new_booking_ref,
+                        booking_id: new_booking_id,
+                        booking_ref: new_booking_ref,
                         gds_pnr: payload.gds_pnr,
                         status: payload.status,
                     },

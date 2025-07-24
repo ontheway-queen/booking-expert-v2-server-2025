@@ -789,16 +789,6 @@ export default class SabreFlightService extends AbstractServices {
         Number(new_fare.discount)
       ).toFixed(2);
 
-      console.log({
-        agent_discount,
-        agent_markup,
-        commission,
-        markup,
-        pax_markup,
-      });
-
-      console.log({ new_fare });
-
       const newItinerary: IFormattedFlightItinerary = {
         flight_id: flight_id || uuidv4(),
         api_search_id: '',
