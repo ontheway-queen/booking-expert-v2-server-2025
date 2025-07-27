@@ -381,11 +381,13 @@ export class CTHotelSupportService extends AbstractServices {
       ...restData,
       fee: price_details,
       rates: newRates,
-      supplier_fee: {
-        price: fee.fee,
-        tax: fee.total_tax,
-        total_price: fee.total_fee,
-      },
+      supplier_fee: with_vendor_price
+        ? {
+            price: fee.fee,
+            tax: fee.total_tax,
+            total_price: fee.total_fee,
+          }
+        : undefined,
       supplier_rates: rates,
     };
   }

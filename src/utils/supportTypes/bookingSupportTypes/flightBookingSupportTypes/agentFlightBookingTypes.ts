@@ -21,7 +21,7 @@ export interface IGetPaymentInformationReqBody {
   booking_id: number;
   payment_type: typeof PAYMENT_TYPE_FULL | typeof PAYMENT_TYPE_PARTIAL;
   refundable: boolean;
-  departure_date: Date;
+  departure_date: string;
   agency_id: number;
   ticket_price: number;
 }

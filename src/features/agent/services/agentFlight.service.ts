@@ -877,11 +877,13 @@ export class AgentFlightService extends AbstractServices {
         Number(id)
       );
 
+      const { vendor_fare, source_type, ...restData } = booking_data;
+
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
         data: {
-          ...booking_data,
+          ...restData,
           price_breakdown_data,
           segment_data,
           traveler_data,

@@ -357,6 +357,8 @@ export class AgentHotelService extends AbstractServices {
         },
         markup_set: agent.hotel_markup_set,
         markup_amount,
+        with_agent_markup: true,
+        with_vendor_price: true,
       });
 
       if (!recheck) {

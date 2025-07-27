@@ -339,12 +339,6 @@ export interface ICTHotelRoomRecheckData {
     tax: number;
     total_price: number;
   };
-  agency_fee?: {
-    fee: number;
-    total_tax: number;
-    total_fee: number;
-    currency: string;
-  };
   hotel_extra_charges: {
     total_payable_amount: number;
     payable_currency: string;
@@ -361,11 +355,6 @@ export interface ICTHotelRoomRecheckData {
     payment_type: string[];
     currency: string;
     price_details: {
-      price: number;
-      tax: number;
-      total_price: number;
-    };
-    agency_price_details?: {
       price: number;
       tax: number;
       total_price: number;
@@ -407,7 +396,7 @@ export interface ICTHotelRoomRecheckData {
     supports_amendment: boolean;
     supports_cancellation: boolean;
   }[];
-  supplier_fee: {
+  supplier_fee?: {
     price: number;
     tax: number;
     total_price: number;

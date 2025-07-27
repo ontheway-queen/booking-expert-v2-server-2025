@@ -96,9 +96,20 @@ export interface IGetSingleFlightBookingData {
   base_fare: number;
   tax: number;
   ait: number;
-  markup_type: JourneyType | null;
   payable_amount: number;
   journey_type: JourneyType;
+  refundable: boolean;
+  api: string;
+  api_booking_ref: string | null;
+  route: string;
+  ticket_issue_last_time: string | null;
+  airline_pnr: string | null;
+  created_by: number;
+  travel_date: string;
+  created_by_user_name: string;
+  cancelled_at: Date | null;
+  issued_at: Date | null;
+  created_at: Date;
   vendor_fare: {
     base_fare: number;
     tax: number;
@@ -108,18 +119,7 @@ export interface IGetSingleFlightBookingData {
     gross_fare: number;
     net_fare: number;
   };
-  refundable: boolean;
-  api: string;
-  api_booking_ref: string | null;
-  route: string;
-  travel_date: Date;
-  ticket_issue_last_time: string | null;
-  airline_pnr: string | null;
-  created_by: number;
-  created_by_user_name: string;
-  cancelled_at: Date | null;
-  issued_at: Date | null;
-  created_at: Date;
+  discount: number;
 }
 
 export interface IUpdateFlightBookingPayload {

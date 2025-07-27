@@ -261,11 +261,13 @@ class CTHotelSupportService extends abstract_service_1.default {
                 rate.price_details = newRate;
                 return rate;
             });
-            return Object.assign(Object.assign({}, restData), { fee: price_details, rates: newRates, supplier_fee: {
-                    price: fee.fee,
-                    tax: fee.total_tax,
-                    total_price: fee.total_fee,
-                }, supplier_rates: rates });
+            return Object.assign(Object.assign({}, restData), { fee: price_details, rates: newRates, supplier_fee: with_vendor_price
+                    ? {
+                        price: fee.fee,
+                        tax: fee.total_tax,
+                        total_price: fee.total_fee,
+                    }
+                    : undefined, supplier_rates: rates });
         });
     }
     HotelBooking(payload, markup_set) {

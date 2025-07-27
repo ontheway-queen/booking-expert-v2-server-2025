@@ -733,10 +733,11 @@ class AgentFlightService extends abstract_service_1.default {
                 const price_breakdown_data = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(Number(id));
                 const segment_data = yield flightSegmentModel.getFlightBookingSegment(Number(id));
                 const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(Number(id));
+                const { vendor_fare, source_type } = booking_data, restData = __rest(booking_data, ["vendor_fare", "source_type"]);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    data: Object.assign(Object.assign({}, booking_data), { price_breakdown_data,
+                    data: Object.assign(Object.assign({}, restData), { price_breakdown_data,
                         segment_data,
                         traveler_data }),
                 };
