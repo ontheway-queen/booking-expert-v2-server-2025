@@ -58,8 +58,9 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 const flightSegmentModel = this.Model.FlightBookingSegmentModel(trx);
                 const flightTravelerModel = this.Model.FlightBookingTravelerModel(trx);
                 const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(trx);
+                const booking_id = Number(id);
                 const booking_data = yield flightBookingModel.getSingleFlightBooking({
-                    id: Number(id),
+                    id: booking_id,
                     booked_by: constants_1.SOURCE_AGENT,
                 });
                 if (!booking_data) {
@@ -69,15 +70,17 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                const price_breakdown_data = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(Number(id));
-                const segment_data = yield flightSegmentModel.getFlightBookingSegment(Number(id));
-                const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(Number(id));
+                const price_breakdown_data = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(booking_id);
+                const segment_data = yield flightSegmentModel.getFlightBookingSegment(booking_id);
+                const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(booking_id);
+                const modified_fare_amount = yield flightPriceBreakdownModel.getFlightBookingModifiedAmount(booking_id);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     data: Object.assign(Object.assign({}, booking_data), { price_breakdown_data,
                         segment_data,
-                        traveler_data }),
+                        traveler_data,
+                        modified_fare_amount }),
                 };
             }));
         });

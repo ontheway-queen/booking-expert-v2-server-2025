@@ -268,7 +268,7 @@ class AgencyModel extends schema_1.default {
        id,
        booking_ref AS title,
        status::text AS status,
-       CONCAT(journey_type,' ',route, ' GDS PNR ',gds_pnr,' AIRLINE PNR ', airline_pnr,  ', ', payable_amount,'/') AS description`))
+       CONCAT(journey_type,' ',route, ' GDS PNR ',gds_pnr,' AIRLINE PNR ', airline_pnr,  ', ', payable_amount,'-/') AS description`))
                 .from('flight_booking')
                 .withSchema(this.DBO_SCHEMA)
                 .where((builder) => {
@@ -326,15 +326,15 @@ class AgencyModel extends schema_1.default {
        fb.id,
        fb.booking_ref AS title,
        fb.status::text AS status,
-       CONCAT(fb.journey_type,' ',fb.route, ' GDS PNR ',fb.gds_pnr,' AIRLINE PNR ', fb.airline_pnr,  ', ', fb.payable_amount,'/') AS description`))
+       CONCAT(fb.journey_type,' ',fb.route, ' GDS PNR ',fb.gds_pnr,' AIRLINE PNR ', fb.airline_pnr, ', Ticket no: ',fbt.ticket_number, ', ', fb.payable_amount,'-/') AS description`))
                     .from('flight_booking_traveler AS fbt')
-                    .leftJoin('flight_booking AS fb', 'fbt.flight_booking_id', 'fb.id')
                     .withSchema(this.DBO_SCHEMA)
+                    .leftJoin('flight_booking AS fb', 'fbt.flight_booking_id', 'fb.id')
                     .where((builder) => {
                     builder
                         .andWhere('fb.source_id', agency_id)
                         .andWhere('fb.source_type', constants_1.SOURCE_AGENT)
-                        .andWhere('ftb.ticket_number', query);
+                        .andWhere('fbt.ticket_number', query);
                 }),
             ]);
         });

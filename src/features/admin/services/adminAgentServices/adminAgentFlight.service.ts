@@ -63,8 +63,9 @@ export class AdminAgentFlightService extends AbstractServices {
       const flightPriceBreakdownModel =
         this.Model.FlightBookingPriceBreakdownModel(trx);
 
+      const booking_id = Number(id);
       const booking_data = await flightBookingModel.getSingleFlightBooking({
-        id: Number(id),
+        id: booking_id,
         booked_by: SOURCE_AGENT,
       });
 
@@ -78,14 +79,19 @@ export class AdminAgentFlightService extends AbstractServices {
 
       const price_breakdown_data =
         await flightPriceBreakdownModel.getFlightBookingPriceBreakdown(
-          Number(id)
+          booking_id
         );
       const segment_data = await flightSegmentModel.getFlightBookingSegment(
-        Number(id)
+        booking_id
       );
       const traveler_data = await flightTravelerModel.getFlightBookingTraveler(
-        Number(id)
+        booking_id
       );
+
+      const modified_fare_amount =
+        await flightPriceBreakdownModel.getFlightBookingModifiedAmount(
+          booking_id
+        );
 
       return {
         success: true,
@@ -95,6 +101,7 @@ export class AdminAgentFlightService extends AbstractServices {
           price_breakdown_data,
           segment_data,
           traveler_data,
+          modified_fare_amount,
         },
       };
     });

@@ -105,7 +105,11 @@ class CTHotelSupportService extends abstract_service_1.default {
                 if (markup_amount) {
                     price_details.price = lib_1.default.markupCalculation({
                         amount: price_details.total_price,
-                        markup: markup_amount,
+                        markup: {
+                            markup: Number(markup_amount.markup),
+                            markup_type: markup_amount.markup_type,
+                            markup_mode: markup_amount.markup_mode,
+                        },
                     });
                     price_details.total_price = price_details.price + price_details.tax;
                 }
@@ -171,7 +175,11 @@ class CTHotelSupportService extends abstract_service_1.default {
                         if (markup_amount) {
                             price_details.price = lib_1.default.markupCalculation({
                                 amount: price_details.total_price,
-                                markup: markup_amount,
+                                markup: {
+                                    markup: Number(markup_amount.markup),
+                                    markup_mode: markup_amount.markup_mode,
+                                    markup_type: markup_amount.markup_type,
+                                },
                             });
                             price_details.total_price = price_details.price + price_details.tax;
                         }
