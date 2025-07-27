@@ -321,6 +321,21 @@ class AgencyModel extends schema_1.default {
                         qb.orWhereILike('st.support_no', query);
                     });
                 }),
+                this.db
+                    .select(this.db.raw(`'flight_booking' AS source,
+       fb.id,
+       fb.booking_ref AS title,
+       fb.status::text AS status,
+       CONCAT(fb.journey_type,' ',fb.route, ' GDS PNR ',fb.gds_pnr,' AIRLINE PNR ', fb.airline_pnr,  ', ', fb.payable_amount,'/') AS description`))
+                    .from('flight_booking_traveler AS fbt')
+                    .leftJoin('flight_booking AS fb', 'fbt.flight_booking_id', 'fb.id')
+                    .withSchema(this.DBO_SCHEMA)
+                    .where((builder) => {
+                    builder
+                        .andWhere('fb.source_id', agency_id)
+                        .andWhere('fb.source_type', constants_1.SOURCE_AGENT)
+                        .andWhere('ftb.ticket_number', query);
+                }),
             ]);
         });
     }

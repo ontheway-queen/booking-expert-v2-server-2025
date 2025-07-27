@@ -121,4 +121,26 @@ export default class AdminAdministrationController extends AbstractController {
       }
     }
   );
+
+  public getAudit = this.asyncWrapper.wrap(
+    {
+      querySchema: this.validator.getAuditTrail,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getAuditTrail(req);
+
+      res.status(code).json(data);
+    }
+  );
+
+  public getErrorLog = this.asyncWrapper.wrap(
+    {
+      querySchema: this.validator.getErrorLog,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getErrorLogs(req);
+
+      res.status(code).json(data);
+    }
+  );
 }

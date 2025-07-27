@@ -283,12 +283,13 @@ class AdminModel extends schema_1.default {
         });
     }
     //get audit
-    getAudit(payload) {
-        return __awaiter(this, void 0, void 0, function* () {
+    getAudit(payload_1) {
+        return __awaiter(this, arguments, void 0, function* (payload, need_total = false) {
             var _a;
-            const data = yield this.db('admin_audit_trail as at')
+            const data = yield this.db('audit_trail as at')
+                .withSchema(this.ADMIN_SCHEMA)
                 .select('at.id', 'ad.name as created_by', 'at.type', 'at.details', 'at.created_at')
-                .leftJoin('admin as ad', 'ad.id', 'at.created_by')
+                .leftJoin('user_admin as ad', 'ad.id', 'at.created_by')
                 .andWhere((qb) => {
                 if (payload.created_by) {
                     qb.andWhere('at.created_by', payload.created_by);
@@ -306,7 +307,8 @@ class AdminModel extends schema_1.default {
                 .limit(payload.limit || 100)
                 .offset(payload.skip || 0)
                 .orderBy('at.id', 'desc');
-            const total = yield this.db('admin_audit_trail as at')
+            const total = yield this.db('audit_trail as at')
+                .withSchema(this.ADMIN_SCHEMA)
                 .count('at.id as total')
                 .andWhere((qb) => {
                 if (payload.created_by) {

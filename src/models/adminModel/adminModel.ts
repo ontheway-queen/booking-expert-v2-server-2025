@@ -388,8 +388,12 @@ export default class AdminModel extends Schema {
   }
 
   //get audit
-  public async getAudit(payload: IGetAdminAuditTrailQuery) {
-    const data = await this.db('admin_audit_trail as at')
+  public async getAudit(
+    payload: IGetAdminAuditTrailQuery,
+    need_total: boolean = false
+  ) {
+    const data = await this.db('audit_trail as at')
+      .withSchema(this.ADMIN_SCHEMA)
       .select(
         'at.id',
         'ad.name as created_by',
@@ -397,7 +401,7 @@ export default class AdminModel extends Schema {
         'at.details',
         'at.created_at'
       )
-      .leftJoin('admin as ad', 'ad.id', 'at.created_by')
+      .leftJoin('user_admin as ad', 'ad.id', 'at.created_by')
       .andWhere((qb) => {
         if (payload.created_by) {
           qb.andWhere('at.created_by', payload.created_by);
@@ -416,7 +420,8 @@ export default class AdminModel extends Schema {
       .offset(payload.skip || 0)
       .orderBy('at.id', 'desc');
 
-    const total = await this.db('admin_audit_trail as at')
+    const total = await this.db('audit_trail as at')
+      .withSchema(this.ADMIN_SCHEMA)
       .count('at.id as total')
       .andWhere((qb) => {
         if (payload.created_by) {

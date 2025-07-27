@@ -61,4 +61,22 @@ export default class AdminAdministrationValidator {
     role_id: Joi.number().optional(),
     status: Joi.boolean().optional(),
   });
+
+  public getErrorLog = Joi.object({
+    search: Joi.string().trim().optional(),
+    source: Joi.string().valid('AGENT', 'ADMIN', 'B2C').optional(),
+    level: Joi.string().valid('ERROR', 'WARNING', 'INFO').optional(),
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+    from_date: Joi.date().raw().optional(),
+    to_date: Joi.date().raw().optional(),
+  });
+
+  public getAuditTrail = Joi.object({
+    admin_id: Joi.number().optional(),
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+    from_date: Joi.date().raw().optional(),
+    to_date: Joi.date().raw().optional(),
+  });
 }

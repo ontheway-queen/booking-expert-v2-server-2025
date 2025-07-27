@@ -35,6 +35,8 @@ class AdminAdministrationRouter extends abstract_router_1.default {
             .route('/role/:id/permissions')
             .get(this.controller.getSingleRoleWithPermissions)
             .patch(this.controller.updateRolePermissions);
+        this.router.route('/error-log').get(this.controller.getErrorLog);
+        this.router.route('/audit-trail').get(this.controller.getAudit);
     }
 }
 exports.default = AdminAdministrationRouter;

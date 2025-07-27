@@ -426,4 +426,62 @@ export class AdminAdministrationService extends AbstractServices {
       data: { photo: payload.photo },
     };
   }
+
+  // get audit trail
+  public async getAuditTrail(req: Request) {
+    const model = this.Model.AdminModel();
+    const { admin_id, from_date, to_date, limit, skip } = req.query as {
+      admin_id?: string;
+      from_date?: string;
+      to_date?: string;
+      limit?: string;
+      skip?: string;
+    };
+
+    const data = await model.getAudit({
+      created_by: Number(admin_id),
+      from_date,
+      to_date,
+      limit: Number(limit),
+      skip: Number(skip),
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      data: data.data,
+      total: data.total,
+    };
+  }
+
+  // get error logs
+  public async getErrorLogs(req: Request) {
+    const model = this.Model.ErrorLogsModel();
+    const { level, from_date, to_date, limit, skip, search, source } =
+      req.query as {
+        level?: string;
+        from_date?: string;
+        to_date?: string;
+        limit?: string;
+        skip?: string;
+        search?: string;
+        source?: string;
+      };
+
+    const data = await model.getErrorLogs({
+      limit: Number(limit),
+      skip: Number(skip),
+      from_date,
+      to_date,
+      level,
+      search,
+      source,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      data,
+    };
+  }
 }

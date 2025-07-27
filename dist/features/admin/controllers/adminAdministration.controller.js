@@ -97,6 +97,18 @@ class AdminAdministrationController extends abstract_controller_1.default {
                 this.error(data.message, code);
             }
         }));
+        this.getAudit = this.asyncWrapper.wrap({
+            querySchema: this.validator.getAuditTrail,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getAuditTrail(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.getErrorLog = this.asyncWrapper.wrap({
+            querySchema: this.validator.getErrorLog,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getErrorLogs(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
     }
 }
 exports.default = AdminAdministrationController;

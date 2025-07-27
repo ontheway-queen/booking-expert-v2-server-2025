@@ -376,5 +376,46 @@ class AdminAdministrationService extends abstract_service_1.default {
             };
         });
     }
+    // get audit trail
+    getAuditTrail(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.AdminModel();
+            const { admin_id, from_date, to_date, limit, skip } = req.query;
+            const data = yield model.getAudit({
+                created_by: Number(admin_id),
+                from_date,
+                to_date,
+                limit: Number(limit),
+                skip: Number(skip),
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                data: data.data,
+                total: data.total,
+            };
+        });
+    }
+    // get error logs
+    getErrorLogs(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.ErrorLogsModel();
+            const { level, from_date, to_date, limit, skip, search, source } = req.query;
+            const data = yield model.getErrorLogs({
+                limit: Number(limit),
+                skip: Number(skip),
+                from_date,
+                to_date,
+                level,
+                search,
+                source,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                data,
+            };
+        });
+    }
 }
 exports.AdminAdministrationService = AdminAdministrationService;

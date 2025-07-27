@@ -57,6 +57,22 @@ class AdminAdministrationValidator {
             role_id: joi_1.default.number().optional(),
             status: joi_1.default.boolean().optional(),
         });
+        this.getErrorLog = joi_1.default.object({
+            search: joi_1.default.string().trim().optional(),
+            source: joi_1.default.string().valid('AGENT', 'ADMIN', 'B2C').optional(),
+            level: joi_1.default.string().valid('ERROR', 'WARNING', 'INFO').optional(),
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
+            from_date: joi_1.default.date().raw().optional(),
+            to_date: joi_1.default.date().raw().optional(),
+        });
+        this.getAuditTrail = joi_1.default.object({
+            admin_id: joi_1.default.number().optional(),
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
+            from_date: joi_1.default.date().raw().optional(),
+            to_date: joi_1.default.date().raw().optional(),
+        });
     }
 }
 exports.default = AdminAdministrationValidator;
