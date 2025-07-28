@@ -8,17 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -30,7 +19,6 @@ const flightConstant_1 = require("../../../../utils/miscellaneous/flightConstant
 const sabreFlightSupport_service_1 = __importDefault(require("../../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service"));
 const commonFlightBookingSupport_service_1 = require("../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service");
 const agentFlightBookingSupport_service_1 = require("../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service");
-const lib_1 = __importDefault(require("../../../../utils/lib/lib"));
 class AdminAgentFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -324,7 +312,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
-                const { user_id } = req.admin;
+                const { user_id, name, user_email } = req.admin;
                 const { status, airline_pnr, charge_credit, gds_pnr, ticket_issue_last_time, ticket_numbers, } = req.body;
                 const flightBookingModel = this.Model.FlightBookingModel(trx);
                 const booking_data = yield flightBookingModel.getSingleFlightBooking({
@@ -338,158 +326,41 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                yield flightBookingModel.updateFlightBooking({
-                    status: req.body.status,
-                }, { id: Number(id), source_type: constants_1.SOURCE_AGENT });
+                const payload = { status };
+                let booking_tracking = `Booking status has been updated from ${booking_data.status} to ${status} by ${name}(${user_email}).`;
+                if (status === flightConstant_1.FLIGHT_BOOKING_CONFIRMED) {
+                    if (booking_data.status !== flightConstant_1.FLIGHT_BOOKING_PENDING &&
+                        booking_data.status !== flightConstant_1.FLIGHT_BOOKING_IN_PROCESS) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Flight book is not allowed for this booking. Only pending/booking in process booking can be booked.',
+                        };
+                    }
+                    payload.gds_pnr = gds_pnr;
+                    payload.airline_pnr = airline_pnr;
+                    payload.ticket_issue_last_time = ticket_issue_last_time;
+                    booking_tracking += ` GDS PNR: ${gds_pnr}, Airline PNR: ${airline_pnr}, Ticket Issue Last Time: ${ticket_issue_last_time}.`;
+                }
+                else if (status === flightConstant_1.FLIGHT_TICKET_ISSUE) {
+                    if (booking_data.status !== flightConstant_1.FLIGHT_BOOKING_CONFIRMED &&
+                        booking_data.status !== flightConstant_1.FLIGHT_TICKET_IN_PROCESS) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Ticket issue is not allowed for this booking. Only confirmed booking can be issued.',
+                        };
+                    }
+                    booking_tracking += ` Ticket numbers: ${JSON.stringify(ticket_numbers)}.`;
+                }
+                yield flightBookingModel.updateFlightBooking(payload, {
+                    id: Number(id),
+                    source_type: constants_1.SOURCE_AGENT,
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: 'Booking has been expired successfully!',
-                };
-            }));
-        });
-    }
-    updatePendingBookingManually(req) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { id } = req.params;
-                const { user_id } = req.admin;
-                const flightBookingModel = this.Model.FlightBookingModel(trx);
-                const booking_data = yield flightBookingModel.getSingleFlightBooking({
-                    id: Number(id),
-                    booked_by: constants_1.SOURCE_AGENT,
-                });
-                if (!booking_data) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND,
-                    };
-                }
-                if (![flightConstant_1.FLIGHT_BOOKING_PENDING, flightConstant_1.FLIGHT_BOOKING_IN_PROCESS].includes(booking_data.status)) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: 'Cannot update the booking. Booking is not in pending state.',
-                    };
-                }
-                const body = req.body;
-                const { ticket_numbers, charge_credit } = body, rest = __rest(body, ["ticket_numbers", "charge_credit"]);
-                yield flightBookingModel.updateFlightBooking(Object.assign({}, rest), { id: Number(id), source_type: constants_1.SOURCE_AGENT });
-                if (ticket_numbers && ticket_numbers.length > 0) {
-                    const flightBookingTravelerModel = this.Model.FlightBookingTravelerModel(trx);
-                    yield Promise.all(ticket_numbers.map((ticket) => __awaiter(this, void 0, void 0, function* () {
-                        yield flightBookingTravelerModel.updateFlightBookingTraveler({
-                            ticket_number: ticket.ticket_number,
-                        }, ticket.passenger_id);
-                    })));
-                }
-                if (charge_credit) {
-                    const agencyPaymentModel = this.Model.AgencyPaymentModel(trx);
-                    yield agencyPaymentModel.insertAgencyLedger({
-                        agency_id: Number(booking_data.source_id),
-                        amount: booking_data.payable_amount,
-                        details: `Amount has been charged for booking ${booking_data.booking_ref}`,
-                        voucher_no: booking_data.booking_ref,
-                        type: 'Debit',
-                    });
-                    const invoiceModel = this.Model.InvoiceModel(trx);
-                    const getInvoice = yield invoiceModel.getInvoiceList({
-                        ref_id: booking_data.id,
-                        ref_type: constants_1.TYPE_FLIGHT,
-                    });
-                    yield invoiceModel.updateInvoice({
-                        due: 0,
-                    }, Number(getInvoice.data[0].id));
-                    const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
-                    yield moneyReceiptModel.createMoneyReceipt({
-                        mr_no: yield lib_1.default.generateNo({
-                            trx,
-                            type: constants_1.GENERATE_AUTO_UNIQUE_ID.money_receipt,
-                        }),
-                        invoice_id: Number(getInvoice.data[0].id),
-                        user_id: booking_data.created_by,
-                        amount: booking_data.payable_amount,
-                        details: `Amount has been charged for booking ${booking_data.booking_ref}`,
-                    });
-                }
-                return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    message: 'Booking has been updated successfully!',
-                };
-            }));
-        });
-    }
-    updateProcessingTicketManually(req) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { id } = req.params;
-                const { user_id } = req.admin;
-                const flightBookingModel = this.Model.FlightBookingModel(trx);
-                const booking_data = yield flightBookingModel.getSingleFlightBooking({
-                    id: Number(id),
-                    booked_by: constants_1.SOURCE_AGENT,
-                });
-                if (!booking_data) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND,
-                    };
-                }
-                if (booking_data.status !== flightConstant_1.FLIGHT_TICKET_IN_PROCESS) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: 'Cannot update the booking. Booking is not in processing state.',
-                    };
-                }
-                yield flightBookingModel.updateFlightBooking({
-                    status: flightConstant_1.FLIGHT_TICKET_ISSUE,
-                }, { id: Number(id), source_type: constants_1.SOURCE_AGENT });
-                const { ticket_numbers, charge_credit } = req.body;
-                if (ticket_numbers && ticket_numbers.length > 0) {
-                    const flightBookingTravelerModel = this.Model.FlightBookingTravelerModel(trx);
-                    yield Promise.all(ticket_numbers.map((ticket) => __awaiter(this, void 0, void 0, function* () {
-                        yield flightBookingTravelerModel.updateFlightBookingTraveler({
-                            ticket_number: ticket.ticket_number,
-                        }, ticket.passenger_id);
-                    })));
-                }
-                if (charge_credit) {
-                    const agencyPaymentModel = this.Model.AgencyPaymentModel(trx);
-                    yield agencyPaymentModel.insertAgencyLedger({
-                        agency_id: Number(booking_data.source_id),
-                        amount: booking_data.payable_amount,
-                        details: `Amount has been charged for booking ${booking_data.booking_ref}`,
-                        voucher_no: booking_data.booking_ref,
-                        type: 'Debit',
-                    });
-                    const invoiceModel = this.Model.InvoiceModel(trx);
-                    const getInvoice = yield invoiceModel.getInvoiceList({
-                        ref_id: booking_data.id,
-                        ref_type: constants_1.TYPE_FLIGHT,
-                    });
-                    yield invoiceModel.updateInvoice({
-                        due: 0,
-                    }, Number(getInvoice.data[0].id));
-                    const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
-                    yield moneyReceiptModel.createMoneyReceipt({
-                        mr_no: yield lib_1.default.generateNo({
-                            trx,
-                            type: constants_1.GENERATE_AUTO_UNIQUE_ID.money_receipt,
-                        }),
-                        invoice_id: Number(getInvoice.data[0].id),
-                        user_id: booking_data.created_by,
-                        amount: booking_data.payable_amount,
-                        details: `Amount has been charged for booking ${booking_data.booking_ref}`,
-                    });
-                }
-                return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    message: 'Ticket has been issued successfully!',
                 };
             }));
         });

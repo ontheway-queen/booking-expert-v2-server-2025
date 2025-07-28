@@ -33,32 +33,32 @@ class AdminAgentFlightController extends abstract_controller_1.default {
         this.service = new adminAgentFlight_service_1.AdminAgentFlightService();
         this.validator = new adminAgentFlight_validator_1.AdminAgentFlightValidator();
         this.getAllFlightBooking = this.asyncWrapper.wrap({
-            querySchema: this.validator.getFlightListSchema
+            querySchema: this.validator.getFlightListSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getAllFlightBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.getSingleBooking = this.asyncWrapper.wrap({
-            paramSchema: this.commonValidator.singleParamNumValidator()
+            paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getSingleBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.getBookingTrackingData = this.asyncWrapper.wrap({
             querySchema: this.validator.getBookingTrackingDataSchema,
-            paramSchema: this.commonValidator.singleParamNumValidator()
+            paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getBookingTrackingData(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.cancelBooking = this.asyncWrapper.wrap({
-            paramSchema: this.commonValidator.singleParamNumValidator()
+            paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.cancelBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.issueTicket = this.asyncWrapper.wrap({
-            paramSchema: this.commonValidator.singleParamNumValidator()
+            paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.issueTicket(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
@@ -67,18 +67,6 @@ class AdminAgentFlightController extends abstract_controller_1.default {
             bodySchema: this.validator.updateFlightBookingSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.updateBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
-        }));
-        this.updatePendingBookingManually = this.asyncWrapper.wrap({
-            bodySchema: this.validator.updatePendingBookingManuallySchema,
-        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.updatePendingBookingManually(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
-        }));
-        this.updateProcessingTicketManually = this.asyncWrapper.wrap({
-            bodySchema: this.validator.updateProcessingTicketSchema,
-        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.updateProcessingTicketManually(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
     }

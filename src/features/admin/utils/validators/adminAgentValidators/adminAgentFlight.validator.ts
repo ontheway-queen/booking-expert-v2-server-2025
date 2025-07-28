@@ -41,16 +41,30 @@ export class AdminAgentFlightValidator {
   });
 
   public updateFlightBookingSchema = Joi.object({
-    status: Joi.string().valid(FLIGHT_BOOKING_EXPIRED).required(),
-  });
-
-  public updatePendingBookingManuallySchema = Joi.object({
     status: Joi.string()
-      .valid(FLIGHT_BOOKING_CONFIRMED, FLIGHT_TICKET_ISSUE)
+      .valid(
+        FLIGHT_BOOKING_EXPIRED,
+        FLIGHT_BOOKING_CONFIRMED,
+        FLIGHT_BOOKING_CANCELLED,
+        FLIGHT_TICKET_ISSUE,
+        FLIGHT_BOOKING_VOID
+      )
       .required(),
-    gds_pnr: Joi.string().trim(),
-    ticket_issue_last_time: Joi.date(),
-    airline_pnr: Joi.string().trim(),
+    gds_pnr: Joi.when('status', {
+      is: FLIGHT_BOOKING_CONFIRMED,
+      then: Joi.string().trim().required(),
+      otherwise: Joi.forbidden(),
+    }),
+    airline_pnr: Joi.when('status', {
+      is: FLIGHT_BOOKING_CONFIRMED,
+      then: Joi.string().trim().required(),
+      otherwise: Joi.forbidden(),
+    }),
+    ticket_issue_last_time: Joi.when('status', {
+      is: FLIGHT_BOOKING_CONFIRMED,
+      then: Joi.date().timestamp().raw().required(),
+      otherwise: Joi.forbidden(),
+    }),
     ticket_numbers: Joi.when('status', {
       is: FLIGHT_TICKET_ISSUE,
       then: Joi.array()
@@ -68,17 +82,5 @@ export class AdminAgentFlightValidator {
       then: Joi.boolean().required(),
       otherwise: Joi.forbidden(),
     }),
-  });
-
-  public updateProcessingTicketSchema = Joi.object({
-    ticket_numbers: Joi.array()
-      .items(
-        Joi.object({
-          passenger_id: Joi.number().required(),
-          ticket_number: Joi.string().required(),
-        })
-      )
-      .required(),
-    charge_credit: Joi.boolean().required(),
   });
 }

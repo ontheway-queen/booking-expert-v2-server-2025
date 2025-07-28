@@ -2,13 +2,13 @@ import express, { Application, NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import { Server } from 'http';
-import { origin } from '../utils/miscellaneous/constants';
 import { SocketServer, io } from './socket';
 import cron from 'node-cron';
 import CustomError from '../utils/lib/customError';
 import ErrorHandler from '../middleware/errorHandler/errorHandler';
 import RootRouter from './router';
 import PublicCommonService from '../features/public/services/publicCommon.service';
+import { origin } from '../utils/miscellaneous/cors';
 
 class App {
   public app: Application = express();

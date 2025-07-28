@@ -132,7 +132,7 @@ export interface IUpdateFlightBookingPayload {
   issued_at?: Date;
   api?: string;
   gds_pnr?: string;
-  ticket_issue_last_time?: Date;
+  ticket_issue_last_time?: string;
   airline_pnr?: string;
 }
 

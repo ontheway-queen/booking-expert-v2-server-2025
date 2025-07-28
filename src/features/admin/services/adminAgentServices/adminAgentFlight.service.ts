@@ -30,6 +30,7 @@ import {
   IAdminUpdateFlightBookingReqBody,
 } from '../../utils/types/adminAgentTypes/adminAgentFlight.types';
 import Lib from '../../../../utils/lib/lib';
+import { IUpdateFlightBookingPayload } from '../../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
 
 export class AdminAgentFlightService extends AbstractServices {
   constructor() {
@@ -390,7 +391,7 @@ export class AdminAgentFlightService extends AbstractServices {
   public async updateBooking(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
-      const { user_id } = req.admin;
+      const { user_id, name, user_email } = req.admin;
       const {
         status,
         airline_pnr,
@@ -401,6 +402,7 @@ export class AdminAgentFlightService extends AbstractServices {
       } = req.body as IAdminUpdateFlightBookingReqBody;
 
       const flightBookingModel = this.Model.FlightBookingModel(trx);
+
       const booking_data = await flightBookingModel.getSingleFlightBooking({
         id: Number(id),
         booked_by: SOURCE_AGENT,
@@ -414,208 +416,53 @@ export class AdminAgentFlightService extends AbstractServices {
         };
       }
 
-      await flightBookingModel.updateFlightBooking(
-        {
-          status: req.body.status,
-        },
-        { id: Number(id), source_type: SOURCE_AGENT }
-      );
+      const payload: IUpdateFlightBookingPayload = { status };
+      let booking_tracking = `Booking status has been updated from ${booking_data.status} to ${status} by ${name}(${user_email}).`;
+
+      if (status === FLIGHT_BOOKING_CONFIRMED) {
+        if (
+          booking_data.status !== FLIGHT_BOOKING_PENDING &&
+          booking_data.status !== FLIGHT_BOOKING_IN_PROCESS
+        ) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message:
+              'Flight book is not allowed for this booking. Only pending/booking in process booking can be booked.',
+          };
+        }
+        payload.gds_pnr = gds_pnr;
+        payload.airline_pnr = airline_pnr;
+        payload.ticket_issue_last_time = ticket_issue_last_time;
+
+        booking_tracking += ` GDS PNR: ${gds_pnr}, Airline PNR: ${airline_pnr}, Ticket Issue Last Time: ${ticket_issue_last_time}.`;
+      } else if (status === FLIGHT_TICKET_ISSUE) {
+        if (
+          booking_data.status !== FLIGHT_BOOKING_CONFIRMED &&
+          booking_data.status !== FLIGHT_TICKET_IN_PROCESS
+        ) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message:
+              'Ticket issue is not allowed for this booking. Only confirmed booking can be issued.',
+          };
+        }
+
+        booking_tracking += ` Ticket numbers: ${JSON.stringify(
+          ticket_numbers
+        )}.`;
+      }
+
+      await flightBookingModel.updateFlightBooking(payload, {
+        id: Number(id),
+        source_type: SOURCE_AGENT,
+      });
 
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: 'Booking has been expired successfully!',
-      };
-    });
-  }
-
-  public async updatePendingBookingManually(req: Request) {
-    return await this.db.transaction(async (trx) => {
-      const { id } = req.params;
-      const { user_id } = req.admin;
-      const flightBookingModel = this.Model.FlightBookingModel(trx);
-      const booking_data = await flightBookingModel.getSingleFlightBooking({
-        id: Number(id),
-        booked_by: SOURCE_AGENT,
-      });
-      if (!booking_data) {
-        return {
-          success: false,
-          code: this.StatusCode.HTTP_NOT_FOUND,
-          message: this.ResMsg.HTTP_NOT_FOUND,
-        };
-      }
-      if (
-        ![FLIGHT_BOOKING_PENDING, FLIGHT_BOOKING_IN_PROCESS].includes(
-          booking_data.status
-        )
-      ) {
-        return {
-          success: false,
-          code: this.StatusCode.HTTP_BAD_REQUEST,
-          message:
-            'Cannot update the booking. Booking is not in pending state.',
-        };
-      }
-
-      const body = req.body as IAdminUpdateAgentPendingBookingManuallyPayload;
-      const { ticket_numbers, charge_credit, ...rest } = body;
-
-      await flightBookingModel.updateFlightBooking(
-        {
-          ...rest,
-        },
-        { id: Number(id), source_type: SOURCE_AGENT }
-      );
-
-      if (ticket_numbers && ticket_numbers.length > 0) {
-        const flightBookingTravelerModel =
-          this.Model.FlightBookingTravelerModel(trx);
-        await Promise.all(
-          ticket_numbers.map(async (ticket) => {
-            await flightBookingTravelerModel.updateFlightBookingTraveler(
-              {
-                ticket_number: ticket.ticket_number,
-              },
-              ticket.passenger_id
-            );
-          })
-        );
-      }
-
-      if (charge_credit) {
-        const agencyPaymentModel = this.Model.AgencyPaymentModel(trx);
-        await agencyPaymentModel.insertAgencyLedger({
-          agency_id: Number(booking_data.source_id),
-          amount: booking_data.payable_amount,
-          details: `Amount has been charged for booking ${booking_data.booking_ref}`,
-          voucher_no: booking_data.booking_ref,
-          type: 'Debit',
-        });
-
-        const invoiceModel = this.Model.InvoiceModel(trx);
-        const getInvoice = await invoiceModel.getInvoiceList({
-          ref_id: booking_data.id,
-          ref_type: TYPE_FLIGHT,
-        });
-        await invoiceModel.updateInvoice(
-          {
-            due: 0,
-          },
-          Number(getInvoice.data[0].id)
-        );
-
-        const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
-        await moneyReceiptModel.createMoneyReceipt({
-          mr_no: await Lib.generateNo({
-            trx,
-            type: GENERATE_AUTO_UNIQUE_ID.money_receipt,
-          }),
-          invoice_id: Number(getInvoice.data[0].id),
-          user_id: booking_data.created_by,
-          amount: booking_data.payable_amount,
-          details: `Amount has been charged for booking ${booking_data.booking_ref}`,
-        });
-      }
-
-      return {
-        success: true,
-        code: this.StatusCode.HTTP_OK,
-        message: 'Booking has been updated successfully!',
-      };
-    });
-  }
-
-  public async updateProcessingTicketManually(req: Request) {
-    return await this.db.transaction(async (trx) => {
-      const { id } = req.params;
-      const { user_id } = req.admin;
-      const flightBookingModel = this.Model.FlightBookingModel(trx);
-      const booking_data = await flightBookingModel.getSingleFlightBooking({
-        id: Number(id),
-        booked_by: SOURCE_AGENT,
-      });
-      if (!booking_data) {
-        return {
-          success: false,
-          code: this.StatusCode.HTTP_NOT_FOUND,
-          message: this.ResMsg.HTTP_NOT_FOUND,
-        };
-      }
-
-      if (booking_data.status !== FLIGHT_TICKET_IN_PROCESS) {
-        return {
-          success: false,
-          code: this.StatusCode.HTTP_BAD_REQUEST,
-          message:
-            'Cannot update the booking. Booking is not in processing state.',
-        };
-      }
-
-      await flightBookingModel.updateFlightBooking(
-        {
-          status: FLIGHT_TICKET_ISSUE,
-        },
-        { id: Number(id), source_type: SOURCE_AGENT }
-      );
-
-      const { ticket_numbers, charge_credit } =
-        req.body as IAdminUpdateAgentProcessingTicketPayload;
-
-      if (ticket_numbers && ticket_numbers.length > 0) {
-        const flightBookingTravelerModel =
-          this.Model.FlightBookingTravelerModel(trx);
-        await Promise.all(
-          ticket_numbers.map(async (ticket) => {
-            await flightBookingTravelerModel.updateFlightBookingTraveler(
-              {
-                ticket_number: ticket.ticket_number,
-              },
-              ticket.passenger_id
-            );
-          })
-        );
-      }
-
-      if (charge_credit) {
-        const agencyPaymentModel = this.Model.AgencyPaymentModel(trx);
-        await agencyPaymentModel.insertAgencyLedger({
-          agency_id: Number(booking_data.source_id),
-          amount: booking_data.payable_amount,
-          details: `Amount has been charged for booking ${booking_data.booking_ref}`,
-          voucher_no: booking_data.booking_ref,
-          type: 'Debit',
-        });
-
-        const invoiceModel = this.Model.InvoiceModel(trx);
-        const getInvoice = await invoiceModel.getInvoiceList({
-          ref_id: booking_data.id,
-          ref_type: TYPE_FLIGHT,
-        });
-        await invoiceModel.updateInvoice(
-          {
-            due: 0,
-          },
-          Number(getInvoice.data[0].id)
-        );
-
-        const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
-        await moneyReceiptModel.createMoneyReceipt({
-          mr_no: await Lib.generateNo({
-            trx,
-            type: GENERATE_AUTO_UNIQUE_ID.money_receipt,
-          }),
-          invoice_id: Number(getInvoice.data[0].id),
-          user_id: booking_data.created_by,
-          amount: booking_data.payable_amount,
-          details: `Amount has been charged for booking ${booking_data.booking_ref}`,
-        });
-      }
-
-      return {
-        success: true,
-        code: this.StatusCode.HTTP_OK,
-        message: 'Ticket has been issued successfully!',
       };
     });
   }

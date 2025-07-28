@@ -15,17 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const cors_1 = __importDefault(require("cors"));
-const constants_1 = require("../utils/miscellaneous/constants");
 const socket_1 = require("./socket");
 const node_cron_1 = __importDefault(require("node-cron"));
 const customError_1 = __importDefault(require("../utils/lib/customError"));
 const errorHandler_1 = __importDefault(require("../middleware/errorHandler/errorHandler"));
 const router_1 = __importDefault(require("./router"));
 const publicCommon_service_1 = __importDefault(require("../features/public/services/publicCommon.service"));
+const cors_2 = require("../utils/miscellaneous/cors");
 class App {
     constructor(port) {
         this.app = (0, express_1.default)();
-        this.origin = constants_1.origin;
+        this.origin = cors_2.origin;
         this.server = (0, socket_1.SocketServer)(this.app);
         this.port = port;
         this.initMiddleware();

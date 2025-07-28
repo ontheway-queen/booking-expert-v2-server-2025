@@ -33,7 +33,6 @@ export interface IAdminUpdateFlightBookingReqBody {
     | typeof FLIGHT_TICKET_ISSUE
     | typeof FLIGHT_BOOKING_EXPIRED
     | typeof FLIGHT_BOOKING_CANCELLED
-    | typeof FLIGHT_BOOKING_REFUNDED
     | typeof FLIGHT_BOOKING_VOID;
   gds_pnr?: string;
   airline_pnr?: string;
