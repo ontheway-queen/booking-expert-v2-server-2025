@@ -24,4 +24,12 @@ export const origin: string[] = [
   'https://www.ota.asianethotels.com',
   'https://pilottravels.com.bd',
   'https://www.pilottravels.com.bd',
+  'https://sharothionline.com',
+  'https://www.sharothionline.com',
+  'https://ltourmv.com',
+  'https://www.ltourmv.com',
+  'https://aviationhubbd.com',
+  'https://www.aviationhubbd.com',
+  'https://firoztrip.com',
+  'https://www.firoztrip.com',
 ];
