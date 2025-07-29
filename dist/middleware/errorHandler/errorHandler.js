@@ -31,12 +31,35 @@ class ErrorHandler {
                 route: req.originalUrl,
                 method: req.method,
                 stack: err.stack,
-                user_id: ((_a = req.user) === null || _a === void 0 ? void 0 : _a.user_id) || ((_b = req.agencyUser) === null || _b === void 0 ? void 0 : _b.user_id) || ((_c = req.admin) === null || _c === void 0 ? void 0 : _c.user_id) || ((_d = req.agencyB2CUser) === null || _d === void 0 ? void 0 : _d.user_id) || ((_e = req.external) === null || _e === void 0 ? void 0 : _e.external_id),
-                source: req.agencyUser ? constants_1.SOURCE_AGENT : req.admin ? constants_1.SOURCE_ADMIN : req.external ? constants_1.SOURCE_EXTERNAL : req.agencyB2CUser ? constants_1.SOURCE_AGENT_B2C : constants_1.SOURCE_B2C
+                user_id: ((_a = req.user) === null || _a === void 0 ? void 0 : _a.user_id) ||
+                    ((_b = req.agencyUser) === null || _b === void 0 ? void 0 : _b.user_id) ||
+                    ((_c = req.admin) === null || _c === void 0 ? void 0 : _c.user_id) ||
+                    ((_d = req.agencyB2CUser) === null || _d === void 0 ? void 0 : _d.user_id) ||
+                    ((_e = req.external) === null || _e === void 0 ? void 0 : _e.external_id),
+                source: req.agencyUser
+                    ? constants_1.SOURCE_AGENT
+                    : req.admin
+                        ? constants_1.SOURCE_ADMIN
+                        : req.external
+                            ? constants_1.SOURCE_EXTERNAL
+                            : req.agencyB2CUser
+                                ? constants_1.SOURCE_AGENT_B2C
+                                : constants_1.SOURCE_B2C,
             };
             try {
                 if (err.status == 500 || !err.status) {
-                    yield new rootModel_1.default().ErrorLogsModel().insertErrorLogs({ level: err.level || "ERROR", message: errorDetails.message || "Internal Server Error", stack_trace: errorDetails.stack, source: errorDetails.source, user_id: errorDetails.user_id, url: errorDetails.route, http_method: errorDetails.method, metadata: err.metadata });
+                    yield new rootModel_1.default()
+                        .ErrorLogsModel()
+                        .insertErrorLogs({
+                        level: err.level || 'ERROR',
+                        message: errorDetails.message || 'Internal Server Error',
+                        stack_trace: errorDetails.stack,
+                        source: errorDetails.source,
+                        user_id: errorDetails.user_id,
+                        url: errorDetails.route,
+                        http_method: errorDetails.method,
+                        metadata: err.metadata,
+                    });
                 }
             }
             catch (err) {

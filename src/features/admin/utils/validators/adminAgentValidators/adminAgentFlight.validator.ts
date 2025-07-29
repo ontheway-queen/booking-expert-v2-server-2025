@@ -62,7 +62,7 @@ export class AdminAgentFlightValidator {
     }),
     ticket_issue_last_time: Joi.when('status', {
       is: FLIGHT_BOOKING_CONFIRMED,
-      then: Joi.date().timestamp().raw().required(),
+      then: Joi.date().iso().raw().required(),
       otherwise: Joi.forbidden(),
     }),
     ticket_numbers: Joi.when('status', {

@@ -36,7 +36,7 @@ class AdminAgentFlightValidator {
             }),
             ticket_issue_last_time: joi_1.default.when('status', {
                 is: flightConstant_1.FLIGHT_BOOKING_CONFIRMED,
-                then: joi_1.default.date().timestamp().raw().required(),
+                then: joi_1.default.date().iso().raw().required(),
                 otherwise: joi_1.default.forbidden(),
             }),
             ticket_numbers: joi_1.default.when('status', {

@@ -24,13 +24,10 @@ import {
 import SabreFlightService from '../../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service';
 import { CommonFlightBookingSupportService } from '../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service';
 import { AgentFlightBookingSupportService } from '../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service';
-import {
-  IAdminUpdateAgentPendingBookingManuallyPayload,
-  IAdminUpdateAgentProcessingTicketPayload,
-  IAdminUpdateFlightBookingReqBody,
-} from '../../utils/types/adminAgentTypes/adminAgentFlight.types';
+import { IAdminUpdateFlightBookingReqBody } from '../../utils/types/adminAgentTypes/adminAgentFlight.types';
 import Lib from '../../../../utils/lib/lib';
 import { IUpdateFlightBookingPayload } from '../../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
+import { IAgentUpdateDataAfterTicketIssue } from '../../../../utils/supportTypes/bookingSupportTypes/flightBookingSupportTypes/agentFlightBookingTypes';
 
 export class AdminAgentFlightService extends AbstractServices {
   constructor() {
@@ -63,6 +60,7 @@ export class AdminAgentFlightService extends AbstractServices {
       const flightTravelerModel = this.Model.FlightBookingTravelerModel(trx);
       const flightPriceBreakdownModel =
         this.Model.FlightBookingPriceBreakdownModel(trx);
+      const invoiceModel = this.Model.InvoiceModel(trx);
 
       const booking_id = Number(id);
       const booking_data = await flightBookingModel.getSingleFlightBooking({
@@ -94,6 +92,12 @@ export class AdminAgentFlightService extends AbstractServices {
           booking_id
         );
 
+      const invoice = await invoiceModel.getSingleInvoice({
+        source_type: SOURCE_AGENT,
+        ref_id: Number(id),
+        ref_type: TYPE_FLIGHT,
+      });
+
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
@@ -102,7 +106,14 @@ export class AdminAgentFlightService extends AbstractServices {
           price_breakdown_data,
           segment_data,
           traveler_data,
-          modified_fare_amount,
+          invoice: {
+            id: invoice?.id,
+            invoice_no: invoice?.invoice_no,
+            total_amount: invoice?.total_amount,
+            due: invoice?.due,
+            status: invoice?.status,
+          },
+          modified_fare_amount: modified_fare_amount[0],
         },
       };
     });
@@ -282,16 +293,12 @@ export class AdminAgentFlightService extends AbstractServices {
       const flightSegment = await flightSegmentsModel.getFlightBookingSegment(
         Number(id)
       );
-      const agentFlightBookingSupportService =
-        new AgentFlightBookingSupportService(trx);
       const ticketIssuePermission =
-        await agentFlightBookingSupportService.checkAgentDirectTicketIssuePermission(
-          {
-            agency_id: Number(booking_data.source_id),
-            api_name: booking_data.api,
-            airline: flightSegment[0].airline_code,
-          }
-        );
+        await agentBookingSubService.checkAgentDirectTicketIssuePermission({
+          agency_id: Number(booking_data.source_id),
+          api_name: booking_data.api,
+          airline: flightSegment[0].airline_code,
+        });
 
       if (ticketIssuePermission.success === false) {
         return ticketIssuePermission;
@@ -332,7 +339,7 @@ export class AdminAgentFlightService extends AbstractServices {
           };
         }
 
-        await agentFlightBookingSupportService.updateDataAfterTicketIssue({
+        await agentBookingSubService.updateDataAfterTicketIssue({
           booking_id: Number(id),
           status,
           due: Number(payment_data.due),
@@ -367,6 +374,7 @@ export class AdminAgentFlightService extends AbstractServices {
           panel_link: `${AGENT_PROJECT_LINK}${FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}`,
           due: Number(payment_data.due),
         });
+
         return {
           success: true,
           code: this.StatusCode.HTTP_OK,
@@ -391,7 +399,7 @@ export class AdminAgentFlightService extends AbstractServices {
   public async updateBooking(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
-      const { user_id, name, user_email } = req.admin;
+      const { name, user_email } = req.admin;
       const {
         status,
         airline_pnr,
@@ -422,7 +430,8 @@ export class AdminAgentFlightService extends AbstractServices {
       if (status === FLIGHT_BOOKING_CONFIRMED) {
         if (
           booking_data.status !== FLIGHT_BOOKING_PENDING &&
-          booking_data.status !== FLIGHT_BOOKING_IN_PROCESS
+          booking_data.status !== FLIGHT_BOOKING_IN_PROCESS &&
+          booking_data.status !== FLIGHT_BOOKING_CONFIRMED
         ) {
           return {
             success: false,
@@ -439,7 +448,8 @@ export class AdminAgentFlightService extends AbstractServices {
       } else if (status === FLIGHT_TICKET_ISSUE) {
         if (
           booking_data.status !== FLIGHT_BOOKING_CONFIRMED &&
-          booking_data.status !== FLIGHT_TICKET_IN_PROCESS
+          booking_data.status !== FLIGHT_TICKET_IN_PROCESS &&
+          booking_data.status !== FLIGHT_TICKET_ISSUE
         ) {
           return {
             success: false,
@@ -452,6 +462,65 @@ export class AdminAgentFlightService extends AbstractServices {
         booking_tracking += ` Ticket numbers: ${JSON.stringify(
           ticket_numbers
         )}.`;
+
+        const flightBookingTravelerModel =
+          this.Model.FlightBookingTravelerModel(trx);
+        const agentBookingSubService = new AgentFlightBookingSupportService(
+          trx
+        );
+
+        if (charge_credit) {
+          const payment_data =
+            await agentBookingSubService.getPaymentInformation({
+              booking_id: Number(id),
+              payment_type: PAYMENT_TYPE_FULL,
+              refundable: booking_data.refundable,
+              departure_date: booking_data.travel_date,
+              agency_id: Number(booking_data.source_id),
+              ticket_price: booking_data.payable_amount,
+            });
+
+          if (payment_data.success === false) {
+            return payment_data;
+          }
+
+          const updatePayload: IAgentUpdateDataAfterTicketIssue = {
+            booking_id: Number(id),
+            status,
+            due: Number(payment_data.due),
+            agency_id: Number(booking_data.source_id),
+            booking_ref: booking_data.booking_ref,
+            deduct_amount_from: payment_data.deduct_amount_from as
+              | 'Both'
+              | 'Loan'
+              | 'Balance',
+            paid_amount: Number(payment_data.paid_amount),
+            loan_amount: Number(payment_data.loan_amount),
+            invoice_id: Number(payment_data.invoice_id),
+            user_id: booking_data.created_by,
+            api: booking_data.api,
+          };
+
+          if (booking_data.status !== FLIGHT_TICKET_IN_PROCESS) {
+            updatePayload.issued_by_type = SOURCE_ADMIN;
+            updatePayload.issued_by_user_id = req.admin.user_id;
+          }
+
+          await agentBookingSubService.updateDataAfterTicketIssue(
+            updatePayload
+          );
+
+          booking_tracking += ` With credit charged.`;
+        } else {
+          booking_tracking += ` Without credit charged.`;
+        }
+
+        ticket_numbers?.map(async (ticket_number) => {
+          await flightBookingTravelerModel.updateFlightBookingTraveler(
+            { ticket_number: ticket_number.ticket_number },
+            ticket_number.passenger_id
+          );
+        });
       }
 
       await flightBookingModel.updateFlightBooking(payload, {
@@ -462,7 +531,7 @@ export class AdminAgentFlightService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: 'Booking has been expired successfully!',
+        message: this.ResMsg.HTTP_OK,
       };
     });
   }

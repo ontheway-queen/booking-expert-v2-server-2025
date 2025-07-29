@@ -341,14 +341,17 @@ class AgentHotelService extends abstract_service_1.default {
                     };
                 }
                 // Hotel Book
-                const booking = yield ctHotelSupport.HotelBooking(body, agent.hotel_markup_set);
-                if (!booking) {
-                    return {
-                        success: false,
-                        message: 'Booking failed. Please try again with another room.',
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                    };
-                }
+                // const booking = await ctHotelSupport.HotelBooking(
+                //   body,
+                //   agent.hotel_markup_set
+                // );
+                // if (!booking) {
+                //   return {
+                //     success: false,
+                //     message: 'Booking failed. Please try again with another room.',
+                //     code: this.StatusCode.HTTP_BAD_REQUEST,
+                //   };
+                // }
                 const payload = body;
                 // Handle room wise paxes files
                 if (files.length) {
@@ -411,10 +414,9 @@ class AgentHotelService extends abstract_service_1.default {
                     hotel_extra_charges: JSON.stringify(recheck.hotel_extra_charges),
                     free_cancellation: ((_a = recheck.rates[0].cancellation_policy) === null || _a === void 0 ? void 0 : _a.free_cancellation) || false,
                     source_type: constants_1.SOURCE_AGENT,
-                    status: 'Booked',
+                    status: 'Pending',
                     free_cancellation_last_date: (_b = recheck.rates[0].cancellation_policy) === null || _b === void 0 ? void 0 : _b.free_cancellation_last_date,
-                    supplier_ref: booking.booking_id,
-                    rooms: JSON.stringify(recheck),
+                    rooms: JSON.stringify(recheck.rates[0].rooms),
                 });
                 if ((_c = recheck.rates[0].cancellation_policy) === null || _c === void 0 ? void 0 : _c.details.length) {
                     const cancellationPayload = recheck.rates[0].cancellation_policy.details.map((item) => {
@@ -487,7 +489,12 @@ class AgentHotelService extends abstract_service_1.default {
                     success: true,
                     message: this.ResMsg.HTTP_SUCCESSFUL,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    data: booking,
+                    data: {
+                        booking_ref,
+                        booking_id: hotelBooking[0].id,
+                        invoice_no,
+                        invoice_id: invoice_res[0].id,
+                    },
                 };
             }));
         });
@@ -518,23 +525,23 @@ class AgentHotelService extends abstract_service_1.default {
     getSingleBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
+            const booking_id = Number(id);
             const hotelBookingModel = this.Model.HotelBookingModel();
-            // const data = await hotelBookingModel.getSingleBooking({
-            //   booking_id: Number(id),
-            //   source_type: 'AGENT',
-            // });
-            // if (!data) {
-            //   return {
-            //     success: false,
-            //     code: this.StatusCode.HTTP_NOT_FOUND,
-            //     message: this.ResMsg.HTTP_NOT_FOUND,
-            //   };
-            // }
+            const data = yield hotelBookingModel.getSingleAgentBooking({ booking_id });
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            const travelers = yield hotelBookingModel.getHotelBookingTraveler(booking_id);
+            const { supplier_price } = data, rest = __rest(data, ["supplier_price"]);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                // data,
+                data: Object.assign(Object.assign({}, rest), { travelers }),
             };
         });
     }

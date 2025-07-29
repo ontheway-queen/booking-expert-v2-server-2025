@@ -385,18 +385,18 @@ export class AgentHotelService extends AbstractServices {
       }
 
       // Hotel Book
-      const booking = await ctHotelSupport.HotelBooking(
-        body,
-        agent.hotel_markup_set
-      );
+      // const booking = await ctHotelSupport.HotelBooking(
+      //   body,
+      //   agent.hotel_markup_set
+      // );
 
-      if (!booking) {
-        return {
-          success: false,
-          message: 'Booking failed. Please try again with another room.',
-          code: this.StatusCode.HTTP_BAD_REQUEST,
-        };
-      }
+      // if (!booking) {
+      //   return {
+      //     success: false,
+      //     message: 'Booking failed. Please try again with another room.',
+      //     code: this.StatusCode.HTTP_BAD_REQUEST,
+      //   };
+      // }
 
       const payload: ICTHotelBookingPayload = body;
 
@@ -484,11 +484,10 @@ export class AgentHotelService extends AbstractServices {
         free_cancellation:
           recheck.rates[0].cancellation_policy?.free_cancellation || false,
         source_type: SOURCE_AGENT,
-        status: 'Booked',
+        status: 'Pending',
         free_cancellation_last_date:
           recheck.rates[0].cancellation_policy?.free_cancellation_last_date,
-        supplier_ref: booking.booking_id,
-        rooms: JSON.stringify(recheck),
+        rooms: JSON.stringify(recheck.rates[0].rooms),
       });
 
       if (recheck.rates[0].cancellation_policy?.details.length) {
@@ -577,7 +576,12 @@ export class AgentHotelService extends AbstractServices {
         success: true,
         message: this.ResMsg.HTTP_SUCCESSFUL,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        data: booking,
+        data: {
+          booking_ref,
+          booking_id: hotelBooking[0].id,
+          invoice_no,
+          invoice_id: invoice_res[0].id,
+        },
       };
     });
   }
@@ -613,26 +617,34 @@ export class AgentHotelService extends AbstractServices {
   public async getSingleBooking(req: Request) {
     const { id } = req.params;
 
+    const booking_id = Number(id);
+
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    // const data = await hotelBookingModel.getSingleBooking({
-    //   booking_id: Number(id),
-    //   source_type: 'AGENT',
-    // });
+    const data = await hotelBookingModel.getSingleAgentBooking({ booking_id });
 
-    // if (!data) {
-    //   return {
-    //     success: false,
-    //     code: this.StatusCode.HTTP_NOT_FOUND,
-    //     message: this.ResMsg.HTTP_NOT_FOUND,
-    //   };
-    // }
+    if (!data) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_NOT_FOUND,
+        message: this.ResMsg.HTTP_NOT_FOUND,
+      };
+    }
+
+    const travelers = await hotelBookingModel.getHotelBookingTraveler(
+      booking_id
+    );
+
+    const { supplier_price, ...rest } = data;
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      // data,
+      data: {
+        ...rest,
+        travelers,
+      },
     };
   }
 }

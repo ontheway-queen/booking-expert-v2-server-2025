@@ -620,12 +620,12 @@ class AgentFlightService extends abstract_service_1.default {
                     console.log({ err });
                     yield this.Model.ErrorLogsModel(trx).insertErrorLogs({
                         http_method: 'POST',
-                        level: constants_1.ERROR_LEVEL_ERROR,
+                        level: err.level || constants_1.ERROR_LEVEL_ERROR,
                         message: 'Error on flight booking.' + err,
-                        url: '/flight/booking',
+                        url: req.originalUrl,
                         user_id: user_id,
-                        source: 'AGENT',
-                        metadata: {
+                        source: constants_1.SOURCE_AGENT,
+                        metadata: err.metadata || {
                             api: data.api,
                             request_body: {
                                 flight_id: body.flight_id,
@@ -639,6 +639,10 @@ class AgentFlightService extends abstract_service_1.default {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
                         message: 'Flight booking is in process. Please check later.',
+                        data: {
+                            booking_id: new_booking_id,
+                            booking_ref: new_booking_ref,
+                        },
                     };
                 }
                 try {

@@ -17,6 +17,7 @@ import {
 } from '../../miscellaneous/flightConstant';
 
 import {
+  ERROR_LEVEL_ERROR,
   ERROR_LEVEL_WARNING,
   PROJECT_EMAIL,
 } from '../../miscellaneous/constants';
@@ -1440,7 +1441,14 @@ export default class SabreFlightService extends AbstractServices {
     if (!response) {
       throw new CustomError(
         'Something went wrong. Please try again later',
-        500
+        500,
+        ERROR_LEVEL_ERROR,
+        {
+          api: SABRE_API,
+          endpoint: SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,
+          payload: requestBody,
+          response: response?.CreatePassengerNameRecordRS?.ApplicationResults,
+        }
       );
     }
     if (
@@ -1450,7 +1458,7 @@ export default class SabreFlightService extends AbstractServices {
       throw new CustomError(
         'This flight is already booked. Please try booking another flight',
         this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
-        ERROR_LEVEL_WARNING,
+        ERROR_LEVEL_ERROR,
         {
           api: SABRE_API,
           endpoint: SabreAPIEndpoints.FLIGHT_BOOKING_ENDPOINT,

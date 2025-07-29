@@ -58,21 +58,11 @@ class AgentHotelController extends abstract_controller_1.default {
         }));
         this.getHotelBooking = this.asyncWrapper.wrap({ querySchema: this.validator.getHotelBooking }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getHotelBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
-            if (rest.success) {
-                res.status(code).json(rest);
-            }
-            else {
-                this.error(rest.message, code);
-            }
+            res.status(code).json(rest);
         }));
         this.getSingleHotelBooking = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.getHotelBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
-            if (rest.success) {
-                res.status(code).json(rest);
-            }
-            else {
-                this.error(rest.message, code);
-            }
+            const _a = yield this.service.getSingleBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
         }));
     }
 }

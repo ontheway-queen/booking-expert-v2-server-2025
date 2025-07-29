@@ -1072,7 +1072,7 @@ class SabreFlightService extends abstract_service_1.default {
     //flight booking service
     FlightBookingService(_a) {
         return __awaiter(this, arguments, void 0, function* ({ body, user_info, revalidate_data, }) {
-            var _b, _c, _d, _e, _f;
+            var _b, _c, _d, _e, _f, _g;
             const requestBody = yield this.pnrReqBody(body, revalidate_data, {
                 email: user_info.email,
                 phone: user_info.phone,
@@ -1080,19 +1080,24 @@ class SabreFlightService extends abstract_service_1.default {
             });
             const response = yield this.request.postRequest(sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT, requestBody);
             if (!response) {
-                throw new customError_1.default('Something went wrong. Please try again later', 500);
-            }
-            if (((_c = (_b = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _b === void 0 ? void 0 : _b.ApplicationResults) === null || _c === void 0 ? void 0 : _c.status) !==
-                'Complete') {
-                throw new customError_1.default('This flight is already booked. Please try booking another flight', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR, constants_1.ERROR_LEVEL_WARNING, {
+                throw new customError_1.default('Something went wrong. Please try again later', 500, constants_1.ERROR_LEVEL_ERROR, {
                     api: flightConstant_1.SABRE_API,
                     endpoint: sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT,
                     payload: requestBody,
-                    response: (_d = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _d === void 0 ? void 0 : _d.ApplicationResults,
+                    response: (_b = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _b === void 0 ? void 0 : _b.ApplicationResults,
+                });
+            }
+            if (((_d = (_c = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _c === void 0 ? void 0 : _c.ApplicationResults) === null || _d === void 0 ? void 0 : _d.status) !==
+                'Complete') {
+                throw new customError_1.default('This flight is already booked. Please try booking another flight', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR, constants_1.ERROR_LEVEL_ERROR, {
+                    api: flightConstant_1.SABRE_API,
+                    endpoint: sabreApiEndpoints_1.default.FLIGHT_BOOKING_ENDPOINT,
+                    payload: requestBody,
+                    response: (_e = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _e === void 0 ? void 0 : _e.ApplicationResults,
                 });
             }
             //return GDS PNR
-            return (_f = (_e = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _e === void 0 ? void 0 : _e.ItineraryRef) === null || _f === void 0 ? void 0 : _f.ID;
+            return (_g = (_f = response === null || response === void 0 ? void 0 : response.CreatePassengerNameRecordRS) === null || _f === void 0 ? void 0 : _f.ItineraryRef) === null || _g === void 0 ? void 0 : _g.ID;
         });
     }
     ///==================FLIGHT BOOKING (END)=========================///

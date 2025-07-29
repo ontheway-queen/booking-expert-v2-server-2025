@@ -60,23 +60,16 @@ export default class AgentHotelController extends AbstractController {
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.service.getHotelBooking(req);
 
-      if (rest.success) {
-        res.status(code).json(rest);
-      } else {
-        this.error(rest.message, code);
-      }
+      res.status(code).json(rest);
     }
   );
+
   public getSingleHotelBooking = this.asyncWrapper.wrap(
     { paramSchema: this.commonValidator.singleParamNumValidator() },
     async (req: Request, res: Response) => {
-      const { code, ...rest } = await this.service.getHotelBooking(req);
+      const { code, ...rest } = await this.service.getSingleBooking(req);
 
-      if (rest.success) {
-        res.status(code).json(rest);
-      } else {
-        this.error(rest.message, code);
-      }
+      res.status(code).json(rest);
     }
   );
 }

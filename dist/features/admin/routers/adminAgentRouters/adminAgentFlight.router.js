@@ -16,7 +16,7 @@ class AdminAgentFlightRouter extends abstract_router_1.default {
         this.router
             .route('/booking/:id')
             .get(this.controller.getSingleBooking)
-            .patch(this.controller.updateBooking);
+            .put(this.controller.updateBooking);
         this.router
             .route('/booking/:id/cancel')
             .post(this.controller.cancelBooking);

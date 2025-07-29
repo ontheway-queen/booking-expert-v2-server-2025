@@ -37,12 +37,12 @@ export interface IAgentUpdateDataAfterTicketIssue {
   loan_amount: number;
   invoice_id: number;
   user_id: number;
-  issued_by_type:
+  issued_by_type?:
     | typeof SOURCE_ADMIN
     | typeof SOURCE_AGENT
     | typeof SOURCE_AGENT_B2C
     | typeof SOURCE_B2C;
-  issued_by_user_id: number;
+  issued_by_user_id?: number;
   issue_block?: boolean;
   api: string;
 }

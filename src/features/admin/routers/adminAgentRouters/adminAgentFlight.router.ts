@@ -14,7 +14,7 @@ export default class AdminAgentFlightRouter extends AbstractRouter {
     this.router
       .route('/booking/:id')
       .get(this.controller.getSingleBooking)
-      .patch(this.controller.updateBooking);
+      .put(this.controller.updateBooking);
 
     this.router
       .route('/booking/:id/cancel')

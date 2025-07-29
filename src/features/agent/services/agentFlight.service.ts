@@ -41,6 +41,7 @@ import {
 } from '../utils/types/agentFlight.types';
 import Lib from '../../../utils/lib/lib';
 import { IUpdateFlightBookingPayload } from '../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
+import CustomError from '../../../utils/lib/customError';
 
 export class AgentFlightService extends AbstractServices {
   constructor() {
@@ -739,16 +740,16 @@ export class AgentFlightService extends AbstractServices {
         } else {
           payload.status = FLIGHT_BOOKING_IN_PROCESS;
         }
-      } catch (err) {
+      } catch (err: any) {
         console.log({ err });
         await this.Model.ErrorLogsModel(trx).insertErrorLogs({
           http_method: 'POST',
-          level: ERROR_LEVEL_ERROR,
+          level: err.level || ERROR_LEVEL_ERROR,
           message: 'Error on flight booking.' + err,
-          url: '/flight/booking',
+          url: req.originalUrl,
           user_id: user_id,
-          source: 'AGENT',
-          metadata: {
+          source: SOURCE_AGENT,
+          metadata: err.metadata || {
             api: data.api,
             request_body: {
               flight_id: body.flight_id,
@@ -763,6 +764,10 @@ export class AgentFlightService extends AbstractServices {
           success: true,
           code: this.StatusCode.HTTP_OK,
           message: 'Flight booking is in process. Please check later.',
+          data: {
+            booking_id: new_booking_id,
+            booking_ref: new_booking_ref,
+          },
         };
       }
 

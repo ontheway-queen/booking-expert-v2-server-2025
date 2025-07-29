@@ -69,13 +69,20 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             //update booking
             const flightBookingModel = this.Model.FlightBookingModel(this.trx);
-            yield flightBookingModel.updateFlightBooking({
+            const updateFlightPayload = {
                 status: payload.status,
-                api: payload.status === flightConstant_1.FLIGHT_TICKET_IN_PROCESS ? flightConstant_1.CUSTOM_API : undefined,
                 issued_at: new Date(),
-                issued_by_type: payload.issued_by_type,
-                issued_by_user_id: payload.issued_by_user_id,
-            }, { id: payload.booking_id, source_type: constants_1.SOURCE_AGENT });
+            };
+            if (payload.issued_by_type) {
+                updateFlightPayload.issued_by_type = payload.issued_by_type;
+            }
+            if (payload.issued_by_user_id) {
+                updateFlightPayload.issued_by_user_id = payload.issued_by_user_id;
+            }
+            yield flightBookingModel.updateFlightBooking(updateFlightPayload, {
+                id: payload.booking_id,
+                source_type: constants_1.SOURCE_AGENT,
+            });
             //add tracking
             const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(this.trx);
             const tracking_data = [];
@@ -95,12 +102,6 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                 tracking_data.push({
                     flight_booking_id: payload.booking_id,
                     description: `${payload.paid_amount} amount has been paid for the booking (loan amount - ${payload.loan_amount}, balance amount - ${payload.paid_amount - payload.loan_amount}). Due amount is ${payload.due}`,
-                });
-            }
-            if (payload.api === flightConstant_1.CUSTOM_API) {
-                tracking_data.push({
-                    flight_booking_id: payload.booking_id,
-                    description: `This was a custom API`,
                 });
             }
             yield flightBookingTrackingModel.insertFlightBookingTracking(tracking_data);

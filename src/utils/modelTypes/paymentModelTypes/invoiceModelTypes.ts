@@ -71,11 +71,14 @@ export interface IGetInvoiceData {
   source_id: number | null;
   user_id: number;
   ref_id: number | null;
-  ref_type: string | null;
-  gross_amount: number;
-  markup_price: number;
-  coupon_code: string | null;
-  net_amount: number;
+  ref_type:
+    | typeof TYPE_FLIGHT
+    | typeof TYPE_HOTEL
+    | typeof TYPE_VISA
+    | typeof TYPE_UMRAH
+    | typeof TYPE_GROUP_FARE
+    | typeof TYPE_HOLIDAY;
+  total_amount: number;
   due: number;
   details: string | null;
   status:
@@ -116,12 +119,20 @@ export interface IGetInvoiceQueryFilter {
 }
 
 export interface IGetSingleInvoiceParams {
-  id: number;
+  id?: number;
+  ref_id?: number;
+  ref_type?:
+    | typeof TYPE_FLIGHT
+    | typeof TYPE_HOTEL
+    | typeof TYPE_VISA
+    | typeof TYPE_UMRAH
+    | typeof TYPE_GROUP_FARE
+    | typeof TYPE_HOLIDAY;
   source_type:
     | typeof SOURCE_AGENT
     | typeof SOURCE_B2C
     | typeof SOURCE_AGENT_B2C;
-  source_id: number;
+  source_id?: number;
 }
 export interface IDeleteSingleInvoiceParams {
   id?: number;

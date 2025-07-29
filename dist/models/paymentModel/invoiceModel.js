@@ -115,13 +115,19 @@ class InvoiceModel extends schema_1.default {
             return yield this.db('invoice')
                 .withSchema(this.DBO_SCHEMA)
                 .select('*')
-                .where({ id: params.id })
                 .andWhere((qb) => {
+                qb.andWhere('source_type', params.source_type);
                 if (params.source_id) {
                     qb.andWhere('source_id', params.source_id);
                 }
-                if (params.source_type) {
-                    qb.andWhere('source_type', params.source_type);
+                if (params.id) {
+                    qb.andWhere('id', params.id);
+                }
+                if (params.ref_id) {
+                    qb.andWhere('ref_id', params.ref_id);
+                }
+                if (params.ref_type) {
+                    qb.andWhere('ref_type', params.ref_type);
                 }
             })
                 .first();

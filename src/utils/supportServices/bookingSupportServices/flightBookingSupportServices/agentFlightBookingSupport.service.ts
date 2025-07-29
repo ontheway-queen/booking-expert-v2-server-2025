@@ -21,6 +21,7 @@ import {
 } from '../../../miscellaneous/constants';
 import { IInsertFlightBookingTrackingPayload } from '../../../modelTypes/flightModelTypes/flightBookingTrackingModelTypes';
 import BalanceLib from '../../../lib/balanceLib';
+import { IUpdateFlightBookingPayload } from '../../../modelTypes/flightModelTypes/flightBookingModelTypes';
 
 export class AgentFlightBookingSupportService extends AbstractServices {
   private trx: Knex.Transaction;
@@ -84,17 +85,24 @@ export class AgentFlightBookingSupportService extends AbstractServices {
   ) {
     //update booking
     const flightBookingModel = this.Model.FlightBookingModel(this.trx);
-    await flightBookingModel.updateFlightBooking(
-      {
-        status: payload.status,
-        api:
-          payload.status === FLIGHT_TICKET_IN_PROCESS ? CUSTOM_API : undefined,
-        issued_at: new Date(),
-        issued_by_type: payload.issued_by_type,
-        issued_by_user_id: payload.issued_by_user_id,
-      },
-      { id: payload.booking_id, source_type: SOURCE_AGENT }
-    );
+
+    const updateFlightPayload: IUpdateFlightBookingPayload = {
+      status: payload.status,
+      issued_at: new Date(),
+    };
+
+    if (payload.issued_by_type) {
+      updateFlightPayload.issued_by_type = payload.issued_by_type;
+    }
+
+    if (payload.issued_by_user_id) {
+      updateFlightPayload.issued_by_user_id = payload.issued_by_user_id;
+    }
+
+    await flightBookingModel.updateFlightBooking(updateFlightPayload, {
+      id: payload.booking_id,
+      source_type: SOURCE_AGENT,
+    });
 
     //add tracking
     const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(
@@ -127,12 +135,7 @@ export class AgentFlightBookingSupportService extends AbstractServices {
         }). Due amount is ${payload.due}`,
       });
     }
-    if (payload.api === CUSTOM_API) {
-      tracking_data.push({
-        flight_booking_id: payload.booking_id,
-        description: `This was a custom API`,
-      });
-    }
+
     await flightBookingTrackingModel.insertFlightBookingTracking(tracking_data);
 
     //if there is due amount then create DEBIT transaction and money receipt
@@ -205,6 +208,7 @@ export class AgentFlightBookingSupportService extends AbstractServices {
             message: 'Partial payment is not allowed for this flight',
           };
         }
+
         //case 2: departure date min 10 days from current date
         const departureDate = new Date(payload.departure_date);
         const currentDate = new Date();

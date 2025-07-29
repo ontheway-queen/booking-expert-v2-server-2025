@@ -22,4 +22,6 @@ export const origin: string[] = [
   'https://www.flyngo.xyz',
   'https://ota.asianethotels.com',
   'https://www.ota.asianethotels.com',
+  'https://pilottravels.com.bd',
+  'https://www.pilottravels.com.bd',
 ];

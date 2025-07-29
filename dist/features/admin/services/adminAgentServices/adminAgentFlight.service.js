@@ -46,6 +46,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 const flightSegmentModel = this.Model.FlightBookingSegmentModel(trx);
                 const flightTravelerModel = this.Model.FlightBookingTravelerModel(trx);
                 const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(trx);
+                const invoiceModel = this.Model.InvoiceModel(trx);
                 const booking_id = Number(id);
                 const booking_data = yield flightBookingModel.getSingleFlightBooking({
                     id: booking_id,
@@ -62,13 +63,23 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 const segment_data = yield flightSegmentModel.getFlightBookingSegment(booking_id);
                 const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(booking_id);
                 const modified_fare_amount = yield flightPriceBreakdownModel.getFlightBookingModifiedAmount(booking_id);
+                const invoice = yield invoiceModel.getSingleInvoice({
+                    source_type: constants_1.SOURCE_AGENT,
+                    ref_id: Number(id),
+                    ref_type: constants_1.TYPE_FLIGHT,
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     data: Object.assign(Object.assign({}, booking_data), { price_breakdown_data,
                         segment_data,
-                        traveler_data,
-                        modified_fare_amount }),
+                        traveler_data, invoice: {
+                            id: invoice === null || invoice === void 0 ? void 0 : invoice.id,
+                            invoice_no: invoice === null || invoice === void 0 ? void 0 : invoice.invoice_no,
+                            total_amount: invoice === null || invoice === void 0 ? void 0 : invoice.total_amount,
+                            due: invoice === null || invoice === void 0 ? void 0 : invoice.due,
+                            status: invoice === null || invoice === void 0 ? void 0 : invoice.status,
+                        }, modified_fare_amount: modified_fare_amount[0] }),
                 };
             }));
         });
@@ -219,8 +230,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 //check direct ticket issue permission
                 const flightSegmentsModel = this.Model.FlightBookingSegmentModel(trx);
                 const flightSegment = yield flightSegmentsModel.getFlightBookingSegment(Number(id));
-                const agentFlightBookingSupportService = new agentFlightBookingSupport_service_1.AgentFlightBookingSupportService(trx);
-                const ticketIssuePermission = yield agentFlightBookingSupportService.checkAgentDirectTicketIssuePermission({
+                const ticketIssuePermission = yield agentBookingSubService.checkAgentDirectTicketIssuePermission({
                     agency_id: Number(booking_data.source_id),
                     api_name: booking_data.api,
                     airline: flightSegment[0].airline_code,
@@ -257,7 +267,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                             message: this.ResMsg.HTTP_NOT_FOUND,
                         };
                     }
-                    yield agentFlightBookingSupportService.updateDataAfterTicketIssue({
+                    yield agentBookingSubService.updateDataAfterTicketIssue({
                         booking_id: Number(id),
                         status,
                         due: Number(payment_data.due),
@@ -312,7 +322,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
-                const { user_id, name, user_email } = req.admin;
+                const { name, user_email } = req.admin;
                 const { status, airline_pnr, charge_credit, gds_pnr, ticket_issue_last_time, ticket_numbers, } = req.body;
                 const flightBookingModel = this.Model.FlightBookingModel(trx);
                 const booking_data = yield flightBookingModel.getSingleFlightBooking({
@@ -330,7 +340,8 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 let booking_tracking = `Booking status has been updated from ${booking_data.status} to ${status} by ${name}(${user_email}).`;
                 if (status === flightConstant_1.FLIGHT_BOOKING_CONFIRMED) {
                     if (booking_data.status !== flightConstant_1.FLIGHT_BOOKING_PENDING &&
-                        booking_data.status !== flightConstant_1.FLIGHT_BOOKING_IN_PROCESS) {
+                        booking_data.status !== flightConstant_1.FLIGHT_BOOKING_IN_PROCESS &&
+                        booking_data.status !== flightConstant_1.FLIGHT_BOOKING_CONFIRMED) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -344,7 +355,8 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 }
                 else if (status === flightConstant_1.FLIGHT_TICKET_ISSUE) {
                     if (booking_data.status !== flightConstant_1.FLIGHT_BOOKING_CONFIRMED &&
-                        booking_data.status !== flightConstant_1.FLIGHT_TICKET_IN_PROCESS) {
+                        booking_data.status !== flightConstant_1.FLIGHT_TICKET_IN_PROCESS &&
+                        booking_data.status !== flightConstant_1.FLIGHT_TICKET_ISSUE) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -352,6 +364,46 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         };
                     }
                     booking_tracking += ` Ticket numbers: ${JSON.stringify(ticket_numbers)}.`;
+                    const flightBookingTravelerModel = this.Model.FlightBookingTravelerModel(trx);
+                    const agentBookingSubService = new agentFlightBookingSupport_service_1.AgentFlightBookingSupportService(trx);
+                    if (charge_credit) {
+                        const payment_data = yield agentBookingSubService.getPaymentInformation({
+                            booking_id: Number(id),
+                            payment_type: flightConstant_1.PAYMENT_TYPE_FULL,
+                            refundable: booking_data.refundable,
+                            departure_date: booking_data.travel_date,
+                            agency_id: Number(booking_data.source_id),
+                            ticket_price: booking_data.payable_amount,
+                        });
+                        if (payment_data.success === false) {
+                            return payment_data;
+                        }
+                        const updatePayload = {
+                            booking_id: Number(id),
+                            status,
+                            due: Number(payment_data.due),
+                            agency_id: Number(booking_data.source_id),
+                            booking_ref: booking_data.booking_ref,
+                            deduct_amount_from: payment_data.deduct_amount_from,
+                            paid_amount: Number(payment_data.paid_amount),
+                            loan_amount: Number(payment_data.loan_amount),
+                            invoice_id: Number(payment_data.invoice_id),
+                            user_id: booking_data.created_by,
+                            api: booking_data.api,
+                        };
+                        if (booking_data.status !== flightConstant_1.FLIGHT_TICKET_IN_PROCESS) {
+                            updatePayload.issued_by_type = constants_1.SOURCE_ADMIN;
+                            updatePayload.issued_by_user_id = req.admin.user_id;
+                        }
+                        yield agentBookingSubService.updateDataAfterTicketIssue(updatePayload);
+                        booking_tracking += ` With credit charged.`;
+                    }
+                    else {
+                        booking_tracking += ` Without credit charged.`;
+                    }
+                    ticket_numbers === null || ticket_numbers === void 0 ? void 0 : ticket_numbers.map((ticket_number) => __awaiter(this, void 0, void 0, function* () {
+                        yield flightBookingTravelerModel.updateFlightBookingTraveler({ ticket_number: ticket_number.ticket_number }, ticket_number.passenger_id);
+                    }));
                 }
                 yield flightBookingModel.updateFlightBooking(payload, {
                     id: Number(id),
@@ -360,7 +412,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: 'Booking has been expired successfully!',
+                    message: this.ResMsg.HTTP_OK,
                 };
             }));
         });
