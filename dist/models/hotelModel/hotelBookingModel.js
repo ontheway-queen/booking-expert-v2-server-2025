@@ -26,6 +26,14 @@ class HotelBookingModel extends schema_1.default {
                 .insert(payload, 'id');
         });
     }
+    updateHotelBooking(payload, conditions) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('hotel_booking')
+                .withSchema(this.DBO_SCHEMA)
+                .update(payload)
+                .where(conditions);
+        });
+    }
     insertHotelBookingTraveler(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('hotel_booking_traveler')

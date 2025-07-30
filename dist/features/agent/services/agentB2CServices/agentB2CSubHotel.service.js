@@ -12,18 +12,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AgentB2CSubHotelService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
 const constants_1 = require("../../../../utils/miscellaneous/constants");
-class AdminAgentHotelService extends abstract_service_1.default {
+class AgentB2CSubHotelService extends abstract_service_1.default {
     constructor() {
         super();
     }
     getBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id, filter, from_date, limit, skip, to_date } = req.query;
+            const { filter, from_date, limit, skip, to_date } = req.query;
+            const { agency_id } = req.agencyUser;
             const hotelBookingModel = this.Model.HotelBookingModel();
             const data = yield hotelBookingModel.getHotelBooking({
-                source_type: constants_1.SOURCE_AGENT,
+                source_type: constants_1.SOURCE_AGENT_B2C,
                 filter,
                 from_date,
                 to_date,
@@ -44,10 +46,12 @@ class AdminAgentHotelService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const booking_id = Number(id);
+            const { agency_id } = req.agencyUser;
             const hotelBookingModel = this.Model.HotelBookingModel();
             const data = yield hotelBookingModel.getSingleAgentBooking({
                 booking_id,
-                source_type: constants_1.SOURCE_AGENT,
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT_B2C,
             });
             if (!data) {
                 return {
@@ -70,11 +74,13 @@ class AdminAgentHotelService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
                 const booking_id = Number(id);
+                const { agency_id } = req.agencyUser;
                 const payload = req.body;
                 const hotelBookingModel = this.Model.HotelBookingModel(trx);
                 const checkBooking = yield hotelBookingModel.getSingleAgentBooking({
                     booking_id,
-                    source_type: constants_1.SOURCE_AGENT,
+                    source_type: constants_1.SOURCE_AGENT_B2C,
+                    source_id: agency_id,
                 });
                 if (!checkBooking || Object.keys(checkBooking).length === 0) {
                     return {
@@ -95,4 +101,4 @@ class AdminAgentHotelService extends abstract_service_1.default {
         });
     }
 }
-exports.default = AdminAgentHotelService;
+exports.AgentB2CSubHotelService = AgentB2CSubHotelService;

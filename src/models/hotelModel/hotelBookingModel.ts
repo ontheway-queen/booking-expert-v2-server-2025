@@ -26,6 +26,20 @@ export default class HotelBookingModel extends Schema {
       .insert(payload, 'id');
   }
 
+  public async updateHotelBooking(
+    payload: {
+      status?: string;
+      confirmation_no?: string;
+      supplier_ref?: string;
+    },
+    conditions: { id: number }
+  ) {
+    return await this.db('hotel_booking')
+      .withSchema(this.DBO_SCHEMA)
+      .update(payload)
+      .where(conditions);
+  }
+
   public async insertHotelBookingTraveler(
     payload: IInsertHotelBookingTravelerPayload[]
   ) {

@@ -10,7 +10,11 @@ export default class AdminAgentHotelRouter extends AbstractRouter {
 
   private callRouter() {
     this.router.route('/booking').get(this.controller.getBooking);
-    this.router.route('/booking/:id').get(this.controller.getSingleBooking);
+    this.router
+      .route('/booking/:id')
+      .get(this.controller.getSingleBooking)
+      .put(this.controller.updateBooking);
+
     this.router.route('/booking/:id/tracking');
     this.router.route('/booking/:id/cancel');
     this.router.route('/booking/:id/refund');

@@ -1,22 +1,22 @@
 import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
-import { IGetAdminHotelBookingQuery } from '../../utils/types/adminAgentTypes/adminAgentHotel.types';
-import { SOURCE_AGENT } from '../../../../utils/miscellaneous/constants';
+import { IGetAgentB2CHotelBookingQuery } from '../../utils/types/agentB2CTypes/agentB2CSubHotel.types';
+import { SOURCE_AGENT_B2C } from '../../../../utils/miscellaneous/constants';
 
-export default class AdminAgentHotelService extends AbstractServices {
+export class AgentB2CSubHotelService extends AbstractServices {
   constructor() {
     super();
   }
 
   public async getBooking(req: Request) {
-    const { agency_id, filter, from_date, limit, skip, to_date } =
-      req.query as IGetAdminHotelBookingQuery;
-
+    const { filter, from_date, limit, skip, to_date } =
+      req.query as IGetAgentB2CHotelBookingQuery;
+    const { agency_id } = req.agencyUser;
     const hotelBookingModel = this.Model.HotelBookingModel();
 
     const data = await hotelBookingModel.getHotelBooking(
       {
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_AGENT_B2C,
         filter,
         from_date,
         to_date,
@@ -40,12 +40,14 @@ export default class AdminAgentHotelService extends AbstractServices {
     const { id } = req.params;
 
     const booking_id = Number(id);
+    const { agency_id } = req.agencyUser;
 
     const hotelBookingModel = this.Model.HotelBookingModel();
 
     const data = await hotelBookingModel.getSingleAgentBooking({
       booking_id,
-      source_type: SOURCE_AGENT,
+      source_id: agency_id,
+      source_type: SOURCE_AGENT_B2C,
     });
 
     if (!data) {
@@ -72,6 +74,8 @@ export default class AdminAgentHotelService extends AbstractServices {
     return this.db.transaction(async (trx) => {
       const { id } = req.params;
       const booking_id = Number(id);
+      const { agency_id } = req.agencyUser;
+
       const payload = req.body as {
         status?: string;
         confirmation_no?: string;
@@ -82,7 +86,8 @@ export default class AdminAgentHotelService extends AbstractServices {
 
       const checkBooking = await hotelBookingModel.getSingleAgentBooking({
         booking_id,
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_AGENT_B2C,
+        source_id: agency_id,
       });
 
       if (!checkBooking || Object.keys(checkBooking).length === 0) {

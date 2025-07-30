@@ -1,8 +1,8 @@
 import Joi from 'joi';
 
-export default class AdminAgentHotelValidator {
+export default class AgentB2CSubHotelValidator {
   public getBooking = Joi.object({
-    agency_id: Joi.number().optional(),
+    user_id: Joi.number().optional(),
     filter: Joi.string().optional(),
     from_date: Joi.date().optional(),
     to_date: Joi.date().optional(),

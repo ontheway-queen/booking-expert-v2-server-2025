@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("joi"));
-class AdminAgentHotelValidator {
+class AgentB2CSubHotelValidator {
     constructor() {
         this.getBooking = joi_1.default.object({
-            agency_id: joi_1.default.number().optional(),
+            user_id: joi_1.default.number().optional(),
             filter: joi_1.default.string().optional(),
             from_date: joi_1.default.date().optional(),
             to_date: joi_1.default.date().optional(),
@@ -21,4 +21,4 @@ class AdminAgentHotelValidator {
         });
     }
 }
-exports.default = AdminAgentHotelValidator;
+exports.default = AgentB2CSubHotelValidator;

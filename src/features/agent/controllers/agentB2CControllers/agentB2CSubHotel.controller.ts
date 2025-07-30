@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import AbstractController from '../../../../abstract/abstract.controller';
-import AdminAgentHotelValidator from '../../utils/validators/adminAgentValidators/adminAgentHotel.validator';
-import AdminAgentHotelService from '../../services/adminAgentServices/adminAgentHotel.service';
+import { AgentB2CSubHotelService } from '../../services/agentB2CServices/agentB2CSubHotel.service';
+import AgentB2CSubHotelValidator from '../../utils/validators/agentB2CValidators/agentB2CSubHotel.validator';
 
-export class AdminAgentHotelController extends AbstractController {
-  private validator = new AdminAgentHotelValidator();
-  private services = new AdminAgentHotelService();
+export class AgentB2CSubHotelController extends AbstractController {
+  private validator = new AgentB2CSubHotelValidator();
+  private services = new AgentB2CSubHotelService();
   constructor() {
     super();
   }

@@ -23,15 +23,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminAgentHotelController = void 0;
+exports.AgentB2CSubHotelController = void 0;
 const abstract_controller_1 = __importDefault(require("../../../../abstract/abstract.controller"));
-const adminAgentHotel_validator_1 = __importDefault(require("../../utils/validators/adminAgentValidators/adminAgentHotel.validator"));
-const adminAgentHotel_service_1 = __importDefault(require("../../services/adminAgentServices/adminAgentHotel.service"));
-class AdminAgentHotelController extends abstract_controller_1.default {
+const agentB2CSubHotel_service_1 = require("../../services/agentB2CServices/agentB2CSubHotel.service");
+const agentB2CSubHotel_validator_1 = __importDefault(require("../../utils/validators/agentB2CValidators/agentB2CSubHotel.validator"));
+class AgentB2CSubHotelController extends abstract_controller_1.default {
     constructor() {
         super();
-        this.validator = new adminAgentHotel_validator_1.default();
-        this.services = new adminAgentHotel_service_1.default();
+        this.validator = new agentB2CSubHotel_validator_1.default();
+        this.services = new agentB2CSubHotel_service_1.AgentB2CSubHotelService();
         this.getBooking = this.asyncWrapper.wrap({ bodySchema: this.validator.getBooking }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.services.getBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
@@ -49,4 +49,4 @@ class AdminAgentHotelController extends abstract_controller_1.default {
         }));
     }
 }
-exports.AdminAgentHotelController = AdminAgentHotelController;
+exports.AgentB2CSubHotelController = AgentB2CSubHotelController;
