@@ -32,61 +32,24 @@ class UmrahPackageModel extends schema_1.default {
     }
     getSingleUmrahPackageDetails(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package as up')
+            return yield this.db('umrah_package')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('up.*')
+                .select('id', 'title', 'description', 'duration', 'valid_till_date', 'group_fare', 'status', 'adult_price', 'child_price', 'package_details', 'slug', 'meta_tag', 'meta_description', 'package_price_details', 'package_accommodation_details', 'short_description')
                 .where((qb) => {
                 if (query.slug) {
-                    qb.andWhere('up.slug', query.slug);
+                    qb.andWhere('slug', query.slug);
                 }
             })
-                .andWhere('up.id', query.umrah_id)
+                .andWhere('id', query.umrah_id)
                 .first();
         });
     }
     getSingleUmrahPackageImages(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package_images as upi')
+            return yield this.db('umrah_package_images')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('upi.*')
-                .where('upi.umrah_id', query.umrah_id);
-        });
-    }
-    getUmrahPackageList(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package as up')
-                .withSchema(this.SERVICE_SCHEMA)
-                .select('*', this.db.raw(`
-        COALESCE(
-          json_agg(DISTINCT jsonb_build_object(
-            'id', upi.id,
-            'photo', upi.photo
-          )) FILTER (WHERE upi.id IS NOT NULL),
-          '[]'
-        ) as images
-      `), this.db.raw(`
-        COALESCE(
-          json_agg(DISTINCT jsonb_build_object(
-            'id', upinei.id,
-            'icon', upinei.icon,
-            'title', upinei.title
-          )) FILTER (WHERE upinei.id IS NOT NULL),
-          '[]'
-        ) as includes
-      `))
-                .leftJoin('umrah_package_images as upi', 'upi.umrah_id', 'up.id')
-                .leftJoin('umrah_package_include as upin', 'upin.umrah_id', 'up.id')
-                .leftJoin('umrah_package_include_exclude_items as upinei', 'upinei.id', 'upin.include_exclude_id')
-                .where((qb) => {
-                if (query.status != undefined) {
-                    qb.andWhere('up.status', query.status);
-                }
-                if (query.title) {
-                    qb.andWhereILike('up.title', `%${query.title}%`);
-                }
-            })
-                .limit(query.limit)
-                .offset(query.skip);
+                .select('id', 'image')
+                .where('umrah_id', query.umrah_id);
         });
     }
 }
