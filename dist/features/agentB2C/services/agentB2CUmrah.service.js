@@ -63,11 +63,17 @@ class AgentB2CUmrahService extends abstract_service_1.default {
                     data,
                 };
             }
+            const photos = yield umrahModel.getSingleUmrahPackageImages({
+                source_id: agency_id,
+                umrah_id: data.id,
+            });
+            const includes = yield umrahModel.getUmrahPackageInclude(data.id);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data,
+                data: Object.assign(Object.assign({}, data), { photos,
+                    includes }),
             };
         });
     }

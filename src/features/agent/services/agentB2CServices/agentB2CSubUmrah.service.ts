@@ -13,8 +13,8 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       const { slug, package_include, ...payload } = reqBody;
 
       const check_slug = await model.getSingleAgentB2CUmrahPackageDetails({
-        slug: slug,
         source_id: agency_id,
+        slug,
       });
 
       if (check_slug) {
@@ -29,24 +29,58 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       payload.source_type = SOURCE_TYPE.AGENT;
       payload.source_id = agency_id;
       payload.created_by = user_id;
+      payload.thumbnail = files.find(
+        (file) => file.fieldname === 'thumbnail'
+      )?.filename;
+
+      console.log({ payload });
 
       const res = await model.insertUmrahPackage(payload);
 
-      const imagePayload: {
-        umrah_id: number;
-        image: string;
-      }[] = [];
-
       if (res.length) {
-        files.forEach((file) => {
-          imagePayload.push({
-            umrah_id: res[0].id,
-            image: file.filename,
-          });
-        });
+        if (files.length) {
+          const imagePayload: {
+            umrah_id: number;
+            image: string;
+          }[] = [];
 
-        await model.insertUmrahPackageImage(imagePayload);
+          files.forEach((file) => {
+            imagePayload.push({
+              umrah_id: res[0].id,
+              image: file.filename,
+            });
+          });
+
+          await model.insertUmrahPackageImage(imagePayload);
+        }
+
+        if (package_include?.length) {
+          const include_service_payload: {
+            umrah_id: number;
+            service_name: string;
+          }[] = [];
+          package_include.forEach(async (service_name: string) => {
+            include_service_payload.push({
+              umrah_id: res[0].id,
+              service_name,
+            });
+          });
+
+          await model.insertPackageInclude(include_service_payload);
+        }
+      } else {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
+          message: this.ResMsg.HTTP_INTERNAL_SERVER_ERROR,
+        };
       }
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
     });
   }
 }

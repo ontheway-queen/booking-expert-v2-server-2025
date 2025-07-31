@@ -45,11 +45,22 @@ export default class AgentB2CUmrahService extends AbstractServices {
       };
     }
 
+    const photos = await umrahModel.getSingleUmrahPackageImages({
+      source_id: agency_id,
+      umrah_id: data.id,
+    });
+
+    const includes = await umrahModel.getUmrahPackageInclude(data.id);
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data,
+      data: {
+        ...data,
+        photos,
+        includes,
+      },
     };
   }
 

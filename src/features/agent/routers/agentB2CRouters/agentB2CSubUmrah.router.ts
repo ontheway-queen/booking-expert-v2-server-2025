@@ -8,5 +8,12 @@ export default class AgentB2CSubUmrahRouter extends AbstractRouter {
     this.callRouter();
   }
 
-  private callRouter() {}
+  private callRouter() {
+    this.router
+      .route('/')
+      .post(
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENT_UMRAH_PACKAGE),
+        this.controller.createUmrahPackage
+      );
+  }
 }

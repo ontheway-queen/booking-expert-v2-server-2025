@@ -28,16 +28,24 @@ class UmrahPackageModel extends schema_1.default {
     }
     insertUmrahPackageImage(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package_images')
+            return yield this.db('umrah_package_photos')
                 .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
+                .insert(payload);
         });
     }
     insertPackageInclude(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('umrah_package_include')
                 .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
+                .insert(payload);
+        });
+    }
+    getUmrahPackageInclude(umrah_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('umrah_package_include')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('*')
+                .where({ umrah_id });
         });
     }
     getAgentB2CUmrahPackageList(query) {
@@ -75,7 +83,7 @@ class UmrahPackageModel extends schema_1.default {
     }
     getSingleUmrahPackageImages(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package_images')
+            return yield this.db('umrah_package_photos')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id', 'image')
                 .where('umrah_id', query.umrah_id);

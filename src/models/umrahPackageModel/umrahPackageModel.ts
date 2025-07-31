@@ -7,6 +7,7 @@ import {
   IGetPackageDetailsQuery,
   IGetSinglePackageDetails,
   IGetUmrahPackageImages,
+  IGetUmrahPackageIncludeServiceData,
   IInsertUmrahPackageImagePayload,
   IInsertUmrahPackageIncludeServicePayload,
   IInsertUmrahPackagePayload,
@@ -29,9 +30,9 @@ export default class UmrahPackageModel extends Schema {
   public async insertUmrahPackageImage(
     payload: IInsertUmrahPackageImagePayload | IInsertUmrahPackageImagePayload[]
   ) {
-    return await this.db('umrah_package_images')
+    return await this.db('umrah_package_photos')
       .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload, 'id');
+      .insert(payload);
   }
 
   public async insertPackageInclude(
@@ -41,7 +42,16 @@ export default class UmrahPackageModel extends Schema {
   ) {
     return await this.db('umrah_package_include')
       .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload, 'id');
+      .insert(payload);
+  }
+
+  public async getUmrahPackageInclude(
+    umrah_id: number
+  ): Promise<IGetUmrahPackageIncludeServiceData[]> {
+    return await this.db('umrah_package_include')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('*')
+      .where({ umrah_id });
   }
 
   public async getAgentB2CUmrahPackageList(
@@ -108,7 +118,7 @@ export default class UmrahPackageModel extends Schema {
   public async getSingleUmrahPackageImages(
     query: IGetPackageDetailsQuery
   ): Promise<IGetUmrahPackageImages[]> {
-    return await this.db('umrah_package_images')
+    return await this.db('umrah_package_photos')
       .withSchema(this.SERVICE_SCHEMA)
       .select('id', 'image')
       .where('umrah_id', query.umrah_id);
