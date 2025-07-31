@@ -37,8 +37,3 @@ export const VIEW_HOLIDAY_PACKAGE_CREATED_BY_AGENT =
   'agent_holiday_package_view';
 
 
-export const VIEW_UMRAH_PACKAGE_CREATED_BY_ADMIN =
-  'admin_umrah_package_view';
-  
-export const VIEW_UMRAH_PACKAGE_CREATED_BY_AGENT =
-  'agent_umrah_package_view';

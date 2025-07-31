@@ -1,11 +1,14 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
+import { SOURCE_AGENT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
+  IGetAgentB2CUmrahListData,
+  IGetAgentB2CUmrahListQuery,
   IGetPackageDetailsQuery,
-  IGetPackageListQuery,
   IGetSinglePackageDetails,
   IGetUmrahPackageImages,
   IInsertUmrahPackageImagePayload,
+  IInsertUmrahPackageIncludeServicePayload,
   IInsertUmrahPackagePayload,
 } from '../../utils/modelTypes/umrahPackageModelTypes/umrahPackageModelTypes';
 
@@ -24,78 +27,89 @@ export default class UmrahPackageModel extends Schema {
   }
 
   public async insertUmrahPackageImage(
-    payload: IInsertUmrahPackageImagePayload
+    payload: IInsertUmrahPackageImagePayload | IInsertUmrahPackageImagePayload[]
   ) {
     return await this.db('umrah_package_images')
       .withSchema(this.SERVICE_SCHEMA)
       .insert(payload, 'id');
   }
 
-  public async getSingleUmrahPackageDetails(
-    query: IGetPackageDetailsQuery
-  ): Promise<IGetSinglePackageDetails> {
-    return await this.db('umrah_package as up')
+  public async insertPackageInclude(
+    payload:
+      | IInsertUmrahPackageIncludeServicePayload
+      | IInsertUmrahPackageIncludeServicePayload[]
+  ) {
+    return await this.db('umrah_package_include')
       .withSchema(this.SERVICE_SCHEMA)
-      .select('up.*')
+      .insert(payload, 'id');
+  }
+
+  public async getAgentB2CUmrahPackageList(
+    query: IGetAgentB2CUmrahListQuery
+  ): Promise<IGetAgentB2CUmrahListData[]> {
+    return await this.db('umrah_package')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select(
+        'id',
+        'slug',
+        'thumbnail',
+        'title',
+        'duration',
+        'group_size',
+        'short_description',
+        'adult_price'
+      )
+      .andWhere('source_type', SOURCE_AGENT)
+      .andWhere('source_id', query.source_id)
       .where((qb) => {
+        if (query.status !== undefined) {
+          qb.andWhere('status', query.status);
+        }
+      });
+  }
+
+  public async getSingleAgentB2CUmrahPackageDetails(
+    query: IGetPackageDetailsQuery
+  ): Promise<IGetSinglePackageDetails | null> {
+    return await this.db('umrah_package')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select(
+        'id',
+        'title',
+        'description',
+        'duration',
+        'valid_till_date',
+        'group_fare',
+        'status',
+        'adult_price',
+        'child_price',
+        'package_details',
+        'slug',
+        'meta_tag',
+        'meta_description',
+        'package_price_details',
+        'package_accommodation_details',
+        'short_description'
+      )
+      .where((qb) => {
+        qb.andWhere('source_id', query.source_id);
+        qb.andWhere('source_type', SOURCE_AGENT);
         if (query.slug) {
-          qb.andWhere('up.slug', query.slug);
+          qb.andWhere('slug', query.slug);
+        }
+        if (query.umrah_id) {
+          qb.andWhere('id', query.umrah_id);
         }
       })
-      .andWhere('up.id', query.umrah_id)
       .first();
   }
 
   public async getSingleUmrahPackageImages(
     query: IGetPackageDetailsQuery
   ): Promise<IGetUmrahPackageImages[]> {
-    return await this.db('umrah_package_images as upi')
+    return await this.db('umrah_package_images')
       .withSchema(this.SERVICE_SCHEMA)
-      .select('upi.*')
-      .where('upi.umrah_id', query.umrah_id);
-  }
-
-  public async getUmrahPackageList(query: IGetPackageListQuery) {
-    return await this.db('umrah_package as up')
-      .withSchema(this.SERVICE_SCHEMA)
-      .select(
-        '*',
-        this.db.raw(`
-        COALESCE(
-          json_agg(DISTINCT jsonb_build_object(
-            'id', upi.id,
-            'photo', upi.photo
-          )) FILTER (WHERE upi.id IS NOT NULL),
-          '[]'
-        ) as images
-      `),
-        this.db.raw(`
-        COALESCE(
-          json_agg(DISTINCT jsonb_build_object(
-            'id', upinei.id,
-            'icon', upinei.icon,
-            'title', upinei.title
-          )) FILTER (WHERE upinei.id IS NOT NULL),
-          '[]'
-        ) as includes
-      `)
-      )
-      .leftJoin('umrah_package_images as upi', 'upi.umrah_id', 'up.id')
-      .leftJoin('umrah_package_include as upin', 'upin.umrah_id', 'up.id')
-      .leftJoin(
-        'umrah_package_include_exclude_items as upinei',
-        'upinei.id',
-        'upin.include_exclude_id'
-      )
-      .where((qb) => {
-        if (query.status != undefined) {
-          qb.andWhere('up.status', query.status);
-        }
-        if (query.title) {
-          qb.andWhereILike('up.title', `%${query.title}%`);
-        }
-      })
-      .limit(query.limit)
-      .offset(query.skip);
+      .select('id', 'image')
+      .where('umrah_id', query.umrah_id);
   }
 }

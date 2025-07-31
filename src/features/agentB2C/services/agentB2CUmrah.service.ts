@@ -10,7 +10,10 @@ export default class AgentB2CUmrahService extends AbstractServices {
     const { agency_id } = req.agencyB2CWhiteLabel;
     const umrahModel = this.Model.UmrahPackageModel();
 
-    const data = await umrahModel.getUmrahPackageList({ limit });
+    const data = await umrahModel.getAgentB2CUmrahPackageList({
+      source_id: agency_id,
+      status: true,
+    });
 
     return {
       success: true,
@@ -25,7 +28,19 @@ export default class AgentB2CUmrahService extends AbstractServices {
     const { slug } = req.params;
     const umrahModel = this.Model.UmrahPackageModel();
 
-    const data = await umrahModel.getSingleUmrahPackageDetails();
+    const data = await umrahModel.getSingleAgentB2CUmrahPackageDetails({
+      slug,
+      source_id: agency_id,
+    });
+
+    if (!data) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_NOT_FOUND,
+        message: this.ResMsg.HTTP_NOT_FOUND,
+        data,
+      };
+    }
 
     return {
       success: true,

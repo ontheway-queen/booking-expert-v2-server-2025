@@ -21,7 +21,10 @@ class AgentB2CUmrahService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { agency_id } = req.agencyB2CWhiteLabel;
             const umrahModel = this.Model.UmrahPackageModel();
-            const data = yield umrahModel.getUmrahPackageList({ limit });
+            const data = yield umrahModel.getAgentB2CUmrahPackageList({
+                source_id: agency_id,
+                status: true,
+            });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -35,7 +38,18 @@ class AgentB2CUmrahService extends abstract_service_1.default {
             const { agency_id } = req.agencyB2CWhiteLabel;
             const { slug } = req.params;
             const umrahModel = this.Model.UmrahPackageModel();
-            const data = yield umrahModel.getSingleUmrahPackageDetails();
+            const data = yield umrahModel.getSingleAgentB2CUmrahPackageDetails({
+                slug,
+                source_id: agency_id,
+            });
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                    data,
+                };
+            }
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
