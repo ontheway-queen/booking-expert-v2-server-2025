@@ -26,6 +26,14 @@ class UmrahBookingModel extends schema_1.default {
                 .insert(payload, 'id');
         });
     }
+    updateUmrahBooking(payload, booking_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('umrah_booking')
+                .withSchema(this.SERVICE_SCHEMA)
+                .update(payload)
+                .where('id', booking_id);
+        });
+    }
     getAgentB2CUmarhBookingList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, need_total = false) {
             var _a;

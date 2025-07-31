@@ -181,8 +181,6 @@ export default class AgentB2CUmrahService extends AbstractServices {
 
     const contact = await UmrahBookingModel.getUmrahBookingContacts(booking_id);
 
-    console.log({ contact });
-
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
@@ -191,6 +189,39 @@ export default class AgentB2CUmrahService extends AbstractServices {
         ...data,
         contact,
       },
+    };
+  }
+
+  public async cancelUmrahBooking(req: Request) {
+    const { agency_id } = req.agencyB2CWhiteLabel;
+    const { user_id } = req.agencyB2CUser;
+    const { id } = req.params;
+    const booking_id = Number(id);
+    const UmrahBookingModel = this.Model.UmrahBookingModel();
+
+    const data = await UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
+      id: booking_id,
+      source_id: agency_id,
+      user_id,
+    });
+
+    if (!data) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_NOT_FOUND,
+        message: this.ResMsg.HTTP_NOT_FOUND,
+      };
+    }
+
+    await UmrahBookingModel.updateUmrahBooking(
+      { status: 'Cancelled' },
+      booking_id
+    );
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
     };
   }
 }

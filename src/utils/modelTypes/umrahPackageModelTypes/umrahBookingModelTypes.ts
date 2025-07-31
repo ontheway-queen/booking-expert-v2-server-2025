@@ -23,6 +23,10 @@ export interface IInsertUmrahBookingPayload {
   note_from_customer?: string | null;
 }
 
+export interface IUpdateUmrahBookingPayload {
+  status: string;
+}
+
 export interface IInsertUmrahBookingContact {
   booking_id: number;
   name: string;

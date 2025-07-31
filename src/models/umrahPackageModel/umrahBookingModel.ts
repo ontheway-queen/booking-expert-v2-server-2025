@@ -12,6 +12,7 @@ import {
   IGetUmrahBookingListQuery,
   IInsertUmrahBookingContact,
   IInsertUmrahBookingPayload,
+  IUpdateUmrahBookingPayload,
 } from '../../utils/modelTypes/umrahPackageModelTypes/umrahBookingModelTypes';
 
 export default class UmrahBookingModel extends Schema {
@@ -26,6 +27,16 @@ export default class UmrahBookingModel extends Schema {
     return await this.db('umrah_booking')
       .withSchema(this.SERVICE_SCHEMA)
       .insert(payload, 'id');
+  }
+
+  public async updateUmrahBooking(
+    payload: IUpdateUmrahBookingPayload,
+    booking_id: number
+  ) {
+    return await this.db('umrah_booking')
+      .withSchema(this.SERVICE_SCHEMA)
+      .update(payload)
+      .where('id', booking_id);
   }
 
   public async getAgentB2CUmarhBookingList(

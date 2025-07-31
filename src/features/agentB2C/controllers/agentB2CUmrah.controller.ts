@@ -53,7 +53,7 @@ export class AgentB2CUmrahController extends AbstractController {
   public cancelUmrahBooking = this.asyncWrapper.wrap(
     { querySchema: this.validator.getUmrahBooking },
     async (req: Request, res: Response) => {
-      const { code, ...rest } = await this.service.getSingleUmrahBooking(req);
+      const { code, ...rest } = await this.service.cancelUmrahBooking(req);
       res.status(code).json(rest);
     }
   );
