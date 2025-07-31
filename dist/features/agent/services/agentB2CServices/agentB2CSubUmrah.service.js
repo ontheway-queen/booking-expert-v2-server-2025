@@ -224,6 +224,11 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                     }
                 }
                 yield model.updateUmrahPackage({ data: payload, umrah_id: Number(id) });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK
+                };
             }));
         });
     }

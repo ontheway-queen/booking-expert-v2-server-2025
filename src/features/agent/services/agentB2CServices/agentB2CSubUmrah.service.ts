@@ -250,6 +250,13 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       }
 
       await model.updateUmrahPackage({ data: payload, umrah_id: Number(id) });
+
+
+      return{
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK
+      }
     });
   }
 }

@@ -32,6 +32,27 @@ class AgentB2CSubUmrahValidator {
             filter: joi_1.default.string().optional(),
             status: joi_1.default.boolean().optional(),
         });
+        this.updateUmrahSchema = joi_1.default.object({
+            title: joi_1.default.string().optional(),
+            description: joi_1.default.string().optional(),
+            short_description: joi_1.default.string().optional(),
+            duration: joi_1.default.number().optional().positive(),
+            valid_till_date: joi_1.default.string().isoDate().optional(),
+            group_size: joi_1.default.number().optional().positive(),
+            adult_price: joi_1.default.number().optional().positive(),
+            child_price: joi_1.default.number().optional().positive(),
+            package_details: joi_1.default.string().optional(),
+            umrah_for: joi_1.default.string().valid('AGENT', 'B2C', 'BOTH').optional(),
+            slug: joi_1.default.string().optional(),
+            status: joi_1.default.boolean().optional(),
+            meta_title: joi_1.default.string().optional(),
+            meta_description: joi_1.default.string().optional(),
+            package_price_details: joi_1.default.string().optional(),
+            package_accommodation_details: joi_1.default.string().optional(),
+            add_package_include: joi_1.default.array().items(joi_1.default.string().allow('')).optional().required(),
+            remove_package_include: joi_1.default.array().items(joi_1.default.number().allow('')).required(),
+            remove_images: joi_1.default.array().items(joi_1.default.number().allow('')).required(),
+        });
     }
 }
 exports.AgentB2CSubUmrahValidator = AgentB2CSubUmrahValidator;
