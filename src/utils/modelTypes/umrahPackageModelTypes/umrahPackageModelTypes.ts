@@ -1,6 +1,7 @@
 export interface IInsertUmrahPackagePayload {
   title: string;
   description?: string | null;
+  thumbnail?: string;
   duration?: number | null;
   valid_till_date?: string | null;
   group_size?: number | null;
@@ -19,6 +20,21 @@ export interface IInsertUmrahPackagePayload {
   source_id: number;
 }
 
+export interface IGetAgentB2CUmrahListQuery {
+  source_id: number;
+  status?: boolean;
+}
+export interface IGetAgentB2CUmrahListData {
+  id: number;
+  slug: string;
+  thumbnail: string;
+  title: string;
+  duration: number;
+  group_size: number;
+  short_description: string;
+  adult_price: string;
+}
+
 export interface IInsertUmrahPackageImagePayload {
   umrah_id: number;
   image: string;
@@ -32,6 +48,7 @@ export interface IInsertUmrahPackageIncludeServicePayload {
 export interface IGetPackageDetailsQuery {
   umrah_id?: number;
   slug?: string;
+  source_id: number;
 }
 
 export interface IGetSinglePackageDetails {
