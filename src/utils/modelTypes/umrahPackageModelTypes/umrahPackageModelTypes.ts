@@ -24,6 +24,11 @@ export interface IInsertUmrahPackageImagePayload {
   image: string;
 }
 
+export interface IInsertUmrahPackageIncludeServicePayload {
+  umrah_id: number;
+  service_name: number;
+}
+
 export interface IGetPackageDetailsQuery {
   umrah_id?: number;
   slug?: string;

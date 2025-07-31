@@ -6,6 +6,7 @@ import {
   IGetSinglePackageDetails,
   IGetUmrahPackageImages,
   IInsertUmrahPackageImagePayload,
+  IInsertUmrahPackageIncludeServicePayload,
   IInsertUmrahPackagePayload,
 } from '../../utils/modelTypes/umrahPackageModelTypes/umrahPackageModelTypes';
 
@@ -21,8 +22,18 @@ export default class UmrahPackageModel extends Schema {
     return await this.db('umrah_package').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
   }
 
-  public async insertUmrahPackageImage(payload: IInsertUmrahPackageImagePayload) {
+  public async insertUmrahPackageImage(
+    payload: IInsertUmrahPackageImagePayload | IInsertUmrahPackageImagePayload[]
+  ) {
     return await this.db('umrah_package_images')
+      .withSchema(this.SERVICE_SCHEMA)
+      .insert(payload, 'id');
+  }
+
+  public async insertPackageInclude(
+    payload: IInsertUmrahPackageIncludeServicePayload | IInsertUmrahPackageIncludeServicePayload[]
+  ) {
+    return await this.db('umrah_package_include')
       .withSchema(this.SERVICE_SCHEMA)
       .insert(payload, 'id');
   }
