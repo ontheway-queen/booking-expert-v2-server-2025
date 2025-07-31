@@ -24,13 +24,13 @@ export class AgentB2CSubUmrahValidator {
     meta_description: Joi.string().required(),
     package_price_details: Joi.string().optional(),
     package_accommodation_details: Joi.string().optional(),
-    package_include: Joi.alternatives().custom((value, helpers) => {
-      try {
-        const parsed = JSON.parse(value);
-        return parsed;
-      } catch (error) {
-        return helpers.error('any.invalid');
-      }
-    }),
+    // package_include: Joi.alternatives().custom((value, helpers) => {
+    //   try {
+    //     const parsed = JSON.parse(value);
+    //     return parsed;
+    //   } catch (error) {
+    //     return helpers.error('any.invalid');
+    //   }
+    // }),
   });
 }
