@@ -165,11 +165,12 @@ class AgentB2CUmrahService extends abstract_service_1.default {
                 };
             }
             const contact = yield UmrahBookingModel.getUmrahBookingContacts(booking_id);
+            console.log({ contact });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: Object.assign(Object.assign({}, data), { contact: contact[0] }),
+                data: Object.assign(Object.assign({}, data), { contact }),
             };
         });
     }

@@ -58,6 +58,19 @@ export interface IGetAgentB2CSingleUmrahBookingQuery {
   user_id?: number;
 }
 
+export interface IGetAgentB2CSingleUmrahBookingData {
+  id: number;
+  booking_ref: string;
+  traveler_adult: number;
+  traveler_child: number;
+  per_adult_price: string;
+  per_child_price: string;
+  note_from_customer: string;
+  status: string;
+  total_price: string;
+  created_at: string;
+}
+
 export interface IGetAgentB2CUmrahBookingListData {
   id: number;
   booking_ref: string;

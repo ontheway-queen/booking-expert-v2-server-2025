@@ -29,7 +29,7 @@ export class AgentB2CUmrahController extends AbstractController {
   public bookUmrahPackage = this.asyncWrapper.wrap(
     { bodySchema: this.validator.umrahBooking },
     async (req: Request, res: Response) => {
-      const { code, ...rest } = await this.service.getSingleUmrahPackages(req);
+      const { code, ...rest } = await this.service.bookUmrahPackages(req);
       res.status(code).json(rest);
     }
   );
@@ -43,6 +43,14 @@ export class AgentB2CUmrahController extends AbstractController {
   );
 
   public getSingleUmrahBooking = this.asyncWrapper.wrap(
+    { querySchema: this.validator.getUmrahBooking },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getSingleUmrahBooking(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public cancelUmrahBooking = this.asyncWrapper.wrap(
     { querySchema: this.validator.getUmrahBooking },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.service.getSingleUmrahBooking(req);

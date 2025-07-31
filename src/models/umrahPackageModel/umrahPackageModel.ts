@@ -90,6 +90,7 @@ export default class UmrahPackageModel extends Schema {
         'description',
         'duration',
         'valid_till_date',
+        'group_size',
         'status',
         'adult_price',
         'child_price',

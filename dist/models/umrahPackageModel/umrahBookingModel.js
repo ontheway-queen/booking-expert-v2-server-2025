@@ -31,8 +31,7 @@ class UmrahBookingModel extends schema_1.default {
             var _a;
             const data = yield this.db('umrah_booking AS ub')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('ub.id', 'ub.booking_ref', 'ub.umrah_id', 'up.title AS umrah_title', 'up.short_description AS umrah_short_description', 'ub.status', 'ub.user_id', 'abu.name AS user_name', 'ub.traveler_adult', 'ub.traveler_child', 'ub.total_price', 'ub.created_at')
-                .joinRaw('agent_b2c.users AS abu ON abu.id = ub.user_id')
+                .select('ub.id', 'ub.booking_ref', 'ub.umrah_id', 'up.title AS umrah_title', 'up.short_description AS umrah_short_description', 'ub.status', 'ub.traveler_adult', 'ub.traveler_child', 'ub.total_price', 'ub.created_at')
                 .leftJoin('umrah_package AS up', 'up.id', 'ub.umrah_id')
                 .where((qb) => {
                 qb.where('ub.source_type', constants_1.SOURCE_AGENT_B2C).andWhere('ub.source_id', query.agency_id);
@@ -78,25 +77,30 @@ class UmrahBookingModel extends schema_1.default {
     getSingleAgentB2CUmrahBookingDetails(query) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('umrah_booking AS ub')
-                .select('ub.*', 'up.title AS umrah_title', 'up.short_description AS umrah_short_description', 'abu.name AS user_name')
-                .joinRaw('agent_b2c.users AS abu ON abu.id = ub.user_id')
-                .leftJoin('umrah_package AS up', 'up.id', 'ub.umrah_id')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('ub.id', 'ub.booking_ref', 'ub.traveler_adult', 'ub.traveler_child', 'ub.per_child_price', 'ub.per_adult_price', 'ub.note_from_customer', 'ub.status', 'ub.total_price', 'ub.created_at')
+                // .joinRaw('JOIN agent_b2c.users AS abu on ub.user_id = abu.id')
                 .andWhere('ub.id', query.id)
                 .andWhere('ub.source_id', query.source_id)
                 .andWhere('ub.source_type', constants_1.SOURCE_AGENT_B2C)
+                .where((qb) => {
+                if (query.user_id) {
+                    qb.andWhere('ub.user_id', query.user_id);
+                }
+            })
                 .first();
         });
     }
     insertUmrahBookingContact(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_booking_contacts')
+            return yield this.db('umrah_booking_contact')
                 .withSchema(this.SERVICE_SCHEMA)
                 .insert(payload, 'id');
         });
     }
     getUmrahBookingContacts(bookingId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_booking_contacts')
+            return yield this.db('umrah_booking_contact')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id', 'name', 'email', 'phone', 'address')
                 .where('booking_id', bookingId)

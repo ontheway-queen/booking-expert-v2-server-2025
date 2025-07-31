@@ -181,13 +181,15 @@ export default class AgentB2CUmrahService extends AbstractServices {
 
     const contact = await UmrahBookingModel.getUmrahBookingContacts(booking_id);
 
+    console.log({ contact });
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
       data: {
         ...data,
-        contact: contact[0],
+        contact,
       },
     };
   }

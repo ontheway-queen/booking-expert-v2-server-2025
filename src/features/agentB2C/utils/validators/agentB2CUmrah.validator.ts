@@ -3,7 +3,7 @@ import Joi from 'joi';
 export class AgentB2CUmrahValidator {
   public umrahBooking = Joi.object({
     traveler_adult: Joi.number().required(),
-    traveler_child: Joi.number().required(),
+    traveler_child: Joi.number().optional(),
     note: Joi.string().max(1000).trim().optional(),
     name: Joi.string().trim().max(500).required(),
     email: Joi.string().email().trim().required(),

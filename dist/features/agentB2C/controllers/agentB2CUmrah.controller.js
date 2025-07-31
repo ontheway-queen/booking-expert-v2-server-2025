@@ -41,7 +41,7 @@ class AgentB2CUmrahController extends abstract_controller_1.default {
             res.status(code).json(rest);
         }));
         this.bookUmrahPackage = this.asyncWrapper.wrap({ bodySchema: this.validator.umrahBooking }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.getSingleUmrahPackages(req), { code } = _a, rest = __rest(_a, ["code"]);
+            const _a = yield this.service.bookUmrahPackages(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.getUmrahBookingList = this.asyncWrapper.wrap({ querySchema: this.validator.getUmrahBooking }, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -49,6 +49,10 @@ class AgentB2CUmrahController extends abstract_controller_1.default {
             res.status(code).json(rest);
         }));
         this.getSingleUmrahBooking = this.asyncWrapper.wrap({ querySchema: this.validator.getUmrahBooking }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getSingleUmrahBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.cancelUmrahBooking = this.asyncWrapper.wrap({ querySchema: this.validator.getUmrahBooking }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getSingleUmrahBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));

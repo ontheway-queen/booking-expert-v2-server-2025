@@ -18,8 +18,9 @@ export default class AgentB2CUmrahRouter extends AbstractRouter {
       .route('/booking')
       .get(
         this.authChecker.agencyB2CUserAuthChecker,
-        this.controller.bookUmrahPackage
+        this.controller.getUmrahBookingList
       );
+
     this.router
       .route('/:id/book')
       .post(
@@ -32,6 +33,13 @@ export default class AgentB2CUmrahRouter extends AbstractRouter {
       .get(
         this.authChecker.agencyB2CUserAuthChecker,
         this.controller.getSingleUmrahBooking
+      );
+
+    this.router
+      .route('/booking/:id/cancel')
+      .get(
+        this.authChecker.agencyB2CUserAuthChecker,
+        this.controller.cancelUmrahBooking
       );
 
     this.router.route('/:slug').get(this.controller.getSingleUmrahPackages);

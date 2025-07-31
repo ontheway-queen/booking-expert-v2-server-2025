@@ -9,7 +9,7 @@ class AgentB2CUmrahValidator {
     constructor() {
         this.umrahBooking = joi_1.default.object({
             traveler_adult: joi_1.default.number().required(),
-            traveler_child: joi_1.default.number().required(),
+            traveler_child: joi_1.default.number().optional(),
             note: joi_1.default.string().max(1000).trim().optional(),
             name: joi_1.default.string().trim().max(500).required(),
             email: joi_1.default.string().email().trim().required(),
