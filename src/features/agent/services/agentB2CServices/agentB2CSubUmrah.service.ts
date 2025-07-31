@@ -12,7 +12,10 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       const reqBody = req.body;
       const { slug, package_include, ...payload } = reqBody;
 
-      const check_slug = await model.getSingleUmrahPackageDetails({ slug: slug });
+      const check_slug = await model.getSingleAgentB2CUmrahPackageDetails({
+        source_id: agency_id,
+        slug,
+      });
 
       if (check_slug) {
         return {
@@ -26,6 +29,9 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       payload.source_type = SOURCE_TYPE.AGENT;
       payload.source_id = agency_id;
       payload.created_by = user_id;
+      payload.thumbnail = files.find((file) => file.fieldname === 'thumbnail')?.filename;
+
+      console.log({ payload });
 
       const res = await model.insertUmrahPackage(payload);
 

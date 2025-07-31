@@ -21,27 +21,19 @@ export default class UmrahPackageModel extends Schema {
   }
 
   public async insertUmrahPackage(payload: IInsertUmrahPackagePayload) {
-    return await this.db('umrah_package')
-      .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload, 'id');
+    return await this.db('umrah_package').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
   }
 
   public async insertUmrahPackageImage(
     payload: IInsertUmrahPackageImagePayload | IInsertUmrahPackageImagePayload[]
   ) {
-    return await this.db('umrah_package_images')
-      .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload);
+    return await this.db('umrah_package_photos').withSchema(this.SERVICE_SCHEMA).insert(payload);
   }
 
   public async insertPackageInclude(
-    payload:
-      | IInsertUmrahPackageIncludeServicePayload
-      | IInsertUmrahPackageIncludeServicePayload[]
+    payload: IInsertUmrahPackageIncludeServicePayload | IInsertUmrahPackageIncludeServicePayload[]
   ) {
-    return await this.db('umrah_package_include')
-      .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload);
+    return await this.db('umrah_package_include').withSchema(this.SERVICE_SCHEMA).insert(payload);
   }
 
   public async getAgentB2CUmrahPackageList(
@@ -79,13 +71,12 @@ export default class UmrahPackageModel extends Schema {
         'description',
         'duration',
         'valid_till_date',
-        'group_fare',
         'status',
         'adult_price',
         'child_price',
         'package_details',
         'slug',
-        'meta_tag',
+        'meta_title',
         'meta_description',
         'package_price_details',
         'package_accommodation_details',
@@ -107,7 +98,7 @@ export default class UmrahPackageModel extends Schema {
   public async getSingleUmrahPackageImages(
     query: IGetPackageDetailsQuery
   ): Promise<IGetUmrahPackageImages[]> {
-    return await this.db('umrah_package_images')
+    return await this.db('umrah_package_photos')
       .withSchema(this.SERVICE_SCHEMA)
       .select('id', 'image')
       .where('umrah_id', query.umrah_id);

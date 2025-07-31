@@ -62,7 +62,7 @@ class AgentB2CUmrahService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { agency_id } = req.agencyB2CWhiteLabel;
             const umrahModel = this.Model.UmrahPackageModel();
-            const data = yield umrahModel.getSingleUmrahPackageDetails();
+            const data = yield umrahModel.getSingleAgentB2CUmrahPackageDetails({ source_id: agency_id });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,

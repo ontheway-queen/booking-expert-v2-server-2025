@@ -17,6 +17,7 @@ FileFolder.AGENCY_B2C_FILES = 'agent/b2c/files';
 FileFolder.AGENCY_B2C_TRAVELER_FILES = 'agent/b2c/traveler';
 FileFolder.ADMIN_HOLIDAY_PACKAGE = 'admin/holiday-package';
 FileFolder.AGENT_HOLIDAY_PACKAGE = 'agent/holiday-package';
+FileFolder.AGENT_UMRAH_PACKAGE = 'agent/umrah-package';
 FileFolder.PACKAGE_FILE = 'package-file';
 FileFolder.VISA_FILES = 'visa-files';
 FileFolder.SPECIAL_OFFER = 'special-offer';

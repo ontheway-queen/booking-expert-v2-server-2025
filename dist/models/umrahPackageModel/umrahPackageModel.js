@@ -21,23 +21,17 @@ class UmrahPackageModel extends schema_1.default {
     }
     insertUmrahPackage(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
+            return yield this.db('umrah_package').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
         });
     }
     insertUmrahPackageImage(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package_images')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload);
+            return yield this.db('umrah_package_photos').withSchema(this.SERVICE_SCHEMA).insert(payload);
         });
     }
     insertPackageInclude(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package_include')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload);
+            return yield this.db('umrah_package_include').withSchema(this.SERVICE_SCHEMA).insert(payload);
         });
     }
     getAgentB2CUmrahPackageList(query) {
@@ -58,7 +52,7 @@ class UmrahPackageModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('umrah_package')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('id', 'title', 'description', 'duration', 'valid_till_date', 'group_fare', 'status', 'adult_price', 'child_price', 'package_details', 'slug', 'meta_tag', 'meta_description', 'package_price_details', 'package_accommodation_details', 'short_description')
+                .select('id', 'title', 'description', 'duration', 'valid_till_date', 'status', 'adult_price', 'child_price', 'package_details', 'slug', 'meta_title', 'meta_description', 'package_price_details', 'package_accommodation_details', 'short_description')
                 .where((qb) => {
                 qb.andWhere('source_id', query.source_id);
                 qb.andWhere('source_type', constants_1.SOURCE_AGENT);
@@ -74,7 +68,7 @@ class UmrahPackageModel extends schema_1.default {
     }
     getSingleUmrahPackageImages(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package_images')
+            return yield this.db('umrah_package_photos')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id', 'image')
                 .where('umrah_id', query.umrah_id);

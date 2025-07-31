@@ -30,12 +30,16 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
     createUmrahPackage(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                var _a;
                 const { agency_id, user_id } = req.agencyUser;
                 const model = this.Model.UmrahPackageModel(trx);
                 const files = req.files || [];
                 const reqBody = req.body;
                 const { slug, package_include } = reqBody, payload = __rest(reqBody, ["slug", "package_include"]);
-                const check_slug = yield model.getSingleUmrahPackageDetails({ slug: slug });
+                const check_slug = yield model.getSingleAgentB2CUmrahPackageDetails({
+                    source_id: agency_id,
+                    slug,
+                });
                 if (check_slug) {
                     return {
                         success: false,
@@ -47,6 +51,8 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 payload.source_type = umrahConstants_1.SOURCE_TYPE.AGENT;
                 payload.source_id = agency_id;
                 payload.created_by = user_id;
+                payload.thumbnail = (_a = files.find((file) => file.fieldname === 'thumbnail')) === null || _a === void 0 ? void 0 : _a.filename;
+                console.log({ payload });
                 const res = yield model.insertUmrahPackage(payload);
                 if (res.length) {
                     if (files.length) {

@@ -54,7 +54,7 @@ export default class AgentB2CUmrahService extends AbstractServices {
     const { agency_id } = req.agencyB2CWhiteLabel;
     const umrahModel = this.Model.UmrahPackageModel();
 
-    const data = await umrahModel.getSingleUmrahPackageDetails();
+    const data = await umrahModel.getSingleAgentB2CUmrahPackageDetails({ source_id: agency_id });
 
     return {
       success: true,
