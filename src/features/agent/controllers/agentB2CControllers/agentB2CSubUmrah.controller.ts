@@ -16,4 +16,24 @@ export class AgentB2CSubUmrahController extends AbstractController {
       res.status(code).json(data);
     }
   );
+
+  public getUmrahPackageList = this.asyncWrapper.wrap(
+    {
+      querySchema: this.validator.getUmrahListQuerySchema,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.services.getUmrahPackageList(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public getSingleUmrahPackage = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.services.getSingleUmrahPackage(req);
+      res.status(code).json(data);
+    }
+  );
 }

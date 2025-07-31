@@ -24,19 +24,13 @@ class AgentB2CSubUmrahValidator {
             meta_description: joi_1.default.string().required(),
             package_price_details: joi_1.default.string().optional(),
             package_accommodation_details: joi_1.default.string().optional(),
-            package_include: joi_1.default.string().custom((value, helpers) => {
-                try {
-                    const parsed = JSON.parse(value);
-                    const { error } = this.parsedSchema.validate(parsed);
-                    if (error) {
-                        return helpers.error('any.invalid', { message: error.message });
-                    }
-                    return parsed;
-                }
-                catch (error) {
-                    return helpers.error('any.invalid');
-                }
-            }),
+            package_include: joi_1.default.array().items(joi_1.default.string()).required(),
+        });
+        this.getUmrahListQuerySchema = joi_1.default.object({
+            limit: joi_1.default.number().required(),
+            skip: joi_1.default.number().required(),
+            filter: joi_1.default.string().optional(),
+            status: joi_1.default.boolean().optional(),
         });
     }
 }

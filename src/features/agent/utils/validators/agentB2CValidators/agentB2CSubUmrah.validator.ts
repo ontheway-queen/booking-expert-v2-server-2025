@@ -19,17 +19,13 @@ export class AgentB2CSubUmrahValidator {
     meta_description: Joi.string().required(),
     package_price_details: Joi.string().optional(),
     package_accommodation_details: Joi.string().optional(),
-    package_include: Joi.string().custom((value, helpers) => {
-      try {
-        const parsed = JSON.parse(value);
-        const { error } = this.parsedSchema.validate(parsed);
-        if (error) {
-          return helpers.error('any.invalid', { message: error.message });
-        }
-        return parsed;
-      } catch (error) {
-        return helpers.error('any.invalid');
-      }
-    }),
+    package_include: Joi.array().items(Joi.string()).required(),
+  });
+
+  public getUmrahListQuerySchema = Joi.object({
+    limit: Joi.number().required(),
+    skip: Joi.number().required(),
+    filter: Joi.string().optional(),
+    status: Joi.boolean().optional(),
   });
 }

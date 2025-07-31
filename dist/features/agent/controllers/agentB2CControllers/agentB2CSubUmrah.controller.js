@@ -38,6 +38,18 @@ class AgentB2CSubUmrahController extends abstract_controller_1.default {
             const _a = yield this.services.createUmrahPackage(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
+        this.getUmrahPackageList = this.asyncWrapper.wrap({
+            querySchema: this.validator.getUmrahListQuerySchema,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.getUmrahPackageList(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.getSingleUmrahPackage = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.getSingleUmrahPackage(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
     }
 }
 exports.AgentB2CSubUmrahController = AgentB2CSubUmrahController;

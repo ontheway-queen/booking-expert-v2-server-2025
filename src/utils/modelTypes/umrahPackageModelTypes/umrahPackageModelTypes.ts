@@ -9,7 +9,7 @@ export interface IInsertUmrahPackagePayload {
   child_price: number;
   package_details: string;
   slug: string;
-  meta_tag: string;
+  meta_title: string;
   meta_description: string;
   umrah_for: 'AGENT' | 'B2C' | 'BOTH';
   package_price_details: string;
@@ -23,6 +23,15 @@ export interface IInsertUmrahPackagePayload {
 export interface IGetAgentB2CUmrahListQuery {
   source_id: number;
   status?: boolean;
+}
+
+export interface IGetUmrahPackageListQuery {
+  limit: number;
+  skip: number;
+  status?: boolean;
+  filter?: string;
+  source_type: 'ADMIN' | 'AGENT';
+  source_id: number;
 }
 export interface IGetAgentB2CUmrahListData {
   id: number;
@@ -51,6 +60,11 @@ export interface IGetPackageDetailsQuery {
   source_id: number;
 }
 
+export interface IGetSinglePackageIncludeService {
+  id: number;
+  service_name: string;
+}
+
 export interface IGetSinglePackageDetails {
   id: number;
   title: string;
@@ -65,11 +79,33 @@ export interface IGetSinglePackageDetails {
   package_price_details?: string;
   package_accommodation_details?: string;
   slug: string;
-  meta_tag: string;
+  meta_title: string;
   meta_description: string;
   umrah_for: 'AGENT' | 'B2C' | 'BOTH';
   package_include: Array<string>;
   short_description: string;
+  thumbnail: string;
+}
+
+export interface IUpdateUmrahPackage {
+  title?: string;
+  description?: string;
+  duration?: number;
+  valid_till_date?: string | Date;
+  group_size?: number | null;
+  status?: boolean;
+  adult_price?: number;
+  child_price?: number;
+  package_details?: string;
+  package_price_details?: string;
+  package_accommodation_details?: string;
+  slug?: string;
+  meta_title?: string;
+  meta_description?: string;
+  umrah_for?: 'AGENT' | 'B2C' | 'BOTH';
+  package_include?: Array<string>;
+  short_description?: string;
+  thumbnail?: string;
 }
 
 export interface IGetUmrahPackageImages {
@@ -86,22 +122,14 @@ export interface IGetPackageListQuery {
   source_id: number;
 }
 
-export interface ICreateUmrahPackagePayload {
+export interface IUmrahPackageListItem {
+  id: number;
   title: string;
-  description: string;
   duration: number;
-  valid_till_date: string;
   group_size: number;
-  status: boolean;
+  short_description: string;
   adult_price: number;
   child_price: number;
-  package_details: string;
-  package_include: Array<string>;
-  slug: string;
-  meta_tag: string;
-  meta_description: string;
-  umrah_for: 'AGENT' | 'B2C' | 'BOTH';
-  package_price_details: string;
-  package_accommodation_details: string;
-  short_description: string;
+  status: boolean;
+  valid_till_date: string;
 }
