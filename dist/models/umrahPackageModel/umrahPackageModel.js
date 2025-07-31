@@ -20,7 +20,9 @@ class UmrahPackageModel extends schema_1.default {
     }
     insertUmrahPackage(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
+            return yield this.db('umrah_package')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload, 'id');
         });
     }
     insertUmrahPackageImage(payload) {

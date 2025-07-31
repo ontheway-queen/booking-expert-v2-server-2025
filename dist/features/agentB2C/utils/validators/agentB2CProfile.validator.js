@@ -15,7 +15,11 @@ class AgentB2CProfileValidator {
         });
         this.changePassword = joi_1.default.object({
             old_password: joi_1.default.string().required().trim().min(8).max(50),
-            new_password: joi_1.default.string().required().trim().min(8).max(50)
+            new_password: joi_1.default.string()
+                .required()
+                .trim()
+                .min(8)
+                .max(50)
                 .invalid(joi_1.default.ref('old_password'))
                 .messages({
                 'any.invalid': 'New password must be different from the old password.',

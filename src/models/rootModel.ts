@@ -37,6 +37,7 @@ import DynamicFareModel from './dynamicFareRuleModel/dynamicFareModel';
 import DynamicFareSetModel from './dynamicFareRuleModel/dynamicFareSetModel';
 import PartialPaymentRuleModel from './dynamicFareRuleModel/partialPaymentRulesModel';
 import UmrahPackageModel from './umrahPackageModel/umrahPackageModel';
+import UmrahBookingModel from './umrahPackageModel/umrahBookingModel';
 
 export default class Models {
   //Common model
@@ -217,5 +218,10 @@ export default class Models {
   //Umrah Package Model
   public UmrahPackageModel(trx?: Knex.Transaction) {
     return new UmrahPackageModel(trx || db);
+  }
+
+  //Umrah booking Model
+  public UmrahBookingModel(trx?: Knex.Transaction) {
+    return new UmrahBookingModel(trx || db);
   }
 }

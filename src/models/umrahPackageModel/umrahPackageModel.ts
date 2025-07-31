@@ -18,10 +18,14 @@ export default class UmrahPackageModel extends Schema {
   }
 
   public async insertUmrahPackage(payload: IInsertUmrahPackagePayload) {
-    return await this.db('umrah_package').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
+    return await this.db('umrah_package')
+      .withSchema(this.SERVICE_SCHEMA)
+      .insert(payload, 'id');
   }
 
-  public async insertUmrahPackageImage(payload: IInsertUmrahPackageImagePayload) {
+  public async insertUmrahPackageImage(
+    payload: IInsertUmrahPackageImagePayload
+  ) {
     return await this.db('umrah_package_images')
       .withSchema(this.SERVICE_SCHEMA)
       .insert(payload, 'id');
