@@ -45,4 +45,5 @@ ResMsg.PRICE_NOT_FOUND = 'An issue occurred while getting the price. Please cont
 ResMsg.BOOKING_CANCELLATION_NOT_ALLOWED = 'Cancellation is not allowed for this booking!';
 ResMsg.BOOKING_STATUS_NOT_ALLOWED_TO_CHANGE = "Changing status is not allowed for this booking!";
 ResMsg.REQUEST_STATUS_NOT_ALLOWED_TO_CHANGE = "Changing status is not allowed for this request!";
+ResMsg.SLUG_EXISTS = "The slug you're trying to create already exists.";
 exports.default = ResMsg;

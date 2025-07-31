@@ -40,6 +40,7 @@ const airlinesPreferenceModel_1 = __importDefault(require("./dynamicFareRuleMode
 const dynamicFareModel_1 = __importDefault(require("./dynamicFareRuleModel/dynamicFareModel"));
 const dynamicFareSetModel_1 = __importDefault(require("./dynamicFareRuleModel/dynamicFareSetModel"));
 const partialPaymentRulesModel_1 = __importDefault(require("./dynamicFareRuleModel/partialPaymentRulesModel"));
+const umrahPackageModel_1 = __importDefault(require("./umrahPackageModel/umrahPackageModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -184,6 +185,10 @@ class Models {
     //Dynamic Fare Set Model
     PartialPaymentRuleModel(trx) {
         return new partialPaymentRulesModel_1.default(trx || database_1.db);
+    }
+    //Umrah Package Model
+    UmrahPackageModel(trx) {
+        return new umrahPackageModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

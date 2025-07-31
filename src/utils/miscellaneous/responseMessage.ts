@@ -62,6 +62,7 @@ class ResMsg {
   static readonly BOOKING_CANCELLATION_NOT_ALLOWED = 'Cancellation is not allowed for this booking!'
   static readonly BOOKING_STATUS_NOT_ALLOWED_TO_CHANGE = "Changing status is not allowed for this booking!"
   static readonly REQUEST_STATUS_NOT_ALLOWED_TO_CHANGE = "Changing status is not allowed for this request!"
+  static readonly SLUG_EXISTS = "The slug you're trying to create already exists.";
 
 }
 
