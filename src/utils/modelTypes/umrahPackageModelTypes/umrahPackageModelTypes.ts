@@ -26,7 +26,7 @@ export interface IInsertUmrahPackageImagePayload {
 
 export interface IInsertUmrahPackageIncludeServicePayload {
   umrah_id: number;
-  service_name: number;
+  service_name: string;
 }
 
 export interface IGetPackageDetailsQuery {
@@ -42,15 +42,17 @@ export interface IGetSinglePackageDetails {
   valid_till_date: string | Date;
   group_size: number | null;
   status: boolean;
-  b2c_price_per_person: number;
-  b2c_discount: number;
-  b2c_discount_type: 'PERCENTAGE' | 'FLAT';
+  adult_price: number;
+  child_price: number;
   package_details?: string;
   package_price_details?: string;
   package_accommodation_details?: string;
   slug: string;
   meta_tag: string;
   meta_description: string;
+  umrah_for: 'AGENT' | 'B2C' | 'BOTH';
+  package_include: Array<string>;
+  short_description: string;
 }
 
 export interface IGetUmrahPackageImages {
@@ -77,7 +79,7 @@ export interface ICreateUmrahPackagePayload {
   adult_price: number;
   child_price: number;
   package_details: string;
-  package_include: Array<number>;
+  package_include: Array<string>;
   slug: string;
   meta_tag: string;
   meta_description: string;

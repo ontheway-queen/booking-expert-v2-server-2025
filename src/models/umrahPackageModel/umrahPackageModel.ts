@@ -27,7 +27,7 @@ export default class UmrahPackageModel extends Schema {
   ) {
     return await this.db('umrah_package_images')
       .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload, 'id');
+      .insert(payload);
   }
 
   public async insertPackageInclude(
@@ -35,7 +35,7 @@ export default class UmrahPackageModel extends Schema {
   ) {
     return await this.db('umrah_package_include')
       .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload, 'id');
+      .insert(payload);
   }
 
   public async getSingleUmrahPackageDetails(

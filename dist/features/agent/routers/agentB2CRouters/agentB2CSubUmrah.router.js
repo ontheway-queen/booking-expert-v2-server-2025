@@ -11,6 +11,8 @@ class AgentB2CSubUmrahRouter extends abstract_router_1.default {
         this.controller = new agentB2CSubUmrah_controller_1.AgentB2CSubUmrahController();
         this.callRouter();
     }
-    callRouter() { }
+    callRouter() {
+        this.router.route('/').post(this.controller.createUmrahPackage);
+    }
 }
 exports.default = AgentB2CSubUmrahRouter;

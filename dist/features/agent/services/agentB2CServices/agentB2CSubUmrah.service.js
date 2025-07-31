@@ -48,16 +48,40 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 payload.source_id = agency_id;
                 payload.created_by = user_id;
                 const res = yield model.insertUmrahPackage(payload);
-                const imagePayload = [];
                 if (res.length) {
-                    files.forEach((file) => {
-                        imagePayload.push({
-                            umrah_id: res[0].id,
-                            image: file.filename,
+                    if (files.length) {
+                        const imagePayload = [];
+                        files.forEach((file) => {
+                            imagePayload.push({
+                                umrah_id: res[0].id,
+                                image: file.filename,
+                            });
                         });
-                    });
-                    yield model.insertUmrahPackageImage(imagePayload);
+                        yield model.insertUmrahPackageImage(imagePayload);
+                    }
+                    if (package_include === null || package_include === void 0 ? void 0 : package_include.length) {
+                        const include_service_payload = [];
+                        package_include.forEach((service_name) => __awaiter(this, void 0, void 0, function* () {
+                            include_service_payload.push({
+                                umrah_id: res[0].id,
+                                service_name,
+                            });
+                        }));
+                        yield model.insertPackageInclude(include_service_payload);
+                    }
                 }
+                else {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_INTERNAL_SERVER_ERROR,
+                        message: this.ResMsg.HTTP_INTERNAL_SERVER_ERROR,
+                    };
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
             }));
         });
     }
