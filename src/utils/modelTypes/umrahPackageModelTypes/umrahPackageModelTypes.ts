@@ -55,18 +55,18 @@ export interface IGetSinglePackageDetails {
   id: number;
   title: string;
   description: string;
+  short_description: string;
   duration: number;
   valid_till_date: string | Date;
   group_size: number | null;
   status: boolean;
-  b2c_price_per_person: number;
-  b2c_discount: number;
-  b2c_discount_type: 'PERCENTAGE' | 'FLAT';
   package_details?: string;
+  adult_price: string;
+  child_price: string;
   package_price_details?: string;
   package_accommodation_details?: string;
   slug: string;
-  meta_tag: string;
+  meta_title: string;
   meta_description: string;
 }
 

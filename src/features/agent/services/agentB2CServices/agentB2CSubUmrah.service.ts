@@ -12,7 +12,10 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       const reqBody = req.body;
       const { slug, package_include, ...payload } = reqBody;
 
-      const check_slug = await model.getSingleUmrahPackageDetails({ slug: slug });
+      const check_slug = await model.getSingleAgentB2CUmrahPackageDetails({
+        slug: slug,
+        source_id: agency_id,
+      });
 
       if (check_slug) {
         return {

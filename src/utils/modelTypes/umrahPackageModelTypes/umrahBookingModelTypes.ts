@@ -16,7 +16,7 @@ export interface IInsertUmrahBookingPayload {
   source_id: number;
   user_id: number;
   traveler_adult: number;
-  traveler_child: number;
+  traveler_child?: number;
   per_child_price: number;
   per_adult_price: number;
   total_price: number;

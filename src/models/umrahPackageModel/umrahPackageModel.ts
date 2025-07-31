@@ -76,16 +76,16 @@ export default class UmrahPackageModel extends Schema {
       .select(
         'id',
         'title',
+        'thumbnail',
         'description',
         'duration',
         'valid_till_date',
-        'group_fare',
         'status',
         'adult_price',
         'child_price',
         'package_details',
         'slug',
-        'meta_tag',
+        'meta_title',
         'meta_description',
         'package_price_details',
         'package_accommodation_details',
@@ -94,6 +94,7 @@ export default class UmrahPackageModel extends Schema {
       .where((qb) => {
         qb.andWhere('source_id', query.source_id);
         qb.andWhere('source_type', SOURCE_AGENT);
+        qb.andWhere('is_deleted', false);
         if (query.slug) {
           qb.andWhere('slug', query.slug);
         }

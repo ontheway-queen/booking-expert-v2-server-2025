@@ -35,7 +35,10 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 const files = req.files || [];
                 const reqBody = req.body;
                 const { slug, package_include } = reqBody, payload = __rest(reqBody, ["slug", "package_include"]);
-                const check_slug = yield model.getSingleUmrahPackageDetails({ slug: slug });
+                const check_slug = yield model.getSingleAgentB2CUmrahPackageDetails({
+                    slug: slug,
+                    source_id: agency_id,
+                });
                 if (check_slug) {
                     return {
                         success: false,
