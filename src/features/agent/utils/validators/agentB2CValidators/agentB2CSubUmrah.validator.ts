@@ -1,12 +1,7 @@
 import Joi from 'joi';
 
 export class AgentB2CSubUmrahValidator {
- public parsedSchema = Joi.array().items(
-    Joi.object({
-      title: Joi.string().required(),
-      description: Joi.string().optional(),
-    })
-  );
+  public parsedSchema = Joi.array().items(Joi.string());
 
   public createUmrahSchema = Joi.object({
     title: Joi.string().required(),
@@ -24,13 +19,17 @@ export class AgentB2CSubUmrahValidator {
     meta_description: Joi.string().required(),
     package_price_details: Joi.string().optional(),
     package_accommodation_details: Joi.string().optional(),
-    // package_include: Joi.alternatives().custom((value, helpers) => {
-    //   try {
-    //     const parsed = JSON.parse(value);
-    //     return parsed;
-    //   } catch (error) {
-    //     return helpers.error('any.invalid');
-    //   }
-    // }),
+    package_include: Joi.string().custom((value, helpers) => {
+      try {
+        const parsed = JSON.parse(value);
+        const { error } = this.parsedSchema.validate(parsed);
+        if (error) {
+          return helpers.error('any.invalid', { message: error.message });
+        }
+        return parsed;
+      } catch (error) {
+        return helpers.error('any.invalid');
+      }
+    }),
   });
 }

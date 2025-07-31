@@ -7,10 +7,7 @@ exports.AgentB2CSubUmrahValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
 class AgentB2CSubUmrahValidator {
     constructor() {
-        this.parsedSchema = joi_1.default.array().items(joi_1.default.object({
-            title: joi_1.default.string().required(),
-            description: joi_1.default.string().optional(),
-        }));
+        this.parsedSchema = joi_1.default.array().items(joi_1.default.string());
         this.createUmrahSchema = joi_1.default.object({
             title: joi_1.default.string().required(),
             description: joi_1.default.string().required(),
@@ -27,9 +24,13 @@ class AgentB2CSubUmrahValidator {
             meta_description: joi_1.default.string().required(),
             package_price_details: joi_1.default.string().optional(),
             package_accommodation_details: joi_1.default.string().optional(),
-            package_include: joi_1.default.alternatives().custom((value, helpers) => {
+            package_include: joi_1.default.string().custom((value, helpers) => {
                 try {
                     const parsed = JSON.parse(value);
+                    const { error } = this.parsedSchema.validate(parsed);
+                    if (error) {
+                        return helpers.error('any.invalid', { message: error.message });
+                    }
                     return parsed;
                 }
                 catch (error) {
