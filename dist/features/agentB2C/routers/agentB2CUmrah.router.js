@@ -26,7 +26,7 @@ class AgentB2CUmrahRouter extends abstract_router_1.default {
             .get(this.authChecker.agencyB2CUserAuthChecker, this.controller.getSingleUmrahBooking);
         this.router
             .route('/booking/:id/cancel')
-            .get(this.authChecker.agencyB2CUserAuthChecker, this.controller.cancelUmrahBooking);
+            .post(this.authChecker.agencyB2CUserAuthChecker, this.controller.cancelUmrahBooking);
         this.router.route('/:slug').get(this.controller.getSingleUmrahPackages);
     }
 }
