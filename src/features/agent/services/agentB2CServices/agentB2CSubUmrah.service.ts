@@ -12,7 +12,6 @@ export class AgentB2CSubUmrahService extends AbstractServices {
 
       const reqBody = req.body;
       const { slug, package_include, ...payload } = reqBody;
-
       const check_slug = await model.getSingleAgentB2CUmrahPackageDetails({
         source_id: agency_id,
         slug,
@@ -30,29 +29,34 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       payload.source_type = SOURCE_AGENT;
       payload.source_id = agency_id;
       payload.created_by = user_id;
-      payload.thumbnail = files.find(
-        (file) => file.fieldname === 'thumbnail'
-      )?.filename;
+
+      const imagePayload: {
+        umrah_id: number;
+        image: string;
+      }[] = [];
+
+      files.forEach((file) => {
+        if (file.fieldname === 'thumbnail') {
+          payload.thumbnail = file.filename;
+        } else {
+          imagePayload.push({
+            umrah_id: 0,
+            image: file.filename,
+          });
+        }
+      });
 
       const res = await model.insertUmrahPackage(payload);
 
       if (res.length) {
-        if (files.length) {
-          const imagePayload: {
-            umrah_id: number;
-            image: string;
-          }[] = [];
-
-          files.forEach((file) => {
-            if (file.fieldname !== 'thumbnail') {
-              imagePayload.push({
-                umrah_id: res[0].id,
-                image: file.filename,
-              });
-            }
+        if (imagePayload.length) {
+          const newImgPayload = imagePayload.map((imgItem) => {
+            return {
+              umrah_id: res[0].id,
+              image: imgItem.image,
+            };
           });
-
-          await model.insertUmrahPackageImage(imagePayload);
+          await model.insertUmrahPackageImage(newImgPayload);
         }
 
         if (package_include?.length) {
@@ -60,6 +64,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
             umrah_id: number;
             service_name: string;
           }[] = [];
+
           package_include.forEach((service_name: string) => {
             include_service_payload.push({
               umrah_id: res[0].id,
@@ -131,7 +136,9 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       };
     }
 
-    const images = await model.getSingleUmrahPackageImages({ umrah_id: Number(id) });
+    const images = await model.getSingleUmrahPackageImages({
+      umrah_id: Number(id),
+    });
 
     const included_services = await model.getSingleUmrahPackageIncludedService({
       umrah_id: Number(id),
@@ -170,7 +177,12 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       }
 
       const reqBody = req.body;
-      const { add_package_include, remove_images, remove_package_include, ...payload } = reqBody;
+      const {
+        add_package_include,
+        remove_images,
+        remove_package_include,
+        ...payload
+      } = reqBody;
 
       if (payload.slug) {
         const check_slug = await model.getSingleAgentB2CUmrahPackageDetails({
@@ -253,12 +265,11 @@ export class AgentB2CSubUmrahService extends AbstractServices {
 
       await model.updateUmrahPackage({ data: payload, umrah_id: Number(id) });
 
-
-      return{
+      return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: this.ResMsg.HTTP_OK
-      }
+        message: this.ResMsg.HTTP_OK,
+      };
     });
   }
 }

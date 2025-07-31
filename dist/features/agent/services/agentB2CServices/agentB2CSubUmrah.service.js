@@ -31,7 +31,6 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
     createUmrahPackage(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
                 const { agency_id, user_id } = req.agencyUser;
                 const model = this.Model.UmrahPackageModel(trx);
                 const files = req.files || [];
@@ -52,20 +51,28 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 payload.source_type = constants_1.SOURCE_AGENT;
                 payload.source_id = agency_id;
                 payload.created_by = user_id;
-                payload.thumbnail = (_a = files.find((file) => file.fieldname === 'thumbnail')) === null || _a === void 0 ? void 0 : _a.filename;
+                const imagePayload = [];
+                files.forEach((file) => {
+                    if (file.fieldname === 'thumbnail') {
+                        payload.thumbnail = file.filename;
+                    }
+                    else {
+                        imagePayload.push({
+                            umrah_id: 0,
+                            image: file.filename,
+                        });
+                    }
+                });
                 const res = yield model.insertUmrahPackage(payload);
                 if (res.length) {
-                    if (files.length) {
-                        const imagePayload = [];
-                        files.forEach((file) => {
-                            if (file.fieldname !== 'thumbnail') {
-                                imagePayload.push({
-                                    umrah_id: res[0].id,
-                                    image: file.filename,
-                                });
-                            }
+                    if (imagePayload.length) {
+                        const newImgPayload = imagePayload.map((imgItem) => {
+                            return {
+                                umrah_id: res[0].id,
+                                image: imgItem.image,
+                            };
                         });
-                        yield model.insertUmrahPackageImage(imagePayload);
+                        yield model.insertUmrahPackageImage(newImgPayload);
                     }
                     if (package_include === null || package_include === void 0 ? void 0 : package_include.length) {
                         const include_service_payload = [];
@@ -129,7 +136,9 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
-            const images = yield model.getSingleUmrahPackageImages({ umrah_id: Number(id) });
+            const images = yield model.getSingleUmrahPackageImages({
+                umrah_id: Number(id),
+            });
             const included_services = yield model.getSingleUmrahPackageIncludedService({
                 umrah_id: Number(id),
             });
@@ -227,7 +236,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: this.ResMsg.HTTP_OK
+                    message: this.ResMsg.HTTP_OK,
                 };
             }));
         });
