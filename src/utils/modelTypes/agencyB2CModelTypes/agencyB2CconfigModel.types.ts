@@ -27,15 +27,54 @@ export interface IGetAgencyB2CHeroBgContentData {
   agency_id: number;
   order_no: number;
   content: string;
+  status: boolean;
 }
 
-export interface ICreateAgencyB2CPopularDestination {
+export interface ICreateAgencyB2CPopularDestinationPayload {
   agency_id: number;
   thumbnail: string;
   order_number: number;
   country_id: number;
   from_airport: number;
   to_airport: number;
+}
+export interface IUpdateAgencyB2CPopularDestinationPayload {
+  thumbnail?: string;
+  order_number: number;
+  country_id?: number;
+  from_airport?: number;
+  to_airport?: number;
+}
+export interface IGetAgencyB2CPopularDestinationQuery {
+  agency_id: number;
+  status?: boolean;
+}
+
+export interface IGetAgencyB2CPopularDestinationData {
+  id: number;
+  agency_id: number;
+  thumbnail: string;
+  order_number: number;
+  country_id: number;
+  country_name: string;
+  from_airport: number;
+  from_airport_name: string;
+  from_airport_code: string;
+  to_airport: number;
+  to_airport_name: string;
+  to_airport_code: string;
+  status: boolean;
+}
+
+export interface IGetAgencyB2CPopularDestinationLastNoData {
+  id: number;
+  agency_id: number;
+  thumbnail: string;
+  order_number: number;
+  country_id: number;
+  from_airport: number;
+  to_airport: number;
+  status: boolean;
 }
 
 export interface ICreateAgencyB2CPopularPlace {

@@ -87,6 +87,62 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .insert(payload);
         });
     }
+    getPopularDestination(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('popular_destination AS pd')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .select('pd.*', 'c.name AS country_name', 'da.name AS from_airport_name', 'da.iata_code AS from_airport_code', 'aa.name AS to_airport_name', 'aa.iata_code AS to_airport_code')
+                .joinRaw(`LEFT JOIN dbo.country AS c ON pd.country_id = c.id`)
+                .joinRaw(`LEFT JOIN public.airport AS da ON pd.from_airport = da.id`)
+                .joinRaw(`LEFT JOIN public.airport AS aa ON pd.to_airport = aa.id`)
+                .orderBy('pd.order_no', 'asc')
+                .andWhere('pd.agency_id', query.agency_id)
+                .where((qb) => {
+                if (query.status !== undefined) {
+                    qb.andWhere('pd.status', query.status);
+                }
+            });
+        });
+    }
+    checkPopularDestination(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('popular_destination')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .select('*')
+                .orderBy('order_no', 'asc')
+                .andWhere('agency_id', query.agency_id)
+                .andWhere('id', query.id)
+                .first();
+        });
+    }
+    getPopularDestinationLastNo(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('popular_destination')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .select('*')
+                .where('agency_id', query.agency_id)
+                .orderBy('order_no', 'desc')
+                .first();
+        });
+    }
+    updatePopularDestination(payload, where) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('popular_destination')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .update(payload)
+                .where('agency_id', where.agency_id)
+                .where('id', where.id);
+        });
+    }
+    deletePopularDestination(where) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('hero_bg_content')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .del()
+                .where('agency_id', where.agency_id)
+                .where('id', where.id);
+        });
+    }
     insertPopularPlaces(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('popular_places')
