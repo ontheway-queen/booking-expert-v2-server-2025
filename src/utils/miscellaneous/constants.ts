@@ -70,6 +70,10 @@ export const DEPOSIT_STATUS_CANCELLED = 'CANCELLED';
 // White label permissions modules
 export const WHITE_LABEL_PERMISSIONS_MODULES: string[] = [];
 
+// content type
+export const CONTENT_TYPE_PHOTO = 'PHOTO';
+export const CONTENT_TYPE_VIDEO = 'VIDEO';
+
 //generate auto unique id
 export const GENERATE_AUTO_UNIQUE_ID = {
   agent: 'Agent',

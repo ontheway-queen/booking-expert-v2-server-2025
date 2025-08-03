@@ -8,7 +8,7 @@ import {
   IGetAgencyB2CUserListQuery,
   IGetAgentB2CSingleUser,
   IUpdateAgencyB2CUserPayload,
-} from '../../utils/modelTypes/agencyB2CModelTypes/agecncyB2CUserModelTypes';
+} from '../../utils/modelTypes/agencyB2CModelTypes/agencyB2CUserModelTypes';
 
 export default class AgencyB2CUserModel extends Schema {
   private db: TDB;

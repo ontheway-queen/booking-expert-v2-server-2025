@@ -86,6 +86,9 @@ export class AgentB2CSubUmrahService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
+        data: {
+          id: res[0].id,
+        },
       };
     });
   }

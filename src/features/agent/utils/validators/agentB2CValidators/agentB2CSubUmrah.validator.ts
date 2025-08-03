@@ -19,7 +19,7 @@ export class AgentB2CSubUmrahValidator {
     meta_description: Joi.string().required(),
     package_price_details: Joi.string().optional(),
     package_accommodation_details: Joi.string().optional(),
-    package_include: Joi.array().items(Joi.string()).required(),
+    package_includes: Joi.array().items(Joi.string()).required(),
   });
 
   public getUmrahListQuerySchema = Joi.object({
@@ -28,7 +28,6 @@ export class AgentB2CSubUmrahValidator {
     filter: Joi.string().optional(),
     status: Joi.boolean().optional(),
   });
-
 
   public updateUmrahSchema = Joi.object({
     title: Joi.string().optional(),
@@ -47,8 +46,13 @@ export class AgentB2CSubUmrahValidator {
     meta_description: Joi.string().optional(),
     package_price_details: Joi.string().optional(),
     package_accommodation_details: Joi.string().optional(),
-    add_package_include: Joi.array().items(Joi.string().allow('')).optional().required(),
-    remove_package_include: Joi.array().items(Joi.number().allow('')).required(),
+    add_package_include: Joi.array()
+      .items(Joi.string().allow(''))
+      .optional()
+      .required(),
+    remove_package_include: Joi.array()
+      .items(Joi.number().allow(''))
+      .required(),
     remove_images: Joi.array().items(Joi.number().allow('')).required(),
   });
 }

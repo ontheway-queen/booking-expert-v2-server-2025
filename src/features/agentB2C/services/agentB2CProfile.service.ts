@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 import Lib from '../../../utils/lib/lib';
-import { IUpdateAgencyB2CUserPayload } from '../../../utils/modelTypes/agencyB2CModelTypes/agecncyB2CUserModelTypes';
+import { IUpdateAgencyB2CUserPayload } from '../../../utils/modelTypes/agencyB2CModelTypes/agencyB2CUserModelTypes';
 import {
   IAgentB2CChangePasswordReqBody,
   IUpdateAgentB2CProfileReqBody,

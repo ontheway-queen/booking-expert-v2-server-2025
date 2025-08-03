@@ -24,7 +24,7 @@ class AgentB2CSubUmrahValidator {
             meta_description: joi_1.default.string().required(),
             package_price_details: joi_1.default.string().optional(),
             package_accommodation_details: joi_1.default.string().optional(),
-            package_include: joi_1.default.array().items(joi_1.default.string()).required(),
+            package_includes: joi_1.default.array().items(joi_1.default.string()).required(),
         });
         this.getUmrahListQuerySchema = joi_1.default.object({
             limit: joi_1.default.number().required(),
@@ -49,8 +49,13 @@ class AgentB2CSubUmrahValidator {
             meta_description: joi_1.default.string().optional(),
             package_price_details: joi_1.default.string().optional(),
             package_accommodation_details: joi_1.default.string().optional(),
-            add_package_include: joi_1.default.array().items(joi_1.default.string().allow('')).optional().required(),
-            remove_package_include: joi_1.default.array().items(joi_1.default.number().allow('')).required(),
+            add_package_include: joi_1.default.array()
+                .items(joi_1.default.string().allow(''))
+                .optional()
+                .required(),
+            remove_package_include: joi_1.default.array()
+                .items(joi_1.default.number().allow(''))
+                .required(),
             remove_images: joi_1.default.array().items(joi_1.default.number().allow('')).required(),
         });
     }
