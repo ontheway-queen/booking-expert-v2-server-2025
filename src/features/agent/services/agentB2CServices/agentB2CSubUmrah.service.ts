@@ -11,7 +11,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       const files = (req.files as Express.Multer.File[]) || [];
 
       const reqBody = req.body;
-      const { slug, package_include, ...payload } = reqBody;
+      const { slug, package_includes, ...payload } = reqBody;
       const check_slug = await model.getSingleAgentB2CUmrahPackageDetails({
         source_id: agency_id,
         slug,
@@ -33,6 +33,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       const imagePayload: {
         umrah_id: number;
         image: string;
+        image_name: string;
       }[] = [];
 
       files.forEach((file) => {
@@ -42,6 +43,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
           imagePayload.push({
             umrah_id: 0,
             image: file.filename,
+            image_name: file.originalname,
           });
         }
       });
@@ -54,18 +56,19 @@ export class AgentB2CSubUmrahService extends AbstractServices {
             return {
               umrah_id: res[0].id,
               image: imgItem.image,
+              image_name: imgItem.image_name,
             };
           });
           await model.insertUmrahPackageImage(newImgPayload);
         }
 
-        if (package_include?.length) {
+        if (package_includes?.length) {
           const include_service_payload: {
             umrah_id: number;
             service_name: string;
           }[] = [];
 
-          package_include.forEach((service_name: string) => {
+          package_includes.forEach((service_name: string) => {
             include_service_payload.push({
               umrah_id: res[0].id,
               service_name,
@@ -85,7 +88,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: this.ResMsg.HTTP_OK,
+        message:"Umrah package created successfully",
         data: {
           id: res[0].id,
         },
@@ -143,7 +146,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       umrah_id: Number(id),
     });
 
-    const included_services = await model.getSingleUmrahPackageIncludedService({
+    const package_includes = await model.getSingleUmrahPackageIncludedService({
       umrah_id: Number(id),
     });
 
@@ -154,7 +157,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       data: {
         ...data,
         images: images || [],
-        included_services: included_services || [],
+        package_includes: package_includes || [],
       },
     };
   }
@@ -180,14 +183,10 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       }
 
       const reqBody = req.body;
-      const {
-        add_package_include,
-        remove_images,
-        remove_package_include,
-        ...payload
-      } = reqBody;
+      const { add_package_include, remove_images, remove_package_include, ...payload } = reqBody;
 
-      if (payload.slug) {
+
+      if (payload?.slug) {
         const check_slug = await model.getSingleAgentB2CUmrahPackageDetails({
           source_id: agency_id,
           slug: payload.slug,
@@ -203,11 +202,17 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       }
 
       //remove images
-      if (remove_images.length) {
+      if (remove_images?.length) {
         const removeImage: string[] = [];
         for (const image_id of remove_images) {
           const image = await model.getSingleUmrahPackageImage({ image_id });
-          if (image) {
+          if (!image) {
+            return {
+              success: false,
+              code: this.StatusCode.HTTP_NOT_FOUND,
+              message: this.ResMsg.HTTP_NOT_FOUND,
+            };
+          } else {
             removeImage.push(image.image);
           }
           await model.deleteUmrahPackageImage({ image_id });
@@ -217,7 +222,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       }
 
       //remove included services
-      if (remove_package_include.length) {
+      if (remove_package_include?.length) {
         for (const service_id of remove_package_include) {
           await model.deleteUmrahPackageIncludedService({ id: service_id });
         }
@@ -239,39 +244,39 @@ export class AgentB2CSubUmrahService extends AbstractServices {
         await model.insertPackageInclude(include_service_payload);
       }
 
-      if (files.length) {
+      //update images
+      if (files?.length) {
         const imagePayload: {
           umrah_id: number;
           image: string;
+          image_name: string;
         }[] = [];
 
-        files.forEach((file) => {
-          if (file.fieldname !== 'thumbnail') {
-            imagePayload.push({
-              umrah_id: Number(id),
-              image: file.filename,
-            });
-          }
-        });
-
-        await model.insertUmrahPackageImage(imagePayload);
-      }
-
-      if (files.length) {
         for (const file of files) {
           if (file.fieldname === 'thumbnail') {
             payload.thumbnail = file.filename;
             await this.manageFile.deleteFromCloud([check.thumbnail]);
+          } else {
+            imagePayload.push({
+              umrah_id: Number(id),
+              image: file.filename,
+              image_name: file.originalname,
+            });
           }
+        }
+        if (imagePayload.length) {
+          await model.insertUmrahPackageImage(imagePayload);
         }
       }
 
-      await model.updateUmrahPackage({ data: payload, umrah_id: Number(id) });
+      if (Object.keys(payload).length) {
+        await model.updateUmrahPackage({ data: payload, umrah_id: Number(id) });
+      }
 
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: this.ResMsg.HTTP_OK,
+        message: "Umrah package updated successfully",
       };
     });
   }

@@ -13,7 +13,7 @@ class AgentB2CSubUmrahValidator {
             description: joi_1.default.string().required(),
             short_description: joi_1.default.string().optional(),
             duration: joi_1.default.number().optional().positive(),
-            valid_till_date: joi_1.default.string().isoDate().optional(),
+            valid_till_date: joi_1.default.string().optional(),
             group_size: joi_1.default.number().optional().positive(),
             adult_price: joi_1.default.number().required().positive(),
             child_price: joi_1.default.number().required().positive(),
@@ -49,14 +49,9 @@ class AgentB2CSubUmrahValidator {
             meta_description: joi_1.default.string().optional(),
             package_price_details: joi_1.default.string().optional(),
             package_accommodation_details: joi_1.default.string().optional(),
-            add_package_include: joi_1.default.array()
-                .items(joi_1.default.string().allow(''))
-                .optional()
-                .required(),
-            remove_package_include: joi_1.default.array()
-                .items(joi_1.default.number().allow(''))
-                .required(),
-            remove_images: joi_1.default.array().items(joi_1.default.number().allow('')).required(),
+            add_package_include: joi_1.default.array().items(joi_1.default.string().allow('')).optional().optional(),
+            remove_package_include: joi_1.default.array().items(joi_1.default.number().allow('')).optional(),
+            remove_images: joi_1.default.array().items(joi_1.default.number().allow('')).optional(),
         });
     }
 }
