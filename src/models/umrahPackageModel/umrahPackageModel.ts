@@ -26,27 +26,19 @@ export default class UmrahPackageModel extends Schema {
   }
 
   public async insertUmrahPackage(payload: IInsertUmrahPackagePayload) {
-    return await this.db('umrah_package')
-      .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload, 'id');
+    return await this.db('umrah_package').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
   }
 
   public async insertUmrahPackageImage(
     payload: IInsertUmrahPackageImagePayload | IInsertUmrahPackageImagePayload[]
   ) {
-    return await this.db('umrah_package_photos')
-      .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload);
+    return await this.db('umrah_package_photos').withSchema(this.SERVICE_SCHEMA).insert(payload);
   }
 
   public async insertPackageInclude(
-    payload:
-      | IInsertUmrahPackageIncludeServicePayload
-      | IInsertUmrahPackageIncludeServicePayload[]
+    payload: IInsertUmrahPackageIncludeServicePayload | IInsertUmrahPackageIncludeServicePayload[]
   ) {
-    return await this.db('umrah_package_include')
-      .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload);
+    return await this.db('umrah_package_include').withSchema(this.SERVICE_SCHEMA).insert(payload);
   }
 
   public async getUmrahPackageInclude(
@@ -208,7 +200,7 @@ export default class UmrahPackageModel extends Schema {
   }): Promise<IGetUmrahPackageImages[]> {
     return await this.db('umrah_package_photos')
       .withSchema(this.SERVICE_SCHEMA)
-      .select('id', 'image')
+      .select('id', 'image', 'image_name')
       .where('umrah_id', query.umrah_id);
   }
 
@@ -221,10 +213,7 @@ export default class UmrahPackageModel extends Schema {
       .where('umrah_id', query.umrah_id);
   }
 
-  public async updateUmrahPackage(payload: {
-    umrah_id: number;
-    data: IUpdateUmrahPackage;
-  }) {
+  public async updateUmrahPackage(payload: { umrah_id: number; data: IUpdateUmrahPackage }) {
     return await this.db('umrah_package')
       .withSchema(this.SERVICE_SCHEMA)
       .where('id', payload.umrah_id)

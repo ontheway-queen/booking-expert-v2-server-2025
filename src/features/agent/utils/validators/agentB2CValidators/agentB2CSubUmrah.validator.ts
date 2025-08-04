@@ -8,7 +8,7 @@ export class AgentB2CSubUmrahValidator {
     description: Joi.string().required(),
     short_description: Joi.string().optional(),
     duration: Joi.number().optional().positive(),
-    valid_till_date: Joi.string().isoDate().optional(),
+    valid_till_date: Joi.string().optional(),
     group_size: Joi.number().optional().positive(),
     adult_price: Joi.number().required().positive(),
     child_price: Joi.number().required().positive(),
@@ -46,13 +46,8 @@ export class AgentB2CSubUmrahValidator {
     meta_description: Joi.string().optional(),
     package_price_details: Joi.string().optional(),
     package_accommodation_details: Joi.string().optional(),
-    add_package_include: Joi.array()
-      .items(Joi.string().allow(''))
-      .optional()
-      .required(),
-    remove_package_include: Joi.array()
-      .items(Joi.number().allow(''))
-      .required(),
-    remove_images: Joi.array().items(Joi.number().allow('')).required(),
+    add_package_include: Joi.array().items(Joi.string().allow('')).optional().optional(),
+    remove_package_include: Joi.array().items(Joi.number().allow('')).optional(),
+    remove_images: Joi.array().items(Joi.number().allow('')).optional(),
   });
 }
