@@ -34,7 +34,7 @@ class UmrahBookingModel extends schema_1.default {
                 .where('id', booking_id);
         });
     }
-    getAgentB2CUmarhBookingList(query_1) {
+    getAgentB2CUmrahBookingList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, need_total = false) {
             var _a;
             const data = yield this.db('umrah_booking AS ub')
@@ -113,6 +113,14 @@ class UmrahBookingModel extends schema_1.default {
                 .select('id', 'name', 'email', 'phone', 'address')
                 .where('booking_id', bookingId)
                 .first();
+        });
+    }
+    checkBookingExistByUmrahId(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ umrah_id }) {
+            return yield this.db('umrah_booking')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('id')
+                .where('umrah_id', umrah_id);
         });
     }
 }

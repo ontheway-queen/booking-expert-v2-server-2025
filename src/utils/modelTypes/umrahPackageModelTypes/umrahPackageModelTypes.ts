@@ -112,6 +112,7 @@ export interface IUpdateUmrahPackage {
   package_include?: Array<string>;
   short_description?: string;
   thumbnail?: string;
+  is_deleted?: boolean;
 }
 
 export interface IGetUmrahPackageImages {

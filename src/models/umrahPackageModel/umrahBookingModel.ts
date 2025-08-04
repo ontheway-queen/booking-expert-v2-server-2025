@@ -39,7 +39,7 @@ export default class UmrahBookingModel extends Schema {
       .where('id', booking_id);
   }
 
-  public async getAgentB2CUmarhBookingList(
+  public async getAgentB2CUmrahBookingList(
     query: IGetUmrahBookingListQuery,
     need_total: boolean = false
   ): Promise<{ data: IGetAgentB2CUmrahBookingListData[]; total?: number }> {
@@ -151,5 +151,13 @@ export default class UmrahBookingModel extends Schema {
       .select('id', 'name', 'email', 'phone', 'address')
       .where('booking_id', bookingId)
       .first();
+  }
+
+
+  public async checkBookingExistByUmrahId({umrah_id}:{umrah_id:number}):Promise<{id:number}[]> {
+    return await this.db('umrah_booking')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('id')
+      .where('umrah_id', umrah_id);
   }
 }

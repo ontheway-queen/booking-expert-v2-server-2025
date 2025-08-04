@@ -88,7 +88,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message:"Umrah package created successfully",
+        message: 'Umrah package created successfully',
         data: {
           id: res[0].id,
         },
@@ -185,7 +185,6 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       const reqBody = req.body;
       const { add_package_include, remove_images, remove_package_include, ...payload } = reqBody;
 
-
       if (payload?.slug) {
         const check_slug = await model.getSingleAgentB2CUmrahPackageDetails({
           source_id: agency_id,
@@ -276,7 +275,43 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: "Umrah package updated successfully",
+        message: 'Umrah package updated successfully',
+      };
+    });
+  }
+
+  //delete umrah package
+  public async deleteUmrahPackage(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { id } = req.params;
+      const packageModel = this.Model.UmrahPackageModel(trx);
+      const data = await packageModel.getSingleUmrahPackage({ umrah_id: Number(id) });
+
+      const bookingModel = this.Model.UmrahBookingModel(trx);
+      const booking = await bookingModel.checkBookingExistByUmrahId({ umrah_id: Number(id) });
+
+      if (booking.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: `You can't delete this package because ${
+            booking.length > 1 ? `${booking.length} bookings` : `${booking.length} booking`
+          } found for this package`,
+        };
+      }
+
+      if (!data) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+      await packageModel.updateUmrahPackage({ umrah_id: Number(id), data: { is_deleted: true } });
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: 'Umrah package deleted successfully',
       };
     });
   }
