@@ -32,4 +32,6 @@ export const origin: string[] = [
   'https://www.aviationhubbd.com',
   'https://firoztrip.com',
   'https://www.firoztrip.com',
+  'https://ayatairtravels.com',
+  'https://www.ayatairtravels.com',
 ];

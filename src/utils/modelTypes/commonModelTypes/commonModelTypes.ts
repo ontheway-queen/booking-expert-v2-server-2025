@@ -121,3 +121,15 @@ export interface IGetEmailSubscriberData {
   agency_id?: number;
   created_at: string;
 }
+
+export interface ICreateBankAccountPayload {
+  id: number;
+  bank_id: number;
+  account_name?: string;
+  account_number: string;
+  branch?: string; // Nullable
+  source_type?: 'ADMIN' | 'AGENT';
+  source_id?: number; // Nullable
+  routing_no?: string; // Nullable
+  swift_code?: string; // Nullable
+}
