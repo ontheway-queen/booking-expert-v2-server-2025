@@ -23,7 +23,8 @@ class AgentB2CSubUmrahRouter extends abstract_router_1.default {
         this.router
             .route('/:id')
             .get(this.controller.getSingleUmrahPackage)
-            .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENT_UMRAH_PACKAGE), this.controller.updateUmrahPackage);
+            .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENT_UMRAH_PACKAGE), this.controller.updateUmrahPackage)
+            .delete(this.controller.deleteUmrahPackage);
     }
 }
 exports.default = AgentB2CSubUmrahRouter;

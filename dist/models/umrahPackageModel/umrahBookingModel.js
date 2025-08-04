@@ -116,5 +116,13 @@ class UmrahBookingModel extends schema_1.default {
                 .first();
         });
     }
+    checkBookingExistByUmrahId(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ umrah_id }) {
+            return yield this.db('umrah_booking')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('id')
+                .where('umrah_id', umrah_id);
+        });
+    }
 }
 exports.default = UmrahBookingModel;

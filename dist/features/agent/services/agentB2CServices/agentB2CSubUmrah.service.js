@@ -255,6 +255,47 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
             }));
         });
     }
+    //delete umrah package
+    deleteUmrahPackage(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { id } = req.params;
+                const packageModel = this.Model.UmrahPackageModel(trx);
+                const data = yield packageModel.getSingleUmrahPackage({
+                    umrah_id: Number(id),
+                });
+                const bookingModel = this.Model.UmrahBookingModel(trx);
+                const booking = yield bookingModel.checkBookingExistByUmrahId({
+                    umrah_id: Number(id),
+                });
+                if (booking.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: `You can't delete this package because ${booking.length > 1
+                            ? `${booking.length} bookings`
+                            : `${booking.length} booking`} found for this package`,
+                    };
+                }
+                if (!data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                yield packageModel.updateUmrahPackage({
+                    umrah_id: Number(id),
+                    data: { is_deleted: true },
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: 'Umrah package deleted successfully',
+                };
+            }));
+        });
+    }
     // get umrah booking
     getUmrahBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -67,4 +67,14 @@ export class AgentB2CSubUmrahController extends AbstractController {
       res.status(code).json(data);
     }
   );
+
+  public deleteUmrahPackage = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.services.deleteUmrahPackage(req);
+      res.status(code).json(data);
+    }
+  );
 }

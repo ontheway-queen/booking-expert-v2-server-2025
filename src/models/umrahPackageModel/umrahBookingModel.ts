@@ -155,4 +155,12 @@ export default class UmrahBookingModel extends Schema {
       .where('booking_id', bookingId)
       .first();
   }
+
+
+  public async checkBookingExistByUmrahId({umrah_id}:{umrah_id:number}):Promise<{id:number}[]> {
+    return await this.db('umrah_booking')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('id')
+      .where('umrah_id', umrah_id);
+  }
 }

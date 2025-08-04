@@ -29,6 +29,7 @@ export default class AgentB2CSubUmrahRouter extends AbstractRouter {
       .patch(
         this.uploader.cloudUploadRaw(this.fileFolders.AGENT_UMRAH_PACKAGE),
         this.controller.updateUmrahPackage
-      );
+      )
+      .delete(this.controller.deleteUmrahPackage);
   }
 }

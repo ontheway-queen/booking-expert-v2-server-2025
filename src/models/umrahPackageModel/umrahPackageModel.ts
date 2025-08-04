@@ -242,4 +242,6 @@ export default class UmrahPackageModel extends Schema {
       .andWhere('id', payload.id)
       .delete();
   }
+
+
 }
