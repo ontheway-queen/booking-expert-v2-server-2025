@@ -39,7 +39,7 @@ export default class UmrahBookingModel extends Schema {
       .where('id', booking_id);
   }
 
-  public async getAgentB2CUmarhBookingList(
+  public async getAgentB2CUmrahBookingList(
     query: IGetUmrahBookingListQuery,
     need_total: boolean = false
   ): Promise<{ data: IGetAgentB2CUmrahBookingListData[]; total?: number }> {
@@ -52,12 +52,15 @@ export default class UmrahBookingModel extends Schema {
         'up.title AS umrah_title',
         'up.short_description AS umrah_short_description',
         'ub.status',
+        'ub.user_id',
+        'abu.name AS user_name',
         'ub.traveler_adult',
         'ub.traveler_child',
         'ub.total_price',
         'ub.created_at'
       )
       .leftJoin('umrah_package AS up', 'up.id', 'ub.umrah_id')
+      .joinRaw('LEFT JOIN agent_b2c.users AS abu ON ub.user_id = abu.id')
       .where((qb) => {
         qb.where('ub.source_type', SOURCE_AGENT_B2C).andWhere(
           'ub.source_id',

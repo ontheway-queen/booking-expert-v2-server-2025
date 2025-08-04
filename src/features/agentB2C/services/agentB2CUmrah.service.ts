@@ -139,7 +139,7 @@ export default class AgentB2CUmrahService extends AbstractServices {
       skip?: string;
     };
 
-    const data = await UmrahBookingModel.getAgentB2CUmarhBookingList(
+    const data = await UmrahBookingModel.getAgentB2CUmrahBookingList(
       {
         agency_id,
         user_id,

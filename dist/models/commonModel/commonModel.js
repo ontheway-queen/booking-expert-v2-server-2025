@@ -176,7 +176,7 @@ class CommonModel extends schema_1.default {
     }
     //get all city
     getCity(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ country_id, limit, skip, filter, code, }, need_total = false) {
+        return __awaiter(this, arguments, void 0, function* ({ country_id, limit, skip, name, code, }, need_total = false) {
             const data = yield this.db('city AS c')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .select('c.id', 'c.name', 'c.country_id', 'co.name AS country_name', 'c.code', 'c.lat', 'c.lng')
@@ -188,10 +188,10 @@ class CommonModel extends schema_1.default {
                 if (code) {
                     qb.orWhere('c.code', code);
                 }
-                if (filter) {
+                if (name) {
                     qb.andWhere((qqb) => {
-                        qqb.orWhere('c.name', 'ilike', `%${filter}%`);
-                        qqb.orWhere('c.code', filter);
+                        qqb.orWhere('c.name', 'ilike', `%${name}%`);
+                        qqb.orWhere('c.code', name);
                     });
                 }
             })
@@ -211,10 +211,10 @@ class CommonModel extends schema_1.default {
                     if (code) {
                         qb.orWhere('c.code', code);
                     }
-                    if (filter) {
+                    if (name) {
                         qb.andWhere((qqb) => {
-                            qqb.orWhere('c.name', 'ilike', `%${filter}%`);
-                            qqb.orWhere('c.code', filter);
+                            qqb.orWhere('c.name', 'ilike', `%${name}%`);
+                            qqb.orWhere('c.code', name);
                         });
                     }
                 });

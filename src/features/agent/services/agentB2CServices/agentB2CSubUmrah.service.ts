@@ -88,7 +88,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message:"Umrah package created successfully",
+        message: 'Umrah package created successfully',
         data: {
           id: res[0].id,
         },
@@ -183,8 +183,12 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       }
 
       const reqBody = req.body;
-      const { add_package_include, remove_images, remove_package_include, ...payload } = reqBody;
-
+      const {
+        add_package_include,
+        remove_images,
+        remove_package_include,
+        ...payload
+      } = reqBody;
 
       if (payload?.slug) {
         const check_slug = await model.getSingleAgentB2CUmrahPackageDetails({
@@ -276,8 +280,69 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: "Umrah package updated successfully",
+        message: 'Umrah package updated successfully',
       };
     });
+  }
+
+  // get umrah booking
+  public async getUmrahBooking(req: Request) {
+    const { agency_id } = req.agencyUser;
+    const query = req.query as {
+      limit?: string;
+      skip?: string;
+      from_date?: string;
+      to_date?: string;
+      status?: string;
+      user_id?: number;
+    };
+
+    const model = this.Model.UmrahBookingModel();
+
+    const data = await model.getAgentB2CUmrahBookingList(
+      { agency_id, ...query },
+      true
+    );
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: data.data,
+      total: data.total,
+    };
+  }
+
+  // get single umrah booking
+  public async getSingleUmrahBooking(req: Request) {
+    const { agency_id } = req.agencyUser;
+    const { id } = req.params;
+    const booking_id = Number(id);
+    const UmrahBookingModel = this.Model.UmrahBookingModel();
+
+    const data = await UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
+      id: booking_id,
+      source_id: agency_id,
+    });
+
+    if (!data) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_NOT_FOUND,
+        message: this.ResMsg.HTTP_NOT_FOUND,
+      };
+    }
+
+    const contact = await UmrahBookingModel.getUmrahBookingContacts(booking_id);
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: {
+        ...data,
+        contact,
+      },
+    };
   }
 }

@@ -133,7 +133,7 @@ class AgentB2CUmrahService extends abstract_service_1.default {
             const { user_id } = req.agencyB2CUser;
             const UmrahBookingModel = this.Model.UmrahBookingModel();
             const query = req.query;
-            const data = yield UmrahBookingModel.getAgentB2CUmarhBookingList(Object.assign({ agency_id,
+            const data = yield UmrahBookingModel.getAgentB2CUmrahBookingList(Object.assign({ agency_id,
                 user_id }, query), true);
             return {
                 success: true,

@@ -97,7 +97,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "Umrah package created successfully",
+                    message: 'Umrah package created successfully',
                     data: {
                         id: res[0].id,
                     },
@@ -250,9 +250,52 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "Umrah package updated successfully",
+                    message: 'Umrah package updated successfully',
                 };
             }));
+        });
+    }
+    // get umrah booking
+    getUmrahBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const query = req.query;
+            const model = this.Model.UmrahBookingModel();
+            const data = yield model.getAgentB2CUmrahBookingList(Object.assign({ agency_id }, query), true);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: data.data,
+                total: data.total,
+            };
+        });
+    }
+    // get single umrah booking
+    getSingleUmrahBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const { id } = req.params;
+            const booking_id = Number(id);
+            const UmrahBookingModel = this.Model.UmrahBookingModel();
+            const data = yield UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
+                id: booking_id,
+                source_id: agency_id,
+            });
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            const contact = yield UmrahBookingModel.getUmrahBookingContacts(booking_id);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: Object.assign(Object.assign({}, data), { contact }),
+            };
         });
     }
 }

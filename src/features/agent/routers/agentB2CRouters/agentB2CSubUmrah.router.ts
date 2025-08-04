@@ -17,6 +17,12 @@ export default class AgentB2CSubUmrahRouter extends AbstractRouter {
       )
       .get(this.controller.getUmrahPackageList);
 
+    this.router.route('/booking').get(this.controller.getUmrahBooking);
+
+    this.router
+      .route('/booking/:id')
+      .get(this.controller.getSingleUmrahBooking);
+
     this.router
       .route('/:id')
       .get(this.controller.getSingleUmrahPackage)

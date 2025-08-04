@@ -187,13 +187,13 @@ class CommonModel extends Schema {
       country_id,
       limit,
       skip,
-      filter,
+      name,
       code,
     }: {
       country_id?: number;
       limit?: number;
       skip?: number;
-      filter?: string;
+      name?: string;
       code?: string;
     },
     need_total: boolean = false
@@ -219,10 +219,10 @@ class CommonModel extends Schema {
           qb.orWhere('c.code', code);
         }
 
-        if (filter) {
+        if (name) {
           qb.andWhere((qqb) => {
-            qqb.orWhere('c.name', 'ilike', `%${filter}%`);
-            qqb.orWhere('c.code', filter);
+            qqb.orWhere('c.name', 'ilike', `%${name}%`);
+            qqb.orWhere('c.code', name);
           });
         }
       })
@@ -245,10 +245,10 @@ class CommonModel extends Schema {
             qb.orWhere('c.code', code);
           }
 
-          if (filter) {
+          if (name) {
             qb.andWhere((qqb) => {
-              qqb.orWhere('c.name', 'ilike', `%${filter}%`);
-              qqb.orWhere('c.code', filter);
+              qqb.orWhere('c.name', 'ilike', `%${name}%`);
+              qqb.orWhere('c.code', name);
             });
           }
         });
