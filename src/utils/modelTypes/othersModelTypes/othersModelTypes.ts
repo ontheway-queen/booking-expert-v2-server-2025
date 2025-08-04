@@ -1,3 +1,5 @@
+import { SOURCE_ADMIN, SOURCE_AGENT } from '../../miscellaneous/constants';
+
 export interface IInsertHotelSearchHistoryPayload {
   user_type: 'Agent' | 'B2C' | 'Agent B2C' | 'Admin';
   check_in_date: string;
@@ -34,4 +36,33 @@ export interface IGetHotelSearchHistoryData {
   }[];
   destination_type: string;
   created_at: string;
+}
+
+export interface ICreateBankAccountPayload {
+  bank_id: number;
+  account_name: string;
+  account_number: string;
+  branch?: string; // Nullable
+  source_type?: 'ADMIN' | 'AGENT';
+  source_id?: number; // Nullable
+  routing_no?: string; // Nullable
+  swift_code?: string; // Nullable
+}
+export interface IGetBankAccountData {
+  id: number;
+  bank_name: string;
+  bank_type: string;
+  bank_logo: string;
+  account_name: string;
+  account_number: string;
+  branch: string;
+  routing_no: string;
+  swift_code: string;
+  status: boolean;
+}
+export interface IGetBankAccountQuery {
+  source_type: typeof SOURCE_ADMIN | typeof SOURCE_AGENT;
+  source_id?: number;
+  status?: boolean;
+  filter?: string;
 }

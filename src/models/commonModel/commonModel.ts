@@ -8,11 +8,13 @@ import Schema from '../../utils/miscellaneous/schema';
 import {
   ICreateAirlinesPayload,
   ICreateAirportPayload,
+  IGetBanksData,
   IGetEmailSubscriberData,
   IGetEmailSubscriberPayload,
   IGetLastIdData,
   IGetLastIdParams,
   IGetOTPPayload,
+  IInsertBanks,
   IInsertEmailSubscriberPayload,
   IInsertLastNoPayload,
   IInsertOTPPayload,
@@ -542,6 +544,23 @@ class CommonModel extends Schema {
     }
 
     return { data, total: total[0]?.total };
+  }
+
+  public async insertBanks(payload: IInsertBanks) {
+    return await this.db('banks')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .insert(payload);
+  }
+
+  public async getBanks(query: { name?: string }): Promise<IGetBanksData[]> {
+    return await this.db('banks')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .select('*')
+      .where((qb) => {
+        if (query.name) {
+          qb.andWhereILike('name', `%${query.name}%`);
+        }
+      });
   }
 }
 export default CommonModel;

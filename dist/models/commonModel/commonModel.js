@@ -460,5 +460,24 @@ class CommonModel extends schema_1.default {
             return { data, total: (_b = total[0]) === null || _b === void 0 ? void 0 : _b.total };
         });
     }
+    insertBanks(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('banks')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .insert(payload);
+        });
+    }
+    getBanks(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('banks')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .select('*')
+                .where((qb) => {
+                if (query.name) {
+                    qb.andWhereILike('name', `%${query.name}%`);
+                }
+            });
+        });
+    }
 }
 exports.default = CommonModel;

@@ -122,14 +122,14 @@ export interface IGetEmailSubscriberData {
   created_at: string;
 }
 
-export interface ICreateBankAccountPayload {
+export interface IInsertBanks {
+  name: string;
+  type: 'Bank' | 'MFS';
+  logo: string;
+}
+export interface IGetBanksData {
   id: number;
-  bank_id: number;
-  account_name?: string;
-  account_number: string;
-  branch?: string; // Nullable
-  source_type?: 'ADMIN' | 'AGENT';
-  source_id?: number; // Nullable
-  routing_no?: string; // Nullable
-  swift_code?: string; // Nullable
+  name: string;
+  type: 'Bank' | 'MFS';
+  logo: string;
 }
