@@ -14,7 +14,11 @@ export class AgentB2CUmrahValidator {
   public getUmrahBooking = Joi.object({
     limit: Joi.number().optional(),
     skip: Joi.number().optional(),
-    status: Joi.string().trim().max(50).optional(),
+    status: Joi.string()
+      .valid('PENDING', 'PROCESSING', 'PROCESSED', 'CONFIRMED', 'CANCELLED')
+      .trim()
+      .max(50)
+      .optional(),
     from_date: Joi.date().raw().optional(),
     to_date: Joi.date().raw().optional(),
   });

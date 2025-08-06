@@ -42,6 +42,7 @@ const dynamicFareSetModel_1 = __importDefault(require("./dynamicFareRuleModel/dy
 const partialPaymentRulesModel_1 = __importDefault(require("./dynamicFareRuleModel/partialPaymentRulesModel"));
 const umrahPackageModel_1 = __importDefault(require("./umrahPackageModel/umrahPackageModel"));
 const umrahBookingModel_1 = __importDefault(require("./umrahPackageModel/umrahBookingModel"));
+const blogModel_1 = __importDefault(require("./blogModel/blogModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -194,6 +195,10 @@ class Models {
     //Umrah booking Model
     UmrahBookingModel(trx) {
         return new umrahBookingModel_1.default(trx || database_1.db);
+    }
+    //Blog Model
+    BlogModel(trx) {
+        return new blogModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

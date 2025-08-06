@@ -2,7 +2,10 @@ import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 import { IBookAgentB2CUmrahPackageReqBody } from '../utils/types/agentB2CUmrah.types';
 import Lib from '../../../utils/lib/lib';
-import { SOURCE_AGENT_B2C } from '../../../utils/miscellaneous/constants';
+import {
+  SOURCE_AGENT_B2C,
+  UMRAH_BOOKING_STATUS_CANCELLED,
+} from '../../../utils/miscellaneous/constants';
 
 export default class AgentB2CUmrahService extends AbstractServices {
   constructor() {
@@ -96,6 +99,8 @@ export default class AgentB2CUmrahService extends AbstractServices {
         total_child_price = Number(check.child_price) * traveler_child;
       }
 
+
+
       const booking = await umrahBookingModel.insertUmrahBooking({
         booking_ref,
         source_id: agency_id,
@@ -107,7 +112,7 @@ export default class AgentB2CUmrahService extends AbstractServices {
         source_type: SOURCE_AGENT_B2C,
         traveler_adult: traveler_adult,
         traveler_child: traveler_child,
-        total_price: total_adult_price + total_adult_price,
+        total_price: total_adult_price + total_child_price,
       });
 
       await umrahBookingModel.insertUmrahBookingContact({
@@ -134,7 +139,7 @@ export default class AgentB2CUmrahService extends AbstractServices {
     const query = req.query as {
       from_date?: string;
       to_date?: string;
-      status?: string;
+      status?: string[];
       limit?: string;
       skip?: string;
     };
@@ -213,7 +218,7 @@ export default class AgentB2CUmrahService extends AbstractServices {
     }
 
     await UmrahBookingModel.updateUmrahBooking(
-      { status: 'Cancelled' },
+      { status: UMRAH_BOOKING_STATUS_CANCELLED },
       booking_id
     );
 

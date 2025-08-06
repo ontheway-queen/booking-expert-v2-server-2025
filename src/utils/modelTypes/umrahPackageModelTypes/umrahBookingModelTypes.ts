@@ -5,6 +5,8 @@ import {
   SOURCE_SUB_AGENT,
 } from '../../miscellaneous/constants';
 
+export type IUmrahBookingStatus = "PENDING" | "PROCESSING" | "PROCESSED" | "CONFIRMED" | "CANCELLED";
+
 export interface IInsertUmrahBookingPayload {
   booking_ref: string;
   umrah_id: number;
@@ -24,7 +26,7 @@ export interface IInsertUmrahBookingPayload {
 }
 
 export interface IUpdateUmrahBookingPayload {
-  status: string;
+  status: IUmrahBookingStatus;
 }
 
 export interface IInsertUmrahBookingContact {
@@ -42,18 +44,16 @@ export interface IGetUmrahBookingContactData {
   address: string;
 }
 
-export interface IUpdateUmrahBookingPayload {
-  status: string;
-}
 
 export interface IGetUmrahBookingListQuery {
   agency_id: number;
   user_id?: number;
   from_date?: string;
-  status?: string;
+  status?: string[];
   to_date?: string;
   limit?: string;
   skip?: string;
+  filter?: string;
 }
 
 export interface IGetAgentB2CSingleUmrahBookingQuery {

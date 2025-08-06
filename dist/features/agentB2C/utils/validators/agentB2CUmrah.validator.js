@@ -19,7 +19,11 @@ class AgentB2CUmrahValidator {
         this.getUmrahBooking = joi_1.default.object({
             limit: joi_1.default.number().optional(),
             skip: joi_1.default.number().optional(),
-            status: joi_1.default.string().trim().max(50).optional(),
+            status: joi_1.default.string()
+                .valid('PENDING', 'PROCESSING', 'PROCESSED', 'CONFIRMED', 'CANCELLED')
+                .trim()
+                .max(50)
+                .optional(),
             from_date: joi_1.default.date().raw().optional(),
             to_date: joi_1.default.date().raw().optional(),
         });

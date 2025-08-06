@@ -1,4 +1,11 @@
-import Joi from 'joi';
+import Joi, { LanguageMessages } from 'joi';
+import {
+  UMRAH_BOOKING_STATUS_CANCELLED,
+  UMRAH_BOOKING_STATUS_CONFIRMED,
+  UMRAH_BOOKING_STATUS_PENDING,
+  UMRAH_BOOKING_STATUS_PROCESSED,
+  UMRAH_BOOKING_STATUS_PROCESSING,
+} from '../../../../../utils/miscellaneous/constants';
 
 export class AgentB2CSubUmrahValidator {
   public parsedSchema = Joi.array().items(Joi.string());
@@ -46,13 +53,8 @@ export class AgentB2CSubUmrahValidator {
     meta_description: Joi.string().optional(),
     package_price_details: Joi.string().optional(),
     package_accommodation_details: Joi.string().optional(),
-    add_package_include: Joi.array()
-      .items(Joi.string().allow(''))
-      .optional()
-      .optional(),
-    remove_package_include: Joi.array()
-      .items(Joi.number().allow(''))
-      .optional(),
+    add_package_include: Joi.array().items(Joi.string().allow('')).optional().optional(),
+    remove_package_include: Joi.array().items(Joi.number().allow('')).optional(),
     remove_images: Joi.array().items(Joi.number().allow('')).optional(),
   });
 
@@ -62,6 +64,39 @@ export class AgentB2CSubUmrahValidator {
     user_id: Joi.number().optional(),
     from_date: Joi.date().raw().optional(),
     to_date: Joi.date().raw().optional(),
-    status: Joi.string().optional(),
+    filter: Joi.string().optional(),
+    status: Joi.string()
+      .custom((value, helpers) => {
+        const splitArray = value.split(',');
+        for (const status of splitArray) {
+          if (
+            ![
+              UMRAH_BOOKING_STATUS_PENDING,
+              UMRAH_BOOKING_STATUS_PROCESSING,
+              UMRAH_BOOKING_STATUS_PROCESSED,
+              UMRAH_BOOKING_STATUS_CONFIRMED,
+              UMRAH_BOOKING_STATUS_CANCELLED,
+            ].includes(status)
+          ) {
+            return helpers.message(
+              "Status must be one of 'PENDING', 'PROCESSING', 'PROCESSED', 'CONFIRMED', 'CANCELLED'" as unknown as LanguageMessages
+            );
+          }
+        }
+        return splitArray;
+      })
+      .optional(),
+  });
+
+  public updateUmrahBookingStatusSchema = Joi.object({
+    status: Joi.string()
+      .valid(
+        UMRAH_BOOKING_STATUS_PENDING,
+        UMRAH_BOOKING_STATUS_PROCESSING,
+        UMRAH_BOOKING_STATUS_PROCESSED,
+        UMRAH_BOOKING_STATUS_CONFIRMED,
+        UMRAH_BOOKING_STATUS_CANCELLED
+      )
+      .required(),
   });
 }

@@ -21,9 +21,7 @@ class UmrahBookingModel extends schema_1.default {
     }
     insertUmrahBooking(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_booking')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
+            return yield this.db('umrah_booking').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
         });
     }
     updateUmrahBooking(payload, booking_id) {
@@ -43,15 +41,19 @@ class UmrahBookingModel extends schema_1.default {
                 .leftJoin('umrah_package AS up', 'up.id', 'ub.umrah_id')
                 .joinRaw('LEFT JOIN agent_b2c.users AS abu ON ub.user_id = abu.id')
                 .where((qb) => {
+                var _a;
                 qb.where('ub.source_type', constants_1.SOURCE_AGENT_B2C).andWhere('ub.source_id', query.agency_id);
                 if (query.user_id) {
                     qb.andWhere('ub.user_id', query.user_id);
                 }
-                if (query.status) {
-                    qb.andWhere('ub.status', query.status);
+                if ((_a = query.status) === null || _a === void 0 ? void 0 : _a.length) {
+                    qb.whereIn('ub.status', query.status);
                 }
                 if (query.from_date && query.to_date) {
                     qb.andWhereBetween('ub.created_at', [query.from_date, query.to_date]);
+                }
+                if (query.filter) {
+                    qb.andWhere('up.booking_ref', 'like', `%${query.filter}%`).orWhere('abu.name', 'like', `%${query.filter}%`);
                 }
             })
                 .limit(query.limit ? parseInt(query.limit) : constants_1.DATA_LIMIT)
@@ -70,10 +72,7 @@ class UmrahBookingModel extends schema_1.default {
                         qb.andWhere('ub.status', query.status);
                     }
                     if (query.from_date && query.to_date) {
-                        qb.andWhereBetween('ub.created_at', [
-                            query.from_date,
-                            query.to_date,
-                        ]);
+                        qb.andWhereBetween('ub.created_at', [query.from_date, query.to_date]);
                     }
                 });
             }
@@ -87,8 +86,10 @@ class UmrahBookingModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('umrah_booking AS ub')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('ub.id', 'ub.booking_ref', 'ub.traveler_adult', 'ub.traveler_child', 'ub.per_child_price', 'ub.per_adult_price', 'ub.note_from_customer', 'ub.status', 'ub.total_price', 'ub.created_at')
+                .select('ub.id', 'ub.booking_ref', 'ub.traveler_adult', 'ub.traveler_child', 'ub.per_child_price', 'ub.per_adult_price', 'ub.note_from_customer', 'ub.status', 'ub.total_price', 'ub.created_at', 'up.title AS umrah_title')
                 // .joinRaw('JOIN agent_b2c.users AS abu on ub.user_id = abu.id')
+                // .joinRaw('JOIN umrah_package AS up on ub.umrah_id = up.id')
+                .leftJoin('umrah_package AS up', 'up.id', 'ub.umrah_id')
                 .andWhere('ub.id', query.id)
                 .andWhere('ub.source_id', query.source_id)
                 .andWhere('ub.source_type', constants_1.SOURCE_AGENT_B2C)
@@ -117,7 +118,7 @@ class UmrahBookingModel extends schema_1.default {
         });
     }
     checkBookingExistByUmrahId(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ umrah_id }) {
+        return __awaiter(this, arguments, void 0, function* ({ umrah_id, }) {
             return yield this.db('umrah_booking')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id')

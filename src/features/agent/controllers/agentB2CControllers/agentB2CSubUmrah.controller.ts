@@ -48,6 +48,16 @@ export class AgentB2CSubUmrahController extends AbstractController {
     }
   );
 
+   public deleteUmrahPackage = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.services.deleteUmrahPackage(req);
+      res.status(code).json(data);
+    }
+  );
+
   public getUmrahBooking = this.asyncWrapper.wrap(
     {
       querySchema: this.validator.getUmrahBooking,
@@ -68,13 +78,16 @@ export class AgentB2CSubUmrahController extends AbstractController {
     }
   );
 
-  public deleteUmrahPackage = this.asyncWrapper.wrap(
+
+  public updateUmrahBookingStatus = this.asyncWrapper.wrap(
     {
       paramSchema: this.commonValidator.singleParamNumValidator(),
+      bodySchema: this.validator.updateUmrahBookingStatusSchema,
     },
     async (req: Request, res: Response) => {
-      const { code, ...data } = await this.services.deleteUmrahPackage(req);
+      const { code, ...data } = await this.services.updateUmrahBookingStatus(req);
       res.status(code).json(data);
     }
   );
+ 
 }

@@ -119,7 +119,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 limit,
                 skip,
                 filter,
-                is_deleted: false
+                is_deleted: false,
             });
             return {
                 success: true,
@@ -276,9 +276,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: `You can't delete this package because ${booking.length > 1
-                            ? `${booking.length} bookings`
-                            : `${booking.length} booking`} found for this package`,
+                        message: `You can't delete this package because ${booking.length > 1 ? `${booking.length} bookings` : `${booking.length} booking`} found for this package`,
                     };
                 }
                 if (!data) {
@@ -340,6 +338,33 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
                 data: Object.assign(Object.assign({}, data), { contact }),
+            };
+        });
+    }
+    //update umrah booking status
+    updateUmrahBookingStatus(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const { id } = req.params;
+            const { status } = req.body;
+            const booking_id = Number(id);
+            const UmrahBookingModel = this.Model.UmrahBookingModel();
+            const data = yield UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
+                id: booking_id,
+                source_id: agency_id,
+            });
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            yield UmrahBookingModel.updateUmrahBooking({ status }, booking_id);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
             };
         });
     }

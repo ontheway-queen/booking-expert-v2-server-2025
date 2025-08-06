@@ -117,7 +117,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       limit,
       skip,
       filter,
-      is_deleted:false
+      is_deleted: false,
     });
 
     return {
@@ -134,7 +134,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
     const { id } = req.params;
     const model = this.Model.UmrahPackageModel();
 
-    const data = await model.getSingleUmrahPackage({ umrah_id: Number(id), is_deleted:false });
+    const data = await model.getSingleUmrahPackage({ umrah_id: Number(id), is_deleted: false });
 
     if (!data) {
       return {
@@ -174,7 +174,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
 
       const check = await model.getSingleUmrahPackage({
         umrah_id: Number(id),
-        is_deleted:false,
+        is_deleted: false,
       });
 
       if (!check) {
@@ -186,12 +186,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       }
 
       const reqBody = req.body;
-      const {
-        add_package_include,
-        remove_images,
-        remove_package_include,
-        ...payload
-      } = reqBody;
+      const { add_package_include, remove_images, remove_package_include, ...payload } = reqBody;
 
       if (payload?.slug) {
         const check_slug = await model.getSingleAgentB2CUmrahPackageDetails({
@@ -308,9 +303,7 @@ export class AgentB2CSubUmrahService extends AbstractServices {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
           message: `You can't delete this package because ${
-            booking.length > 1
-              ? `${booking.length} bookings`
-              : `${booking.length} booking`
+            booking.length > 1 ? `${booking.length} bookings` : `${booking.length} booking`
           } found for this package`,
         };
       }
@@ -342,16 +335,13 @@ export class AgentB2CSubUmrahService extends AbstractServices {
       skip?: string;
       from_date?: string;
       to_date?: string;
-      status?: string;
+      status?: string[];
       user_id?: number;
     };
 
     const model = this.Model.UmrahBookingModel();
 
-    const data = await model.getAgentB2CUmrahBookingList(
-      { agency_id, ...query },
-      true
-    );
+    const data = await model.getAgentB2CUmrahBookingList({ agency_id, ...query }, true);
 
     return {
       success: true,
@@ -392,6 +382,37 @@ export class AgentB2CSubUmrahService extends AbstractServices {
         ...data,
         contact,
       },
+    };
+  }
+
+
+  //update umrah booking status
+  public async updateUmrahBookingStatus(req: Request) {
+    const { agency_id } = req.agencyUser;
+    const { id } = req.params;
+    const { status } = req.body;
+    const booking_id = Number(id);
+    const UmrahBookingModel = this.Model.UmrahBookingModel();
+
+    const data = await UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
+      id: booking_id,
+      source_id: agency_id,
+    });
+
+    if (!data) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_NOT_FOUND,
+        message: this.ResMsg.HTTP_NOT_FOUND,
+      };
+    }
+
+    await UmrahBookingModel.updateUmrahBooking({ status }, booking_id);
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
     };
   }
 }
