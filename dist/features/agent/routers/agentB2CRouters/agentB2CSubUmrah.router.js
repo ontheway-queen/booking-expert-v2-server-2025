@@ -19,7 +19,8 @@ class AgentB2CSubUmrahRouter extends abstract_router_1.default {
         this.router.route('/booking').get(this.controller.getUmrahBooking);
         this.router
             .route('/booking/:id')
-            .get(this.controller.getSingleUmrahBooking);
+            .get(this.controller.getSingleUmrahBooking)
+            .patch(this.controller.updateUmrahBookingStatus);
         this.router
             .route('/:id')
             .get(this.controller.getSingleUmrahPackage)

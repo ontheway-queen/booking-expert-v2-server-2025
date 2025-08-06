@@ -113,7 +113,7 @@ class AgentB2CUmrahService extends abstract_service_1.default {
                     source_type: constants_1.SOURCE_AGENT_B2C,
                     traveler_adult: traveler_adult,
                     traveler_child: traveler_child,
-                    total_price: total_adult_price + total_adult_price,
+                    total_price: total_adult_price + total_child_price,
                 });
                 yield umrahBookingModel.insertUmrahBookingContact(Object.assign({ booking_id: booking[0].id }, contact));
                 return {
@@ -191,7 +191,7 @@ class AgentB2CUmrahService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
-            yield UmrahBookingModel.updateUmrahBooking({ status: 'Cancelled' }, booking_id);
+            yield UmrahBookingModel.updateUmrahBooking({ status: constants_1.UMRAH_BOOKING_STATUS_CANCELLED }, booking_id);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,

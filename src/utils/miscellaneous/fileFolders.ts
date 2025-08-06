@@ -15,6 +15,7 @@ class FileFolder {
   static readonly ADMIN_HOLIDAY_PACKAGE = 'admin/holiday-package';
   static readonly AGENT_HOLIDAY_PACKAGE = 'agent/holiday-package';
   static readonly AGENT_UMRAH_PACKAGE = 'agent/umrah-package';
+  static readonly AGENT_BLOG_FILES = 'agent/blog-files';
   static readonly PACKAGE_FILE = 'package-file';
   static readonly VISA_FILES = 'visa-files';
   static readonly SPECIAL_OFFER = 'special-offer';

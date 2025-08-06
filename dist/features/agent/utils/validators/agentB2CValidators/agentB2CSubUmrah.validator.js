@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentB2CSubUmrahValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
+const constants_1 = require("../../../../../utils/miscellaneous/constants");
 class AgentB2CSubUmrahValidator {
     constructor() {
         this.parsedSchema = joi_1.default.array().items(joi_1.default.string());
@@ -49,13 +50,8 @@ class AgentB2CSubUmrahValidator {
             meta_description: joi_1.default.string().optional(),
             package_price_details: joi_1.default.string().optional(),
             package_accommodation_details: joi_1.default.string().optional(),
-            add_package_include: joi_1.default.array()
-                .items(joi_1.default.string().allow(''))
-                .optional()
-                .optional(),
-            remove_package_include: joi_1.default.array()
-                .items(joi_1.default.number().allow(''))
-                .optional(),
+            add_package_include: joi_1.default.array().items(joi_1.default.string().allow('')).optional().optional(),
+            remove_package_include: joi_1.default.array().items(joi_1.default.number().allow('')).optional(),
             remove_images: joi_1.default.array().items(joi_1.default.number().allow('')).optional(),
         });
         this.getUmrahBooking = joi_1.default.object({
@@ -64,7 +60,29 @@ class AgentB2CSubUmrahValidator {
             user_id: joi_1.default.number().optional(),
             from_date: joi_1.default.date().raw().optional(),
             to_date: joi_1.default.date().raw().optional(),
-            status: joi_1.default.string().optional(),
+            filter: joi_1.default.string().optional(),
+            status: joi_1.default.string()
+                .custom((value, helpers) => {
+                const splitArray = value.split(',');
+                for (const status of splitArray) {
+                    if (![
+                        constants_1.UMRAH_BOOKING_STATUS_PENDING,
+                        constants_1.UMRAH_BOOKING_STATUS_PROCESSING,
+                        constants_1.UMRAH_BOOKING_STATUS_PROCESSED,
+                        constants_1.UMRAH_BOOKING_STATUS_CONFIRMED,
+                        constants_1.UMRAH_BOOKING_STATUS_CANCELLED,
+                    ].includes(status)) {
+                        return helpers.message("Status must be one of 'PENDING', 'PROCESSING', 'PROCESSED', 'CONFIRMED', 'CANCELLED'");
+                    }
+                }
+                return splitArray;
+            })
+                .optional(),
+        });
+        this.updateUmrahBookingStatusSchema = joi_1.default.object({
+            status: joi_1.default.string()
+                .valid(constants_1.UMRAH_BOOKING_STATUS_PENDING, constants_1.UMRAH_BOOKING_STATUS_PROCESSING, constants_1.UMRAH_BOOKING_STATUS_PROCESSED, constants_1.UMRAH_BOOKING_STATUS_CONFIRMED, constants_1.UMRAH_BOOKING_STATUS_CANCELLED)
+                .required(),
         });
     }
 }

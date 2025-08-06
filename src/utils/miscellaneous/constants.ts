@@ -123,3 +123,11 @@ export const INVOICE_STATUS_TYPES = {
 
 //frontend endpoints
 export const FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = '/dashboard/flights/';
+
+
+//Umrah package Booking status
+export const UMRAH_BOOKING_STATUS_PENDING = 'PENDING';
+export const UMRAH_BOOKING_STATUS_PROCESSING = 'PROCESSING';
+export const UMRAH_BOOKING_STATUS_PROCESSED = 'PROCESSED';
+export const UMRAH_BOOKING_STATUS_CONFIRMED = 'CONFIRMED';
+export const UMRAH_BOOKING_STATUS_CANCELLED = 'CANCELLED';

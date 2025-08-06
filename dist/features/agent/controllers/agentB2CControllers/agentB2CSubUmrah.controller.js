@@ -57,6 +57,12 @@ class AgentB2CSubUmrahController extends abstract_controller_1.default {
             const _a = yield this.services.updateUmrahPackage(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
+        this.deleteUmrahPackage = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.deleteUmrahPackage(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
         this.getUmrahBooking = this.asyncWrapper.wrap({
             querySchema: this.validator.getUmrahBooking,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -69,10 +75,11 @@ class AgentB2CSubUmrahController extends abstract_controller_1.default {
             const _a = yield this.services.getSingleUmrahBooking(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
-        this.deleteUmrahPackage = this.asyncWrapper.wrap({
+        this.updateUmrahBookingStatus = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),
+            bodySchema: this.validator.updateUmrahBookingStatusSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.services.deleteUmrahPackage(req), { code } = _a, data = __rest(_a, ["code"]);
+            const _a = yield this.services.updateUmrahBookingStatus(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
     }

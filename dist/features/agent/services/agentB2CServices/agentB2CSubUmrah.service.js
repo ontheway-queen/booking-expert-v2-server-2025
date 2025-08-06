@@ -39,6 +39,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 const check_slug = yield model.getSingleAgentB2CUmrahPackageDetails({
                     source_id: agency_id,
                     slug,
+                    is_deleted: false,
                 });
                 if (check_slug) {
                     return {
@@ -118,6 +119,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 limit,
                 skip,
                 filter,
+                is_deleted: false,
             });
             return {
                 success: true,
@@ -133,7 +135,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const model = this.Model.UmrahPackageModel();
-            const data = yield model.getSingleUmrahPackage({ umrah_id: Number(id) });
+            const data = yield model.getSingleUmrahPackage({ umrah_id: Number(id), is_deleted: false });
             if (!data) {
                 return {
                     success: false,
@@ -165,6 +167,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 const { id } = req.params;
                 const check = yield model.getSingleUmrahPackage({
                     umrah_id: Number(id),
+                    is_deleted: false,
                 });
                 if (!check) {
                     return {
@@ -179,6 +182,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                     const check_slug = yield model.getSingleAgentB2CUmrahPackageDetails({
                         source_id: agency_id,
                         slug: payload.slug,
+                        is_deleted: false,
                     });
                     if (check_slug && check_slug.id !== Number(id)) {
                         return {
@@ -272,9 +276,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: `You can't delete this package because ${booking.length > 1
-                            ? `${booking.length} bookings`
-                            : `${booking.length} booking`} found for this package`,
+                        message: `You can't delete this package because ${booking.length > 1 ? `${booking.length} bookings` : `${booking.length} booking`} found for this package`,
                     };
                 }
                 if (!data) {
@@ -336,6 +338,33 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
                 data: Object.assign(Object.assign({}, data), { contact }),
+            };
+        });
+    }
+    //update umrah booking status
+    updateUmrahBookingStatus(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const { id } = req.params;
+            const { status } = req.body;
+            const booking_id = Number(id);
+            const UmrahBookingModel = this.Model.UmrahBookingModel();
+            const data = yield UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
+                id: booking_id,
+                source_id: agency_id,
+            });
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            yield UmrahBookingModel.updateUmrahBooking({ status }, booking_id);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
             };
         });
     }
