@@ -12,7 +12,9 @@ import {
   IGetAgencyB2CPopularDestinationQuery,
   ICreateAgencyB2CPopularDestinationPayload,
   IUpdateAgencyB2CHeroBgContentPayload,
-} from '../../utils/modelTypes/agencyB2CModelTypes/agencyB2CconfigModel.types';
+  ICreateAgencyB2CHotDeals,
+  ICreateAgencyB2CPopUpBanner,
+} from '../../utils/modelTypes/agencyB2CModelTypes/agencyB2COonfigModel.types';
 
 export default class AgencyB2CConfigModel extends Schema {
   private db: TDB;
@@ -197,6 +199,22 @@ export default class AgencyB2CConfigModel extends Schema {
     payload: ICreateAgencyB2CSocialLink | ICreateAgencyB2CSocialLink[]
   ) {
     return await this.db('social_links')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .insert(payload);
+  }
+
+  public async insertHotDeals(
+    payload: ICreateAgencyB2CHotDeals | ICreateAgencyB2CHotDeals[]
+  ) {
+    return await this.db('hot_deals')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .insert(payload);
+  }
+
+  public async insertPopUpBanner(
+    payload: ICreateAgencyB2CPopUpBanner | ICreateAgencyB2CPopUpBanner[]
+  ) {
+    return await this.db('pop_up_banner')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .insert(payload);
   }

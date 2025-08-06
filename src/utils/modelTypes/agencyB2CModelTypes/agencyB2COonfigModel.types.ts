@@ -107,6 +107,7 @@ export interface ICreateAgencyB2CSiteConfig {
   meta_title?: string;
   meta_description?: string;
   meta_tags?: string;
+  notice?: string;
   last_updated?: string;
   updated_by?: number;
 }
@@ -117,4 +118,20 @@ export interface ICreateAgencyB2CSocialLink {
   link: string;
   order_number: number;
   icon: string;
+}
+
+export interface ICreateAgencyB2CHotDeals {
+  agency_id: number;
+  title: string;
+  thumbnail: string;
+  link: string;
+  order_number: number;
+}
+export interface ICreateAgencyB2CPopUpBanner {
+  agency_id: number;
+  title: string;
+  thumbnail: string;
+  link: string;
+  description: string;
+  pop_up_for: 'AGENT' | 'B2C' | 'BOTH';
 }

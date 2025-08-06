@@ -164,5 +164,19 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .insert(payload);
         });
     }
+    insertHotDeals(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('hot_deals')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .insert(payload);
+        });
+    }
+    insertPopUpBanner(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('pop_up_banner')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .insert(payload);
+        });
+    }
 }
 exports.default = AgencyB2CConfigModel;
