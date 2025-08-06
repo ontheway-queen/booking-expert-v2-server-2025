@@ -4,7 +4,6 @@ import {
   ICreateAgencyB2CHeroBgContentPayload,
   ICreateAgencyB2CPopularPlace,
   ICreateAgencyB2CSiteConfig,
-  ICreateAgencyB2CSocialLink,
   IGetAgencyB2CHeroBgContentData,
   IGetAgencyB2CHeroBgContentQuery,
   IGetAgencyB2CPopularDestinationData,
@@ -19,6 +18,15 @@ import {
   IUpdateAgencyB2CPopularPlace,
   IGetAgencyB2CSiteConfigData,
   IUpdateAgencyB2CSiteConfigPayload,
+  IGetAgencyB2CSocialLinkQuery,
+  IGetAgencyB2CSocialLinkData,
+  ICreateAgencyB2CSocialLinkPayload,
+  IUpdateAgencyB2CSocialLinkPayload,
+  IGetAgencyB2CHotDealsQuery,
+  IGetAgencyB2CHotDealsData,
+  IUpdateAgencyB2CHotDealsPayload,
+  IGetAgencyB2CPopUpBannerQuery,
+  IGetAgencyB2CPopUpBannerData,
 } from '../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types';
 
 export default class AgencyB2CConfigModel extends Schema {
@@ -45,7 +53,7 @@ export default class AgencyB2CConfigModel extends Schema {
     return await this.db('hero_bg_content')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('*')
-      .orderBy('order_no', 'asc')
+      .orderBy('order_number', 'asc')
       .andWhere('agency_id', query.agency_id)
       .where((qb) => {
         if (query.status !== undefined) {
@@ -64,7 +72,7 @@ export default class AgencyB2CConfigModel extends Schema {
     return await this.db('hero_bg_content')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('*')
-      .orderBy('order_no', 'asc')
+      .orderBy('order_number', 'asc')
       .andWhere('agency_id', query.agency_id)
       .andWhere('id', query.id);
   }
@@ -76,7 +84,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('*')
       .where('agency_id', query.agency_id)
-      .orderBy('order_no', 'desc')
+      .orderBy('order_number', 'desc')
       .first();
   }
 
@@ -128,7 +136,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .joinRaw(`LEFT JOIN public.country AS c ON pd.country_id = c.id`)
       .joinRaw(`LEFT JOIN public.airport AS da ON pd.from_airport = da.id`)
       .joinRaw(`LEFT JOIN public.airport AS aa ON pd.to_airport = aa.id`)
-      .orderBy('pd.order_no', 'asc')
+      .orderBy('pd.order_number', 'asc')
       .andWhere('pd.agency_id', query.agency_id)
       .where((qb) => {
         if (query.status !== undefined) {
@@ -144,7 +152,7 @@ export default class AgencyB2CConfigModel extends Schema {
     return await this.db('popular_destination')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('*')
-      .orderBy('order_no', 'asc')
+      .orderBy('order_number', 'asc')
       .andWhere('agency_id', query.agency_id)
       .andWhere('id', query.id)
       .first();
@@ -157,7 +165,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('*')
       .where('agency_id', query.agency_id)
-      .orderBy('order_no', 'desc')
+      .orderBy('order_number', 'desc')
       .first();
   }
 
@@ -201,7 +209,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('pp.*', 'c.name AS country_name')
       .joinRaw(`LEFT JOIN public.country AS c ON pp.country_id = c.id`)
-      .orderBy('pp.order_no', 'asc')
+      .orderBy('pp.order_number', 'asc')
       .andWhere('pp.agency_id', query.agency_id)
       .where((qb) => {
         if (query.status !== undefined) {
@@ -229,7 +237,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('*')
       .where('agency_id', query.agency_id)
-      .orderBy('order_no', 'desc')
+      .orderBy('order_number', 'desc')
       .first();
   }
 
@@ -286,11 +294,73 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async insertSocialLink(
-    payload: ICreateAgencyB2CSocialLink | ICreateAgencyB2CSocialLink[]
+    payload:
+      | ICreateAgencyB2CSocialLinkPayload
+      | ICreateAgencyB2CSocialLinkPayload[]
   ) {
     return await this.db('social_links')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .insert(payload);
+  }
+
+  public async getSocialLink(
+    query: IGetAgencyB2CSocialLinkQuery
+  ): Promise<IGetAgencyB2CSocialLinkData[]> {
+    return await this.db('social_links')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .orderBy('order_number', 'asc')
+      .andWhere('agency_id', query.agency_id)
+      .where((qb) => {
+        if (query.status !== undefined) {
+          qb.andWhere('status', query.status);
+        }
+      });
+  }
+
+  public async checkSocialLink(query: {
+    agency_id: number;
+    id: number;
+  }): Promise<IGetAgencyB2CSocialLinkData | null> {
+    return await this.db('social_links')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .andWhere('agency_id', query.agency_id)
+      .andWhere('id', query.id)
+      .first();
+  }
+
+  public async getSocialLinkLastNo(query: {
+    agency_id: number;
+  }): Promise<IGetAgencyB2CSocialLinkData | null> {
+    return await this.db('social_links')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .where('agency_id', query.agency_id)
+      .orderBy('order_number', 'desc')
+      .first();
+  }
+
+  public async updateSocialLink(
+    payload: IUpdateAgencyB2CSocialLinkPayload,
+    where: {
+      agency_id: number;
+      id: number;
+    }
+  ) {
+    return await this.db('social_links')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .update(payload)
+      .where('agency_id', where.agency_id)
+      .andWhere('id', where.id);
+  }
+
+  public async deleteSocialLink(where: { agency_id: number; id: number }) {
+    return await this.db('social_links')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .del()
+      .where('agency_id', where.agency_id)
+      .where('id', where.id);
   }
 
   public async insertHotDeals(
@@ -301,11 +371,135 @@ export default class AgencyB2CConfigModel extends Schema {
       .insert(payload);
   }
 
+  public async getHotDeals(
+    query: IGetAgencyB2CHotDealsQuery
+  ): Promise<IGetAgencyB2CHotDealsData[]> {
+    return await this.db('hot_deals')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .orderBy('order_number', 'asc')
+      .andWhere('agency_id', query.agency_id)
+      .where((qb) => {
+        if (query.status !== undefined) {
+          qb.andWhere('status', query.status);
+        }
+      });
+  }
+
+  public async checkHotDeals(query: {
+    agency_id: number;
+    id: number;
+  }): Promise<IGetAgencyB2CHotDealsData | null> {
+    return await this.db('hot_deals')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .andWhere('agency_id', query.agency_id)
+      .andWhere('id', query.id)
+      .first();
+  }
+
+  public async getHotDealsLastNo(query: {
+    agency_id: number;
+  }): Promise<IGetAgencyB2CHotDealsData | null> {
+    return await this.db('hot_deals')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .where('agency_id', query.agency_id)
+      .orderBy('order_number', 'desc')
+      .first();
+  }
+
+  public async updateHotDeals(
+    payload: IUpdateAgencyB2CHotDealsPayload,
+    where: {
+      agency_id: number;
+      id: number;
+    }
+  ) {
+    return await this.db('hot_deals')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .update(payload)
+      .where('agency_id', where.agency_id)
+      .andWhere('id', where.id);
+  }
+
+  public async deleteHotDeals(where: { agency_id: number; id: number }) {
+    return await this.db('hot_deals')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .del()
+      .where('agency_id', where.agency_id)
+      .where('id', where.id);
+  }
+
   public async insertPopUpBanner(
     payload: ICreateAgencyB2CPopUpBanner | ICreateAgencyB2CPopUpBanner[]
   ) {
     return await this.db('pop_up_banner')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .insert(payload);
+  }
+
+  public async getPopUpBanner(
+    query: IGetAgencyB2CPopUpBannerQuery
+  ): Promise<IGetAgencyB2CPopUpBannerData[]> {
+    return await this.db('pop_up_banner')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .andWhere('agency_id', query.agency_id)
+      .where((qb) => {
+        if (query.status !== undefined) {
+          qb.andWhere('status', query.status);
+        }
+        if (query.pop_up_for) {
+          qb.andWhere('pop_up_for', query.pop_up_for);
+        }
+      });
+  }
+
+  public async getSinglePopUpBanner(query: {
+    agency_id: number;
+    status: boolean;
+    pop_up_for: 'AGENT' | 'B2C';
+  }): Promise<IGetAgencyB2CPopUpBannerData | null> {
+    return await this.db('pop_up_banner')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .andWhere('agency_id', query.agency_id)
+      .andWhere('status', query.status)
+      .andWhere('pop_up_for', query.pop_up_for)
+      .first();
+  }
+  public async checkPopUpBanner(query: {
+    agency_id: number;
+    id: number;
+  }): Promise<IGetAgencyB2CPopUpBannerData | null> {
+    return await this.db('pop_up_banner')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .andWhere('agency_id', query.agency_id)
+      .andWhere('id', query.id)
+      .first();
+  }
+
+  public async updatePopUpBanner(
+    payload: IUpdateAgencyB2CHotDealsPayload,
+    where: {
+      agency_id: number;
+      id: number;
+    }
+  ) {
+    return await this.db('pop_up_banner')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .update(payload)
+      .where('agency_id', where.agency_id)
+      .andWhere('id', where.id);
+  }
+
+  public async deletePopUpBanner(where: { agency_id: number; id: number }) {
+    return await this.db('pop_up_banner')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .del()
+      .where('agency_id', where.agency_id)
+      .where('id', where.id);
   }
 }
