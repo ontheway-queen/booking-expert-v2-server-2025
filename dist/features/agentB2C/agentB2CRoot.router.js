@@ -14,6 +14,7 @@ const agentB2CTraveler_router_1 = __importDefault(require("./routers/agentB2CTra
 const agentB2CUmrah_router_1 = __importDefault(require("./routers/agentB2CUmrah.router"));
 const agentB2CVisa_router_1 = __importDefault(require("./routers/agentB2CVisa.router"));
 const authChecker_1 = __importDefault(require("../../middleware/authChecker/authChecker"));
+const agentB2CConfig_router_1 = __importDefault(require("./routers/agentB2CConfig.router"));
 class AgentB2CRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
@@ -28,10 +29,12 @@ class AgentB2CRootRouter {
         this.travelerRouter = new agentB2CTraveler_router_1.default();
         this.umrahRouter = new agentB2CUmrah_router_1.default();
         this.visaRouter = new agentB2CVisa_router_1.default();
+        this.agentB2CConfigRouter = new agentB2CConfig_router_1.default();
         this.callRouter();
     }
     callRouter() {
         this.Router.use('/', this.mainRouter.router);
+        this.Router.use('/config', this.agentB2CConfigRouter.router);
         this.Router.use('/flight', this.flightRouter.router);
         this.Router.use('/holiday', this.holidayRouter.router);
         this.Router.use('/hotel', this.hotelRouter.router);

@@ -303,11 +303,6 @@ class AuthChecker {
                         .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
                     return;
                 }
-                console.log({
-                    type: 'White label',
-                    agency_id: check_agency.id,
-                    agency_name: check_agency.agency_name,
-                });
                 const module = req.originalUrl.split('/')[4] || '';
                 req.agencyB2CWhiteLabel = {
                     agency_id: Number(check_token === null || check_token === void 0 ? void 0 : check_token.agency_id),
@@ -332,7 +327,14 @@ class AuthChecker {
                     'profile',
                     'email-otp',
                     'traveler',
+                    'config',
                 ];
+                console.log({
+                    type: 'White label',
+                    agency_id: check_agency.id,
+                    agency_name: check_agency.agency_name,
+                    module,
+                });
                 let hasPermission = agencyB2CModules.includes(module);
                 if (!hasPermission) {
                     res

@@ -138,8 +138,10 @@ export interface ICreateAgencyB2CSiteConfig {
   meta_description?: string;
   meta_tags?: string;
   notice?: string;
-  last_updated?: string;
+  last_updated?: Date;
   updated_by?: number;
+  android_app_link?: string;
+  ios_app_link?: string;
 }
 
 export interface IGetAgencyB2CSiteConfigData {
@@ -162,9 +164,11 @@ export interface IGetAgencyB2CSiteConfigData {
   meta_description?: string;
   meta_tags?: string;
   notice?: string;
-  last_updated?: string;
+  last_updated?: Date;
   updated_by?: number;
   updated_by_name?: string;
+  android_app_link?: string;
+  ios_app_link?: string;
 }
 export interface IUpdateAgencyB2CSiteConfigPayload {
   main_logo?: string;
@@ -186,6 +190,8 @@ export interface IUpdateAgencyB2CSiteConfigPayload {
   notice?: string;
   last_updated?: Date;
   updated_by?: number;
+  android_app_link?: string;
+  ios_app_link?: string;
 }
 
 export interface ICreateAgencyB2CSocialLinkPayload {

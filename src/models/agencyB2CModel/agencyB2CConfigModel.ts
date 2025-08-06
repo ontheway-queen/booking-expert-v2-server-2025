@@ -275,7 +275,7 @@ export default class AgencyB2CConfigModel extends Schema {
     return await this.db('site_config')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('*')
-      .where('pp.agency_id', query.agency_id)
+      .where('agency_id', query.agency_id)
       .first();
   }
 

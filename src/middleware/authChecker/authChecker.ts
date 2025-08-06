@@ -362,12 +362,6 @@ export default class AuthChecker {
         return;
       }
 
-      console.log({
-        type: 'White label',
-        agency_id: check_agency.id,
-        agency_name: check_agency.agency_name,
-      });
-
       const module = req.originalUrl.split('/')[4] || '';
 
       req.agencyB2CWhiteLabel = {
@@ -394,7 +388,14 @@ export default class AuthChecker {
         'profile',
         'email-otp',
         'traveler',
+        'config',
       ];
+      console.log({
+        type: 'White label',
+        agency_id: check_agency.id,
+        agency_name: check_agency.agency_name,
+        module,
+      });
 
       let hasPermission = agencyB2CModules.includes(module);
 
