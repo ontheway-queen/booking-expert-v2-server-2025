@@ -1,7 +1,14 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { DATA_LIMIT } from '../../utils/miscellaneous/constants';
+import {
+  DATA_LIMIT,
+  SOURCE_ADMIN,
+  SOURCE_AGENT,
+} from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
+  ICreateBankAccountPayload,
+  IGetBankAccountData,
+  IGetBankAccountQuery,
   IGetHotelSearchHistoryData,
   IGetHotelSearchHistoryQuery,
   IInsertHotelSearchHistoryPayload,
@@ -65,4 +72,50 @@ export default class OthersModel extends Schema {
 
     return await query;
   }
+
+  public async createAccount(payload: ICreateBankAccountPayload) {
+    return await this.db('account_details')
+      .withSchema(this.DBO_SCHEMA)
+      .insert(payload);
+  }
+
+  public async getAccount(
+    query: IGetBankAccountQuery
+  ): Promise<IGetBankAccountData[]> {
+    return await this.db('account_details AS ad')
+      .withSchema(this.DBO_SCHEMA)
+      .select(
+        'ad.id',
+        'ad.account_name',
+        'ad.account_number',
+        'ad.branch',
+        'ad.routing_no',
+        'ad.status',
+        'ad.swift_code',
+        'b.name AS bank_name',
+        'b.type AS bank_type',
+        'b.logo AS bank_logo'
+      )
+      .joinRaw(`LEFT JOIN public.banks AS b ON ad.bank_id = b.id`)
+      .andWhere('ad.source_type', query.source_type)
+      .where((qb) => {
+        if (query.filter) {
+          qb.orWhereILike('ad.account_name', `%${query.filter}%`).orWhereILike(
+            'b.name',
+            `%${query.filter}%`
+          );
+        }
+
+        if (query.source_id) {
+          qb.andWhere('ad.source_id', query.source_id);
+        }
+        if (query.status !== undefined) {
+          qb.andWhere('ad.status', query.status);
+        }
+      });
+  }
+
+  public async deleteAccount() {}
+
+  public async updateAccount() {}
 }

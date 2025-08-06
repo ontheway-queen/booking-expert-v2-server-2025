@@ -46,8 +46,22 @@ export class AgentB2CSubUmrahValidator {
     meta_description: Joi.string().optional(),
     package_price_details: Joi.string().optional(),
     package_accommodation_details: Joi.string().optional(),
-    add_package_include: Joi.array().items(Joi.string().allow('')).optional().optional(),
-    remove_package_include: Joi.array().items(Joi.number().allow('')).optional(),
+    add_package_include: Joi.array()
+      .items(Joi.string().allow(''))
+      .optional()
+      .optional(),
+    remove_package_include: Joi.array()
+      .items(Joi.number().allow(''))
+      .optional(),
     remove_images: Joi.array().items(Joi.number().allow('')).optional(),
+  });
+
+  public getUmrahBooking = Joi.object({
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+    user_id: Joi.number().optional(),
+    from_date: Joi.date().raw().optional(),
+    to_date: Joi.date().raw().optional(),
+    status: Joi.string().optional(),
   });
 }

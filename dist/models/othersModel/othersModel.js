@@ -51,5 +51,38 @@ class OthersModel extends schema_1.default {
             return yield query;
         });
     }
+    createAccount(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('account_details')
+                .withSchema(this.DBO_SCHEMA)
+                .insert(payload);
+        });
+    }
+    getAccount(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('account_details AS ad')
+                .withSchema(this.DBO_SCHEMA)
+                .select('ad.id', 'ad.account_name', 'ad.account_number', 'ad.branch', 'ad.routing_no', 'ad.status', 'ad.swift_code', 'b.name AS bank_name', 'b.type AS bank_type', 'b.logo AS bank_logo')
+                .joinRaw(`LEFT JOIN public.banks AS b ON ad.bank_id = b.id`)
+                .andWhere('ad.source_type', query.source_type)
+                .where((qb) => {
+                if (query.filter) {
+                    qb.orWhereILike('ad.account_name', `%${query.filter}%`).orWhereILike('b.name', `%${query.filter}%`);
+                }
+                if (query.source_id) {
+                    qb.andWhere('ad.source_id', query.source_id);
+                }
+                if (query.status !== undefined) {
+                    qb.andWhere('ad.status', query.status);
+                }
+            });
+        });
+    }
+    deleteAccount() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    updateAccount() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
 }
 exports.default = OthersModel;

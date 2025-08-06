@@ -39,8 +39,9 @@ class UmrahBookingModel extends schema_1.default {
             var _a;
             const data = yield this.db('umrah_booking AS ub')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('ub.id', 'ub.booking_ref', 'ub.umrah_id', 'up.title AS umrah_title', 'up.short_description AS umrah_short_description', 'ub.status', 'ub.traveler_adult', 'ub.traveler_child', 'ub.total_price', 'ub.created_at')
+                .select('ub.id', 'ub.booking_ref', 'ub.umrah_id', 'up.title AS umrah_title', 'up.short_description AS umrah_short_description', 'ub.status', 'ub.user_id', 'abu.name AS user_name', 'ub.traveler_adult', 'ub.traveler_child', 'ub.total_price', 'ub.created_at')
                 .leftJoin('umrah_package AS up', 'up.id', 'ub.umrah_id')
+                .joinRaw('LEFT JOIN agent_b2c.users AS abu ON ub.user_id = abu.id')
                 .where((qb) => {
                 qb.where('ub.source_type', constants_1.SOURCE_AGENT_B2C).andWhere('ub.source_id', query.agency_id);
                 if (query.user_id) {

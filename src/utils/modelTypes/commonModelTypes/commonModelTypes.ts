@@ -121,3 +121,15 @@ export interface IGetEmailSubscriberData {
   agency_id?: number;
   created_at: string;
 }
+
+export interface IInsertBanks {
+  name: string;
+  type: 'Bank' | 'MFS';
+  logo: string;
+}
+export interface IGetBanksData {
+  id: number;
+  name: string;
+  type: 'Bank' | 'MFS';
+  logo: string;
+}
