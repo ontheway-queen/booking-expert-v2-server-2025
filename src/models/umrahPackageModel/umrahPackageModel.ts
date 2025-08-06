@@ -53,6 +53,7 @@ export default class UmrahPackageModel extends Schema {
   public async getAgentB2CUmrahPackageList(
     query: IGetAgentB2CUmrahListQuery
   ): Promise<IGetAgentB2CUmrahListData[]> {
+    const { is_deleted = false } = query;
     return await this.db('umrah_package')
       .withSchema(this.SERVICE_SCHEMA)
       .select(
@@ -67,6 +68,7 @@ export default class UmrahPackageModel extends Schema {
       )
       .andWhere('source_type', SOURCE_AGENT)
       .andWhere('source_id', query.source_id)
+      .andWhere('is_deleted', is_deleted)
       .where((qb) => {
         if (query.status !== undefined) {
           qb.andWhere('status', query.status);
@@ -77,6 +79,7 @@ export default class UmrahPackageModel extends Schema {
   public async getUmrahPackageList(
     query: IGetUmrahPackageListQuery
   ): Promise<{ data: IUmrahPackageListItem[]; total: number }> {
+    const { is_deleted = false } = query;
     const result = await this.db('umrah_package')
       .withSchema(this.SERVICE_SCHEMA)
       .select(
@@ -93,6 +96,7 @@ export default class UmrahPackageModel extends Schema {
       .andWhere('source_type', SOURCE_AGENT)
       .andWhere('source_id', query.source_id)
       .where((qb) => {
+        qb.andWhere('is_deleted', is_deleted);
         if (query.status !== undefined) {
           qb.andWhere('status', query.status);
         }
@@ -114,6 +118,7 @@ export default class UmrahPackageModel extends Schema {
       .andWhere('source_type', SOURCE_AGENT)
       .andWhere('source_id', query.source_id)
       .where((qb) => {
+        qb.andWhere('is_deleted', is_deleted);
         if (query.status !== undefined) {
           qb.andWhere('status', query.status);
         }
@@ -132,6 +137,7 @@ export default class UmrahPackageModel extends Schema {
   public async getSingleAgentB2CUmrahPackageDetails(
     query: IGetPackageDetailsQuery
   ): Promise<IGetSinglePackageDetails | null> {
+    const { is_deleted = false } = query;
     return await this.db('umrah_package')
       .withSchema(this.SERVICE_SCHEMA)
       .select(
@@ -156,7 +162,7 @@ export default class UmrahPackageModel extends Schema {
       .where((qb) => {
         qb.andWhere('source_id', query.source_id);
         qb.andWhere('source_type', SOURCE_AGENT);
-        qb.andWhere('is_deleted', false);
+        qb.andWhere('is_deleted', is_deleted);
         if (query.slug) {
           qb.andWhere('slug', query.slug);
         }
@@ -169,7 +175,10 @@ export default class UmrahPackageModel extends Schema {
 
   public async getSingleUmrahPackage(query: {
     umrah_id: number;
+    is_deleted?: boolean;
+    source_id?: number;
   }): Promise<IGetSinglePackageDetails | null> {
+    const { is_deleted = false } = query;
     return await this.db('umrah_package')
       .withSchema(this.SERVICE_SCHEMA)
       .select(
@@ -192,6 +201,7 @@ export default class UmrahPackageModel extends Schema {
         'thumbnail'
       )
       .where('id', query.umrah_id)
+      .andWhere('is_deleted', is_deleted)
       .first();
   }
 
@@ -242,6 +252,4 @@ export default class UmrahPackageModel extends Schema {
       .andWhere('id', payload.id)
       .delete();
   }
-
-
 }

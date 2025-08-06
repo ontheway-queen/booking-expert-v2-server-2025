@@ -44,11 +44,13 @@ class UmrahPackageModel extends schema_1.default {
     }
     getAgentB2CUmrahPackageList(query) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { is_deleted = false } = query;
             return yield this.db('umrah_package')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id', 'slug', 'thumbnail', 'title', 'duration', 'group_size', 'short_description', 'adult_price')
                 .andWhere('source_type', constants_1.SOURCE_AGENT)
                 .andWhere('source_id', query.source_id)
+                .andWhere('is_deleted', is_deleted)
                 .where((qb) => {
                 if (query.status !== undefined) {
                     qb.andWhere('status', query.status);
@@ -58,12 +60,14 @@ class UmrahPackageModel extends schema_1.default {
     }
     getUmrahPackageList(query) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { is_deleted = false } = query;
             const result = yield this.db('umrah_package')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id', 'title', 'duration', 'group_size', 'short_description', 'adult_price', 'child_price', 'status', 'valid_till_date')
                 .andWhere('source_type', constants_1.SOURCE_AGENT)
                 .andWhere('source_id', query.source_id)
                 .where((qb) => {
+                qb.andWhere('is_deleted', is_deleted);
                 if (query.status !== undefined) {
                     qb.andWhere('status', query.status);
                 }
@@ -80,6 +84,7 @@ class UmrahPackageModel extends schema_1.default {
                 .andWhere('source_type', constants_1.SOURCE_AGENT)
                 .andWhere('source_id', query.source_id)
                 .where((qb) => {
+                qb.andWhere('is_deleted', is_deleted);
                 if (query.status !== undefined) {
                     qb.andWhere('status', query.status);
                 }
@@ -92,13 +97,14 @@ class UmrahPackageModel extends schema_1.default {
     }
     getSingleAgentB2CUmrahPackageDetails(query) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { is_deleted = false } = query;
             return yield this.db('umrah_package')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id', 'title', 'thumbnail', 'description', 'duration', 'valid_till_date', 'group_size', 'status', 'adult_price', 'child_price', 'package_details', 'slug', 'meta_title', 'meta_description', 'package_price_details', 'package_accommodation_details', 'short_description')
                 .where((qb) => {
                 qb.andWhere('source_id', query.source_id);
                 qb.andWhere('source_type', constants_1.SOURCE_AGENT);
-                qb.andWhere('is_deleted', false);
+                qb.andWhere('is_deleted', is_deleted);
                 if (query.slug) {
                     qb.andWhere('slug', query.slug);
                 }
@@ -111,10 +117,12 @@ class UmrahPackageModel extends schema_1.default {
     }
     getSingleUmrahPackage(query) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { is_deleted = false } = query;
             return yield this.db('umrah_package')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('title', 'description', 'duration', 'valid_till_date', 'group_size', 'status', 'adult_price', 'child_price', 'package_details', 'slug', 'meta_title', 'meta_description', 'umrah_for', 'package_price_details', 'package_accommodation_details', 'short_description', 'thumbnail')
                 .where('id', query.umrah_id)
+                .andWhere('is_deleted', is_deleted)
                 .first();
         });
     }

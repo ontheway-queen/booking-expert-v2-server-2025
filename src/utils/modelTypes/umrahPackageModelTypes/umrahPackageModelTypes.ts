@@ -23,6 +23,7 @@ export interface IInsertUmrahPackagePayload {
 export interface IGetAgentB2CUmrahListQuery {
   source_id: number;
   status?: boolean;
+  is_deleted?: boolean;
 }
 
 export interface IGetUmrahPackageListQuery {
@@ -32,6 +33,7 @@ export interface IGetUmrahPackageListQuery {
   filter?: string;
   source_type: 'ADMIN' | 'AGENT';
   source_id: number;
+  is_deleted?: boolean;
 }
 export interface IGetAgentB2CUmrahListData {
   id: number;
@@ -63,6 +65,7 @@ export interface IGetPackageDetailsQuery {
   umrah_id?: number;
   slug?: string;
   source_id: number;
+  is_deleted?: boolean;
 }
 
 export interface IGetSinglePackageIncludeService {
