@@ -89,6 +89,36 @@ export interface ICreateAgencyB2CPopularPlace {
   status?: boolean;
 }
 
+export interface IGetAgencyB2CPopularPlaceQuery {
+  agency_id: number;
+  status?: boolean;
+}
+
+export interface IGetAgencyB2CPopularPlaceData {
+  id: number;
+  agency_id: number;
+  thumbnail: string;
+  order_number: number;
+  short_description?: string;
+  location_id?: number;
+  location_type?: string;
+  location_name?: string;
+  country_name: string;
+  country_id?: number;
+  status: boolean;
+}
+
+export interface IUpdateAgencyB2CPopularPlace {
+  thumbnail: string;
+  order_number: number;
+  short_description?: string;
+  location_id?: number;
+  location_type?: string;
+  location_name?: string;
+  country_id?: number;
+  status?: boolean;
+}
+
 export interface ICreateAgencyB2CSiteConfig {
   agency_id: number;
   main_logo?: string;
@@ -109,6 +139,52 @@ export interface ICreateAgencyB2CSiteConfig {
   meta_tags?: string;
   notice?: string;
   last_updated?: string;
+  updated_by?: number;
+}
+
+export interface IGetAgencyB2CSiteConfigData {
+  id: number;
+  agency_id: number;
+  main_logo?: string;
+  hero_quote?: string;
+  hero_sub_quote?: string;
+  site_name?: string;
+  emails?: string;
+  numbers?: string;
+  address?: string;
+  contact_us_content?: string;
+  contact_us_thumbnail?: string;
+  about_us_content?: string;
+  about_us_thumbnail?: string;
+  privacy_policy_content?: string;
+  terms_and_conditions_content?: string;
+  meta_title?: string;
+  meta_description?: string;
+  meta_tags?: string;
+  notice?: string;
+  last_updated?: string;
+  updated_by?: number;
+  updated_by_name?: string;
+}
+export interface IUpdateAgencyB2CSiteConfigPayload {
+  main_logo?: string;
+  hero_quote?: string;
+  hero_sub_quote?: string;
+  site_name?: string;
+  emails?: string;
+  numbers?: string;
+  address?: string;
+  contact_us_content?: string;
+  contact_us_thumbnail?: string;
+  about_us_content?: string;
+  about_us_thumbnail?: string;
+  privacy_policy_content?: string;
+  terms_and_conditions_content?: string;
+  meta_title?: string;
+  meta_description?: string;
+  meta_tags?: string;
+  notice?: string;
+  last_updated?: Date;
   updated_by?: number;
 }
 

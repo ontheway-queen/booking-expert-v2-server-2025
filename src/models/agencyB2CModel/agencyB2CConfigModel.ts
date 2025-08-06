@@ -14,7 +14,12 @@ import {
   IUpdateAgencyB2CHeroBgContentPayload,
   ICreateAgencyB2CHotDeals,
   ICreateAgencyB2CPopUpBanner,
-} from '../../utils/modelTypes/agencyB2CModelTypes/agencyB2COonfigModel.types';
+  IGetAgencyB2CPopularPlaceQuery,
+  IGetAgencyB2CPopularPlaceData,
+  IUpdateAgencyB2CPopularPlace,
+  IGetAgencyB2CSiteConfigData,
+  IUpdateAgencyB2CSiteConfigPayload,
+} from '../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types';
 
 export default class AgencyB2CConfigModel extends Schema {
   private db: TDB;
@@ -120,7 +125,7 @@ export default class AgencyB2CConfigModel extends Schema {
         'aa.name AS to_airport_name',
         'aa.iata_code AS to_airport_code'
       )
-      .joinRaw(`LEFT JOIN dbo.country AS c ON pd.country_id = c.id`)
+      .joinRaw(`LEFT JOIN public.country AS c ON pd.country_id = c.id`)
       .joinRaw(`LEFT JOIN public.airport AS da ON pd.from_airport = da.id`)
       .joinRaw(`LEFT JOIN public.airport AS aa ON pd.to_airport = aa.id`)
       .orderBy('pd.order_no', 'asc')
@@ -174,7 +179,7 @@ export default class AgencyB2CConfigModel extends Schema {
     agency_id: number;
     id: number;
   }) {
-    return await this.db('hero_bg_content')
+    return await this.db('popular_destination')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .del()
       .where('agency_id', where.agency_id)
@@ -189,10 +194,95 @@ export default class AgencyB2CConfigModel extends Schema {
       .insert(payload);
   }
 
+  public async getPopularPlaces(
+    query: IGetAgencyB2CPopularPlaceQuery
+  ): Promise<IGetAgencyB2CPopularPlaceData[]> {
+    return await this.db('popular_places AS pp')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('pp.*', 'c.name AS country_name')
+      .joinRaw(`LEFT JOIN public.country AS c ON pp.country_id = c.id`)
+      .orderBy('pp.order_no', 'asc')
+      .andWhere('pp.agency_id', query.agency_id)
+      .where((qb) => {
+        if (query.status !== undefined) {
+          qb.andWhere('pp.status', query.status);
+        }
+      });
+  }
+
+  public async checkPopularPlace(query: {
+    agency_id: number;
+    id: number;
+  }): Promise<IGetAgencyB2CPopularPlaceData | null> {
+    return await this.db('popular_places')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .andWhere('agency_id', query.agency_id)
+      .andWhere('id', query.id)
+      .first();
+  }
+
+  public async getPopularPlaceLastNo(query: {
+    agency_id: number;
+  }): Promise<IGetAgencyB2CPopularPlaceData | null> {
+    return await this.db('popular_places')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .where('agency_id', query.agency_id)
+      .orderBy('order_no', 'desc')
+      .first();
+  }
+
+  public async updatePopularPlace(
+    payload: IUpdateAgencyB2CPopularPlace,
+    where: {
+      agency_id: number;
+      id: number;
+    }
+  ) {
+    return await this.db('popular_places')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .update(payload)
+      .where('agency_id', where.agency_id)
+      .andWhere('id', where.id);
+  }
+
+  public async deletePopularPlace(where: { agency_id: number; id: number }) {
+    return await this.db('popular_places')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .del()
+      .where('agency_id', where.agency_id)
+      .where('id', where.id);
+  }
+
   public async insertSiteConfig(payload: ICreateAgencyB2CSiteConfig) {
     return await this.db('site_config')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .insert(payload);
+  }
+
+  public async getSiteConfig(query: {
+    agency_id: number;
+  }): Promise<IGetAgencyB2CSiteConfigData | null> {
+    return await this.db('site_config')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .select('*')
+      .where('pp.agency_id', query.agency_id)
+      .first();
+  }
+
+  public async updateConfig(
+    payload: IUpdateAgencyB2CSiteConfigPayload,
+    where: {
+      agency_id: number;
+      id: number;
+    }
+  ) {
+    return await this.db('site_config')
+      .withSchema(this.AGENT_B2C_SCHEMA)
+      .update(payload)
+      .where('agency_id', where.agency_id)
+      .andWhere('id', where.id);
   }
 
   public async insertSocialLink(
