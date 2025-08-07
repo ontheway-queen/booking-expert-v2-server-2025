@@ -43,7 +43,8 @@ export default class AgencyPaymentModel extends Schema {
   ): Promise<{ data: IGetAgencyLedgerData[]; total?: number }> {
     const data = await this.db('agency_ledger as al')
       .withSchema(this.AGENT_SCHEMA)
-      .select('al.id',
+      .select(
+        'al.id',
         'al.agency_id',
         'al.type',
         'al.amount',
@@ -54,7 +55,7 @@ export default class AgencyPaymentModel extends Schema {
         'a.agency_name',
         'a.agency_logo'
       )
-      .leftJoin("agency as a", "a.id", "al.agency_id")
+      .leftJoin('agency as a', 'a.id', 'al.agency_id')
       .where((qb) => {
         if (agency_id) {
           qb.andWhere('al.agency_id', agency_id);
@@ -78,7 +79,7 @@ export default class AgencyPaymentModel extends Schema {
 
     if (need_total) {
       total = await this.db('agency_ledger')
-      .withSchema(this.AGENT_SCHEMA)
+        .withSchema(this.AGENT_SCHEMA)
         .count('id AS total')
         .where((qb) => {
           if (agency_id) {
@@ -109,7 +110,10 @@ export default class AgencyPaymentModel extends Schema {
       .where('voucher_no', voucher_no);
   }
 
-  public async updateAgencyLedgerByVoucherNo(payload: { amount: number, details?: string }, voucher_no: string) {
+  public async updateAgencyLedgerByVoucherNo(
+    payload: { amount: number; details?: string },
+    voucher_no: string
+  ) {
     await this.db('agency_ledger')
       .withSchema(this.AGENT_SCHEMA)
       .update(payload)
@@ -186,14 +190,19 @@ export default class AgencyPaymentModel extends Schema {
       .where('id', id);
   }
 
-  public async createDepositRequest(payload: ICreateDepositRequestPayload): Promise<{ id: number }[]> {
-    return await this.db("deposit_request")
+  public async createDepositRequest(
+    payload: ICreateDepositRequestPayload
+  ): Promise<{ id: number }[]> {
+    return await this.db('deposit_request')
       .withSchema(this.AGENT_SCHEMA)
       .insert(payload, 'id');
   }
 
-  public async updateDepositRequest(payload: IUpdateDepositRequestPayload, id: number) {
-    return await this.db("deposit_request")
+  public async updateDepositRequest(
+    payload: IUpdateDepositRequestPayload,
+    id: number
+  ) {
+    return await this.db('deposit_request')
       .withSchema(this.AGENT_SCHEMA)
       .update(payload)
       .where({ id });
@@ -202,101 +211,108 @@ export default class AgencyPaymentModel extends Schema {
   public async getDepositRequestList(
     query: IGetDepositRequestListFilterQuery,
     is_total: boolean = false
-  ): Promise<{ data: IGetDepositRequestData[]; total?: number; }> {
-    const data = await this.db("deposit_request as dr")
+  ): Promise<{ data: IGetDepositRequestData[]; total?: number }> {
+    const data = await this.db('deposit_request as dr')
       .withSchema(this.AGENT_SCHEMA)
       .select(
-        "dr.id",
-        "dr.agency_id",
-        "dr.bank_name",
-        "dr.amount",
-        "dr.remarks",
-        "dr.request_no",
-        "dr.status",
-        "dr.payment_date",
-        "dr.created_at",
-        "dr.docs",
-        "a.agency_name",
-        "a.agency_logo"
+        'dr.id',
+        'dr.agency_id',
+        'dr.bank_name',
+        'dr.amount',
+        'dr.remarks',
+        'dr.request_no',
+        'dr.status',
+        'dr.payment_date',
+        'dr.created_at',
+        'dr.docs',
+        'a.agency_name',
+        'a.agency_logo'
       )
-      .join("agency as a", "a.id", "dr.agency_id")
+      .join('agency as a', 'a.id', 'dr.agency_id')
       .where((qb) => {
         if (query.agency_id) {
-          qb.andWhere("dr.agency_id", query.agency_id);
+          qb.andWhere('dr.agency_id', query.agency_id);
         }
         if (query.from_date && query.to_date) {
-          qb.andWhereBetween("dr.payment_date", [query.from_date, query.to_date]);
+          qb.andWhereBetween('dr.payment_date', [
+            query.from_date,
+            query.to_date,
+          ]);
         }
         if (query.status) {
-          qb.andWhere("dr.status", query.status);
+          qb.andWhere('dr.status', query.status);
         }
         if (query.filter) {
           qb.andWhere((qbc) => {
-            qbc.whereILike("dr.request_no", `${query.filter}%`)
-            qbc.orWhereILike("a.agency_name", `%${query.filter}%`)
-          })
+            qbc.whereILike('dr.request_no', `${query.filter}%`);
+            qbc.orWhereILike('a.agency_name', `%${query.filter}%`);
+          });
         }
       })
       .limit(query.limit || 100)
       .offset(query.skip || 0)
-      .orderBy("dr.id", "desc");
+      .orderBy('dr.id', 'desc');
 
     let total: any[] = [];
 
     if (is_total) {
-      total = await this.db("deposit_request as dr")
+      total = await this.db('deposit_request as dr')
         .withSchema(this.AGENT_SCHEMA)
-        .count(
-          "dr.id as total"
-        )
-        .join("agency as a", "a.id", "dr.agency_id")
+        .count('dr.id as total')
+        .join('agency as a', 'a.id', 'dr.agency_id')
         .where((qb) => {
           if (query.agency_id) {
-            qb.andWhere("dr.agency_id", query.agency_id);
+            qb.andWhere('dr.agency_id', query.agency_id);
           }
           if (query.from_date && query.to_date) {
-            qb.andWhereBetween("dr.payment_date", [query.from_date, query.to_date]);
+            qb.andWhereBetween('dr.payment_date', [
+              query.from_date,
+              query.to_date,
+            ]);
           }
           if (query.status) {
-            qb.andWhere("dr.status", query.status);
+            qb.andWhere('dr.status', query.status);
           }
           if (query.filter) {
             qb.andWhere((qbc) => {
-              qbc.whereILike("dr.request_no", `${query.filter}%`)
-              qbc.orWhereILike("a.agency_name", `%${query.filter}%`)
-            })
+              qbc.whereILike('dr.request_no', `${query.filter}%`);
+              qbc.orWhereILike('a.agency_name', `%${query.filter}%`);
+            });
           }
-        })
+        });
     }
 
     return {
       data,
-      total: total[0]?.total
-    }
+      total: total[0]?.total,
+    };
   }
 
-  public async getSingleDepositRequest(id: number, agency_id?: number): Promise<IGetDepositRequestData> {
-    return await this.db("deposit_request as dr")
+  public async getSingleDepositRequest(
+    id: number,
+    agency_id?: number
+  ): Promise<IGetDepositRequestData> {
+    return await this.db('deposit_request as dr')
       .withSchema(this.AGENT_SCHEMA)
       .select(
-        "dr.id",
-        "dr.agency_id",
-        "dr.bank_name",
-        "dr.amount",
-        "dr.remarks",
-        "dr.request_no",
-        "dr.status",
-        "dr.payment_date",
-        "dr.created_at",
-        "dr.docs",
-        "a.agency_name",
-        "a.agency_logo"
+        'dr.id',
+        'dr.agency_id',
+        'dr.bank_name',
+        'dr.amount',
+        'dr.remarks',
+        'dr.request_no',
+        'dr.status',
+        'dr.payment_date',
+        'dr.created_at',
+        'dr.docs',
+        'a.agency_name',
+        'a.agency_logo'
       )
-      .join("agency as a", "a.id", "dr.agency_id")
+      .join('agency as a', 'a.id', 'dr.agency_id')
       .where((qb) => {
-        qb.andWhere("dr.id", id);
+        qb.andWhere('dr.id', id);
         if (agency_id) {
-          qb.andWhere("dr.agency_id", agency_id);
+          qb.andWhere('dr.agency_id', agency_id);
         }
       })
       .first();

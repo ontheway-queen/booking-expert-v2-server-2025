@@ -1,6 +1,15 @@
-import { DEPOSIT_STATUS_APPROVED, DEPOSIT_STATUS_CANCELLED, DEPOSIT_STATUS_PENDING, DEPOSIT_STATUS_REJECTED } from "../../miscellaneous/constants";
+import {
+  DEPOSIT_STATUS_APPROVED,
+  DEPOSIT_STATUS_CANCELLED,
+  DEPOSIT_STATUS_PENDING,
+  DEPOSIT_STATUS_REJECTED,
+} from '../../miscellaneous/constants';
 
-type deposit_status = typeof DEPOSIT_STATUS_PENDING | typeof DEPOSIT_STATUS_APPROVED | typeof DEPOSIT_STATUS_CANCELLED | typeof DEPOSIT_STATUS_REJECTED;
+type deposit_status =
+  | typeof DEPOSIT_STATUS_PENDING
+  | typeof DEPOSIT_STATUS_APPROVED
+  | typeof DEPOSIT_STATUS_CANCELLED
+  | typeof DEPOSIT_STATUS_REJECTED;
 
 export interface IInsertAgencyLedgerPayload {
   agency_id: number;
@@ -61,7 +70,7 @@ export interface IGetAgentLoanData {
 export interface ICreateDepositRequestPayload {
   agency_id: number;
   request_no: string;
-  bank_name: string;
+  account_id: number;
   amount: number;
   remarks?: string;
   payment_date: Date;

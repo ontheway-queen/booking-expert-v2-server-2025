@@ -67,6 +67,7 @@ export class AgentPaymentsService extends AbstractServices {
       const { user_id, agency_id } = req.agencyUser;
 
       const paymentModel = this.Model.AgencyPaymentModel(trx);
+      const othersModel = this.Model.OthersModel(trx);
 
       const check_duplicate = await paymentModel.getDepositRequestList({
         agency_id,
@@ -83,6 +84,11 @@ export class AgentPaymentsService extends AbstractServices {
       }
 
       const body = req.body as ICreateDepositPayload;
+
+      const checkAccount = await othersModel.checkAccount({
+        id: body.account_id,
+        source_type: 'ADMIN',
+      });
 
       const request_no = await Lib.generateNo({
         trx,

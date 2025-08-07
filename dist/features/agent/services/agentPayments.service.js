@@ -54,6 +54,7 @@ class AgentPaymentsService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id, agency_id } = req.agencyUser;
                 const paymentModel = this.Model.AgencyPaymentModel(trx);
+                const othersModel = this.Model.OthersModel(trx);
                 const check_duplicate = yield paymentModel.getDepositRequestList({
                     agency_id,
                     status: constants_1.DEPOSIT_STATUS_PENDING,
@@ -66,6 +67,10 @@ class AgentPaymentsService extends abstract_service_1.default {
                     };
                 }
                 const body = req.body;
+                const checkAccount = yield othersModel.checkAccount({
+                    id: body.account_id,
+                    source_type: 'ADMIN',
+                });
                 const request_no = yield lib_1.default.generateNo({
                     trx,
                     type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent_deposit_request,

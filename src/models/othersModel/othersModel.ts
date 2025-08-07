@@ -115,6 +115,31 @@ export default class OthersModel extends Schema {
       });
   }
 
+  public async checkAccount(query: {
+    id: number;
+    source_type: typeof SOURCE_ADMIN | typeof SOURCE_AGENT;
+    source_id?: number;
+  }): Promise<IGetBankAccountData | null> {
+    return await this.db('account_details AS ad')
+      .withSchema(this.DBO_SCHEMA)
+      .select(
+        'ad.id',
+        'ad.account_name',
+        'ad.account_number',
+        'ad.branch',
+        'ad.routing_no',
+        'ad.status',
+        'ad.swift_code',
+        'b.name AS bank_name',
+        'b.type AS bank_type',
+        'b.logo AS bank_logo'
+      )
+      .joinRaw(`LEFT JOIN public.banks AS b ON ad.bank_id = b.id`)
+      .where('ad.source_type', query.source_type)
+      .andWhere('ad.id', query.id)
+      .first();
+  }
+
   public async deleteAccount() {}
 
   public async updateAccount() {}
