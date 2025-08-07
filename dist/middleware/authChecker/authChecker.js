@@ -147,6 +147,7 @@ class AuthChecker {
                 return;
             }
             const verify = lib_1.default.verifyToken(authSplit[1], config_1.default.JWT_SECRET_AGENT);
+            console.log(verify);
             if (!verify) {
                 res
                     .status(statusCode_1.default.HTTP_UNAUTHORIZED)

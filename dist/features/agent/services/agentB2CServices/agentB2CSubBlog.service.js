@@ -30,12 +30,11 @@ class AgentB2CSubBlogService extends abstract_service_1.default {
     createBlog(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
                 const { agency_id, user_id } = req.agencyUser;
-                const _b = req.body, { slug } = _b, payload = __rest(_b, ["slug"]);
-                const file = req.files || [];
-                const model = this.Model.BlogModel(trx);
-                const check_slug = yield model.getSingleBlogPost({
+                const _a = req.body, { slug } = _a, restPayload = __rest(_a, ["slug"]);
+                const files = req.files || [];
+                const blogModel = this.Model.BlogModel(trx);
+                const check_slug = yield blogModel.getSingleBlogPost({
                     slug: slug,
                     source_id: agency_id,
                     source_type: constants_1.SOURCE_AGENT,
@@ -48,21 +47,16 @@ class AgentB2CSubBlogService extends abstract_service_1.default {
                         message: this.ResMsg.SLUG_EXISTS,
                     };
                 }
-                if ((file === null || file === void 0 ? void 0 : file.length) && ((_a = file[0]) === null || _a === void 0 ? void 0 : _a.fieldname) === 'cover_image') {
-                    payload.cover_image = file[0].filename;
-                }
-                else {
+                const coverImage = files === null || files === void 0 ? void 0 : files.find((file) => file.fieldname === 'cover_image');
+                if (!coverImage) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                         message: 'Cover image is required',
                     };
                 }
-                (payload.slug = slug),
-                    (payload.source_type = constants_1.SOURCE_AGENT),
-                    (payload.source_id = agency_id),
-                    (payload.created_by = user_id);
-                yield model.createBlog(payload);
+                const payload = Object.assign(Object.assign({}, restPayload), { slug: slug, source_type: constants_1.SOURCE_AGENT, source_id: agency_id, created_by: user_id, cover_image: coverImage.filename });
+                yield blogModel.createBlog(payload);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -123,33 +117,32 @@ class AgentB2CSubBlogService extends abstract_service_1.default {
     updateBlog(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
                 const { id } = req.params;
                 const { agency_id } = req.agencyUser;
-                const _b = req.body, { slug } = _b, payload = __rest(_b, ["slug"]);
-                const file = req.files || [];
-                const model = this.Model.BlogModel(trx);
-                const data = yield model.getSingleBlogPost({
+                const _a = req.body, { slug } = _a, payload = __rest(_a, ["slug"]);
+                const files = req.files;
+                const blogModel = this.Model.BlogModel(trx);
+                const blogPost = yield blogModel.getSingleBlogPost({
                     blog_id: Number(id),
                     is_deleted: false,
                     source_id: agency_id,
                     source_type: constants_1.SOURCE_AGENT,
                 });
-                if (!data) {
+                if (!blogPost) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                if (slug) {
-                    const check_slug = yield model.getSingleBlogPost({
-                        slug: slug,
+                if (slug && slug !== blogPost.slug) {
+                    const existingSlug = yield blogModel.getSingleBlogPost({
+                        slug,
                         source_id: agency_id,
                         source_type: constants_1.SOURCE_AGENT,
                         is_deleted: false,
                     });
-                    if (check_slug && check_slug.id !== Number(id)) {
+                    if (existingSlug && existingSlug.id !== Number(id)) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_CONFLICT,
@@ -157,12 +150,15 @@ class AgentB2CSubBlogService extends abstract_service_1.default {
                         };
                     }
                 }
-                if ((file === null || file === void 0 ? void 0 : file.length) && ((_a = file[0]) === null || _a === void 0 ? void 0 : _a.fieldname) === 'cover_image') {
-                    payload.cover_image = file[0].filename;
-                    yield this.manageFile.deleteFromCloud([data.cover_image]);
+                const coverImage = files === null || files === void 0 ? void 0 : files.find((file) => file.fieldname === 'cover_image');
+                if (coverImage) {
+                    payload.cover_image = coverImage.filename;
+                    if (blogPost.cover_image) {
+                        yield this.manageFile.deleteFromCloud([blogPost.cover_image]);
+                    }
                 }
-                if (payload && Object.keys(payload).length) {
-                    yield model.updateBlog(payload, Number(id));
+                if (Object.keys(payload).length > 0) {
+                    yield blogModel.updateBlog(payload, Number(id));
                 }
                 return {
                     success: true,
@@ -183,7 +179,6 @@ class AgentB2CSubBlogService extends abstract_service_1.default {
                 source_id: agency_id,
                 source_type: constants_1.SOURCE_AGENT,
             });
-            console.log({ data });
             if (!data) {
                 return {
                     success: false,

@@ -14,6 +14,7 @@ const agentB2CTraveler_router_1 = __importDefault(require("./routers/agentB2CTra
 const agentB2CUmrah_router_1 = __importDefault(require("./routers/agentB2CUmrah.router"));
 const agentB2CVisa_router_1 = __importDefault(require("./routers/agentB2CVisa.router"));
 const authChecker_1 = __importDefault(require("../../middleware/authChecker/authChecker"));
+const agentB2CBlog_router_1 = __importDefault(require("./routers/agentB2CBlog.router"));
 class AgentB2CRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
@@ -28,6 +29,7 @@ class AgentB2CRootRouter {
         this.travelerRouter = new agentB2CTraveler_router_1.default();
         this.umrahRouter = new agentB2CUmrah_router_1.default();
         this.visaRouter = new agentB2CVisa_router_1.default();
+        this.blogRouter = new agentB2CBlog_router_1.default();
         this.callRouter();
     }
     callRouter() {
@@ -40,6 +42,7 @@ class AgentB2CRootRouter {
         this.Router.use('/traveler', this.authChecker.agencyB2CUserAuthChecker, this.travelerRouter.router);
         this.Router.use('/umrah', this.umrahRouter.router);
         this.Router.use('/visa', this.visaRouter.router);
+        this.Router.use('/blog', this.blogRouter.router);
     }
 }
 exports.default = AgentB2CRootRouter;

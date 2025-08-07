@@ -179,6 +179,9 @@ export default class AuthChecker {
       config.JWT_SECRET_AGENT
     ) as ITokenParseAgencyUser;
 
+    console.log(verify);
+
+
     if (!verify) {
       res
         .status(StatusCode.HTTP_UNAUTHORIZED)

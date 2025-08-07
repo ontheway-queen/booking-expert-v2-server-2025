@@ -1,16 +1,17 @@
 import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
 import { SOURCE_AGENT } from '../../../../utils/miscellaneous/constants';
+import { IBlogPayload } from '../../utils/types/agentB2CTypes/agentB2CSubBlog.types';
 
 export class AgentB2CSubBlogService extends AbstractServices {
   public async createBlog(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { agency_id, user_id } = req.agencyUser;
-      const { slug, ...payload } = req.body;
-      const file = (req.files as Express.Multer.File[]) || [];
-      const model = this.Model.BlogModel(trx);
+      const { slug, ...restPayload } = req.body;
+      const files = (req.files as Express.Multer.File[]) || [];
+      const blogModel = this.Model.BlogModel(trx);
 
-      const check_slug = await model.getSingleBlogPost({
+      const check_slug = await blogModel.getSingleBlogPost({
         slug: slug,
         source_id: agency_id,
         source_type: SOURCE_AGENT,
@@ -25,9 +26,9 @@ export class AgentB2CSubBlogService extends AbstractServices {
         };
       }
 
-      if (file?.length && file[0]?.fieldname === 'cover_image') {
-        payload.cover_image = file[0].filename;
-      } else {
+      const coverImage = files?.find((file) => file.fieldname === 'cover_image');
+
+      if (!coverImage) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -35,12 +36,16 @@ export class AgentB2CSubBlogService extends AbstractServices {
         };
       }
 
-      (payload.slug = slug),
-        (payload.source_type = SOURCE_AGENT),
-        (payload.source_id = agency_id),
-        (payload.created_by = user_id);
+      const payload: IBlogPayload = {
+        ...restPayload,
+        slug: slug,
+        source_type: SOURCE_AGENT,
+        source_id: agency_id,
+        created_by: user_id,
+        cover_image: coverImage.filename,
+      };
 
-      await model.createBlog(payload);
+      await blogModel.createBlog(payload);
 
       return {
         success: true,
@@ -113,18 +118,17 @@ export class AgentB2CSubBlogService extends AbstractServices {
       const { id } = req.params;
       const { agency_id } = req.agencyUser;
       const { slug, ...payload } = req.body;
-      const file = (req.files as Express.Multer.File[]) || [];
-      const model = this.Model.BlogModel(trx);
+      const files = req.files as Express.Multer.File[] | undefined;
+      const blogModel = this.Model.BlogModel(trx);
 
-
-      const data = await model.getSingleBlogPost({
+      const blogPost = await blogModel.getSingleBlogPost({
         blog_id: Number(id),
         is_deleted: false,
         source_id: agency_id,
         source_type: SOURCE_AGENT,
       });
 
-      if (!data) {
+      if (!blogPost) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
@@ -132,15 +136,15 @@ export class AgentB2CSubBlogService extends AbstractServices {
         };
       }
 
-      if (slug) {
-        const check_slug = await model.getSingleBlogPost({
-          slug: slug,
+      if (slug && slug !== blogPost.slug) {
+        const existingSlug = await blogModel.getSingleBlogPost({
+          slug,
           source_id: agency_id,
           source_type: SOURCE_AGENT,
           is_deleted: false,
         });
 
-        if (check_slug && check_slug.id !== Number(id)) {
+        if (existingSlug && existingSlug.id !== Number(id)) {
           return {
             success: false,
             code: this.StatusCode.HTTP_CONFLICT,
@@ -149,14 +153,16 @@ export class AgentB2CSubBlogService extends AbstractServices {
         }
       }
 
-      if (file?.length && file[0]?.fieldname === 'cover_image') {
-        payload.cover_image = file[0].filename;
-        await this.manageFile.deleteFromCloud([data.cover_image]);
+      const coverImage = files?.find((file) => file.fieldname === 'cover_image');
+      if (coverImage) {
+        payload.cover_image = coverImage.filename;
+        if (blogPost.cover_image) {
+          await this.manageFile.deleteFromCloud([blogPost.cover_image]);
+        }
       }
 
-
-      if (payload && Object.keys(payload).length) {
-        await model.updateBlog(payload, Number(id));
+      if (Object.keys(payload).length > 0) {
+        await blogModel.updateBlog(payload, Number(id));
       }
 
       return {
@@ -166,7 +172,7 @@ export class AgentB2CSubBlogService extends AbstractServices {
       };
     });
   }
-
+  
   public async deleteBlog(req: Request) {
     const { id: blog_id } = req.params;
     const { agency_id } = req.agencyUser;
@@ -180,7 +186,6 @@ export class AgentB2CSubBlogService extends AbstractServices {
       source_type: SOURCE_AGENT,
     });
 
-    console.log({ data });
 
     if (!data) {
       return {
