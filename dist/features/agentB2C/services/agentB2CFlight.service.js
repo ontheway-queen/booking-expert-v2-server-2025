@@ -36,6 +36,9 @@ const commonFlightBookingSupport_service_1 = require("../../../utils/supportServ
 const flightUtils_1 = __importDefault(require("../../../utils/lib/flight/flightUtils"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
 class AgentB2CFlightService extends abstract_service_1.default {
+    constructor() {
+        super();
+    }
     flightSearch(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {

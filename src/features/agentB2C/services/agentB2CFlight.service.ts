@@ -30,6 +30,9 @@ import {
 } from '../../../utils/miscellaneous/constants';
 
 export class AgentB2CFlightService extends AbstractServices {
+  constructor() {
+    super();
+  }
   public async flightSearch(req: Request) {
     return this.db.transaction(async (trx) => {
       const { agency_id } = req.agencyB2CWhiteLabel;

@@ -6,12 +6,12 @@ import {
 export interface ICreateAgencyB2CHeroBgContentPayload {
   type: typeof CONTENT_TYPE_PHOTO | typeof CONTENT_TYPE_VIDEO;
   agency_id: number;
-  order_no: number;
+  order_number: number;
   content: string;
 }
 
 export interface IUpdateAgencyB2CHeroBgContentPayload {
-  order_no: number;
+  order_number: number;
   content: string;
 }
 
@@ -25,7 +25,7 @@ export interface IGetAgencyB2CHeroBgContentData {
   id: number;
   type: typeof CONTENT_TYPE_PHOTO | typeof CONTENT_TYPE_VIDEO;
   agency_id: number;
-  order_no: number;
+  order_number: number;
   content: string;
   status: boolean;
 }
@@ -138,8 +138,10 @@ export interface ICreateAgencyB2CSiteConfig {
   meta_description?: string;
   meta_tags?: string;
   notice?: string;
-  last_updated?: string;
+  last_updated?: Date;
   updated_by?: number;
+  android_app_link?: string;
+  ios_app_link?: string;
 }
 
 export interface IGetAgencyB2CSiteConfigData {
@@ -162,9 +164,11 @@ export interface IGetAgencyB2CSiteConfigData {
   meta_description?: string;
   meta_tags?: string;
   notice?: string;
-  last_updated?: string;
+  last_updated?: Date;
   updated_by?: number;
   updated_by_name?: string;
+  android_app_link?: string;
+  ios_app_link?: string;
 }
 export interface IUpdateAgencyB2CSiteConfigPayload {
   main_logo?: string;
@@ -186,14 +190,39 @@ export interface IUpdateAgencyB2CSiteConfigPayload {
   notice?: string;
   last_updated?: Date;
   updated_by?: number;
+  android_app_link?: string;
+  ios_app_link?: string;
 }
 
-export interface ICreateAgencyB2CSocialLink {
+export interface ICreateAgencyB2CSocialLinkPayload {
   agency_id: number;
   media: string;
   link: string;
   order_number: number;
   icon: string;
+}
+
+export interface IGetAgencyB2CSocialLinkQuery {
+  agency_id: number;
+  status?: boolean;
+}
+
+export interface IGetAgencyB2CSocialLinkData {
+  id: number;
+  agency_id: number;
+  media: string;
+  link: string;
+  order_number: number;
+  icon: string;
+  status: boolean;
+}
+
+export interface IUpdateAgencyB2CSocialLinkPayload {
+  media?: string;
+  link?: string;
+  order_number?: number;
+  icon?: string;
+  status?: boolean;
 }
 
 export interface ICreateAgencyB2CHotDeals {
@@ -203,11 +232,60 @@ export interface ICreateAgencyB2CHotDeals {
   link: string;
   order_number: number;
 }
+
+export interface IGetAgencyB2CHotDealsQuery {
+  agency_id: number;
+  status?: boolean;
+}
+
+export interface IGetAgencyB2CHotDealsData {
+  id: number;
+  agency_id: number;
+  title: string;
+  thumbnail: string;
+  link: string;
+  order_number: number;
+  status: boolean;
+}
+
+export interface IUpdateAgencyB2CHotDealsPayload {
+  title?: string;
+  thumbnail?: string;
+  link?: string;
+  order_number?: number;
+  status?: boolean;
+}
+
 export interface ICreateAgencyB2CPopUpBanner {
   agency_id: number;
   title: string;
   thumbnail: string;
   link: string;
   description: string;
-  pop_up_for: 'AGENT' | 'B2C' | 'BOTH';
+  pop_up_for: 'AGENT' | 'B2C';
+}
+
+export interface IGetAgencyB2CPopUpBannerQuery {
+  agency_id: number;
+  status?: boolean;
+  pop_up_for: 'AGENT' | 'B2C';
+}
+
+export interface IGetAgencyB2CPopUpBannerData {
+  id: number;
+  agency_id: number;
+  title: string;
+  thumbnail: string;
+  link: string;
+  description: string;
+  pop_up_for: 'AGENT' | 'B2C';
+  status: boolean;
+}
+
+export interface IUpdateAgencyB2CPopUpBannerPayload {
+  title?: string;
+  thumbnail?: string;
+  link?: string;
+  description?: string;
+  status?: boolean;
 }

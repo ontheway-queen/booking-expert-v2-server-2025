@@ -39,6 +39,7 @@ import PartialPaymentRuleModel from './dynamicFareRuleModel/partialPaymentRulesM
 import UmrahPackageModel from './umrahPackageModel/umrahPackageModel';
 import UmrahBookingModel from './umrahPackageModel/umrahBookingModel';
 import BlogModel from './blogModel/blogModel';
+import AgencyB2CConfigModel from './agencyB2CModel/agencyB2CConfigModel';
 
 export default class Models {
   //Common model
@@ -229,5 +230,10 @@ export default class Models {
   //Blog Model
   public BlogModel(trx?: Knex.Transaction) {
     return new BlogModel(trx || db);
+  }
+
+  //Agent B2C Config Model
+  public AgencyB2CConfigModel(trx?: Knex.Transaction) {
+    return new AgencyB2CConfigModel(trx || db);
   }
 }

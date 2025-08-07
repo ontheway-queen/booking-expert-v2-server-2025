@@ -10,6 +10,7 @@ import AgentB2CUmrahRouter from './routers/agentB2CUmrah.router';
 import AgentB2CVisaRouter from './routers/agentB2CVisa.router';
 import AuthChecker from '../../middleware/authChecker/authChecker';
 import BlogRouter from './routers/agentB2CBlog.router';
+import AgentB2CConfigRouter from './routers/agentB2CConfig.router';
 
 export default class AgentB2CRootRouter {
   public Router = Router();
@@ -27,6 +28,7 @@ export default class AgentB2CRootRouter {
   private umrahRouter = new AgentB2CUmrahRouter();
   private visaRouter = new AgentB2CVisaRouter();
   private blogRouter = new BlogRouter();
+  private agentB2CConfigRouter = new AgentB2CConfigRouter();
 
   constructor() {
     this.callRouter();
@@ -34,6 +36,7 @@ export default class AgentB2CRootRouter {
 
   private callRouter() {
     this.Router.use('/', this.mainRouter.router);
+    this.Router.use('/config', this.agentB2CConfigRouter.router);
     this.Router.use('/flight', this.flightRouter.router);
     this.Router.use('/holiday', this.holidayRouter.router);
     this.Router.use('/hotel', this.hotelRouter.router);
