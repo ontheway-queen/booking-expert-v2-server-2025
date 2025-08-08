@@ -1,7 +1,7 @@
-import { Request } from 'express';
-import AbstractServices from '../../../../abstract/abstract.service';
-import { IGetAgentB2CHotelBookingQuery } from '../../utils/types/agentB2CTypes/agentB2CSubHotel.types';
-import { SOURCE_AGENT_B2C } from '../../../../utils/miscellaneous/constants';
+import { Request } from "express";
+import AbstractServices from "../../../../abstract/abstract.service";
+import { IGetAgentB2CHotelBookingQuery } from "../../utils/types/agentB2CSubTypes/agentB2CSubHotel.types";
+import { SOURCE_AGENT_B2C } from "../../../../utils/miscellaneous/constants";
 
 export class AgentB2CSubHotelService extends AbstractServices {
   constructor() {

@@ -68,7 +68,7 @@ class AgentB2CSubUsersService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: 'Profile has been updated',
+                    message: "Profile has been updated",
                 };
             }));
         });

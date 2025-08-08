@@ -83,7 +83,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: 'Holiday package has been created successfully',
+                    message: "Holiday package has been created successfully",
                     data: {
                         id: holidayPackage[0].id,
                         image_body,
@@ -159,7 +159,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: 'Holiday package not found',
+                        message: "Holiday package not found",
                     };
                 }
                 //check slug
@@ -259,7 +259,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: 'Holiday package has been updated successfully',
+                    message: "Holiday package has been updated successfully",
                     data: {
                         imageBody,
                     },
@@ -282,14 +282,14 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: 'Holiday package not found',
+                        message: "Holiday package not found",
                     };
                 }
                 yield holidayPackageModel.updateHolidayPackage({ is_deleted: true }, Number(id));
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: 'Holiday package has been deleted successfully',
+                    message: "Holiday package has been deleted successfully",
                 };
             }));
         });

@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import AbstractController from '../../../abstract/abstract.controller';
-import { AgentB2CConfigService } from '../services/agentB2CConfig.service';
+import { Request, Response } from "express";
+import AbstractController from "../../../abstract/abstract.controller";
+import { AgentB2CConfigService } from "../services/agentB2CConfig.service";
 
 export default class AgentB2CConfigController extends AbstractController {
   private service = new AgentB2CConfigService();
@@ -38,6 +38,14 @@ export default class AgentB2CConfigController extends AbstractController {
       const { code, ...rest } = await this.service.GetPrivacyPolicyPageData(
         req
       );
+      res.status(code).json(rest);
+    }
+  );
+
+  public GetAccountsData = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.GetAccountsData(req);
       res.status(code).json(rest);
     }
   );

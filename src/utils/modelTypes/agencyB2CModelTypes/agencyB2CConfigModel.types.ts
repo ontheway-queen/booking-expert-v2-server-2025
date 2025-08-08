@@ -1,7 +1,7 @@
 import {
   CONTENT_TYPE_PHOTO,
   CONTENT_TYPE_VIDEO,
-} from '../../miscellaneous/constants';
+} from "../../miscellaneous/constants";
 
 export interface ICreateAgencyB2CHeroBgContentPayload {
   type: typeof CONTENT_TYPE_PHOTO | typeof CONTENT_TYPE_VIDEO;
@@ -122,6 +122,8 @@ export interface IUpdateAgencyB2CPopularPlace {
 export interface ICreateAgencyB2CSiteConfig {
   agency_id: number;
   main_logo?: string;
+  fabicon?: string;
+  site_thumbnail?: string;
   hero_quote?: string;
   hero_sub_quote?: string;
   site_name?: string;
@@ -148,6 +150,8 @@ export interface IGetAgencyB2CSiteConfigData {
   id: number;
   agency_id: number;
   main_logo?: string;
+  fabicon?: string;
+  site_thumbnail?: string;
   hero_quote?: string;
   hero_sub_quote?: string;
   site_name?: string;
@@ -170,8 +174,11 @@ export interface IGetAgencyB2CSiteConfigData {
   android_app_link?: string;
   ios_app_link?: string;
 }
+
 export interface IUpdateAgencyB2CSiteConfigPayload {
   main_logo?: string;
+  fabicon?: string;
+  site_thumbnail?: string;
   hero_quote?: string;
   hero_sub_quote?: string;
   site_name?: string;
@@ -188,8 +195,8 @@ export interface IUpdateAgencyB2CSiteConfigPayload {
   meta_description?: string;
   meta_tags?: string;
   notice?: string;
-  last_updated?: Date;
-  updated_by?: number;
+  last_updated: Date;
+  updated_by: number;
   android_app_link?: string;
   ios_app_link?: string;
 }
@@ -262,13 +269,13 @@ export interface ICreateAgencyB2CPopUpBanner {
   thumbnail: string;
   link: string;
   description: string;
-  pop_up_for: 'AGENT' | 'B2C';
+  pop_up_for: "AGENT" | "B2C";
 }
 
 export interface IGetAgencyB2CPopUpBannerQuery {
   agency_id: number;
   status?: boolean;
-  pop_up_for: 'AGENT' | 'B2C';
+  pop_up_for: "AGENT" | "B2C";
 }
 
 export interface IGetAgencyB2CPopUpBannerData {
@@ -278,7 +285,7 @@ export interface IGetAgencyB2CPopUpBannerData {
   thumbnail: string;
   link: string;
   description: string;
-  pop_up_for: 'AGENT' | 'B2C';
+  pop_up_for: "AGENT" | "B2C";
   status: boolean;
 }
 

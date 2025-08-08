@@ -65,7 +65,7 @@ class AgentB2CConfigService extends abstract_service_1.default {
                 });
                 const popUpBanner = yield configModel.getPopUpBanner({
                     agency_id,
-                    pop_up_for: 'B2C',
+                    pop_up_for: "B2C",
                     status: true,
                 });
                 return {
@@ -163,6 +163,23 @@ class AgentB2CConfigService extends abstract_service_1.default {
                     },
                 };
             }));
+        });
+    }
+    GetAccountsData(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyB2CWhiteLabel;
+            const configModel = this.Model.OthersModel();
+            const accounts = yield configModel.getAccount({
+                source_type: "AGENT",
+                source_id: agency_id,
+                status: true,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: accounts,
+            };
         });
     }
 }

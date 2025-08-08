@@ -1,6 +1,6 @@
-import AbstractServices from '../../../../abstract/abstract.service';
-import { Request } from 'express';
-import { IUpdateAgentB2CUsersReqBody } from '../../utils/types/agentB2CTypes/agentB2CSubUsers.types';
+import AbstractServices from "../../../../abstract/abstract.service";
+import { Request } from "express";
+import { IUpdateAgentB2CUsersReqBody } from "../../utils/types/agentB2CSubTypes/agentB2CSubUsers.types";
 export class AgentB2CSubUsersService extends AbstractServices {
   public async getAllUsers(req: Request) {
     const { agency_id } = req.agencyUser;
@@ -65,7 +65,7 @@ export class AgentB2CSubUsersService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: 'Profile has been updated',
+        message: "Profile has been updated",
       };
     });
   }

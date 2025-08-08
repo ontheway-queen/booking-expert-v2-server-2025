@@ -1,5 +1,5 @@
-import { Request } from 'express';
-import AbstractServices from '../../../abstract/abstract.service';
+import { Request } from "express";
+import AbstractServices from "../../../abstract/abstract.service";
 
 export class AgentB2CConfigService extends AbstractServices {
   constructor() {
@@ -62,7 +62,7 @@ export class AgentB2CConfigService extends AbstractServices {
 
       const popUpBanner = await configModel.getPopUpBanner({
         agency_id,
-        pop_up_for: 'B2C',
+        pop_up_for: "B2C",
         status: true,
       });
 
@@ -170,5 +170,23 @@ export class AgentB2CConfigService extends AbstractServices {
         },
       };
     });
+  }
+
+  public async GetAccountsData(req: Request) {
+    const { agency_id } = req.agencyB2CWhiteLabel;
+
+    const configModel = this.Model.OthersModel();
+    const accounts = await configModel.getAccount({
+      source_type: "AGENT",
+      source_id: agency_id,
+      status: true,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: accounts,
+    };
   }
 }

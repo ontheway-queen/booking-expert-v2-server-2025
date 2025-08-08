@@ -12,12 +12,13 @@ class AgentB2CConfigRouter extends abstract_router_1.default {
         this.callRouter();
     }
     callRouter() {
-        this.router.route('/home').get(this.controller.GetHomePageData);
-        this.router.route('/about-us').get(this.controller.GetAboutUsPageData);
-        this.router.route('/contact-us').get(this.controller.GetContactUsPageData);
+        this.router.route("/home").get(this.controller.GetHomePageData);
+        this.router.route("/about-us").get(this.controller.GetAboutUsPageData);
+        this.router.route("/contact-us").get(this.controller.GetContactUsPageData);
         this.router
-            .route('/privacy-policy')
+            .route("/privacy-policy")
             .get(this.controller.GetPrivacyPolicyPageData);
+        this.router.route("/accounts").get(this.controller.GetAccountsData);
     }
 }
 exports.default = AgentB2CConfigRouter;
