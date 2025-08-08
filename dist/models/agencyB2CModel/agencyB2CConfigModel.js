@@ -379,23 +379,13 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .first();
         });
     }
-    checkPopUpBanner(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("pop_up_banner")
-                .withSchema(this.AGENT_B2C_SCHEMA)
-                .select("*")
-                .andWhere("agency_id", query.agency_id)
-                .andWhere("id", query.id)
-                .first();
-        });
-    }
     updatePopUpBanner(payload, where) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db("pop_up_banner")
                 .withSchema(this.AGENT_B2C_SCHEMA)
                 .update(payload)
                 .where("agency_id", where.agency_id)
-                .andWhere("id", where.id);
+                .andWhere("pop_up_for", where.pop_up_for);
         });
     }
     deletePopUpBanner(where) {

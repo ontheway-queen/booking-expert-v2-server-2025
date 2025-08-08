@@ -1,11 +1,11 @@
-import { SOURCE_ADMIN, SOURCE_AGENT } from '../../miscellaneous/constants';
+import { SOURCE_ADMIN, SOURCE_AGENT } from "../../miscellaneous/constants";
 
 export interface IInsertHotelSearchHistoryPayload {
-  user_type: 'Agent' | 'B2C' | 'Agent B2C' | 'Admin';
+  user_type: "Agent" | "B2C" | "Agent B2C" | "Admin";
   check_in_date: string;
   check_out_date: string;
   guest_n_rooms: string;
-  destination_type: 'Hotel' | 'City';
+  destination_type: "Hotel" | "City";
   user_id?: number;
   code: number;
   agency_id?: number;
@@ -16,7 +16,7 @@ export interface IInsertHotelSearchHistoryPayload {
 export interface IGetHotelSearchHistoryQuery {
   limit?: string;
   skip?: string;
-  user_type?: 'Agent' | 'B2C' | 'Agent B2C' | 'Admin' | 'All';
+  user_type?: "Agent" | "B2C" | "Agent B2C" | "Admin" | "All";
   agency_id?: number;
   user_id?: number;
   from_date?: string;
@@ -43,7 +43,7 @@ export interface ICreateBankAccountPayload {
   account_name: string;
   account_number: string;
   branch?: string; // Nullable
-  source_type?: 'ADMIN' | 'AGENT';
+  source_type?: "ADMIN" | "AGENT";
   source_id?: number; // Nullable
   routing_no?: string; // Nullable
   swift_code?: string; // Nullable
@@ -65,4 +65,13 @@ export interface IGetBankAccountQuery {
   source_id?: number;
   status?: boolean;
   filter?: string;
+}
+
+export interface IUpdateBankAccountPayload {
+  account_name?: string;
+  account_number?: string;
+  branch?: string; // Nullable
+  routing_no?: string; // Nullable
+  swift_code?: string; // Nullable
+  status?: boolean;
 }

@@ -27,6 +27,7 @@ import {
   IUpdateAgencyB2CHotDealsPayload,
   IGetAgencyB2CPopUpBannerQuery,
   IGetAgencyB2CPopUpBannerData,
+  IUpdateAgencyB2CPopUpBannerPayload,
 } from "../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types";
 
 export default class AgencyB2CConfigModel extends Schema {
@@ -467,30 +468,19 @@ export default class AgencyB2CConfigModel extends Schema {
       .andWhere("pop_up_for", query.pop_up_for)
       .first();
   }
-  public async checkPopUpBanner(query: {
-    agency_id: number;
-    id: number;
-  }): Promise<IGetAgencyB2CPopUpBannerData | null> {
-    return await this.db("pop_up_banner")
-      .withSchema(this.AGENT_B2C_SCHEMA)
-      .select("*")
-      .andWhere("agency_id", query.agency_id)
-      .andWhere("id", query.id)
-      .first();
-  }
 
   public async updatePopUpBanner(
-    payload: IUpdateAgencyB2CHotDealsPayload,
+    payload: IUpdateAgencyB2CPopUpBannerPayload,
     where: {
       agency_id: number;
-      id: number;
+      pop_up_for: "AGENT" | "B2C";
     }
   ) {
     return await this.db("pop_up_banner")
       .withSchema(this.AGENT_B2C_SCHEMA)
       .update(payload)
       .where("agency_id", where.agency_id)
-      .andWhere("id", where.id);
+      .andWhere("pop_up_for", where.pop_up_for);
   }
 
   public async deletePopUpBanner(where: { agency_id: number; id: number }) {

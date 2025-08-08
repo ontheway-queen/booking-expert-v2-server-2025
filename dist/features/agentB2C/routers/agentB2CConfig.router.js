@@ -18,6 +18,9 @@ class AgentB2CConfigRouter extends abstract_router_1.default {
         this.router
             .route("/privacy-policy")
             .get(this.controller.GetPrivacyPolicyPageData);
+        this.router
+            .route("/terms-and-conditions")
+            .get(this.controller.GetTermsAndConditionsPageData);
         this.router.route("/accounts").get(this.controller.GetAccountsData);
     }
 }

@@ -172,6 +172,34 @@ export class AgentB2CConfigService extends AbstractServices {
     });
   }
 
+  public async GetTermsAndConditionsPageData(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyB2CWhiteLabel;
+
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+      const siteConfig = await configModel.getSiteConfig({ agency_id });
+
+      if (!siteConfig) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      const { terms_and_conditions_content } = siteConfig;
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: {
+          terms_and_conditions_content,
+        },
+      };
+    });
+  }
+
   public async GetAccountsData(req: Request) {
     const { agency_id } = req.agencyB2CWhiteLabel;
 

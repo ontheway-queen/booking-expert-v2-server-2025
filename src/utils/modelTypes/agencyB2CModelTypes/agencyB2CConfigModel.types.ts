@@ -206,7 +206,7 @@ export interface ICreateAgencyB2CSocialLinkPayload {
   media: string;
   link: string;
   order_number: number;
-  icon: string;
+  icon?: string;
 }
 
 export interface IGetAgencyB2CSocialLinkQuery {
@@ -265,17 +265,17 @@ export interface IUpdateAgencyB2CHotDealsPayload {
 
 export interface ICreateAgencyB2CPopUpBanner {
   agency_id: number;
-  title: string;
-  thumbnail: string;
-  link: string;
-  description: string;
+  title?: string;
+  thumbnail?: string;
+  link?: string;
+  description?: string;
   pop_up_for: "AGENT" | "B2C";
 }
 
 export interface IGetAgencyB2CPopUpBannerQuery {
   agency_id: number;
   status?: boolean;
-  pop_up_for: "AGENT" | "B2C";
+  pop_up_for?: "AGENT" | "B2C";
 }
 
 export interface IGetAgencyB2CPopUpBannerData {

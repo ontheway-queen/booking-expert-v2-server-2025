@@ -1,5 +1,5 @@
-type markup_type = 'PER' | 'FLAT';
-type markup_mode = 'INCREASE' | 'DECREASE';
+type markup_type = "PER" | "FLAT";
+type markup_mode = "INCREASE" | "DECREASE";
 export interface ICreateAgencyPayload {
   agency_logo: string;
   agent_no: string;
@@ -8,7 +8,7 @@ export interface ICreateAgencyPayload {
   phone: string;
   address: string;
   ref_agent_id?: number;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: "Agent" | "Sub Agent";
   national_id?: string;
   civil_aviation?: string;
   trade_license?: string;
@@ -19,7 +19,7 @@ export interface ICreateAgencyPayload {
   ref_id?: number;
   white_label?: boolean;
   allow_api?: boolean;
-  status: 'Pending' | 'Active' | 'Incomplete';
+  status: "Pending" | "Active" | "Incomplete";
 }
 
 export interface IUpdateAgencyPayload {
@@ -33,7 +33,7 @@ export interface IUpdateAgencyPayload {
   address?: string;
   kam_id?: number;
   ref_id?: number;
-  status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
+  status?: "Pending" | "Active" | "Inactive" | "Rejected" | "Incomplete";
   flight_markup_set?: number;
   hotel_markup_set?: number;
   white_label?: boolean;
@@ -46,11 +46,11 @@ export interface IGetAgencyListQuery {
   limit?: string;
   skip?: string;
   filter?: string;
-  status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
+  status?: "Pending" | "Active" | "Inactive" | "Rejected" | "Incomplete";
   ref_id?: number;
   ref_agent_id?: number;
-  agency_type?: 'Agent' | 'Sub Agent';
-  order?: 'asc' | 'desc';
+  agency_type?: "Agent" | "Sub Agent";
+  order?: "asc" | "desc";
 }
 export interface IGetAgencyListWithBalanceQuery {
   limit?: string;
@@ -59,7 +59,7 @@ export interface IGetAgencyListWithBalanceQuery {
   status?: string;
   ref_id?: number;
   ref_agent_id?: number;
-  agency_type?: 'Agent' | 'Sub Agent';
+  agency_type?: "Agent" | "Sub Agent";
 }
 
 export interface IGetAgencyListData {
@@ -73,7 +73,7 @@ export interface IGetAgencyListData {
   status: string;
   white_label: boolean;
   allow_api: boolean;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: "Agent" | "Sub Agent";
 }
 
 export interface IGetAgencyListWithBalanceData {
@@ -91,7 +91,7 @@ export interface IGetAgencyListWithBalanceData {
   allow_api: boolean;
   flight_markup_set: string;
   hotel_markup_set: string;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: "Agent" | "Sub Agent";
 }
 
 export interface IGetSingleAgencyData {
@@ -111,7 +111,7 @@ export interface IGetSingleAgencyData {
   hotel_markup_set: string;
   ref_id?: number;
   ref_agent_id?: number;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: "Agent" | "Sub Agent";
   kam_id?: number;
   civil_aviation: string;
   referred_by: string;
@@ -125,10 +125,10 @@ export interface ICheckAgencyQuery {
   email?: string;
   name?: string;
   agent_no?: string;
-  status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
+  status?: "Pending" | "Active" | "Inactive" | "Rejected" | "Incomplete";
   ref_id?: number;
   ref_agent_id?: number;
-  agency_type?: 'Agent' | 'Sub Agent';
+  agency_type?: "Agent" | "Sub Agent";
 }
 
 export interface ICheckAgencyData {
@@ -150,7 +150,7 @@ export interface ICheckAgencyData {
   kam_id?: number;
   address: string;
   ref_agent_id?: number;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: "Agent" | "Sub Agent";
   book_permission: boolean;
 }
 
@@ -237,13 +237,13 @@ export interface IUpdateAPICredsPayload {
 export interface ICreateAgentAuditTrailPayload {
   agency_id: number;
   created_by: number;
-  type: 'CREATE' | 'GET' | 'UPDATE' | 'DELETE';
+  type: "CREATE" | "GET" | "UPDATE" | "DELETE";
   details: string;
   payload?: object | string;
 }
 
 export interface IGetAgentAuditTrailQuery {
-  type?: 'CREATE' | 'GET' | 'UPDATE' | 'DELETE';
+  type?: "CREATE" | "GET" | "UPDATE" | "DELETE";
   created_by?: number;
   limit?: number;
   skip?: number;

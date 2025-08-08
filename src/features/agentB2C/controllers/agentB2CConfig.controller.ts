@@ -42,6 +42,15 @@ export default class AgentB2CConfigController extends AbstractController {
     }
   );
 
+  public GetTermsAndConditionsPageData = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } =
+        await this.service.GetTermsAndConditionsPageData(req);
+      res.status(code).json(rest);
+    }
+  );
+
   public GetAccountsData = this.asyncWrapper.wrap(
     null,
     async (req: Request, res: Response) => {
