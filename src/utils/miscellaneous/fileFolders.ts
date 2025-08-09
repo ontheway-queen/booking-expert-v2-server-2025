@@ -12,6 +12,8 @@ class FileFolder {
   static readonly AGENCY_Traveler_FILES = "agent/traveler-files";
   static readonly AGENCY_B2C_FILES = "agent/b2c/files";
   static readonly AGENCY_B2C_SITE_CONFIG = "agent/b2c/site-config";
+  static readonly AGENCY_B2C_SITE_CONFIG_HERO_BG = "agent/b2c/hero-bg";
+  static readonly AGENCY_B2C_SITE_CONFIG_OTHERS = "agent/b2c/others";
   static readonly AGENCY_B2C_SITE_CONFIG_SOCIAL_ICONS =
     "agent/b2c/social-icons";
   static readonly AGENCY_B2C_SITE_CONFIG_POP_UP = "agent/b2c/pop-up";

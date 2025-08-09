@@ -62,7 +62,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     }
     getAccounts(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyUser;
             const configModel = this.Model.OthersModel();
             const accounts = yield configModel.getAccount({
                 source_type: "AGENT",
@@ -79,7 +79,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     updateAccounts(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const configModel = this.Model.OthersModel(trx);
                 const { id } = req.params;
                 const account_id = Number(id);
@@ -115,7 +115,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     createAccounts(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const OtersModel = this.Model.OthersModel(trx);
                 const CommonModel = this.Model.CommonModel(trx);
                 const body = req.body;
@@ -127,7 +127,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                         message: "Bank not found.",
                     };
                 }
-                yield OtersModel.createAccount(body);
+                const account = yield OtersModel.createAccount(Object.assign(Object.assign({}, body), { source_type: "AGENT", source_id: agency_id }));
                 yield this.insertAgentAudit(undefined, {
                     agency_id,
                     created_by: user_id,
@@ -139,13 +139,16 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: this.ResMsg.HTTP_SUCCESSFUL,
+                    data: {
+                        id: account[0].id,
+                    },
                 };
             }));
         });
     }
     deleteAccounts(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id, user_id } = req.agencyB2CUser;
+            const { agency_id, user_id } = req.agencyUser;
             const OthersModel = this.Model.OthersModel();
             const { id } = req.params;
             const account_id = Number(id);
@@ -182,7 +185,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     getHeroBGContent(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
-            const { agency_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyUser;
             const hero_bg_data = yield configModel.getHeroBGContent({
                 agency_id,
             });
@@ -198,7 +201,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const body = req.body;
                 const files = req.files || [];
                 if (!files.length) {
@@ -211,7 +214,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 const lastOrderNumber = yield configModel.getHeroBGContentLastNo({
                     agency_id,
                 });
-                yield configModel.insertHeroBGContent(Object.assign(Object.assign({ agency_id }, body), { content: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 }));
+                const heroBG = yield configModel.insertHeroBGContent(Object.assign(Object.assign({ agency_id }, body), { content: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 }));
                 yield this.insertAgentAudit(trx, {
                     agency_id,
                     created_by: user_id,
@@ -225,6 +228,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_OK,
                     data: {
                         content: files[0].filename,
+                        id: heroBG[0].id,
                     },
                 };
             }));
@@ -234,7 +238,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const body = req.body;
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const id = Number(req.params.id);
                 const check = yield configModel.checkHeroBGContent({ agency_id, id });
@@ -249,6 +253,13 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 const payload = body;
                 if (files.length) {
                     payload.content = files[0].filename;
+                }
+                if (!Object.keys(payload).length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                    };
                 }
                 yield configModel.updateHeroBGContent(payload, { agency_id, id });
                 if (payload.content && check[0].content) {
@@ -273,7 +284,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     deleteHeroBGContent(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const id = Number(req.params.id);
                 const check = yield configModel.checkHeroBGContent({ agency_id, id });
@@ -305,7 +316,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     getPopularDestination(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
-            const { agency_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyUser;
             const popular_destinations = yield configModel.getPopularDestination({
                 agency_id,
             });
@@ -322,7 +333,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const CommonModel = this.Model.CommonModel(trx);
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const body = req.body;
                 const files = req.files || [];
                 if (!files.length) {
@@ -386,7 +397,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const body = req.body;
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const CommonModel = this.Model.CommonModel(trx);
                 const id = Number(req.params.id);
@@ -442,6 +453,13 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 if (files.length) {
                     payload.thumbnail = files[0].filename;
                 }
+                if (!Object.keys(payload).length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                    };
+                }
                 yield configModel.updatePopularDestination(payload, { agency_id, id });
                 if (payload.thumbnail && check.thumbnail) {
                     yield this.manageFile.deleteFromCloud([check.thumbnail]);
@@ -465,7 +483,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     deletePopularDestination(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const id = Number(req.params.id);
                 const check = yield configModel.checkPopularDestination({
@@ -500,7 +518,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     getPopularPlace(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
-            const { agency_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyUser;
             const popular_places = yield configModel.getPopularPlaces({
                 agency_id,
             });
@@ -517,7 +535,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const CommonModel = this.Model.CommonModel(trx);
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const body = req.body;
                 const files = req.files || [];
                 if (!files.length) {
@@ -561,7 +579,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const body = req.body;
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const CommonModel = this.Model.CommonModel(trx);
                 const id = Number(req.params.id);
@@ -593,6 +611,13 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 if (files.length) {
                     payload.thumbnail = files[0].filename;
                 }
+                if (!Object.keys(payload).length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                    };
+                }
                 yield configModel.updatePopularPlace(payload, { agency_id, id });
                 if (payload.thumbnail && check.thumbnail) {
                     yield this.manageFile.deleteFromCloud([check.thumbnail]);
@@ -616,7 +641,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     deletePopularPlace(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const id = Number(req.params.id);
                 const check = yield configModel.checkPopularPlace({
@@ -651,7 +676,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     getHotDeals(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
-            const { agency_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyUser;
             const hotDeals = yield configModel.getHotDeals({
                 agency_id,
             });
@@ -667,7 +692,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const body = req.body;
                 const files = req.files || [];
                 if (!files.length) {
@@ -701,9 +726,8 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const body = req.body;
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
-                const CommonModel = this.Model.CommonModel(trx);
                 const id = Number(req.params.id);
                 const check = yield configModel.checkHotDeals({
                     agency_id,
@@ -720,6 +744,13 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 const payload = body;
                 if (files.length) {
                     payload.thumbnail = files[0].filename;
+                }
+                if (!Object.keys(payload).length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                    };
                 }
                 yield configModel.updateHotDeals(payload, { agency_id, id });
                 if (payload.thumbnail && check.thumbnail) {
@@ -744,7 +775,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     deleteHotDeals(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const id = Number(req.params.id);
                 const check = yield configModel.checkHotDeals({

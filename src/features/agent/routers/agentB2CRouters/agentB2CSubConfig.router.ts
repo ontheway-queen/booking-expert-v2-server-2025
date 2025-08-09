@@ -27,41 +27,89 @@ export default class AgentB2CSubConfigRouter extends AbstractRouter {
     this.router
       .route("/hero-bg")
       .get(this.controller.getHeroBGContent)
-      .post(this.controller.createHeroBGContent);
+      .post(
+        this.uploader.cloudUploadRaw(
+          this.fileFolders.AGENCY_B2C_SITE_CONFIG_HERO_BG,
+          ["content"]
+        ),
+        this.controller.createHeroBGContent
+      );
 
     this.router
       .route("/hero-bg/:id")
-      .patch(this.controller.updateHeroBGContent)
+      .patch(
+        this.uploader.cloudUploadRaw(
+          this.fileFolders.AGENCY_B2C_SITE_CONFIG_HERO_BG,
+          ["content"]
+        ),
+        this.controller.updateHeroBGContent
+      )
       .delete(this.controller.deleteHeroBGContent);
 
     this.router
       .route("/popular-dest")
       .get(this.controller.getPopularDestination)
-      .post(this.controller.createPopularDestination);
+      .post(
+        this.uploader.cloudUploadRaw(
+          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
+          ["thumbnail"]
+        ),
+        this.controller.createPopularDestination
+      );
 
     this.router
       .route("/popular-dest/:id")
-      .patch(this.controller.updatePopularDestination)
+      .patch(
+        this.uploader.cloudUploadRaw(
+          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
+          ["thumbnail"]
+        ),
+        this.controller.updatePopularDestination
+      )
       .delete(this.controller.deletePopularDestination);
 
     this.router
       .route("/popular-place")
       .get(this.controller.getPopularPlace)
-      .post(this.controller.createPopularPlace);
+      .post(
+        this.uploader.cloudUploadRaw(
+          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
+          ["thumbnail"]
+        ),
+        this.controller.createPopularPlace
+      );
 
     this.router
       .route("/popular-place/:id")
-      .patch(this.controller.updatePopularPlace)
+      .patch(
+        this.uploader.cloudUploadRaw(
+          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
+          ["thumbnail"]
+        ),
+        this.controller.updatePopularPlace
+      )
       .delete(this.controller.deletePopularPlace);
 
     this.router
       .route("/hot-deals")
-      .get(this.controller.getHotDeals)
+      .get(
+        this.uploader.cloudUploadRaw(
+          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
+          ["thumbnail"]
+        ),
+        this.controller.getHotDeals
+      )
       .post(this.controller.createHotDeals);
 
     this.router
       .route("/hot-deals/:id")
-      .patch(this.controller.updateHotDeals)
+      .patch(
+        this.uploader.cloudUploadRaw(
+          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
+          ["thumbnail"]
+        ),
+        this.controller.updateHotDeals
+      )
       .delete(this.controller.deleteHotDeals);
   }
 }

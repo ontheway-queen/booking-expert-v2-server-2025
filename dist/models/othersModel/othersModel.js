@@ -55,7 +55,7 @@ class OthersModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db("account_details")
                 .withSchema(this.DBO_SCHEMA)
-                .insert(payload);
+                .insert(payload, "id");
         });
     }
     getAccount(query) {

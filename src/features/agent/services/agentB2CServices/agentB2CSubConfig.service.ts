@@ -65,7 +65,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
   }
 
   public async getAccounts(req: Request) {
-    const { agency_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyUser;
 
     const configModel = this.Model.OthersModel();
     const accounts = await configModel.getAccount({
@@ -83,7 +83,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
   public async updateAccounts(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
 
       const configModel = this.Model.OthersModel(trx);
       const { id } = req.params;
@@ -127,7 +127,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
   public async createAccounts(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
 
       const OtersModel = this.Model.OthersModel(trx);
       const CommonModel = this.Model.CommonModel(trx);
@@ -144,7 +144,11 @@ export class AgentB2CSubConfigService extends AbstractServices {
         };
       }
 
-      await OtersModel.createAccount(body);
+      const account = await OtersModel.createAccount({
+        ...body,
+        source_type: "AGENT",
+        source_id: agency_id,
+      });
 
       await this.insertAgentAudit(undefined, {
         agency_id,
@@ -158,12 +162,15 @@ export class AgentB2CSubConfigService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: this.ResMsg.HTTP_SUCCESSFUL,
+        data: {
+          id: account[0].id,
+        },
       };
     });
   }
 
   public async deleteAccounts(req: Request) {
-    const { agency_id, user_id } = req.agencyB2CUser;
+    const { agency_id, user_id } = req.agencyUser;
 
     const OthersModel = this.Model.OthersModel();
 
@@ -206,7 +213,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
   public async getHeroBGContent(req: Request) {
     const configModel = this.Model.AgencyB2CConfigModel();
-    const { agency_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyUser;
 
     const hero_bg_data = await configModel.getHeroBGContent({
       agency_id,
@@ -223,7 +230,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async createHeroBGContent(req: Request) {
     return this.db.transaction(async (trx) => {
       const configModel = this.Model.AgencyB2CConfigModel(trx);
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
 
       const body = req.body as ICreateHeroBGContentReqBody;
 
@@ -241,7 +248,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         agency_id,
       });
 
-      await configModel.insertHeroBGContent({
+      const heroBG = await configModel.insertHeroBGContent({
         agency_id,
         ...body,
         content: files[0].filename,
@@ -268,6 +275,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         message: this.ResMsg.HTTP_OK,
         data: {
           content: files[0].filename,
+          id: heroBG[0].id,
         },
       };
     });
@@ -276,7 +284,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async updateHeroBGContent(req: Request) {
     return this.db.transaction(async (trx) => {
       const body = req.body as IUpdateHeroBGContentReqBody;
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
       const configModel = this.Model.AgencyB2CConfigModel(trx);
 
       const id = Number(req.params.id);
@@ -299,11 +307,20 @@ export class AgentB2CSubConfigService extends AbstractServices {
         payload.content = files[0].filename;
       }
 
+      if (!Object.keys(payload).length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+        };
+      }
+
       await configModel.updateHeroBGContent(payload, { agency_id, id });
 
       if (payload.content && check[0].content) {
         await this.manageFile.deleteFromCloud([check[0].content]);
       }
+
       await this.insertAgentAudit(trx, {
         agency_id,
         created_by: user_id,
@@ -323,7 +340,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
   public async deleteHeroBGContent(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
       const configModel = this.Model.AgencyB2CConfigModel(trx);
 
       const id = Number(req.params.id);
@@ -361,7 +378,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
   public async getPopularDestination(req: Request) {
     const configModel = this.Model.AgencyB2CConfigModel();
-    const { agency_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyUser;
 
     const popular_destinations = await configModel.getPopularDestination({
       agency_id,
@@ -379,7 +396,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
     return this.db.transaction(async (trx) => {
       const configModel = this.Model.AgencyB2CConfigModel(trx);
       const CommonModel = this.Model.CommonModel(trx);
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
 
       const body = req.body as ICreatePopularDestinationReqBody;
 
@@ -462,7 +479,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async updatePopularDestination(req: Request) {
     return this.db.transaction(async (trx) => {
       const body = req.body as IUpdatePopularDestinationReqBody;
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
       const configModel = this.Model.AgencyB2CConfigModel(trx);
       const CommonModel = this.Model.CommonModel(trx);
 
@@ -531,6 +548,14 @@ export class AgentB2CSubConfigService extends AbstractServices {
         payload.thumbnail = files[0].filename;
       }
 
+      if (!Object.keys(payload).length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+        };
+      }
+
       await configModel.updatePopularDestination(payload, { agency_id, id });
 
       if (payload.thumbnail && check.thumbnail) {
@@ -555,7 +580,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
   public async deletePopularDestination(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
       const configModel = this.Model.AgencyB2CConfigModel(trx);
 
       const id = Number(req.params.id);
@@ -596,7 +621,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
   public async getPopularPlace(req: Request) {
     const configModel = this.Model.AgencyB2CConfigModel();
-    const { agency_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyUser;
 
     const popular_places = await configModel.getPopularPlaces({
       agency_id,
@@ -614,7 +639,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
     return this.db.transaction(async (trx) => {
       const configModel = this.Model.AgencyB2CConfigModel(trx);
       const CommonModel = this.Model.CommonModel(trx);
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
 
       const body = req.body as ICreatePopularPlaceReqBody;
 
@@ -675,7 +700,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async updatePopularPlace(req: Request) {
     return this.db.transaction(async (trx) => {
       const body = req.body as IUpdatePopularPlaceReqBody;
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
       const configModel = this.Model.AgencyB2CConfigModel(trx);
       const CommonModel = this.Model.CommonModel(trx);
 
@@ -716,6 +741,14 @@ export class AgentB2CSubConfigService extends AbstractServices {
         payload.thumbnail = files[0].filename;
       }
 
+      if (!Object.keys(payload).length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+        };
+      }
+
       await configModel.updatePopularPlace(payload, { agency_id, id });
 
       if (payload.thumbnail && check.thumbnail) {
@@ -741,7 +774,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
   public async deletePopularPlace(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
       const configModel = this.Model.AgencyB2CConfigModel(trx);
 
       const id = Number(req.params.id);
@@ -782,7 +815,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
   public async getHotDeals(req: Request) {
     const configModel = this.Model.AgencyB2CConfigModel();
-    const { agency_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyUser;
 
     const hotDeals = await configModel.getHotDeals({
       agency_id,
@@ -799,7 +832,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async createHotDeals(req: Request) {
     return this.db.transaction(async (trx) => {
       const configModel = this.Model.AgencyB2CConfigModel(trx);
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
 
       const body = req.body as ICreateHotDealsReqBody;
 
@@ -848,9 +881,8 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async updateHotDeals(req: Request) {
     return this.db.transaction(async (trx) => {
       const body = req.body as IUpdateHotDealsReqBody;
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
       const configModel = this.Model.AgencyB2CConfigModel(trx);
-      const CommonModel = this.Model.CommonModel(trx);
 
       const id = Number(req.params.id);
 
@@ -873,6 +905,14 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
       if (files.length) {
         payload.thumbnail = files[0].filename;
+      }
+
+      if (!Object.keys(payload).length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+        };
       }
 
       await configModel.updateHotDeals(payload, { agency_id, id });
@@ -900,7 +940,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
   public async deleteHotDeals(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
       const configModel = this.Model.AgencyB2CConfigModel(trx);
 
       const id = Number(req.params.id);

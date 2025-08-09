@@ -77,7 +77,7 @@ export default class OthersModel extends Schema {
   public async createAccount(payload: ICreateBankAccountPayload) {
     return await this.db("account_details")
       .withSchema(this.DBO_SCHEMA)
-      .insert(payload);
+      .insert(payload, "id");
   }
 
   public async getAccount(

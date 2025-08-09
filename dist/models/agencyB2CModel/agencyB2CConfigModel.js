@@ -22,7 +22,7 @@ class AgencyB2CConfigModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db("hero_bg_content")
                 .withSchema(this.AGENT_B2C_SCHEMA)
-                .insert(payload);
+                .insert(payload, "id");
         });
     }
     getHeroBGContent(query) {

@@ -46,7 +46,7 @@ export default class AgencyB2CConfigModel extends Schema {
   ) {
     return await this.db("hero_bg_content")
       .withSchema(this.AGENT_B2C_SCHEMA)
-      .insert(payload);
+      .insert(payload, "id");
   }
 
   public async getHeroBGContent(
