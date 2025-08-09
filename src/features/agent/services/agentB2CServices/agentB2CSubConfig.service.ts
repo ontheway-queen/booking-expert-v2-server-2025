@@ -3,14 +3,20 @@ import { Request } from "express";
 import {
   ICreateBankAccountReqBody,
   ICreateHeroBGContentReqBody,
+  ICreateHotDealsReqBody,
   ICreatePopularDestinationReqBody,
+  ICreatePopularPlaceReqBody,
   IUpdateBankAccountReqBody,
   IUpdateHeroBGContentReqBody,
+  IUpdateHotDealsReqBody,
   IUpdatePopularDestinationReqBody,
+  IUpdatePopularPlaceReqBody,
 } from "../../utils/types/agentB2CSubTypes/agentB2CSubConfig.types";
 import {
   IUpdateAgencyB2CHeroBgContentPayload,
+  IUpdateAgencyB2CHotDealsPayload,
   IUpdateAgencyB2CPopularDestinationPayload,
+  IUpdateAgencyB2CPopularPlace,
 } from "../../../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types";
 
 export class AgentB2CSubConfigService extends AbstractServices {
@@ -249,7 +255,6 @@ export class AgentB2CSubConfigService extends AbstractServices {
           body.tab || "all tab"
         }(${files[0].filename}).`,
         payload: JSON.stringify({
-          agency_id,
           ...body,
           content: files[0].filename,
           order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
@@ -434,7 +439,6 @@ export class AgentB2CSubConfigService extends AbstractServices {
         created_by: user_id,
         details: `New popular destination is created.`,
         payload: JSON.stringify({
-          agency_id,
           ...body,
           thumbnail: files[0].filename,
           order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
@@ -571,6 +575,343 @@ export class AgentB2CSubConfigService extends AbstractServices {
         agency_id,
         created_by: user_id,
         details: `Deleted Popular destination(${id}).`,
+        type: "DELETE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
+    });
+  }
+
+  public async getPopularPlace(req: Request) {
+    const configModel = this.Model.AgencyB2CConfigModel();
+    const { agency_id } = req.agencyB2CUser;
+
+    const popular_places = await configModel.getPopularPlaces({
+      agency_id,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: popular_places,
+    };
+  }
+
+  public async createPopularPlace(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+      const CommonModel = this.Model.CommonModel(trx);
+      const { agency_id, user_id } = req.agencyB2CUser;
+
+      const body = req.body as ICreatePopularPlaceReqBody;
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      if (!files.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: "Thumbnail is required",
+        };
+      }
+
+      const checkCountry = await CommonModel.getCountry({
+        id: body.country_id,
+      });
+
+      if (!checkCountry.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: "Country not found.",
+        };
+      }
+
+      const lastOrderNumber = await configModel.getPopularPlaceLastNo({
+        agency_id,
+      });
+
+      await configModel.insertPopularPlaces({
+        agency_id,
+        ...body,
+        thumbnail: files[0].filename,
+        order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
+      });
+
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `New popular place is created.`,
+        payload: JSON.stringify({
+          ...body,
+          thumbnail: files[0].filename,
+          order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
+        }),
+        type: "CREATE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: { thumbnail: files[0].filename },
+      };
+    });
+  }
+
+  public async updatePopularPlace(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const body = req.body as IUpdatePopularPlaceReqBody;
+      const { agency_id, user_id } = req.agencyB2CUser;
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const id = Number(req.params.id);
+
+      const check = await configModel.checkPopularPlace({
+        agency_id,
+        id,
+      });
+
+      if (!check) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      if (body.country_id) {
+        const checkCountry = await CommonModel.getCountry({
+          id: body.country_id,
+        });
+
+        if (!checkCountry.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_NOT_FOUND,
+            message: "Country not found.",
+          };
+        }
+      }
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      const payload: IUpdateAgencyB2CPopularPlace = body;
+
+      if (files.length) {
+        payload.thumbnail = files[0].filename;
+      }
+
+      await configModel.updatePopularPlace(payload, { agency_id, id });
+
+      if (payload.thumbnail && check.thumbnail) {
+        await this.manageFile.deleteFromCloud([check.thumbnail]);
+      }
+
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `Popular place(${id}) is updated.`,
+        payload: JSON.stringify(payload),
+        type: "UPDATE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: { content: payload.thumbnail },
+      };
+    });
+  }
+
+  public async deletePopularPlace(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id, user_id } = req.agencyB2CUser;
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+
+      const id = Number(req.params.id);
+
+      const check = await configModel.checkPopularPlace({
+        agency_id,
+        id,
+      });
+
+      if (!check) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      await configModel.deletePopularPlace({ agency_id, id });
+
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `Deleted Popular place(${id}).`,
+        type: "DELETE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
+    });
+  }
+
+  public async getHotDeals(req: Request) {
+    const configModel = this.Model.AgencyB2CConfigModel();
+    const { agency_id } = req.agencyB2CUser;
+
+    const hotDeals = await configModel.getHotDeals({
+      agency_id,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: hotDeals,
+    };
+  }
+
+  public async createHotDeals(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+      const { agency_id, user_id } = req.agencyB2CUser;
+
+      const body = req.body as ICreateHotDealsReqBody;
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      if (!files.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: "Thumbnail is required",
+        };
+      }
+
+      const lastOrderNumber = await configModel.getHotDealsLastNo({
+        agency_id,
+      });
+
+      await configModel.insertHotDeals({
+        agency_id,
+        ...body,
+        thumbnail: files[0].filename,
+        order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
+      });
+
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `New Hot deals is created.`,
+        payload: JSON.stringify({
+          ...body,
+          thumbnail: files[0].filename,
+          order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
+        }),
+        type: "CREATE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: { thumbnail: files[0].filename },
+      };
+    });
+  }
+
+  public async updateHotDeals(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const body = req.body as IUpdateHotDealsReqBody;
+      const { agency_id, user_id } = req.agencyB2CUser;
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const id = Number(req.params.id);
+
+      const check = await configModel.checkHotDeals({
+        agency_id,
+        id,
+      });
+
+      if (!check) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      const payload: IUpdateAgencyB2CHotDealsPayload = body;
+
+      if (files.length) {
+        payload.thumbnail = files[0].filename;
+      }
+
+      await configModel.updateHotDeals(payload, { agency_id, id });
+
+      if (payload.thumbnail && check.thumbnail) {
+        await this.manageFile.deleteFromCloud([check.thumbnail]);
+      }
+
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `Hot deals(${id}) is updated.`,
+        payload: JSON.stringify(payload),
+        type: "UPDATE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: { content: payload.thumbnail },
+      };
+    });
+  }
+
+  public async deleteHotDeals(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id, user_id } = req.agencyB2CUser;
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+
+      const id = Number(req.params.id);
+
+      const check = await configModel.checkHotDeals({
+        agency_id,
+        id,
+      });
+
+      if (!check) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      await configModel.deleteHotDeals({ agency_id, id });
+
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `Deleted Hot deals(${id}).`,
         type: "DELETE",
       });
 

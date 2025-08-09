@@ -137,8 +137,8 @@ export interface IGetAgencyB2CPopularPlaceData {
 }
 
 export interface IUpdateAgencyB2CPopularPlace {
-  thumbnail: string;
-  order_number: number;
+  thumbnail?: string;
+  order_number?: number;
   short_description?: string;
   location_id?: number;
   location_type?: string;

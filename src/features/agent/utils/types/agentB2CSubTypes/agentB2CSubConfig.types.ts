@@ -76,3 +76,31 @@ export interface IUpdatePopularDestinationReqBody {
   status?: boolean;
   order_number?: number;
 }
+export interface ICreatePopularPlaceReqBody {
+  country_id: number;
+  location_id: number;
+  location_type: string;
+  location_name: string;
+  short_description: string;
+}
+
+export interface IUpdatePopularPlaceReqBody {
+  country_id?: number;
+  location_id?: number;
+  location_type?: string;
+  location_name?: string;
+  short_description?: string;
+  order_number?: number;
+  status?: boolean;
+}
+export interface ICreateHotDealsReqBody {
+  title: string;
+  link: string;
+}
+
+export interface IUpdateHotDealsReqBody {
+  title?: string;
+  link?: string;
+  order_number?: number;
+  status?: boolean;
+}

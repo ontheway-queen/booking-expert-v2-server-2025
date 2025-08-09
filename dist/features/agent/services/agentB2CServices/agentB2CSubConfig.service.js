@@ -216,7 +216,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     agency_id,
                     created_by: user_id,
                     details: `New bg content(${body.type}) created for ${body.tab || "all tab"}(${files[0].filename}).`,
-                    payload: JSON.stringify(Object.assign(Object.assign({ agency_id }, body), { content: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 })),
+                    payload: JSON.stringify(Object.assign(Object.assign({}, body), { content: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 })),
                     type: "CREATE",
                 });
                 return {
@@ -367,7 +367,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     agency_id,
                     created_by: user_id,
                     details: `New popular destination is created.`,
-                    payload: JSON.stringify(Object.assign(Object.assign({ agency_id }, body), { thumbnail: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 })),
+                    payload: JSON.stringify(Object.assign(Object.assign({}, body), { thumbnail: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 })),
                     type: "CREATE",
                 });
                 return {
@@ -481,6 +481,279 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     agency_id,
                     created_by: user_id,
                     details: `Deleted Popular destination(${id}).`,
+                    type: "DELETE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }));
+        });
+    }
+    getPopularPlace(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const configModel = this.Model.AgencyB2CConfigModel();
+            const { agency_id } = req.agencyB2CUser;
+            const popular_places = yield configModel.getPopularPlaces({
+                agency_id,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: popular_places,
+            };
+        });
+    }
+    createPopularPlace(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const CommonModel = this.Model.CommonModel(trx);
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const body = req.body;
+                const files = req.files || [];
+                if (!files.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "Thumbnail is required",
+                    };
+                }
+                const checkCountry = yield CommonModel.getCountry({
+                    id: body.country_id,
+                });
+                if (!checkCountry.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: "Country not found.",
+                    };
+                }
+                const lastOrderNumber = yield configModel.getPopularPlaceLastNo({
+                    agency_id,
+                });
+                yield configModel.insertPopularPlaces(Object.assign(Object.assign({ agency_id }, body), { thumbnail: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 }));
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `New popular place is created.`,
+                    payload: JSON.stringify(Object.assign(Object.assign({}, body), { thumbnail: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 })),
+                    type: "CREATE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: { thumbnail: files[0].filename },
+                };
+            }));
+        });
+    }
+    updatePopularPlace(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const body = req.body;
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const CommonModel = this.Model.CommonModel(trx);
+                const id = Number(req.params.id);
+                const check = yield configModel.checkPopularPlace({
+                    agency_id,
+                    id,
+                });
+                if (!check) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                if (body.country_id) {
+                    const checkCountry = yield CommonModel.getCountry({
+                        id: body.country_id,
+                    });
+                    if (!checkCountry.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_NOT_FOUND,
+                            message: "Country not found.",
+                        };
+                    }
+                }
+                const files = req.files || [];
+                const payload = body;
+                if (files.length) {
+                    payload.thumbnail = files[0].filename;
+                }
+                yield configModel.updatePopularPlace(payload, { agency_id, id });
+                if (payload.thumbnail && check.thumbnail) {
+                    yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                }
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `Popular place(${id}) is updated.`,
+                    payload: JSON.stringify(payload),
+                    type: "UPDATE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: { content: payload.thumbnail },
+                };
+            }));
+        });
+    }
+    deletePopularPlace(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const id = Number(req.params.id);
+                const check = yield configModel.checkPopularPlace({
+                    agency_id,
+                    id,
+                });
+                if (!check) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                yield configModel.deletePopularPlace({ agency_id, id });
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `Deleted Popular place(${id}).`,
+                    type: "DELETE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }));
+        });
+    }
+    getHotDeals(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const configModel = this.Model.AgencyB2CConfigModel();
+            const { agency_id } = req.agencyB2CUser;
+            const hotDeals = yield configModel.getHotDeals({
+                agency_id,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: hotDeals,
+            };
+        });
+    }
+    createHotDeals(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const body = req.body;
+                const files = req.files || [];
+                if (!files.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "Thumbnail is required",
+                    };
+                }
+                const lastOrderNumber = yield configModel.getHotDealsLastNo({
+                    agency_id,
+                });
+                yield configModel.insertHotDeals(Object.assign(Object.assign({ agency_id }, body), { thumbnail: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 }));
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `New Hot deals is created.`,
+                    payload: JSON.stringify(Object.assign(Object.assign({}, body), { thumbnail: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 })),
+                    type: "CREATE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: { thumbnail: files[0].filename },
+                };
+            }));
+        });
+    }
+    updateHotDeals(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const body = req.body;
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const CommonModel = this.Model.CommonModel(trx);
+                const id = Number(req.params.id);
+                const check = yield configModel.checkHotDeals({
+                    agency_id,
+                    id,
+                });
+                if (!check) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const files = req.files || [];
+                const payload = body;
+                if (files.length) {
+                    payload.thumbnail = files[0].filename;
+                }
+                yield configModel.updateHotDeals(payload, { agency_id, id });
+                if (payload.thumbnail && check.thumbnail) {
+                    yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                }
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `Hot deals(${id}) is updated.`,
+                    payload: JSON.stringify(payload),
+                    type: "UPDATE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: { content: payload.thumbnail },
+                };
+            }));
+        });
+    }
+    deleteHotDeals(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const id = Number(req.params.id);
+                const check = yield configModel.checkHotDeals({
+                    agency_id,
+                    id,
+                });
+                if (!check) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                yield configModel.deleteHotDeals({ agency_id, id });
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `Deleted Hot deals(${id}).`,
                     type: "DELETE",
                 });
                 return {
