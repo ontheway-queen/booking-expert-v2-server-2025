@@ -179,5 +179,317 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
             };
         });
     }
+    getHeroBGContent(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const configModel = this.Model.AgencyB2CConfigModel();
+            const { agency_id } = req.agencyB2CUser;
+            const hero_bg_data = yield configModel.getHeroBGContent({
+                agency_id,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: hero_bg_data,
+            };
+        });
+    }
+    createHeroBGContent(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const body = req.body;
+                const files = req.files || [];
+                if (!files.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "Content is required",
+                    };
+                }
+                const lastOrderNumber = yield configModel.getHeroBGContentLastNo({
+                    agency_id,
+                });
+                yield configModel.insertHeroBGContent(Object.assign(Object.assign({ agency_id }, body), { content: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 }));
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `New bg content(${body.type}) created for ${body.tab || "all tab"}(${files[0].filename}).`,
+                    payload: JSON.stringify(Object.assign(Object.assign({ agency_id }, body), { content: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 })),
+                    type: "CREATE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: {
+                        content: files[0].filename,
+                    },
+                };
+            }));
+        });
+    }
+    updateHeroBGContent(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const body = req.body;
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const id = Number(req.params.id);
+                const check = yield configModel.checkHeroBGContent({ agency_id, id });
+                if (!check.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const files = req.files || [];
+                const payload = body;
+                if (files.length) {
+                    payload.content = files[0].filename;
+                }
+                yield configModel.updateHeroBGContent(payload, { agency_id, id });
+                if (payload.content && check[0].content) {
+                    yield this.manageFile.deleteFromCloud([check[0].content]);
+                }
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `BG content(${id}) is updated.`,
+                    payload: JSON.stringify(payload),
+                    type: "CREATE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: { content: payload.content },
+                };
+            }));
+        });
+    }
+    deleteHeroBGContent(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const id = Number(req.params.id);
+                const check = yield configModel.checkHeroBGContent({ agency_id, id });
+                if (!check.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                yield configModel.deleteHeroBGContent({ agency_id, id });
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `Deleted BG content(${id}).`,
+                    type: "DELETE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }));
+        });
+    }
+    getPopularDestination(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const configModel = this.Model.AgencyB2CConfigModel();
+            const { agency_id } = req.agencyB2CUser;
+            const popular_destinations = yield configModel.getPopularDestination({
+                agency_id,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: popular_destinations,
+            };
+        });
+    }
+    createPopularDestination(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const CommonModel = this.Model.CommonModel(trx);
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const body = req.body;
+                const files = req.files || [];
+                if (!files.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: "Thumbnail is required",
+                    };
+                }
+                const checkCountry = yield CommonModel.getCountry({
+                    id: body.country_id,
+                });
+                if (!checkCountry.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: "Country not found.",
+                    };
+                }
+                const checkFromAirport = yield CommonModel.getAirport({
+                    id: body.from_airport,
+                });
+                if (!checkFromAirport.data.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: "From Airport not found.",
+                    };
+                }
+                const toAirport = yield CommonModel.getAirport({
+                    id: body.to_airport,
+                });
+                if (!toAirport.data.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: "To Airport not found.",
+                    };
+                }
+                const lastOrderNumber = yield configModel.getPopularDestinationLastNo({
+                    agency_id,
+                });
+                yield configModel.insertPopularDestination(Object.assign(Object.assign({ agency_id }, body), { thumbnail: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 }));
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `New popular destination is created.`,
+                    payload: JSON.stringify(Object.assign(Object.assign({ agency_id }, body), { thumbnail: files[0].filename, order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1 })),
+                    type: "CREATE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: { thumbnail: files[0].filename },
+                };
+            }));
+        });
+    }
+    updatePopularDestination(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const body = req.body;
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const CommonModel = this.Model.CommonModel(trx);
+                const id = Number(req.params.id);
+                const check = yield configModel.checkPopularDestination({
+                    agency_id,
+                    id,
+                });
+                if (!check) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                if (body.country_id) {
+                    const checkCountry = yield CommonModel.getCountry({
+                        id: body.country_id,
+                    });
+                    if (!checkCountry.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_NOT_FOUND,
+                            message: "Country not found.",
+                        };
+                    }
+                }
+                if (body.from_airport) {
+                    const checkFromAirport = yield CommonModel.getAirport({
+                        id: body.from_airport,
+                    });
+                    if (!checkFromAirport.data.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_NOT_FOUND,
+                            message: "From Airport not found.",
+                        };
+                    }
+                }
+                if (body.to_airport) {
+                    const toAirport = yield CommonModel.getAirport({
+                        id: body.to_airport,
+                    });
+                    if (!toAirport.data.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_NOT_FOUND,
+                            message: "To Airport not found.",
+                        };
+                    }
+                }
+                const files = req.files || [];
+                const payload = body;
+                if (files.length) {
+                    payload.thumbnail = files[0].filename;
+                }
+                yield configModel.updatePopularDestination(payload, { agency_id, id });
+                if (payload.thumbnail && check.thumbnail) {
+                    yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                }
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `Popular destination(${id}) is updated.`,
+                    payload: JSON.stringify(payload),
+                    type: "UPDATE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: { content: payload.thumbnail },
+                };
+            }));
+        });
+    }
+    deletePopularDestination(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id, user_id } = req.agencyB2CUser;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const id = Number(req.params.id);
+                const check = yield configModel.checkPopularDestination({
+                    agency_id,
+                    id,
+                });
+                if (!check) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                yield configModel.deletePopularDestination({ agency_id, id });
+                yield this.insertAgentAudit(trx, {
+                    agency_id,
+                    created_by: user_id,
+                    details: `Deleted Popular destination(${id}).`,
+                    type: "DELETE",
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }));
+        });
+    }
 }
 exports.AgentB2CSubConfigService = AgentB2CSubConfigService;

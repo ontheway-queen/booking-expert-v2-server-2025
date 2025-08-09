@@ -1,6 +1,13 @@
 import {
   CONTENT_TYPE_PHOTO,
   CONTENT_TYPE_VIDEO,
+  FUNCTION_TYPE_BLOG,
+  FUNCTION_TYPE_FLIGHT,
+  FUNCTION_TYPE_GROUP,
+  FUNCTION_TYPE_HOLIDAY,
+  FUNCTION_TYPE_HOTEL,
+  FUNCTION_TYPE_UMRAH,
+  FUNCTION_TYPE_VISA,
 } from "../../miscellaneous/constants";
 
 export interface ICreateAgencyB2CHeroBgContentPayload {
@@ -8,11 +15,32 @@ export interface ICreateAgencyB2CHeroBgContentPayload {
   agency_id: number;
   order_number: number;
   content: string;
+  quote?: string;
+  sub_quote?: string;
+  tab?:
+    | typeof FUNCTION_TYPE_FLIGHT
+    | typeof FUNCTION_TYPE_HOTEL
+    | typeof FUNCTION_TYPE_HOLIDAY
+    | typeof FUNCTION_TYPE_VISA
+    | typeof FUNCTION_TYPE_GROUP
+    | typeof FUNCTION_TYPE_BLOG
+    | typeof FUNCTION_TYPE_UMRAH;
 }
 
 export interface IUpdateAgencyB2CHeroBgContentPayload {
-  order_number: number;
-  content: string;
+  order_number?: number;
+  type?: typeof CONTENT_TYPE_PHOTO | typeof CONTENT_TYPE_VIDEO;
+  content?: string;
+  quote?: string;
+  sub_quote?: string;
+  tab?:
+    | typeof FUNCTION_TYPE_FLIGHT
+    | typeof FUNCTION_TYPE_HOTEL
+    | typeof FUNCTION_TYPE_HOLIDAY
+    | typeof FUNCTION_TYPE_VISA
+    | typeof FUNCTION_TYPE_GROUP
+    | typeof FUNCTION_TYPE_BLOG
+    | typeof FUNCTION_TYPE_UMRAH;
 }
 
 export interface IGetAgencyB2CHeroBgContentQuery {
@@ -40,7 +68,7 @@ export interface ICreateAgencyB2CPopularDestinationPayload {
 }
 export interface IUpdateAgencyB2CPopularDestinationPayload {
   thumbnail?: string;
-  order_number: number;
+  order_number?: number;
   country_id?: number;
   from_airport?: number;
   to_airport?: number;

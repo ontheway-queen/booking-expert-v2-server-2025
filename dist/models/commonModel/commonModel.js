@@ -272,6 +272,9 @@ class CommonModel extends schema_1.default {
                 if (params.country_id) {
                     qb.where("air.country_id", params.country_id);
                 }
+                if (params.id) {
+                    qb.where("air.id", params.id);
+                }
                 if (params.code) {
                     qb.orWhere("air.iata_code", params.code);
                 }

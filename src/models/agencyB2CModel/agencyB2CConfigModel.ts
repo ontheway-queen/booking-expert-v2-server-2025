@@ -28,6 +28,7 @@ import {
   IGetAgencyB2CPopUpBannerQuery,
   IGetAgencyB2CPopUpBannerData,
   IUpdateAgencyB2CPopUpBannerPayload,
+  IUpdateAgencyB2CPopularDestinationPayload,
 } from "../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types";
 
 export default class AgencyB2CConfigModel extends Schema {
@@ -171,7 +172,7 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async updatePopularDestination(
-    payload: IUpdateAgencyB2CHeroBgContentPayload,
+    payload: IUpdateAgencyB2CPopularDestinationPayload,
     where: {
       agency_id: number;
       id: number;

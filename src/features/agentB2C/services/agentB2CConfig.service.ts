@@ -40,7 +40,7 @@ export class AgentB2CConfigService extends AbstractServices {
         status: true,
       });
 
-      const hot_deals = await configModel.getPopularDestination({
+      const hot_deals = await configModel.getHotDeals({
         agency_id,
         status: true,
       });
@@ -50,7 +50,7 @@ export class AgentB2CConfigService extends AbstractServices {
         status: true,
       });
 
-      const popular_places = await configModel.getPopularDestination({
+      const popular_places = await configModel.getPopularPlaces({
         agency_id,
         status: true,
       });

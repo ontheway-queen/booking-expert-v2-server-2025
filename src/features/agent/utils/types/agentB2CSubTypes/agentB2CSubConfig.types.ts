@@ -1,3 +1,15 @@
+import {
+  CONTENT_TYPE_PHOTO,
+  CONTENT_TYPE_VIDEO,
+  FUNCTION_TYPE_FLIGHT,
+  FUNCTION_TYPE_HOTEL,
+  FUNCTION_TYPE_BLOG,
+  FUNCTION_TYPE_GROUP,
+  FUNCTION_TYPE_HOLIDAY,
+  FUNCTION_TYPE_UMRAH,
+  FUNCTION_TYPE_VISA,
+} from "../../../../../utils/miscellaneous/constants";
+
 export interface IUpdateBankAccountReqBody {
   account_name?: string;
   account_number?: string;
@@ -20,4 +32,47 @@ export interface IUpSertPopUpBannerReqBody {
   status?: boolean;
   description?: string;
   link?: string;
+}
+
+export interface ICreateHeroBGContentReqBody {
+  type: typeof CONTENT_TYPE_PHOTO | typeof CONTENT_TYPE_VIDEO;
+  quote?: string;
+  sub_quote?: string;
+  tab?:
+    | typeof FUNCTION_TYPE_FLIGHT
+    | typeof FUNCTION_TYPE_HOTEL
+    | typeof FUNCTION_TYPE_HOLIDAY
+    | typeof FUNCTION_TYPE_VISA
+    | typeof FUNCTION_TYPE_GROUP
+    | typeof FUNCTION_TYPE_BLOG
+    | typeof FUNCTION_TYPE_UMRAH;
+}
+
+export interface IUpdateHeroBGContentReqBody {
+  type?: typeof CONTENT_TYPE_PHOTO | typeof CONTENT_TYPE_VIDEO;
+  quote?: string;
+  sub_quote?: string;
+  tab?:
+    | typeof FUNCTION_TYPE_FLIGHT
+    | typeof FUNCTION_TYPE_HOTEL
+    | typeof FUNCTION_TYPE_HOLIDAY
+    | typeof FUNCTION_TYPE_VISA
+    | typeof FUNCTION_TYPE_GROUP
+    | typeof FUNCTION_TYPE_BLOG
+    | typeof FUNCTION_TYPE_UMRAH;
+  status?: boolean;
+  order_number?: number;
+}
+
+export interface ICreatePopularDestinationReqBody {
+  country_id: number;
+  from_airport: number;
+  to_airport: number;
+}
+export interface IUpdatePopularDestinationReqBody {
+  country_id?: number;
+  from_airport?: number;
+  to_airport?: number;
+  status?: boolean;
+  order_number?: number;
 }

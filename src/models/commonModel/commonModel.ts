@@ -311,6 +311,7 @@ class CommonModel extends Schema {
   public async getAirport(
     params: {
       country_id?: number;
+      id?: number;
       name?: string;
       code?: string;
       limit?: number;
@@ -335,6 +336,11 @@ class CommonModel extends Schema {
         if (params.country_id) {
           qb.where("air.country_id", params.country_id);
         }
+
+        if (params.id) {
+          qb.where("air.id", params.id);
+        }
+
         if (params.code) {
           qb.orWhere("air.iata_code", params.code);
         }

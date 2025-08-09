@@ -2,8 +2,16 @@ import AbstractServices from "../../../../abstract/abstract.service";
 import { Request } from "express";
 import {
   ICreateBankAccountReqBody,
+  ICreateHeroBGContentReqBody,
+  ICreatePopularDestinationReqBody,
   IUpdateBankAccountReqBody,
+  IUpdateHeroBGContentReqBody,
+  IUpdatePopularDestinationReqBody,
 } from "../../utils/types/agentB2CSubTypes/agentB2CSubConfig.types";
+import {
+  IUpdateAgencyB2CHeroBgContentPayload,
+  IUpdateAgencyB2CPopularDestinationPayload,
+} from "../../../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types";
 
 export class AgentB2CSubConfigService extends AbstractServices {
   public async getB2CMarkup(req: Request) {
@@ -188,5 +196,389 @@ export class AgentB2CSubConfigService extends AbstractServices {
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
     };
+  }
+
+  public async getHeroBGContent(req: Request) {
+    const configModel = this.Model.AgencyB2CConfigModel();
+    const { agency_id } = req.agencyB2CUser;
+
+    const hero_bg_data = await configModel.getHeroBGContent({
+      agency_id,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: hero_bg_data,
+    };
+  }
+
+  public async createHeroBGContent(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+      const { agency_id, user_id } = req.agencyB2CUser;
+
+      const body = req.body as ICreateHeroBGContentReqBody;
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      if (!files.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: "Content is required",
+        };
+      }
+
+      const lastOrderNumber = await configModel.getHeroBGContentLastNo({
+        agency_id,
+      });
+
+      await configModel.insertHeroBGContent({
+        agency_id,
+        ...body,
+        content: files[0].filename,
+        order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
+      });
+
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `New bg content(${body.type}) created for ${
+          body.tab || "all tab"
+        }(${files[0].filename}).`,
+        payload: JSON.stringify({
+          agency_id,
+          ...body,
+          content: files[0].filename,
+          order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
+        }),
+        type: "CREATE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: {
+          content: files[0].filename,
+        },
+      };
+    });
+  }
+
+  public async updateHeroBGContent(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const body = req.body as IUpdateHeroBGContentReqBody;
+      const { agency_id, user_id } = req.agencyB2CUser;
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+
+      const id = Number(req.params.id);
+
+      const check = await configModel.checkHeroBGContent({ agency_id, id });
+
+      if (!check.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      const payload: IUpdateAgencyB2CHeroBgContentPayload = body;
+
+      if (files.length) {
+        payload.content = files[0].filename;
+      }
+
+      await configModel.updateHeroBGContent(payload, { agency_id, id });
+
+      if (payload.content && check[0].content) {
+        await this.manageFile.deleteFromCloud([check[0].content]);
+      }
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `BG content(${id}) is updated.`,
+        payload: JSON.stringify(payload),
+        type: "CREATE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: { content: payload.content },
+      };
+    });
+  }
+
+  public async deleteHeroBGContent(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id, user_id } = req.agencyB2CUser;
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+
+      const id = Number(req.params.id);
+
+      const check = await configModel.checkHeroBGContent({ agency_id, id });
+
+      if (!check.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      await configModel.deleteHeroBGContent({ agency_id, id });
+
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `Deleted BG content(${id}).`,
+        type: "DELETE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
+    });
+  }
+
+  public async getPopularDestination(req: Request) {
+    const configModel = this.Model.AgencyB2CConfigModel();
+    const { agency_id } = req.agencyB2CUser;
+
+    const popular_destinations = await configModel.getPopularDestination({
+      agency_id,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: popular_destinations,
+    };
+  }
+
+  public async createPopularDestination(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+      const CommonModel = this.Model.CommonModel(trx);
+      const { agency_id, user_id } = req.agencyB2CUser;
+
+      const body = req.body as ICreatePopularDestinationReqBody;
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      if (!files.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: "Thumbnail is required",
+        };
+      }
+
+      const checkCountry = await CommonModel.getCountry({
+        id: body.country_id,
+      });
+
+      if (!checkCountry.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: "Country not found.",
+        };
+      }
+      const checkFromAirport = await CommonModel.getAirport({
+        id: body.from_airport,
+      });
+
+      if (!checkFromAirport.data.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: "From Airport not found.",
+        };
+      }
+      const toAirport = await CommonModel.getAirport({
+        id: body.to_airport,
+      });
+
+      if (!toAirport.data.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: "To Airport not found.",
+        };
+      }
+
+      const lastOrderNumber = await configModel.getPopularDestinationLastNo({
+        agency_id,
+      });
+
+      await configModel.insertPopularDestination({
+        agency_id,
+        ...body,
+        thumbnail: files[0].filename,
+        order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
+      });
+
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `New popular destination is created.`,
+        payload: JSON.stringify({
+          agency_id,
+          ...body,
+          thumbnail: files[0].filename,
+          order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
+        }),
+        type: "CREATE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: { thumbnail: files[0].filename },
+      };
+    });
+  }
+
+  public async updatePopularDestination(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const body = req.body as IUpdatePopularDestinationReqBody;
+      const { agency_id, user_id } = req.agencyB2CUser;
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const id = Number(req.params.id);
+
+      const check = await configModel.checkPopularDestination({
+        agency_id,
+        id,
+      });
+
+      if (!check) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      if (body.country_id) {
+        const checkCountry = await CommonModel.getCountry({
+          id: body.country_id,
+        });
+
+        if (!checkCountry.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_NOT_FOUND,
+            message: "Country not found.",
+          };
+        }
+      }
+
+      if (body.from_airport) {
+        const checkFromAirport = await CommonModel.getAirport({
+          id: body.from_airport,
+        });
+
+        if (!checkFromAirport.data.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_NOT_FOUND,
+            message: "From Airport not found.",
+          };
+        }
+      }
+
+      if (body.to_airport) {
+        const toAirport = await CommonModel.getAirport({
+          id: body.to_airport,
+        });
+
+        if (!toAirport.data.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_NOT_FOUND,
+            message: "To Airport not found.",
+          };
+        }
+      }
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      const payload: IUpdateAgencyB2CPopularDestinationPayload = body;
+
+      if (files.length) {
+        payload.thumbnail = files[0].filename;
+      }
+
+      await configModel.updatePopularDestination(payload, { agency_id, id });
+
+      if (payload.thumbnail && check.thumbnail) {
+        await this.manageFile.deleteFromCloud([check.thumbnail]);
+      }
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `Popular destination(${id}) is updated.`,
+        payload: JSON.stringify(payload),
+        type: "UPDATE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: { content: payload.thumbnail },
+      };
+    });
+  }
+
+  public async deletePopularDestination(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id, user_id } = req.agencyB2CUser;
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+
+      const id = Number(req.params.id);
+
+      const check = await configModel.checkPopularDestination({
+        agency_id,
+        id,
+      });
+
+      if (!check) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      await configModel.deletePopularDestination({ agency_id, id });
+
+      await this.insertAgentAudit(trx, {
+        agency_id,
+        created_by: user_id,
+        details: `Deleted Popular destination(${id}).`,
+        type: "DELETE",
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
+    });
   }
 }

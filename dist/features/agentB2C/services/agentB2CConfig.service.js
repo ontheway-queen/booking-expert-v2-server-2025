@@ -47,7 +47,7 @@ class AgentB2CConfigService extends abstract_service_1.default {
                     agency_id,
                     status: true,
                 });
-                const hot_deals = yield configModel.getPopularDestination({
+                const hot_deals = yield configModel.getHotDeals({
                     agency_id,
                     status: true,
                 });
@@ -55,7 +55,7 @@ class AgentB2CConfigService extends abstract_service_1.default {
                     agency_id,
                     status: true,
                 });
-                const popular_places = yield configModel.getPopularDestination({
+                const popular_places = yield configModel.getPopularPlaces({
                     agency_id,
                     status: true,
                 });
