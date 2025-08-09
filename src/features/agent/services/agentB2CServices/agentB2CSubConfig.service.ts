@@ -340,6 +340,10 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
       await configModel.deleteHeroBGContent({ agency_id, id });
 
+      if (check[0].content) {
+        await this.manageFile.deleteFromCloud([check[0].content]);
+      }
+
       await this.insertAgentAudit(trx, {
         agency_id,
         created_by: user_id,
@@ -578,6 +582,10 @@ export class AgentB2CSubConfigService extends AbstractServices {
         type: "DELETE",
       });
 
+      if (check.thumbnail) {
+        await this.manageFile.deleteFromCloud([check.thumbnail]);
+      }
+
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
@@ -760,6 +768,10 @@ export class AgentB2CSubConfigService extends AbstractServices {
         type: "DELETE",
       });
 
+      if (check.thumbnail) {
+        await this.manageFile.deleteFromCloud([check.thumbnail]);
+      }
+
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
@@ -907,6 +919,10 @@ export class AgentB2CSubConfigService extends AbstractServices {
       }
 
       await configModel.deleteHotDeals({ agency_id, id });
+
+      if (check.thumbnail) {
+        await this.manageFile.deleteFromCloud([check.thumbnail]);
+      }
 
       await this.insertAgentAudit(trx, {
         agency_id,

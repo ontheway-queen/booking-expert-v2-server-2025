@@ -21,13 +21,15 @@ class AuthRootRouter {
     }
     callRouter() {
         // Agent auth routes
-        this.Router.use('/agent', this.authAgentRouter.router);
+        this.Router.use("/agent", this.authAgentRouter.router);
         // B2C auth routes
-        this.Router.use('/b2c', this.authB2CRouter.router);
+        this.Router.use("/b2c", this.authB2CRouter.router);
         // Admin auth routes
-        this.Router.use('/admin', this.authAdminRouter.router);
+        this.Router.use("/admin", this.authAdminRouter.router);
+        // Sub Agent auth routes
+        this.Router.use("/sub-agent", new authChecker_1.default().whiteLabelAuthChecker, this.authAgentRouter.router);
         // Agent B2C auth routes
-        this.Router.use('/agent-b2c', new authChecker_1.default().whiteLabelAuthChecker, this.authAgentB2CRouter.router);
+        this.Router.use("/agent-b2c", new authChecker_1.default().whiteLabelAuthChecker, this.authAgentB2CRouter.router);
     }
 }
 exports.default = AuthRootRouter;

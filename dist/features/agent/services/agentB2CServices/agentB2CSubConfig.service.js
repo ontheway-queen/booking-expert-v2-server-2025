@@ -285,6 +285,9 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     };
                 }
                 yield configModel.deleteHeroBGContent({ agency_id, id });
+                if (check[0].content) {
+                    yield this.manageFile.deleteFromCloud([check[0].content]);
+                }
                 yield this.insertAgentAudit(trx, {
                     agency_id,
                     created_by: user_id,
@@ -483,6 +486,9 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     details: `Deleted Popular destination(${id}).`,
                     type: "DELETE",
                 });
+                if (check.thumbnail) {
+                    yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -631,6 +637,9 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     details: `Deleted Popular place(${id}).`,
                     type: "DELETE",
                 });
+                if (check.thumbnail) {
+                    yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -750,6 +759,9 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     };
                 }
                 yield configModel.deleteHotDeals({ agency_id, id });
+                if (check.thumbnail) {
+                    yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                }
                 yield this.insertAgentAudit(trx, {
                     agency_id,
                     created_by: user_id,

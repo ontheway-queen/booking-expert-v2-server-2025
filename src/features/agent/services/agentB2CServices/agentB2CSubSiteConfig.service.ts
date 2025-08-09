@@ -387,31 +387,29 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
   }
 
   public async getTermsAndConditionsData(req: Request) {
-    return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyB2CUser;
 
-      const configModel = this.Model.AgencyB2CConfigModel(trx);
-      const siteConfig = await configModel.getSiteConfig({ agency_id });
+    const configModel = this.Model.AgencyB2CConfigModel();
+    const siteConfig = await configModel.getSiteConfig({ agency_id });
 
-      if (!siteConfig) {
-        return {
-          success: false,
-          code: this.StatusCode.HTTP_NOT_FOUND,
-          message: this.ResMsg.HTTP_NOT_FOUND,
-        };
-      }
-
-      const { terms_and_conditions_content } = siteConfig;
-
+    if (!siteConfig) {
       return {
-        success: true,
-        code: this.StatusCode.HTTP_OK,
-        message: this.ResMsg.HTTP_OK,
-        data: {
-          terms_and_conditions_content,
-        },
+        success: false,
+        code: this.StatusCode.HTTP_NOT_FOUND,
+        message: this.ResMsg.HTTP_NOT_FOUND,
       };
-    });
+    }
+
+    const { terms_and_conditions_content } = siteConfig;
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: {
+        terms_and_conditions_content,
+      },
+    };
   }
 
   public async getSocialLinks(req: Request) {
@@ -458,6 +456,10 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         details: `Deleted social media link [${check.media}(${check.link})]`,
         type: "DELETE",
       });
+
+      if (check.icon) {
+        await this.manageFile.deleteFromCloud([check.icon]);
+      }
 
       return {
         success: true,

@@ -33,7 +33,7 @@ class AuthChecker {
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
                 return;
             }
-            const authSplit = authorization.split(' ');
+            const authSplit = authorization.split(" ");
             if (authSplit.length !== 2) {
                 res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
                     success: false,
@@ -85,7 +85,7 @@ class AuthChecker {
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
                 return;
             }
-            const authSplit = authorization.split(' ');
+            const authSplit = authorization.split(" ");
             if (authSplit.length !== 2) {
                 res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
                     success: false,
@@ -138,7 +138,7 @@ class AuthChecker {
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
                 return;
             }
-            const authSplit = authorization.split(' ');
+            const authSplit = authorization.split(" ");
             if (authSplit.length !== 2) {
                 res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
                     success: false,
@@ -159,7 +159,7 @@ class AuthChecker {
                 const checkAgencyUser = yield agencyUserModel.checkUser({ id: user_id });
                 if (checkAgencyUser) {
                     console.log({
-                        type: 'Agent',
+                        type: "Agent",
                         agency_id: checkAgencyUser.agency_id,
                         user_id: checkAgencyUser.id,
                         agency_name: checkAgencyUser.agency_name,
@@ -170,9 +170,9 @@ class AuthChecker {
                             .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
                         return;
                     }
-                    if (checkAgencyUser.agency_status === 'Inactive' ||
-                        checkAgencyUser.agency_status === 'Incomplete' ||
-                        checkAgencyUser.agency_status === 'Rejected') {
+                    if (checkAgencyUser.agency_status === "Inactive" ||
+                        checkAgencyUser.agency_status === "Incomplete" ||
+                        checkAgencyUser.agency_status === "Rejected") {
                         res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
                             success: false,
                             message: responseMessage_1.default.HTTP_UNAUTHORIZED,
@@ -216,7 +216,7 @@ class AuthChecker {
                     .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
                 return;
             }
-            const authSplit = authorization.split(' ');
+            const authSplit = authorization.split(" ");
             if (authSplit.length !== 2) {
                 res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
                     success: false,
@@ -238,7 +238,7 @@ class AuthChecker {
                 const check_agency = yield agencyModel.checkAgency({
                     agency_id,
                 });
-                if (!check_agency || check_agency.status !== 'Active') {
+                if (!check_agency || check_agency.status !== "Active") {
                     res
                         .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                         .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
@@ -297,13 +297,15 @@ class AuthChecker {
                 const check_agency = yield agencyModel.checkAgency({
                     agency_id: check_token === null || check_token === void 0 ? void 0 : check_token.agency_id,
                 });
-                if (!check_agency || check_agency.status !== 'Active') {
+                if (!check_agency ||
+                    check_agency.status !== "Active" ||
+                    !check_agency.white_label) {
                     res
                         .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                         .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
                     return;
                 }
-                const module = req.originalUrl.split('/')[4] || '';
+                const module = req.originalUrl.split("/")[4] || "";
                 req.agencyB2CWhiteLabel = {
                     agency_id: Number(check_token === null || check_token === void 0 ? void 0 : check_token.agency_id),
                     flight: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.flight),
@@ -316,43 +318,43 @@ class AuthChecker {
                 };
                 // Check permission
                 const agencyB2CModules = [
-                    'flight',
-                    'hotel',
-                    'visa',
-                    'holiday',
-                    'umrah',
-                    'group_fare',
-                    'blog',
-                    'agent-b2c',
-                    'profile',
-                    'email-otp',
-                    'traveler',
-                    'config',
+                    "flight",
+                    "hotel",
+                    "visa",
+                    "holiday",
+                    "umrah",
+                    "group_fare",
+                    "blog",
+                    "agent-b2c",
+                    "profile",
+                    "email-otp",
+                    "traveler",
+                    "config",
                 ];
                 console.log({
-                    type: 'White label',
+                    type: "White label",
                     agency_id: check_agency.id,
                     agency_name: check_agency.agency_name,
                     module,
                 });
                 let hasPermission = agencyB2CModules.includes(module);
-                if (!hasPermission) {
-                    res
-                        .status(statusCode_1.default.HTTP_UNAUTHORIZED)
-                        .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
-                    return;
-                }
+                // if (!hasPermission) {
+                //   res
+                //     .status(StatusCode.HTTP_UNAUTHORIZED)
+                //     .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
+                //   return;
+                // }
                 next();
             }
         });
         // Agency B2C API Authorizer
         this.agencyB2CAPIAccessChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            req.agentAPI = { agency_email: '', agency_id: 1, agency_name: '' };
+            req.agentAPI = { agency_email: "", agency_id: 1, agency_name: "" };
             next();
         });
         // External API Authorizer
         this.externalAPIAccessChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            req.external = { external_email: '', external_id: 1, external_name: '' };
+            req.external = { external_email: "", external_id: 1, external_name: "" };
             next();
         });
     }

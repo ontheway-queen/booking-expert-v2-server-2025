@@ -13,9 +13,9 @@ import {
 export interface IUpdateBankAccountReqBody {
   account_name?: string;
   account_number?: string;
-  branch?: string; // Nullable
-  routing_no?: string; // Nullable
-  swift_code?: string; // Nullable
+  branch?: string;
+  routing_no?: string;
+  swift_code?: string;
   status?: boolean;
 }
 export interface ICreateBankAccountReqBody {
@@ -93,6 +93,7 @@ export interface IUpdatePopularPlaceReqBody {
   order_number?: number;
   status?: boolean;
 }
+
 export interface ICreateHotDealsReqBody {
   title: string;
   link: string;

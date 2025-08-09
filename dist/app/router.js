@@ -13,6 +13,7 @@ const agentB2CRoot_router_1 = __importDefault(require("../features/agentB2C/agen
 const externalRoot_router_1 = __importDefault(require("../features/external/externalRoot.router"));
 const authChecker_1 = __importDefault(require("../middleware/authChecker/authChecker"));
 const publicPayment_router_1 = require("../features/public/routers/publicPayment.router");
+const subAgentRoot_router_1 = __importDefault(require("../features/subAgent/subAgentRoot.router"));
 class RootRouter {
     constructor() {
         this.v2Router = (0, express_1.Router)();
@@ -22,6 +23,7 @@ class RootRouter {
         this.b2cRootRouter = new b2cRoot_router_1.default();
         this.adminRootRouter = new adminRoot_router_1.default();
         this.agentB2CRootRouter = new agentB2CRoot_router_1.default();
+        this.subAgentRootRouter = new subAgentRoot_router_1.default();
         this.externalRootRouter = new externalRoot_router_1.default();
         this.paymentRootRouter = new publicPayment_router_1.PublicPaymentRouter();
         // Auth checker
@@ -30,21 +32,23 @@ class RootRouter {
     }
     callV2Router() {
         // Public Routes
-        this.v2Router.use('/public', this.publicRootRouter.Router);
+        this.v2Router.use("/public", this.publicRootRouter.Router);
         // Auth Routes
-        this.v2Router.use('/auth', this.authRootRouter.Router);
+        this.v2Router.use("/auth", this.authRootRouter.Router);
         // Agent Routes
-        this.v2Router.use('/agent', this.authChecker.agencyUserAuthChecker, this.agentRootRouter.Router);
+        this.v2Router.use("/agent", this.authChecker.agencyUserAuthChecker, this.agentRootRouter.Router);
         // B2C Routes
-        this.v2Router.use('/b2c', this.b2cRootRouter.Router);
+        this.v2Router.use("/b2c", this.b2cRootRouter.Router);
         // Admin Routes
-        this.v2Router.use('/admin', this.authChecker.adminAuthChecker, this.adminRootRouter.Router);
+        this.v2Router.use("/admin", this.authChecker.adminAuthChecker, this.adminRootRouter.Router);
         // Agent B2C Routes
-        this.v2Router.use('/agent-b2c', this.authChecker.whiteLabelAuthChecker, this.agentB2CRootRouter.Router);
+        this.v2Router.use("/agent-b2c", this.authChecker.whiteLabelAuthChecker, this.agentB2CRootRouter.Router);
+        // Sub Agent B2C Routes
+        this.v2Router.use("/sub-agent", this.authChecker.whiteLabelAuthChecker, this.subAgentRootRouter.Router);
         // External Routes
-        this.v2Router.use('/external', this.externalRootRouter.Router);
+        this.v2Router.use("/external", this.externalRootRouter.Router);
         //Payment Routes
-        this.v2Router.use('/payment', this.paymentRootRouter.router);
+        this.v2Router.use("/payment", this.paymentRootRouter.router);
     }
 }
 exports.default = RootRouter;

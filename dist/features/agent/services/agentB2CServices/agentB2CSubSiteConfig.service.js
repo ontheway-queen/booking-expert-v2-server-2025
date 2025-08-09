@@ -338,27 +338,25 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
     }
     getTermsAndConditionsData(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyB2CUser;
-                const configModel = this.Model.AgencyB2CConfigModel(trx);
-                const siteConfig = yield configModel.getSiteConfig({ agency_id });
-                if (!siteConfig) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND,
-                    };
-                }
-                const { terms_and_conditions_content } = siteConfig;
+            const { agency_id } = req.agencyB2CUser;
+            const configModel = this.Model.AgencyB2CConfigModel();
+            const siteConfig = yield configModel.getSiteConfig({ agency_id });
+            if (!siteConfig) {
                 return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    message: this.ResMsg.HTTP_OK,
-                    data: {
-                        terms_and_conditions_content,
-                    },
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
                 };
-            }));
+            }
+            const { terms_and_conditions_content } = siteConfig;
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: {
+                    terms_and_conditions_content,
+                },
+            };
         });
     }
     getSocialLinks(req) {
@@ -400,6 +398,9 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     details: `Deleted social media link [${check.media}(${check.link})]`,
                     type: "DELETE",
                 });
+                if (check.icon) {
+                    yield this.manageFile.deleteFromCloud([check.icon]);
+                }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
