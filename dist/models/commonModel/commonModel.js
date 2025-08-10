@@ -23,16 +23,16 @@ class CommonModel extends schema_1.default {
     // get otp
     getOTP(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            const check = yield this.db("email_otp")
+            const check = yield this.db('email_otp')
                 .withSchema(this.DBO_SCHEMA)
-                .select("id", "hashed_otp as otp", "tried")
-                .andWhere("email", payload.email)
-                .andWhere("type", payload.type)
-                .andWhere("matched", 0)
+                .select('id', 'hashed_otp as otp', 'tried')
+                .andWhere('email', payload.email)
+                .andWhere('type', payload.type)
+                .andWhere('matched', 0)
                 .andWhereRaw(`"create_date" + interval '${constants_1.OTP_DEFAULT_EXPIRY} minutes' > NOW()`)
                 .andWhere((qb) => {
                 if (payload.agency_id) {
-                    qb.andWhere("agency_id", payload.agency_id);
+                    qb.andWhere('agency_id', payload.agency_id);
                 }
             });
             return check;
@@ -41,7 +41,7 @@ class CommonModel extends schema_1.default {
     // insert OTP
     insertOTP(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("email_otp")
+            return yield this.db('email_otp')
                 .withSchema(this.DBO_SCHEMA)
                 .insert(payload);
         });
@@ -49,13 +49,13 @@ class CommonModel extends schema_1.default {
     // update otp
     updateOTP(payload, where) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("email_otp")
+            return yield this.db('email_otp')
                 .withSchema(this.DBO_SCHEMA)
                 .update(payload)
-                .where("id", where.id)
+                .where('id', where.id)
                 .andWhere((qb) => {
                 if (where.agency_id) {
-                    qb.andWhere("agency_id", where.agency_id);
+                    qb.andWhere('agency_id', where.agency_id);
                 }
             });
         });
@@ -63,9 +63,9 @@ class CommonModel extends schema_1.default {
     // Get Env Variable
     getEnv(key) {
         return __awaiter(this, void 0, void 0, function* () {
-            const data = yield this.db("variable_env")
+            const data = yield this.db('variable_env')
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
+                .select('*')
                 .where({ key });
             if (data.length) {
                 return data[0].value;
@@ -78,7 +78,7 @@ class CommonModel extends schema_1.default {
     // update env variable
     updateEnv(key, value) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("variable_env")
+            return yield this.db('variable_env')
                 .withSchema(this.DBO_SCHEMA)
                 .update({ value })
                 .where({ key });
@@ -86,37 +86,37 @@ class CommonModel extends schema_1.default {
     }
     insertLastNo(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("last_no")
+            return yield this.db('last_no')
                 .withSchema(this.DBO_SCHEMA)
-                .insert(payload, "id");
+                .insert(payload, 'id');
         });
     }
     updateLastNo(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("last_no")
+            return yield this.db('last_no')
                 .withSchema(this.DBO_SCHEMA)
                 .update(payload)
-                .where("id", id);
+                .where('id', id);
         });
     }
     getLastId(_a) {
         return __awaiter(this, arguments, void 0, function* ({ type, }) {
-            return yield this.db("last_no")
+            return yield this.db('last_no')
                 .withSchema(this.DBO_SCHEMA)
-                .select("id", "last_id")
-                .where("type", type)
+                .select('id', 'last_id')
+                .where('type', type)
                 .first();
         });
     }
     // Get airlines
     getAirlineByCode(airlineCode) {
         return __awaiter(this, void 0, void 0, function* () {
-            const airline = yield this.db("airlines")
+            const airline = yield this.db('airlines')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .select("name", "logo")
+                .select('name', 'logo')
                 .where((qb) => {
                 if (airlineCode) {
-                    qb.andWhere("code", airlineCode);
+                    qb.andWhere('code', airlineCode);
                 }
             })
                 .first();
@@ -125,8 +125,8 @@ class CommonModel extends schema_1.default {
             }
             else {
                 return {
-                    name: "Not available",
-                    logo: "Not available",
+                    name: 'Not available',
+                    logo: 'Not available',
                 };
             }
         });
@@ -134,10 +134,10 @@ class CommonModel extends schema_1.default {
     // Get airlines
     getAirlineById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("airlines")
+            return yield this.db('airlines')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .select("id", "name", "logo")
-                .where("id", id)
+                .select('id', 'name', 'logo')
+                .where('id', id)
                 .first();
         });
     }
@@ -145,76 +145,76 @@ class CommonModel extends schema_1.default {
     getAircraft(code) {
         return __awaiter(this, void 0, void 0, function* () {
             const aircraft = yield this.db
-                .select("*")
-                .from("aircraft")
+                .select('*')
+                .from('aircraft')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .where("code", code);
+                .where('code', code);
             if (aircraft.length) {
                 return aircraft[0];
             }
             else {
-                return { code: code, name: "Not available" };
+                return { code: code, name: 'Not available' };
             }
         });
     }
     //get all country
     getCountry(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("country")
+            return yield this.db('country')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .select("id", "name", "iso", "iso3", "phone_code")
+                .select('id', 'name', 'iso', 'iso3', 'phone_code')
                 .where((qb) => {
                 if (payload.id) {
-                    qb.where("id", payload.id);
+                    qb.where('id', payload.id);
                 }
                 if (payload.name) {
-                    qb.andWhereILike("name", `%${payload.name}%`);
+                    qb.andWhereILike('name', `%${payload.name}%`);
                 }
             })
-                .orderBy("name", "asc");
+                .orderBy('name', 'asc');
         });
     }
     //get all city
     getCity(_a) {
         return __awaiter(this, arguments, void 0, function* ({ country_id, limit, skip, name, code, }, need_total = false) {
-            const data = yield this.db("city AS c")
+            const data = yield this.db('city AS c')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .select("c.id", "c.name", "c.country_id", "co.name AS country_name", "c.code", "c.lat", "c.lng")
-                .leftJoin("country AS co", "c.country_id", "co.id")
+                .select('c.id', 'c.name', 'c.country_id', 'co.name AS country_name', 'c.code', 'c.lat', 'c.lng')
+                .leftJoin('country AS co', 'c.country_id', 'co.id')
                 .where((qb) => {
                 if (country_id) {
-                    qb.andWhere("c.country_id", country_id);
+                    qb.andWhere('c.country_id', country_id);
                 }
                 if (code) {
-                    qb.orWhere("c.code", code);
+                    qb.orWhere('c.code', code);
                 }
                 if (name) {
                     qb.andWhere((qqb) => {
-                        qqb.orWhere("c.name", "ilike", `%${name}%`);
-                        qqb.orWhere("c.code", name);
+                        qqb.orWhere('c.name', 'ilike', `%${name}%`);
+                        qqb.orWhere('c.code', name);
                     });
                 }
             })
-                .orderBy("c.name", "asc")
+                .orderBy('c.name', 'asc')
                 .limit(limit || 100)
                 .offset(skip || 0);
             let total = [];
             if (need_total) {
-                total = yield this.db("city AS c")
+                total = yield this.db('city AS c')
                     .withSchema(this.PUBLIC_SCHEMA)
-                    .count("c.id as total")
-                    .leftJoin("country AS co", "c.country_id", "co.id")
+                    .count('c.id as total')
+                    .leftJoin('country AS co', 'c.country_id', 'co.id')
                     .where((qb) => {
                     if (country_id) {
-                        qb.andWhere("c.country_id", country_id);
+                        qb.andWhere('c.country_id', country_id);
                     }
                     if (code) {
-                        qb.orWhere("c.code", code);
+                        qb.orWhere('c.code', code);
                     }
                     if (name) {
                         qb.andWhere((qqb) => {
-                            qqb.orWhere("c.name", "ilike", `%${name}%`);
-                            qqb.orWhere("c.code", name);
+                            qqb.orWhere('c.name', 'ilike', `%${name}%`);
+                            qqb.orWhere('c.code', name);
                         });
                     }
                 });
@@ -228,88 +228,88 @@ class CommonModel extends schema_1.default {
     //insert city
     insertCity(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("city")
+            return yield this.db('city')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .insert(payload, "id");
+                .insert(payload, 'id');
         });
     }
     // update city
     updateCity(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("city")
+            return yield this.db('city')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .update(payload)
-                .where("id", id);
+                .where('id', id);
         });
     }
     // delete city
     deleteCity(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("city")
+            return yield this.db('city')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .delete()
-                .where("id", id);
+                .where('id', id);
         });
     }
     //insert airport
     insertAirport(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("airport")
+            return yield this.db('airport')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .insert(payload, "id");
+                .insert(payload, 'id');
         });
     }
     //get all airport
     getAirport(params_1) {
         return __awaiter(this, arguments, void 0, function* (params, total = false) {
             var _a;
-            const data = yield this.db("airport as air")
+            const data = yield this.db('airport as air')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .select("air.id", "air.country_id", "cou.name as country", "air.name", "air.iata_code", "ct.id as city_id", "ct.name as city_name")
-                .join("country as cou", "cou.id", "air.country_id")
-                .leftJoin("city as ct", "ct.id", "air.city")
+                .select('air.id', 'air.country_id', 'cou.name as country', 'air.name', 'air.iata_code', 'ct.id as city_id', 'ct.name as city_name')
+                .join('country as cou', 'cou.id', 'air.country_id')
+                .leftJoin('city as ct', 'ct.id', 'air.city')
                 .where((qb) => {
                 if (params.country_id) {
-                    qb.where("air.country_id", params.country_id);
+                    qb.where('air.country_id', params.country_id);
                 }
                 if (params.id) {
-                    qb.where("air.id", params.id);
+                    qb.where('air.id', params.id);
                 }
                 if (params.code) {
-                    qb.orWhere("air.iata_code", params.code);
+                    qb.orWhere('air.iata_code', params.code);
                 }
                 qb.andWhere((qqb) => {
                     if (params.name) {
-                        qqb.orWhere("air.iata_code", params.name.toUpperCase());
-                        qqb.orWhereILike("air.name", `${params.name}%`);
-                        qqb.orWhereILike("cou.name", `${params.name}%`);
-                        qqb.orWhereILike("ct.name", `${params.name}%`);
+                        qqb.orWhere('air.iata_code', params.name.toUpperCase());
+                        qqb.orWhereILike('air.name', `${params.name}%`);
+                        qqb.orWhereILike('cou.name', `${params.name}%`);
+                        qqb.orWhereILike('ct.name', `${params.name}%`);
                     }
                 });
             })
-                .orderByRaw(`ARRAY_POSITION(ARRAY[${flightConstant_1.PRIORITY_AIRPORTS.map(() => "?").join(", ")}]::TEXT[], air.iata_code) ASC NULLS LAST, air.id ASC`, flightConstant_1.PRIORITY_AIRPORTS)
+                .orderByRaw(`ARRAY_POSITION(ARRAY[${flightConstant_1.PRIORITY_AIRPORTS.map(() => '?').join(', ')}]::TEXT[], air.iata_code) ASC NULLS LAST, air.id ASC`, flightConstant_1.PRIORITY_AIRPORTS)
                 .limit(params.limit ? params.limit : 100)
                 .offset(params.skip ? params.skip : 0)
-                .orderBy("air.id", "asc");
+                .orderBy('air.id', 'asc');
             let count = [];
             if (total) {
-                count = yield this.db("airport as air")
+                count = yield this.db('airport as air')
                     .withSchema(this.PUBLIC_SCHEMA)
-                    .count("air.id as total")
-                    .join("country as cou", "cou.id", "air.country_id")
+                    .count('air.id as total')
+                    .join('country as cou', 'cou.id', 'air.country_id')
                     .where((qb) => {
                     if (params.country_id) {
-                        qb.where("air.country_id", params.country_id);
+                        qb.where('air.country_id', params.country_id);
                     }
                     if (params.code) {
-                        qb.orWhere("air.iata_code", params.code);
+                        qb.orWhere('air.iata_code', params.code);
                     }
                     qb.andWhere((qqb) => {
                         if (params.name) {
-                            qqb.orWhere("air.iata_code", params.name.toUpperCase());
-                            qqb.orWhereILike("air.name", `${params.name}%`);
-                            qqb.orWhereILike("cou.name", `${params.name}%`);
-                            qqb.orWhereILike("ct.name", `${params.name}%`);
+                            qqb.orWhere('air.iata_code', params.name.toUpperCase());
+                            qqb.orWhereILike('air.name', `${params.name}%`);
+                            qqb.orWhereILike('cou.name', `${params.name}%`);
+                            qqb.orWhereILike('ct.name', `${params.name}%`);
                         }
                     });
                 });
@@ -320,7 +320,7 @@ class CommonModel extends schema_1.default {
     //update airport
     updateAirport(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("airport")
+            return yield this.db('airport')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .update(payload)
                 .where({ id });
@@ -329,7 +329,7 @@ class CommonModel extends schema_1.default {
     //delete airport
     deleteAirport(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("airport")
+            return yield this.db('airport')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .delete()
                 .where({ id });
@@ -338,52 +338,52 @@ class CommonModel extends schema_1.default {
     //insert airline
     insertAirline(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("airlines")
+            return yield this.db('airlines')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .insert(payload, "id");
+                .insert(payload, 'id');
         });
     }
     //get all airlines
     getAirlines(params, total) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            const data = yield this.db("airlines as air")
+            const data = yield this.db('airlines as air')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .select("air.id", "air.code", "air.name", "air.logo")
+                .select('air.id', 'air.code', 'air.name', 'air.logo')
                 .where((qb) => {
                 if (params.code) {
-                    qb.where("air.code", params.code);
+                    qb.where('air.code', params.code);
                 }
                 qb.andWhere((qqb) => {
                     if (params.name) {
                         if (params.name.length === 2) {
-                            qqb.andWhere("air.code", params.name);
+                            qqb.andWhere('air.code', params.name);
                         }
                         else {
-                            qqb.andWhere("air.name", "ilike", `%${params.name}%`);
+                            qqb.andWhere('air.name', 'ilike', `%${params.name}%`);
                         }
                     }
                 });
             })
                 .limit(params.limit ? params.limit : 100)
                 .offset(params.skip ? params.skip : 0)
-                .orderBy("air.id", "asc");
+                .orderBy('air.id', 'asc');
             let count = [];
             if (total) {
-                count = yield this.db("airlines as air")
+                count = yield this.db('airlines as air')
                     .withSchema(this.PUBLIC_SCHEMA)
-                    .count("air.id as total")
+                    .count('air.id as total')
                     .where((qb) => {
                     if (params.code) {
-                        qb.where("air.code", params.code);
+                        qb.where('air.code', params.code);
                     }
                     qb.andWhere((qqb) => {
                         if (params.name) {
                             if (params.name.length === 2) {
-                                qqb.andWhere("air.code", params.name);
+                                qqb.andWhere('air.code', params.name);
                             }
                             else {
-                                qqb.andWhere("air.name", "ilike", `%${params.name}%`);
+                                qqb.andWhere('air.name', 'ilike', `%${params.name}%`);
                             }
                         }
                     });
@@ -395,7 +395,7 @@ class CommonModel extends schema_1.default {
     //update airlines
     updateAirlines(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("airlines")
+            return yield this.db('airlines')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .update(payload)
                 .where({ id });
@@ -404,7 +404,7 @@ class CommonModel extends schema_1.default {
     //delete airlines
     deleteAirlines(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("airlines")
+            return yield this.db('airlines')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .delete()
                 .where({ id });
@@ -413,7 +413,7 @@ class CommonModel extends schema_1.default {
     // Insert email subscriber
     insertEmailSubscriber(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("email_subscriber")
+            return yield this.db('email_subscriber')
                 .withSchema(this.DBO_SCHEMA)
                 .insert(payload);
         });
@@ -421,42 +421,42 @@ class CommonModel extends schema_1.default {
     getEmailSubscriber(_a) {
         return __awaiter(this, arguments, void 0, function* ({ agency_id, email, from_date, source_type, to_date, with_total, limit, skip, }) {
             var _b;
-            const data = yield this.db("email_subscriber")
+            const data = yield this.db('email_subscriber')
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
+                .select('*')
                 .where((qb) => {
                 if (agency_id) {
-                    qb.andWhere("agency_id", agency_id);
+                    qb.andWhere('agency_id', agency_id);
                 }
                 if (email) {
-                    qb.andWhere("email", email);
+                    qb.andWhere('email', email);
                 }
                 if (from_date && to_date) {
-                    qb.andWhereBetween("created_at", [from_date, to_date]);
+                    qb.andWhereBetween('created_at', [from_date, to_date]);
                 }
                 if (source_type) {
-                    qb.andWhere("source_type", source_type);
+                    qb.andWhere('source_type', source_type);
                 }
             })
                 .limit(Number(limit) || constants_1.DATA_LIMIT)
                 .offset(Number(skip) || 0);
             let total = [];
             if (with_total) {
-                total = yield this.db("email_subscriber")
+                total = yield this.db('email_subscriber')
                     .withSchema(this.DBO_SCHEMA)
-                    .count("id AS total")
+                    .count('id AS total')
                     .where((qb) => {
                     if (agency_id) {
-                        qb.andWhere("agency_id", agency_id);
+                        qb.andWhere('agency_id', agency_id);
                     }
                     if (email) {
-                        qb.andWhere("email", email);
+                        qb.andWhere('email', email);
                     }
                     if (from_date && to_date) {
-                        qb.andWhereBetween("created_at", [from_date, to_date]);
+                        qb.andWhereBetween('created_at', [from_date, to_date]);
                     }
                     if (source_type) {
-                        qb.andWhere("source_type", source_type);
+                        qb.andWhere('source_type', source_type);
                     }
                 });
             }
@@ -465,24 +465,44 @@ class CommonModel extends schema_1.default {
     }
     insertBanks(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("banks")
+            return yield this.db('banks')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .insert(payload);
         });
     }
+    updateBanks(payload, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('banks')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .update(payload)
+                .where('id', id);
+        });
+    }
     getBanks(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("banks")
+            return yield this.db('banks')
                 .withSchema(this.PUBLIC_SCHEMA)
-                .select("*")
+                .select('*')
                 .where((qb) => {
                 if (query.name) {
-                    qb.andWhereILike("name", `%${query.name}%`);
+                    qb.andWhereILike('name', `%${query.name}%`);
                 }
                 if (query.id) {
-                    qb.andWhere("id", query.id);
+                    qb.andWhere('id', query.id);
+                }
+                if (query.status === undefined) {
+                    qb.andWhere('status', query.status);
                 }
             });
+        });
+    }
+    checkBank(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('banks')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .select('*')
+                .where('id', id)
+                .first();
         });
     }
 }

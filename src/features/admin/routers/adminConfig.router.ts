@@ -52,5 +52,20 @@ export default class AdminConfigRouter extends AbstractRouter {
       .route('/b2c-markup-set')
       .get(this.controller.getB2CMarkupSet)
       .put(this.controller.updateB2CMarkupSet);
+
+    this.router
+      .route('/bank')
+      .get(this.controller.getBanks)
+      .post(
+        this.uploader.cloudUploadRaw(this.fileFolders.BANK_LOGO, ['logo']),
+        this.controller.createBank
+      );
+
+    this.router
+      .route('/bank/:id')
+      .patch(
+        this.uploader.cloudUploadRaw(this.fileFolders.BANK_LOGO, ['logo']),
+        this.controller.updateBank
+      );
   }
 }

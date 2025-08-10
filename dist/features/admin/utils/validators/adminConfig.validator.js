@@ -78,6 +78,19 @@ class AdminConfigValidator {
             flight_set_id: joi_1.default.number().optional(),
             hotel_set_id: joi_1.default.number().optional(),
         });
+        this.getBanks = joi_1.default.object({
+            status: joi_1.default.string().optional(),
+            filer: joi_1.default.string().optional(),
+        });
+        this.updateBank = joi_1.default.object({
+            name: joi_1.default.string().optional(),
+            type: joi_1.default.string().valid('Bank', 'MFS').optional(),
+            status: joi_1.default.boolean().optional(),
+        });
+        this.createBank = joi_1.default.object({
+            name: joi_1.default.string().required(),
+            type: joi_1.default.string().valid('Bank', 'MFS').required(),
+        });
     }
 }
 exports.default = AdminConfigValidator;

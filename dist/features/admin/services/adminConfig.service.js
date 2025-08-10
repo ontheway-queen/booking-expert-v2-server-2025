@@ -296,50 +296,133 @@ class AdminConfigService extends abstract_service_1.default {
     // UPDATE B2C MARKUP
     updateB2CMarkupConfig(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const body = req.body;
-            const B2CMarkupConfigModel = this.Model.B2CMarkupConfigModel();
-            const markupSetModel = this.Model.DynamicFareSetModel();
-            if (body.flight_set_id) {
-                // Check if the markup set exists
-                const existingFlightMarkupSet = yield markupSetModel.checkDynamicFareSet({
-                    id: body.flight_set_id,
-                    type: constants_1.TYPE_FLIGHT,
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const body = req.body;
+                const { user_id } = req.admin;
+                const B2CMarkupConfigModel = this.Model.B2CMarkupConfigModel();
+                const markupSetModel = this.Model.DynamicFareSetModel();
+                if (body.flight_set_id) {
+                    // Check if the markup set exists
+                    const existingFlightMarkupSet = yield markupSetModel.checkDynamicFareSet({
+                        id: body.flight_set_id,
+                        type: constants_1.TYPE_FLIGHT,
+                    });
+                    if (!existingFlightMarkupSet) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_NOT_FOUND,
+                            message: 'Flight set not found.',
+                        };
+                    }
+                    yield B2CMarkupConfigModel.upsertB2CMarkupConfig({
+                        type: 'Flight',
+                        markup_set_id: body.flight_set_id,
+                    });
+                }
+                if (body.hotel_set_id) {
+                    // Check if the markup set exists
+                    const existingHotelMarkupSet = yield markupSetModel.checkDynamicFareSet({
+                        id: body.hotel_set_id,
+                        type: constants_1.TYPE_HOTEL,
+                    });
+                    if (!existingHotelMarkupSet) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_NOT_FOUND,
+                            message: 'Hotel set not found.',
+                        };
+                    }
+                    yield B2CMarkupConfigModel.upsertB2CMarkupConfig({
+                        type: 'Hotel',
+                        markup_set_id: body.hotel_set_id,
+                    });
+                }
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    details: 'B2C Markup config updated',
+                    type: 'UPDATE',
                 });
-                if (!existingFlightMarkupSet) {
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }));
+        });
+    }
+    // Get bank
+    getBank(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const CommonModel = this.Model.CommonModel(trx);
+                const { filter, status } = req.query;
+                const banks = yield CommonModel.getBanks({
+                    name: filter,
+                    status: Boolean(status),
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: banks,
+                };
+            }));
+        });
+    }
+    // Create bank
+    createBank(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                var _a;
+                const CommonModel = this.Model.CommonModel(trx);
+                const body = req.body;
+                const files = req.files || [];
+                yield CommonModel.insertBanks(Object.assign(Object.assign({}, body), { logo: (_a = files[0]) === null || _a === void 0 ? void 0 : _a.filename }));
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                };
+            }));
+        });
+    }
+    // Update Bank
+    updateBank(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const CommonModel = this.Model.CommonModel(trx);
+                const bank_id = Number(req.params.id);
+                const check = yield CommonModel.checkBank(bank_id);
+                if (!check) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: 'Flight set not found.',
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                yield B2CMarkupConfigModel.upsertB2CMarkupConfig({
-                    type: 'Flight',
-                    markup_set_id: body.flight_set_id,
-                });
-            }
-            if (body.hotel_set_id) {
-                // Check if the markup set exists
-                const existingHotelMarkupSet = yield markupSetModel.checkDynamicFareSet({
-                    id: body.hotel_set_id,
-                    type: constants_1.TYPE_HOTEL,
-                });
-                if (!existingHotelMarkupSet) {
+                const body = req.body;
+                const files = req.files || [];
+                const payload = Object.assign({}, body);
+                if (files.length) {
+                    payload.logo = files[0].filename;
+                }
+                if (!Object.keys(payload).length) {
                     return {
                         success: false,
-                        code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: 'Hotel set not found.',
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
                     };
                 }
-                yield B2CMarkupConfigModel.upsertB2CMarkupConfig({
-                    type: 'Hotel',
-                    markup_set_id: body.hotel_set_id,
-                });
-            }
-            return {
-                success: true,
-                code: this.StatusCode.HTTP_OK,
-                message: this.ResMsg.HTTP_OK,
-            };
+                yield CommonModel.updateBanks(payload, bank_id);
+                if (check.logo && payload.logo) {
+                    yield this.manageFile.deleteFromCloud([check.logo]);
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                };
+            }));
         });
     }
 }

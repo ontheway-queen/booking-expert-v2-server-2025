@@ -110,6 +110,21 @@ class AdminConfigController extends abstract_controller_1.default {
             const _a = yield this.service.updateB2CMarkupConfig(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
+        this.getBanks = this.asyncWrapper.wrap({ querySchema: this.validator.getBanks }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getBank(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.createBank = this.asyncWrapper.wrap({ bodySchema: this.validator.createBank }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.createBank(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.updateBank = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+            bodySchema: this.validator.updateBank,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.updateBank(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
     }
 }
 exports.default = AdminConfigController;

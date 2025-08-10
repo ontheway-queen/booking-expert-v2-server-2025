@@ -88,4 +88,20 @@ export default class AdminConfigValidator {
     flight_set_id: Joi.number().optional(),
     hotel_set_id: Joi.number().optional(),
   });
+
+  public getBanks = Joi.object({
+    status: Joi.string().optional(),
+    filer: Joi.string().optional(),
+  });
+
+  public updateBank = Joi.object({
+    name: Joi.string().optional(),
+    type: Joi.string().valid('Bank', 'MFS').optional(),
+    status: Joi.boolean().optional(),
+  });
+
+  public createBank = Joi.object({
+    name: Joi.string().required(),
+    type: Joi.string().valid('Bank', 'MFS').required(),
+  });
 }

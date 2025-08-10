@@ -145,4 +145,30 @@ export default class AdminConfigController extends AbstractController {
       res.status(code).json(data);
     }
   );
+  public getBanks = this.asyncWrapper.wrap(
+    { querySchema: this.validator.getBanks },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getBank(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public createBank = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.createBank },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.createBank(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public updateBank = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+      bodySchema: this.validator.updateBank,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.updateBank(req);
+      res.status(code).json(data);
+    }
+  );
 }

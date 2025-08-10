@@ -5,6 +5,7 @@ class FileFolder {
 FileFolder.AIRLINES_FILES = 'airlines';
 FileFolder.PROMOTIONAL_FILES = 'promotional-files';
 FileFolder.ARTICLE_FILES = 'article-files';
+FileFolder.BANK_LOGO = 'bank-logo';
 FileFolder.ADMIN_FILES = 'admin/admin-files';
 FileFolder.COMMON_FILES = 'common-files';
 FileFolder.B2C_USER_FILES = 'b2c/user-files';

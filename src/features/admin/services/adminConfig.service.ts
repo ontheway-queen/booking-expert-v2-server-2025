@@ -15,6 +15,7 @@ import { HOLIDAY_CREATED_BY_ADMIN } from '../../../utils/miscellaneous/holidayCo
 import {
   ICreateAirlinesPayload,
   IUpdateAirlinesPayload,
+  IUpdateBankPayload,
 } from '../../../utils/modelTypes/commonModelTypes/commonModelTypes';
 
 export class AdminConfigService extends AbstractServices {
@@ -321,60 +322,175 @@ export class AdminConfigService extends AbstractServices {
 
   // UPDATE B2C MARKUP
   public async updateB2CMarkupConfig(req: Request) {
-    const body = req.body as {
-      flight_set_id?: number;
-      hotel_set_id?: number;
-    };
+    return this.db.transaction(async (trx) => {
+      const body = req.body as {
+        flight_set_id?: number;
+        hotel_set_id?: number;
+      };
 
-    const B2CMarkupConfigModel = this.Model.B2CMarkupConfigModel();
-    const markupSetModel = this.Model.DynamicFareSetModel();
+      const { user_id } = req.admin;
 
-    if (body.flight_set_id) {
-      // Check if the markup set exists
-      const existingFlightMarkupSet = await markupSetModel.checkDynamicFareSet({
-        id: body.flight_set_id,
-        type: TYPE_FLIGHT,
+      const B2CMarkupConfigModel = this.Model.B2CMarkupConfigModel();
+      const markupSetModel = this.Model.DynamicFareSetModel();
+
+      if (body.flight_set_id) {
+        // Check if the markup set exists
+        const existingFlightMarkupSet =
+          await markupSetModel.checkDynamicFareSet({
+            id: body.flight_set_id,
+            type: TYPE_FLIGHT,
+          });
+
+        if (!existingFlightMarkupSet) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_NOT_FOUND,
+            message: 'Flight set not found.',
+          };
+        }
+
+        await B2CMarkupConfigModel.upsertB2CMarkupConfig({
+          type: 'Flight',
+          markup_set_id: body.flight_set_id,
+        });
+      }
+
+      if (body.hotel_set_id) {
+        // Check if the markup set exists
+        const existingHotelMarkupSet = await markupSetModel.checkDynamicFareSet(
+          {
+            id: body.hotel_set_id,
+            type: TYPE_HOTEL,
+          }
+        );
+
+        if (!existingHotelMarkupSet) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_NOT_FOUND,
+            message: 'Hotel set not found.',
+          };
+        }
+
+        await B2CMarkupConfigModel.upsertB2CMarkupConfig({
+          type: 'Hotel',
+          markup_set_id: body.hotel_set_id,
+        });
+      }
+
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        details: 'B2C Markup config updated',
+        type: 'UPDATE',
       });
 
-      if (!existingFlightMarkupSet) {
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
+    });
+  }
+
+  // Get bank
+  public async getBank(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const { filter, status } = req.query as {
+        filter?: string;
+        status?: string;
+      };
+
+      const banks = await CommonModel.getBanks({
+        name: filter,
+        status: Boolean(status),
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: banks,
+      };
+    });
+  }
+
+  // Create bank
+  public async createBank(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const body = req.body as {
+        name: string;
+        type: 'Bank' | 'MFS';
+      };
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      await CommonModel.insertBanks({
+        ...body,
+        logo: files[0]?.filename,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
+      };
+    });
+  }
+
+  // Update Bank
+  public async updateBank(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const bank_id = Number(req.params.id);
+
+      const check = await CommonModel.checkBank(bank_id);
+
+      if (!check) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: 'Flight set not found.',
+          message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
 
-      await B2CMarkupConfigModel.upsertB2CMarkupConfig({
-        type: 'Flight',
-        markup_set_id: body.flight_set_id,
-      });
-    }
+      const body = req.body as {
+        name?: string;
+        type?: 'Bank' | 'MFS';
+        status?: boolean;
+      };
 
-    if (body.hotel_set_id) {
-      // Check if the markup set exists
-      const existingHotelMarkupSet = await markupSetModel.checkDynamicFareSet({
-        id: body.hotel_set_id,
-        type: TYPE_HOTEL,
-      });
+      const files = (req.files as Express.Multer.File[]) || [];
 
-      if (!existingHotelMarkupSet) {
+      const payload: IUpdateBankPayload = { ...body };
+
+      if (files.length) {
+        payload.logo = files[0].filename;
+      }
+
+      if (!Object.keys(payload).length) {
         return {
           success: false,
-          code: this.StatusCode.HTTP_NOT_FOUND,
-          message: 'Hotel set not found.',
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
         };
       }
 
-      await B2CMarkupConfigModel.upsertB2CMarkupConfig({
-        type: 'Hotel',
-        markup_set_id: body.hotel_set_id,
-      });
-    }
+      await CommonModel.updateBanks(payload, bank_id);
 
-    return {
-      success: true,
-      code: this.StatusCode.HTTP_OK,
-      message: this.ResMsg.HTTP_OK,
-    };
+      if (check.logo && payload.logo) {
+        await this.manageFile.deleteFromCloud([check.logo]);
+      }
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
+      };
+    });
   }
 }

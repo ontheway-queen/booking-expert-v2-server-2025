@@ -127,9 +127,16 @@ export interface IInsertBanks {
   type: 'Bank' | 'MFS';
   logo: string;
 }
+export interface IUpdateBankPayload {
+  name?: string;
+  type?: 'Bank' | 'MFS';
+  logo?: string;
+  status?: boolean;
+}
 export interface IGetBanksData {
   id: number;
   name: string;
   type: 'Bank' | 'MFS';
   logo: string;
+  status: boolean;
 }
