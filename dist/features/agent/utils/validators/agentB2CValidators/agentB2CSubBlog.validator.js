@@ -17,7 +17,7 @@ class AgentB2CSubBlogValidator {
                 'string.base': 'Enter valid summary',
                 'string.max': 'Summary must be less than 300 characters',
             }),
-            content: joi_1.default.string().max(3000).required().messages({
+            content: joi_1.default.string().required().messages({
                 'string.base': 'Enter valid content',
                 'any.required': 'Content is required',
                 'string.empty': 'Content is empty',

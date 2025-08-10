@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import AbstractController from "../../../../abstract/abstract.controller";
-import { AgentB2CSubConfigService } from "../../services/agentB2CServices/agentB2CSubConfig.service";
-import { AgentB2CSubConfigValidator } from "../../utils/validators/agentB2CValidators/agentB2CSubConfig.validator";
+import { Request, Response } from 'express';
+import AbstractController from '../../../../abstract/abstract.controller';
+import { AgentB2CSubConfigService } from '../../services/agentB2CServices/agentB2CSubConfig.service';
+import { AgentB2CSubConfigValidator } from '../../utils/validators/agentB2CValidators/agentB2CSubConfig.validator';
 
 export default class AgentB2CSubConfigController extends AbstractController {
   private validator = new AgentB2CSubConfigValidator();

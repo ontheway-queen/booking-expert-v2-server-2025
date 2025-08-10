@@ -163,12 +163,15 @@ export default class UmrahPackageModel extends Schema {
         qb.andWhere('source_id', query.source_id);
         qb.andWhere('source_type', SOURCE_AGENT);
         qb.andWhere('is_deleted', is_deleted);
+
+
         if (query.slug) {
           qb.andWhere('slug', query.slug);
         }
         if (query.umrah_id) {
           qb.andWhere('id', query.umrah_id);
         }
+        
       })
       .first();
   }

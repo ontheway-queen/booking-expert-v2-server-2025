@@ -47,8 +47,8 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     if (file.fieldname === 'site_thumbnail') {
                         payload.site_thumbnail = file.filename;
                     }
-                    if (file.fieldname === 'fabicon') {
-                        payload.fabicon = file.filename;
+                    if (file.fieldname === 'favicon') {
+                        payload.favicon = file.filename;
                     }
                 });
                 if (emails) {
@@ -66,8 +66,8 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                 if ((checkConfig === null || checkConfig === void 0 ? void 0 : checkConfig.main_logo) && payload.main_logo) {
                     deletedFiles.push(checkConfig.main_logo);
                 }
-                if ((checkConfig === null || checkConfig === void 0 ? void 0 : checkConfig.fabicon) && payload.fabicon) {
-                    deletedFiles.push(checkConfig.fabicon);
+                if ((checkConfig === null || checkConfig === void 0 ? void 0 : checkConfig.favicon) && payload.favicon) {
+                    deletedFiles.push(checkConfig.favicon);
                 }
                 if ((checkConfig === null || checkConfig === void 0 ? void 0 : checkConfig.site_thumbnail) && payload.site_thumbnail) {
                     deletedFiles.push(checkConfig.site_thumbnail);
@@ -88,7 +88,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_OK,
                     data: {
                         main_logo: payload.main_logo,
-                        fabicon: payload.fabicon,
+                        favicon: payload.favicon,
                         site_thumbnail: payload.site_thumbnail,
                     },
                 };
@@ -314,7 +314,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                 updated_by: user_id,
             };
             if (body.content) {
-                payload.about_us_content = body.content;
+                payload.terms_and_conditions_content = body.content;
             }
             yield AgencyB2CConfigModel.updateConfig(payload, { agency_id });
             yield this.insertAgentAudit(undefined, {
@@ -328,9 +328,6 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: {
-                    about_us_thumbnail: payload.about_us_thumbnail,
-                },
             };
         });
     }
@@ -492,7 +489,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
                 data: {
-                    b2b: agentPopUp,
+                    agent: agentPopUp,
                     b2c: b2cPopUp,
                 },
             };

@@ -16,7 +16,7 @@ export default class AgentB2CSubSiteConfigRouter extends AbstractRouter {
         this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG, [
           'main_logo',
           'site_thumbnail',
-          'fabicon',
+          'favicon',
         ]),
         this.controller.updateSiteConfig
       );

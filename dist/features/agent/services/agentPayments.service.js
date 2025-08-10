@@ -347,5 +347,19 @@ class AgentPaymentsService extends abstract_service_1.default {
             }));
         });
     }
+    getAccounts(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const configModel = this.Model.OthersModel();
+            const accounts = yield configModel.getAccount({
+                source_type: 'ADMIN',
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: accounts,
+            };
+        });
+    }
 }
 exports.AgentPaymentsService = AgentPaymentsService;

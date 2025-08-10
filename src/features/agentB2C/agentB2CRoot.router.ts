@@ -9,6 +9,7 @@ import AgentB2CTravelerRouter from './routers/agentB2CTraveler.router';
 import AgentB2CUmrahRouter from './routers/agentB2CUmrah.router';
 import AgentB2CVisaRouter from './routers/agentB2CVisa.router';
 import AuthChecker from '../../middleware/authChecker/authChecker';
+import BlogRouter from './routers/agentB2CBlog.router';
 import AgentB2CConfigRouter from './routers/agentB2CConfig.router';
 
 export default class AgentB2CRootRouter {
@@ -26,6 +27,7 @@ export default class AgentB2CRootRouter {
   private travelerRouter = new AgentB2CTravelerRouter();
   private umrahRouter = new AgentB2CUmrahRouter();
   private visaRouter = new AgentB2CVisaRouter();
+  private blogRouter = new BlogRouter();
   private agentB2CConfigRouter = new AgentB2CConfigRouter();
 
   constructor() {
@@ -55,5 +57,7 @@ export default class AgentB2CRootRouter {
     );
     this.Router.use('/umrah', this.umrahRouter.router);
     this.Router.use('/visa', this.visaRouter.router);
+
+    this.Router.use('/blog', this.blogRouter.router);
   }
 }

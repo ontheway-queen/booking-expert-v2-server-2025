@@ -427,4 +427,18 @@ export class AgentPaymentsService extends AbstractServices {
       };
     });
   }
+
+  public async getAccounts(req: Request) {
+    const configModel = this.Model.OthersModel();
+    const accounts = await configModel.getAccount({
+      source_type: 'ADMIN',
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: accounts,
+    };
+  }
 }

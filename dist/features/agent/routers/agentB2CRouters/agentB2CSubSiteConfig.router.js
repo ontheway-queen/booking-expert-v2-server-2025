@@ -18,7 +18,7 @@ class AgentB2CSubSiteConfigRouter extends abstract_router_1.default {
             .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG, [
             'main_logo',
             'site_thumbnail',
-            'fabicon',
+            'favicon',
         ]), this.controller.updateSiteConfig);
         this.router
             .route('/about-us')

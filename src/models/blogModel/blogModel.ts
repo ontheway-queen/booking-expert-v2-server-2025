@@ -1,9 +1,14 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
+import { SOURCE_AGENT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
+  GetSingleAgentB2CBlogPayload,
+  IAgentB2CBlogListQuery,
   ICreateBlogPayload,
+  IGetAgentB2CBlogListPayload,
   IGetBlogListPayloadWithTotal,
   IGetBlogListQuery,
+  IGetSingleAgentB2CBlogQuery,
   IGetSingleBlogPayload,
   ISingleBlogPostQuery,
   IUpdateBlogPayload,
@@ -106,5 +111,68 @@ export default class BlogModel extends Schema {
       .withSchema(this.SERVICE_SCHEMA)
       .update(payload)
       .where('id', blog_id);
+  }
+
+  public async getAgentB2CBlogList(
+    query: IAgentB2CBlogListQuery
+  ): Promise<IGetAgentB2CBlogListPayload[]> {
+    const { is_deleted = false } = query;
+    return await this.db('blog as b')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select(
+        'b.id',
+        'b.title',
+        'b.summary',
+        'b.cover_image',
+        'b.slug',
+        'b.meta_title',
+        'b.meta_description',
+        'b.created_at as created_date'
+      )
+      .where((qb) => {
+        qb.andWhere('b.source_type', SOURCE_AGENT);
+        qb.andWhere('b.source_id', query.source_id);
+        qb.andWhere('b.is_deleted', is_deleted);
+        qb.andWhere('b.blog_for', 'B2C').orWhere('b.blog_for', 'BOTH');
+
+        if (query.status !== undefined) {
+          qb.andWhere('b.status', query.status);
+        }
+      });
+  }
+
+  public async getSingleAgentB2CBlog(
+    query: IGetSingleAgentB2CBlogQuery
+  ): Promise<GetSingleAgentB2CBlogPayload | null> {
+    const { is_deleted = false } = query;
+    return await this.db('services.blog as b')
+      .select(
+        'b.title',
+        'b.summary',
+        'b.content',
+        'b.slug',
+        'b.meta_title',
+        'b.meta_description',
+        'b.cover_image',
+        'b.created_at as created_date',
+        'au.name as author',
+        'au.photo as author_photo'
+      )
+      .where((qb) => {
+        qb.andWhere('b.source_type', SOURCE_AGENT);
+        qb.andWhere('b.source_id', query.source_id);
+        qb.andWhere('b.is_deleted', is_deleted);
+        qb.andWhere('b.blog_for', 'B2C').orWhere('b.blog_for', 'BOTH');
+
+        if (query.status !== undefined) {
+          qb.andWhere('b.status', query.status);
+        }
+
+        if (query.slug) {
+          qb.andWhere('b.slug', query.slug);
+        }
+      })
+      .leftJoin('agent.agency_user as au', 'au.id', 'b.created_by')
+      .first();
   }
 }

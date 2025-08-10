@@ -150,7 +150,7 @@ export interface IUpdateAgencyB2CPopularPlace {
 export interface ICreateAgencyB2CSiteConfig {
   agency_id: number;
   main_logo?: string;
-  fabicon?: string;
+  favicon?: string;
   site_thumbnail?: string;
   hero_quote?: string;
   hero_sub_quote?: string;
@@ -178,7 +178,7 @@ export interface IGetAgencyB2CSiteConfigData {
   id: number;
   agency_id: number;
   main_logo?: string;
-  fabicon?: string;
+  favicon?: string;
   site_thumbnail?: string;
   hero_quote?: string;
   hero_sub_quote?: string;
@@ -205,7 +205,7 @@ export interface IGetAgencyB2CSiteConfigData {
 
 export interface IUpdateAgencyB2CSiteConfigPayload {
   main_logo?: string;
-  fabicon?: string;
+  favicon?: string;
   site_thumbnail?: string;
   hero_quote?: string;
   hero_sub_quote?: string;

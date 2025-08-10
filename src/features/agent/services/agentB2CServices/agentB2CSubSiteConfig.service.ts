@@ -40,8 +40,8 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         if (file.fieldname === 'site_thumbnail') {
           payload.site_thumbnail = file.filename;
         }
-        if (file.fieldname === 'fabicon') {
-          payload.fabicon = file.filename;
+        if (file.fieldname === 'favicon') {
+          payload.favicon = file.filename;
         }
       });
 
@@ -64,8 +64,8 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
       if (checkConfig?.main_logo && payload.main_logo) {
         deletedFiles.push(checkConfig.main_logo);
       }
-      if (checkConfig?.fabicon && payload.fabicon) {
-        deletedFiles.push(checkConfig.fabicon);
+      if (checkConfig?.favicon && payload.favicon) {
+        deletedFiles.push(checkConfig.favicon);
       }
       if (checkConfig?.site_thumbnail && payload.site_thumbnail) {
         deletedFiles.push(checkConfig.site_thumbnail);
@@ -89,7 +89,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         message: this.ResMsg.HTTP_OK,
         data: {
           main_logo: payload.main_logo,
-          fabicon: payload.fabicon,
+          favicon: payload.favicon,
           site_thumbnail: payload.site_thumbnail,
         },
       };
@@ -362,7 +362,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
     };
 
     if (body.content) {
-      payload.about_us_content = body.content;
+      payload.terms_and_conditions_content = body.content;
     }
 
     await AgencyB2CConfigModel.updateConfig(payload, { agency_id });
@@ -379,9 +379,6 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: {
-        about_us_thumbnail: payload.about_us_thumbnail,
-      },
     };
   }
 
@@ -586,7 +583,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
       data: {
-        b2b: agentPopUp,
+        agent: agentPopUp,
         b2c: b2cPopUp,
       },
     };

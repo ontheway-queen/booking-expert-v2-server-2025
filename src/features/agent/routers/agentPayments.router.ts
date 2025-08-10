@@ -37,5 +37,7 @@ export default class AgentPaymentsRouter extends AbstractRouter {
     this.router.route('/partial').get(this.controller.getPartialPaymentList);
 
     this.router.route('/balance').get(this.controller.getAgentBalance);
+
+    this.router.route('/accounts').get(this.controller.getAccounts);
   }
 }

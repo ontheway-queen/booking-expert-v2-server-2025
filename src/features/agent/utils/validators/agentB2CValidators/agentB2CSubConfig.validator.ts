@@ -1,4 +1,4 @@
-import Joi from "joi";
+import Joi from 'joi';
 import {
   CONTENT_TYPE_PHOTO,
   CONTENT_TYPE_VIDEO,
@@ -13,7 +13,7 @@ import {
   MARKUP_MODE_INCREASE,
   MARKUP_TYPE_FLAT,
   MARKUP_TYPE_PER,
-} from "../../../../../utils/miscellaneous/constants";
+} from '../../../../../utils/miscellaneous/constants';
 
 export class AgentB2CSubConfigValidator {
   public upsertB2CMarkup = Joi.object({

@@ -119,4 +119,12 @@ export default class AgentPaymentsController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public getAccounts = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getAccounts(req);
+      res.status(code).json(rest);
+    }
+  );
 }
