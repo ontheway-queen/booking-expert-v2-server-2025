@@ -114,4 +114,22 @@ export default class PublicCommonService extends AbstractServices {
       };
     });
   }
+
+  //get banks
+  public async getBank(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const { filter } = req.query as { filter: string };
+
+      const banks = await CommonModel.getBanks({ name: filter });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: banks,
+      };
+    });
+  }
 }

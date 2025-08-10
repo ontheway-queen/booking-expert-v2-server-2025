@@ -14,6 +14,7 @@ const agentB2CSubUsers_router_1 = __importDefault(require("./agentB2CRouters/age
 const agentB2CSubVisa_router_1 = __importDefault(require("./agentB2CRouters/agentB2CSubVisa.router"));
 const abstract_router_1 = __importDefault(require("../../../abstract/abstract.router"));
 const agentB2CSubBlog_router_1 = __importDefault(require("./agentB2CRouters/agentB2CSubBlog.router"));
+const agentB2CSubSiteConfig_router_1 = __importDefault(require("./agentB2CRouters/agentB2CSubSiteConfig.router"));
 class AgentB2CRouter extends abstract_router_1.default {
     constructor() {
         super();
@@ -28,6 +29,7 @@ class AgentB2CRouter extends abstract_router_1.default {
         this.agentB2CSubUsersRouter = new agentB2CSubUsers_router_1.default();
         this.agentB2CSubVisaRouter = new agentB2CSubVisa_router_1.default();
         this.AgentB2CSubBlogRouter = new agentB2CSubBlog_router_1.default();
+        this.agentB2CSubSiteConfigRouter = new agentB2CSubSiteConfig_router_1.default();
         this.callRouter();
     }
     callRouter() {
@@ -41,6 +43,7 @@ class AgentB2CRouter extends abstract_router_1.default {
         this.router.use('/umrah', this.agentB2CSubUmrahRouter.router);
         this.router.use('/group-fare', this.agentB2CSubGroupFareRouter.router);
         this.router.use('/blog', this.AgentB2CSubBlogRouter.router);
+        this.router.use('/site-config', this.agentB2CSubSiteConfigRouter.router);
     }
 }
 exports.default = AgentB2CRouter;

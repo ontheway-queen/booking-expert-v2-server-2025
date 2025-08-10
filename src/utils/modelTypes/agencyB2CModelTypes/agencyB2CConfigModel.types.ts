@@ -8,7 +8,7 @@ import {
   FUNCTION_TYPE_HOTEL,
   FUNCTION_TYPE_UMRAH,
   FUNCTION_TYPE_VISA,
-} from "../../miscellaneous/constants";
+} from '../../miscellaneous/constants';
 
 export interface ICreateAgencyB2CHeroBgContentPayload {
   type: typeof CONTENT_TYPE_PHOTO | typeof CONTENT_TYPE_VIDEO;
@@ -297,13 +297,13 @@ export interface ICreateAgencyB2CPopUpBanner {
   thumbnail?: string;
   link?: string;
   description?: string;
-  pop_up_for: "AGENT" | "B2C";
+  pop_up_for: 'AGENT' | 'B2C';
 }
 
 export interface IGetAgencyB2CPopUpBannerQuery {
   agency_id: number;
   status?: boolean;
-  pop_up_for?: "AGENT" | "B2C";
+  pop_up_for?: 'AGENT' | 'B2C';
 }
 
 export interface IGetAgencyB2CPopUpBannerData {
@@ -313,7 +313,7 @@ export interface IGetAgencyB2CPopUpBannerData {
   thumbnail: string;
   link: string;
   description: string;
-  pop_up_for: "AGENT" | "B2C";
+  pop_up_for: 'AGENT' | 'B2C';
   status: boolean;
 }
 

@@ -1,20 +1,20 @@
-import { NextFunction, Request, Response } from "express";
-import StatusCode from "../../utils/miscellaneous/statusCode";
-import ResMsg from "../../utils/miscellaneous/responseMessage";
-import Lib from "../../utils/lib/lib";
-import config from "../../config/config";
+import { NextFunction, Request, Response } from 'express';
+import StatusCode from '../../utils/miscellaneous/statusCode';
+import ResMsg from '../../utils/miscellaneous/responseMessage';
+import Lib from '../../utils/lib/lib';
+import config from '../../config/config';
 import {
   ITokenParseAdmin,
   ITokenParseAgencyUser,
   ITokenParseAgencyB2CUser,
   ITokenParseUser,
-} from "../../features/public/utils/types/publicCommon.types";
-import AdminModel from "../../models/adminModel/adminModel";
-import { db } from "../../app/database";
-import AgencyUserModel from "../../models/agentModel/agencyUserModel";
-import B2CUserModel from "../../models/b2cModel/b2cUserModel";
-import AgencyModel from "../../models/agentModel/agencyModel";
-import AgencyB2CUserModel from "../../models/agencyB2CModel/agencyB2CUserModel";
+} from '../../features/public/utils/types/publicCommon.types';
+import AdminModel from '../../models/adminModel/adminModel';
+import { db } from '../../app/database';
+import AgencyUserModel from '../../models/agentModel/agencyUserModel';
+import B2CUserModel from '../../models/b2cModel/b2cUserModel';
+import AgencyModel from '../../models/agentModel/agencyModel';
+import AgencyB2CUserModel from '../../models/agencyB2CModel/agencyB2CUserModel';
 
 export default class AuthChecker {
   // admin auth checker
@@ -32,7 +32,7 @@ export default class AuthChecker {
       return;
     }
 
-    const authSplit = authorization.split(" ");
+    const authSplit = authorization.split(' ');
 
     if (authSplit.length !== 2) {
       res.status(StatusCode.HTTP_UNAUTHORIZED).json({
@@ -98,7 +98,7 @@ export default class AuthChecker {
       return;
     }
 
-    const authSplit = authorization.split(" ");
+    const authSplit = authorization.split(' ');
 
     if (authSplit.length !== 2) {
       res.status(StatusCode.HTTP_UNAUTHORIZED).json({
@@ -164,7 +164,7 @@ export default class AuthChecker {
       return;
     }
 
-    const authSplit = authorization.split(" ");
+    const authSplit = authorization.split(' ');
 
     if (authSplit.length !== 2) {
       res.status(StatusCode.HTTP_UNAUTHORIZED).json({
@@ -193,7 +193,7 @@ export default class AuthChecker {
 
       if (checkAgencyUser) {
         console.log({
-          type: "Agent",
+          type: 'Agent',
           agency_id: checkAgencyUser.agency_id,
           user_id: checkAgencyUser.id,
           agency_name: checkAgencyUser.agency_name,
@@ -207,9 +207,9 @@ export default class AuthChecker {
         }
 
         if (
-          checkAgencyUser.agency_status === "Inactive" ||
-          checkAgencyUser.agency_status === "Incomplete" ||
-          checkAgencyUser.agency_status === "Rejected"
+          checkAgencyUser.agency_status === 'Inactive' ||
+          checkAgencyUser.agency_status === 'Incomplete' ||
+          checkAgencyUser.agency_status === 'Rejected'
         ) {
           res.status(StatusCode.HTTP_UNAUTHORIZED).json({
             success: false,
@@ -258,7 +258,7 @@ export default class AuthChecker {
       return;
     }
 
-    const authSplit = authorization.split(" ");
+    const authSplit = authorization.split(' ');
 
     if (authSplit.length !== 2) {
       res.status(StatusCode.HTTP_UNAUTHORIZED).json({
@@ -286,7 +286,7 @@ export default class AuthChecker {
       const check_agency = await agencyModel.checkAgency({
         agency_id,
       });
-      if (!check_agency || check_agency.status !== "Active") {
+      if (!check_agency || check_agency.status !== 'Active') {
         res
           .status(StatusCode.HTTP_UNAUTHORIZED)
           .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
@@ -344,6 +344,8 @@ export default class AuthChecker {
         token: token,
       });
 
+      console.log({ check_token });
+
       if (!check_token) {
         res
           .status(StatusCode.HTTP_UNAUTHORIZED)
@@ -355,9 +357,11 @@ export default class AuthChecker {
         agency_id: check_token?.agency_id,
       });
 
+      console.log({ check_agency });
+
       if (
         !check_agency ||
-        check_agency.status !== "Active" ||
+        check_agency.status !== 'Active' ||
         !check_agency.white_label
       ) {
         res
@@ -366,7 +370,7 @@ export default class AuthChecker {
         return;
       }
 
-      const module = req.originalUrl.split("/")[4] || "";
+      const module = req.originalUrl.split('/')[4] || '';
 
       req.agencyB2CWhiteLabel = {
         agency_id: Number(check_token?.agency_id),
@@ -381,21 +385,21 @@ export default class AuthChecker {
 
       // Check permission
       const agencyB2CModules = [
-        "flight",
-        "hotel",
-        "visa",
-        "holiday",
-        "umrah",
-        "group_fare",
-        "blog",
-        "agent-b2c",
-        "profile",
-        "email-otp",
-        "traveler",
-        "config",
+        'flight',
+        'hotel',
+        'visa',
+        'holiday',
+        'umrah',
+        'group_fare',
+        'blog',
+        'agent-b2c',
+        'profile',
+        'email-otp',
+        'traveler',
+        'config',
       ];
       console.log({
-        type: "White label",
+        type: 'White label',
         agency_id: check_agency.id,
         agency_name: check_agency.agency_name,
         module,
@@ -420,7 +424,7 @@ export default class AuthChecker {
     res: Response,
     next: NextFunction
   ) => {
-    req.agentAPI = { agency_email: "", agency_id: 1, agency_name: "" };
+    req.agentAPI = { agency_email: '', agency_id: 1, agency_name: '' };
     next();
   };
 
@@ -430,7 +434,7 @@ export default class AuthChecker {
     res: Response,
     next: NextFunction
   ) => {
-    req.external = { external_email: "", external_id: 1, external_name: "" };
+    req.external = { external_email: '', external_id: 1, external_name: '' };
     next();
   };
 }

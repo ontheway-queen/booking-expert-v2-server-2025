@@ -7,15 +7,21 @@ exports.AgentB2CSubSiteConfigValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
 class AgentB2CSubSiteConfigValidator {
     constructor() {
-        this.SiteConfigEmail = joi_1.default.array().min(1).items({
-            email: joi_1.default.string().email().lowercase().trim().required(),
+        this.SiteConfigEmail = joi_1.default.object({
+            emails: joi_1.default.array().min(1).items({
+                email: joi_1.default.string().email().lowercase().trim().required(),
+            }),
         });
-        this.SiteConfigPhone = joi_1.default.array().min(1).items({
-            number: joi_1.default.string().trim().required(),
+        this.SiteConfigPhone = joi_1.default.object({
+            numbers: joi_1.default.array().min(1).items({
+                number: joi_1.default.string().trim().required(),
+            }),
         });
-        this.SiteConfigAddres = joi_1.default.object({
-            title: joi_1.default.string().required().trim(),
-            address: joi_1.default.string().required().trim(),
+        this.SiteConfigAddress = joi_1.default.object({
+            addresses: joi_1.default.array().min(1).items({
+                title: joi_1.default.string().required().trim(),
+                address: joi_1.default.string().required().trim(),
+            }),
         });
         this.updateSiteConfig = joi_1.default.object({
             hero_quote: joi_1.default.string().trim().optional(),
@@ -33,15 +39,15 @@ class AgentB2CSubSiteConfigValidator {
                     const parsed = JSON.parse(value);
                     const { error } = this.SiteConfigEmail.validate(parsed);
                     if (error) {
-                        return helpers.error("any.invalid", {
-                            message: error.details.map((d) => d.message).join(", "),
+                        return helpers.error('any.invalid', {
+                            message: error.details.map((d) => d.message).join(', '),
                         });
                     }
                     return parsed;
                 }
                 catch (err) {
-                    return helpers.error("any.invalid", {
-                        message: "Invalid JSON in contact field",
+                    return helpers.error('any.invalid', {
+                        message: 'Invalid JSON in contact field',
                     });
                 }
             })
@@ -52,34 +58,34 @@ class AgentB2CSubSiteConfigValidator {
                     const parsed = JSON.parse(value);
                     const { error } = this.SiteConfigPhone.validate(parsed);
                     if (error) {
-                        return helpers.error("any.invalid", {
-                            message: error.details.map((d) => d.message).join(", "),
+                        return helpers.error('any.invalid', {
+                            message: error.details.map((d) => d.message).join(', '),
                         });
                     }
                     return parsed;
                 }
                 catch (err) {
-                    return helpers.error("any.invalid", {
-                        message: "Invalid JSON in contact field",
+                    return helpers.error('any.invalid', {
+                        message: 'Invalid JSON in contact field',
                     });
                 }
             })
                 .optional(),
-            address: joi_1.default.string()
+            addresses: joi_1.default.string()
                 .custom((value, helpers) => {
                 try {
                     const parsed = JSON.parse(value);
-                    const { error } = this.SiteConfigAddres.validate(parsed);
+                    const { error } = this.SiteConfigAddress.validate(parsed);
                     if (error) {
-                        return helpers.error("any.invalid", {
-                            message: error.details.map((d) => d.message).join(", "),
+                        return helpers.error('any.invalid', {
+                            message: error.details.map((d) => d.message).join(', '),
                         });
                     }
                     return parsed;
                 }
                 catch (err) {
-                    return helpers.error("any.invalid", {
-                        message: "Invalid JSON in contact field",
+                    return helpers.error('any.invalid', {
+                        message: 'Invalid JSON in contact field',
                     });
                 }
             })
@@ -112,7 +118,7 @@ class AgentB2CSubSiteConfigValidator {
             link: joi_1.default.string().optional().trim(),
             status: joi_1.default.boolean().optional(),
             description: joi_1.default.string().optional().trim(),
-            pop_up_for: joi_1.default.string().valid("AGENT", "B2C").required(),
+            pop_up_for: joi_1.default.string().valid('AGENT', 'B2C').required(),
         });
     }
 }

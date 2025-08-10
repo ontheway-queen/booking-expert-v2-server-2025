@@ -47,4 +47,12 @@ export default class PublicCommonController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public getBank = this.asyncWrapper.wrap(
+    { bodySchema: this.commonValidator.getBanks },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getBank(req);
+      res.status(code).json(rest);
+    }
+  );
 }

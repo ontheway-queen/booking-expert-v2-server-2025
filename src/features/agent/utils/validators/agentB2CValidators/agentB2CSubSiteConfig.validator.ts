@@ -1,17 +1,23 @@
-import Joi from "joi";
+import Joi from 'joi';
 
 export class AgentB2CSubSiteConfigValidator {
-  private SiteConfigEmail = Joi.array().min(1).items({
-    email: Joi.string().email().lowercase().trim().required(),
+  private SiteConfigEmail = Joi.object({
+    emails: Joi.array().min(1).items({
+      email: Joi.string().email().lowercase().trim().required(),
+    }),
   });
 
-  private SiteConfigPhone = Joi.array().min(1).items({
-    number: Joi.string().trim().required(),
+  private SiteConfigPhone = Joi.object({
+    numbers: Joi.array().min(1).items({
+      number: Joi.string().trim().required(),
+    }),
   });
 
-  private SiteConfigAddres = Joi.object({
-    title: Joi.string().required().trim(),
-    address: Joi.string().required().trim(),
+  private SiteConfigAddress = Joi.object({
+    addresses: Joi.array().min(1).items({
+      title: Joi.string().required().trim(),
+      address: Joi.string().required().trim(),
+    }),
   });
 
   public updateSiteConfig = Joi.object({
@@ -30,15 +36,15 @@ export class AgentB2CSubSiteConfigValidator {
           const parsed = JSON.parse(value);
           const { error } = this.SiteConfigEmail.validate(parsed);
           if (error) {
-            return helpers.error("any.invalid", {
-              message: error.details.map((d) => d.message).join(", "),
+            return helpers.error('any.invalid', {
+              message: error.details.map((d) => d.message).join(', '),
             });
           }
 
           return parsed;
         } catch (err) {
-          return helpers.error("any.invalid", {
-            message: "Invalid JSON in contact field",
+          return helpers.error('any.invalid', {
+            message: 'Invalid JSON in contact field',
           });
         }
       })
@@ -49,34 +55,34 @@ export class AgentB2CSubSiteConfigValidator {
           const parsed = JSON.parse(value);
           const { error } = this.SiteConfigPhone.validate(parsed);
           if (error) {
-            return helpers.error("any.invalid", {
-              message: error.details.map((d) => d.message).join(", "),
+            return helpers.error('any.invalid', {
+              message: error.details.map((d) => d.message).join(', '),
             });
           }
 
           return parsed;
         } catch (err) {
-          return helpers.error("any.invalid", {
-            message: "Invalid JSON in contact field",
+          return helpers.error('any.invalid', {
+            message: 'Invalid JSON in contact field',
           });
         }
       })
       .optional(),
-    address: Joi.string()
+    addresses: Joi.string()
       .custom((value, helpers) => {
         try {
           const parsed = JSON.parse(value);
-          const { error } = this.SiteConfigAddres.validate(parsed);
+          const { error } = this.SiteConfigAddress.validate(parsed);
           if (error) {
-            return helpers.error("any.invalid", {
-              message: error.details.map((d) => d.message).join(", "),
+            return helpers.error('any.invalid', {
+              message: error.details.map((d) => d.message).join(', '),
             });
           }
 
           return parsed;
         } catch (err) {
-          return helpers.error("any.invalid", {
-            message: "Invalid JSON in contact field",
+          return helpers.error('any.invalid', {
+            message: 'Invalid JSON in contact field',
           });
         }
       })
@@ -116,6 +122,6 @@ export class AgentB2CSubSiteConfigValidator {
     link: Joi.string().optional().trim(),
     status: Joi.boolean().optional(),
     description: Joi.string().optional().trim(),
-    pop_up_for: Joi.string().valid("AGENT", "B2C").required(),
+    pop_up_for: Joi.string().valid('AGENT', 'B2C').required(),
   });
 }

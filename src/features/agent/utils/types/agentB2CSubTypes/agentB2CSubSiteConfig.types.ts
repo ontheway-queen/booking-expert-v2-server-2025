@@ -2,9 +2,9 @@ export interface IAgencyB2CSubUpdateSiteConfigReqBody {
   hero_quote?: string;
   hero_sub_quote?: string;
   site_name?: string;
-  emails?: IUpdateSiteConfigEmailReqBody[];
-  numbers?: IUpdateSiteConfigNumberReqBody[];
-  address?: IUpdateSiteConfigAddressReqBody;
+  emails?: IUpdateSiteConfigEmailReqBody;
+  numbers?: IUpdateSiteConfigNumberReqBody;
+  addresses?: IUpdateSiteConfigAddressReqBody;
   meta_title?: string;
   meta_description?: string;
   meta_tags?: string;
@@ -14,14 +14,13 @@ export interface IAgencyB2CSubUpdateSiteConfigReqBody {
 }
 
 export interface IUpdateSiteConfigEmailReqBody {
-  email: string;
+  emails: { email: string }[];
 }
 
 export interface IUpdateSiteConfigNumberReqBody {
-  number: string;
+  numbers: { number: string }[];
 }
 
 export interface IUpdateSiteConfigAddressReqBody {
-  title: string;
-  address: string;
+  addresses: { title: string; address: string }[];
 }

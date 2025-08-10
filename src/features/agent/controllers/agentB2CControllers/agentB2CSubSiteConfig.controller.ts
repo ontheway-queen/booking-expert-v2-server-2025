@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import AbstractController from "../../../../abstract/abstract.controller";
-import { AgentB2CSubSiteConfigService } from "../../services/agentB2CServices/agentB2CSubSiteConfig.service";
-import { AgentB2CSubSiteConfigValidator } from "../../utils/validators/agentB2CValidators/agentB2CSubSiteConfig.validator";
+import { Request, Response } from 'express';
+import AbstractController from '../../../../abstract/abstract.controller';
+import { AgentB2CSubSiteConfigService } from '../../services/agentB2CServices/agentB2CSubSiteConfig.service';
+import { AgentB2CSubSiteConfigValidator } from '../../utils/validators/agentB2CValidators/agentB2CSubSiteConfig.validator';
 
 export class AgentB2CSubSiteConfigController extends AbstractController {
   private service = new AgentB2CSubSiteConfigService();

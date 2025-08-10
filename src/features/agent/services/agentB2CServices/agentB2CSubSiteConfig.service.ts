@@ -1,13 +1,13 @@
-import { Request } from "express";
-import AbstractServices from "../../../../abstract/abstract.service";
-import { IAgencyB2CSubUpdateSiteConfigReqBody } from "../../utils/types/agentB2CSubTypes/agentB2CSubSiteConfig.types";
+import { Request } from 'express';
+import AbstractServices from '../../../../abstract/abstract.service';
+import { IAgencyB2CSubUpdateSiteConfigReqBody } from '../../utils/types/agentB2CSubTypes/agentB2CSubSiteConfig.types';
 import {
   ICreateAgencyB2CSocialLinkPayload,
   IUpdateAgencyB2CPopUpBannerPayload,
   IUpdateAgencyB2CSiteConfigPayload,
   IUpdateAgencyB2CSocialLinkPayload,
-} from "../../../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types";
-import { IUpSertPopUpBannerReqBody } from "../../utils/types/agentB2CSubTypes/agentB2CSubConfig.types";
+} from '../../../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types';
+import { IUpSertPopUpBannerReqBody } from '../../utils/types/agentB2CSubTypes/agentB2CSubConfig.types';
 
 export class AgentB2CSubSiteConfigService extends AbstractServices {
   constructor() {
@@ -16,7 +16,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
 
   public async updateSiteConfig(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { emails, numbers, address, ...body } =
+      const { emails, numbers, addresses, ...body } =
         req.body as IAgencyB2CSubUpdateSiteConfigReqBody;
       const files = (req.files as Express.Multer.File[]) || [];
       const { agency_id, user_id } = req.agencyUser;
@@ -34,25 +34,27 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
       };
 
       files.forEach((file) => {
-        if (file.fieldname === "main_logo") {
+        if (file.fieldname === 'main_logo') {
           payload.main_logo = file.filename;
         }
-        if (file.fieldname === "site_thumbnail") {
+        if (file.fieldname === 'site_thumbnail') {
           payload.site_thumbnail = file.filename;
         }
-        if (file.fieldname === "fabicon") {
+        if (file.fieldname === 'fabicon') {
           payload.fabicon = file.filename;
         }
       });
 
-      if (emails?.length) {
-        payload.emails = JSON.stringify(emails);
+      if (emails) {
+        payload.emails = JSON.stringify(emails.emails);
       }
-      if (numbers?.length) {
-        payload.numbers = JSON.stringify(numbers);
+
+      if (numbers) {
+        payload.numbers = JSON.stringify(numbers.numbers);
       }
-      if (address) {
-        payload.address = JSON.stringify(address);
+      if (addresses) {
+        console.log(addresses);
+        payload.address = JSON.stringify(addresses.addresses);
       }
 
       await AgencyB2CConfigModel.updateConfig(payload, { agency_id });
@@ -76,9 +78,9 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
       await this.insertAgentAudit(trx, {
         agency_id,
         created_by: user_id,
-        details: "Updated site config data.",
+        details: 'Updated site config data.',
         payload: JSON.stringify(payload),
-        type: "UPDATE",
+        type: 'UPDATE',
       });
 
       return {
@@ -95,7 +97,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
   }
 
   public async getSiteConfigData(req: Request) {
-    const { agency_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyUser;
     const configModel = this.Model.AgencyB2CConfigModel();
     const siteConfig = await configModel.getSiteConfig({ agency_id });
 
@@ -151,7 +153,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
     }
 
     files.forEach((file) => {
-      if (file.fieldname === "thumbnail") {
+      if (file.fieldname === 'thumbnail') {
         payload.about_us_thumbnail = file.filename;
       }
     });
@@ -165,9 +167,9 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
     await this.insertAgentAudit(undefined, {
       agency_id,
       created_by: user_id,
-      details: "Updated site config about us data.",
+      details: 'Updated site config about us data.',
       payload: JSON.stringify(payload),
-      type: "UPDATE",
+      type: 'UPDATE',
     });
 
     return {
@@ -182,7 +184,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
 
   public async getAboutUsData(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyB2CUser;
+      const { agency_id } = req.agencyUser;
 
       const configModel = this.Model.AgencyB2CConfigModel(trx);
       const siteConfig = await configModel.getSiteConfig({ agency_id });
@@ -230,7 +232,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
     }
 
     files.forEach((file) => {
-      if (file.fieldname === "thumbnail") {
+      if (file.fieldname === 'thumbnail') {
         payload.contact_us_thumbnail = file.filename;
       }
     });
@@ -244,9 +246,9 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
     await this.insertAgentAudit(undefined, {
       agency_id,
       created_by: user_id,
-      details: "Updated site config contact us data.",
+      details: 'Updated site config contact us data.',
       payload: JSON.stringify(payload),
-      type: "UPDATE",
+      type: 'UPDATE',
     });
 
     return {
@@ -261,7 +263,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
 
   public async getContactUsData(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyB2CUser;
+      const { agency_id } = req.agencyUser;
 
       const configModel = this.Model.AgencyB2CConfigModel(trx);
       const siteConfig = await configModel.getSiteConfig({ agency_id });
@@ -300,7 +302,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
     };
 
     if (body.content) {
-      payload.about_us_content = body.content;
+      payload.privacy_policy_content = body.content;
     }
 
     await AgencyB2CConfigModel.updateConfig(payload, { agency_id });
@@ -308,24 +310,21 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
     await this.insertAgentAudit(undefined, {
       agency_id,
       created_by: user_id,
-      details: "Updated site config privacy policy data.",
+      details: 'Updated site config privacy policy data.',
       payload: JSON.stringify(payload),
-      type: "UPDATE",
+      type: 'UPDATE',
     });
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: {
-        about_us_thumbnail: payload.about_us_thumbnail,
-      },
     };
   }
 
   public async getPrivacyPolicyData(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyB2CUser;
+      const { agency_id } = req.agencyUser;
 
       const configModel = this.Model.AgencyB2CConfigModel(trx);
       const siteConfig = await configModel.getSiteConfig({ agency_id });
@@ -371,9 +370,9 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
     await this.insertAgentAudit(undefined, {
       agency_id,
       created_by: user_id,
-      details: "Updated site config terms and conditions data.",
+      details: 'Updated site config terms and conditions data.',
       payload: JSON.stringify(payload),
-      type: "UPDATE",
+      type: 'UPDATE',
     });
 
     return {
@@ -387,7 +386,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
   }
 
   public async getTermsAndConditionsData(req: Request) {
-    const { agency_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyUser;
 
     const configModel = this.Model.AgencyB2CConfigModel();
     const siteConfig = await configModel.getSiteConfig({ agency_id });
@@ -414,7 +413,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
 
   public async getSocialLinks(req: Request) {
     const configModel = this.Model.AgencyB2CConfigModel();
-    const { agency_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyUser;
 
     const social_links = await configModel.getSocialLink({
       agency_id,
@@ -431,7 +430,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
   public async deleteSocialLinks(req: Request) {
     return this.db.transaction(async (trx) => {
       const configModel = this.Model.AgencyB2CConfigModel(trx);
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
       const id = Number(req.params.id);
 
       const check = await configModel.checkSocialLink({ agency_id, id });
@@ -454,7 +453,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         agency_id,
         created_by: user_id,
         details: `Deleted social media link [${check.media}(${check.link})]`,
-        type: "DELETE",
+        type: 'DELETE',
       });
 
       if (check.icon) {
@@ -472,7 +471,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
   public async createSocialLinks(req: Request) {
     return this.db.transaction(async (trx) => {
       const configModel = this.Model.AgencyB2CConfigModel(trx);
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
 
       const body = req.body as {
         media: string;
@@ -500,7 +499,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         created_by: user_id,
         details: `Created new social link.`,
         payload: JSON.stringify(payload),
-        type: "CREATE",
+        type: 'CREATE',
       });
 
       return {
@@ -517,7 +516,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
   public async updateSocialLinks(req: Request) {
     return this.db.transaction(async (trx) => {
       const configModel = this.Model.AgencyB2CConfigModel(trx);
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
 
       const id = Number(req.params.id);
       const check = await configModel.checkSocialLink({ agency_id, id });
@@ -552,7 +551,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         created_by: user_id,
         details: `Updated Social link(${id}).`,
         payload: JSON.stringify(payload),
-        type: "UPDATE",
+        type: 'UPDATE',
       });
 
       if (payload.icon && check.icon) {
@@ -572,14 +571,14 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
 
   public async getPopUpBanner(req: Request) {
     const configModel = this.Model.AgencyB2CConfigModel();
-    const { agency_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyUser;
 
     const popUpBanners = await configModel.getPopUpBanner({ agency_id });
 
-    const b2cPopUp = popUpBanners.find((banner) => banner.pop_up_for === "B2C");
+    const b2cPopUp = popUpBanners.find((banner) => banner.pop_up_for === 'B2C');
 
     const agentPopUp = popUpBanners.find(
-      (banner) => banner.pop_up_for === "AGENT"
+      (banner) => banner.pop_up_for === 'AGENT'
     );
 
     return {
@@ -596,7 +595,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
   public async upSertPopUpBanner(req: Request) {
     return this.db.transaction(async (trx) => {
       const configModel = this.Model.AgencyB2CConfigModel(trx);
-      const { agency_id, user_id } = req.agencyB2CUser;
+      const { agency_id, user_id } = req.agencyUser;
 
       const { pop_up_for, ...restBody } = req.body as IUpSertPopUpBannerReqBody;
 
@@ -613,18 +612,18 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         pop_up_for: pop_up_for,
       });
 
-      let auditDesc = "";
+      let auditDesc = '';
 
       if (checkPopUp.length) {
         await configModel.updatePopUpBanner(payload, { agency_id, pop_up_for });
-        auditDesc = "Created new pop up banner for " + pop_up_for;
+        auditDesc = 'Created new pop up banner for ' + pop_up_for;
       } else {
         await configModel.insertPopUpBanner({
           ...payload,
           pop_up_for,
           agency_id,
         });
-        auditDesc = "Updated " + pop_up_for + " Pop up banner.";
+        auditDesc = 'Updated ' + pop_up_for + ' Pop up banner.';
       }
 
       await this.insertAgentAudit(trx, {
@@ -632,7 +631,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         created_by: user_id,
         details: auditDesc,
         payload: JSON.stringify(payload),
-        type: "UPDATE",
+        type: 'UPDATE',
       });
 
       return {

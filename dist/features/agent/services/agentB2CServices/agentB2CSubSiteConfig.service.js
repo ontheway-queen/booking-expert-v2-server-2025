@@ -32,7 +32,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
     updateSiteConfig(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const _a = req.body, { emails, numbers, address } = _a, body = __rest(_a, ["emails", "numbers", "address"]);
+                const _a = req.body, { emails, numbers, addresses } = _a, body = __rest(_a, ["emails", "numbers", "addresses"]);
                 const files = req.files || [];
                 const { agency_id, user_id } = req.agencyUser;
                 const AgencyB2CConfigModel = this.Model.AgencyB2CConfigModel(trx);
@@ -41,24 +41,25 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                 });
                 const payload = Object.assign({ last_updated: new Date(), updated_by: user_id }, body);
                 files.forEach((file) => {
-                    if (file.fieldname === "main_logo") {
+                    if (file.fieldname === 'main_logo') {
                         payload.main_logo = file.filename;
                     }
-                    if (file.fieldname === "site_thumbnail") {
+                    if (file.fieldname === 'site_thumbnail') {
                         payload.site_thumbnail = file.filename;
                     }
-                    if (file.fieldname === "fabicon") {
+                    if (file.fieldname === 'fabicon') {
                         payload.fabicon = file.filename;
                     }
                 });
-                if (emails === null || emails === void 0 ? void 0 : emails.length) {
-                    payload.emails = JSON.stringify(emails);
+                if (emails) {
+                    payload.emails = JSON.stringify(emails.emails);
                 }
-                if (numbers === null || numbers === void 0 ? void 0 : numbers.length) {
-                    payload.numbers = JSON.stringify(numbers);
+                if (numbers) {
+                    payload.numbers = JSON.stringify(numbers.numbers);
                 }
-                if (address) {
-                    payload.address = JSON.stringify(address);
+                if (addresses) {
+                    console.log(addresses);
+                    payload.address = JSON.stringify(addresses.addresses);
                 }
                 yield AgencyB2CConfigModel.updateConfig(payload, { agency_id });
                 const deletedFiles = [];
@@ -77,9 +78,9 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                 yield this.insertAgentAudit(trx, {
                     agency_id,
                     created_by: user_id,
-                    details: "Updated site config data.",
+                    details: 'Updated site config data.',
                     payload: JSON.stringify(payload),
-                    type: "UPDATE",
+                    type: 'UPDATE',
                 });
                 return {
                     success: true,
@@ -96,7 +97,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
     }
     getSiteConfigData(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyUser;
             const configModel = this.Model.AgencyB2CConfigModel();
             const siteConfig = yield configModel.getSiteConfig({ agency_id });
             if (!siteConfig) {
@@ -132,7 +133,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                 payload.about_us_content = body.content;
             }
             files.forEach((file) => {
-                if (file.fieldname === "thumbnail") {
+                if (file.fieldname === 'thumbnail') {
                     payload.about_us_thumbnail = file.filename;
                 }
             });
@@ -143,9 +144,9 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
             yield this.insertAgentAudit(undefined, {
                 agency_id,
                 created_by: user_id,
-                details: "Updated site config about us data.",
+                details: 'Updated site config about us data.',
                 payload: JSON.stringify(payload),
-                type: "UPDATE",
+                type: 'UPDATE',
             });
             return {
                 success: true,
@@ -160,7 +161,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
     getAboutUsData(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyB2CUser;
+                const { agency_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const siteConfig = yield configModel.getSiteConfig({ agency_id });
                 if (!siteConfig) {
@@ -200,7 +201,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                 payload.contact_us_content = body.content;
             }
             files.forEach((file) => {
-                if (file.fieldname === "thumbnail") {
+                if (file.fieldname === 'thumbnail') {
                     payload.contact_us_thumbnail = file.filename;
                 }
             });
@@ -211,9 +212,9 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
             yield this.insertAgentAudit(undefined, {
                 agency_id,
                 created_by: user_id,
-                details: "Updated site config contact us data.",
+                details: 'Updated site config contact us data.',
                 payload: JSON.stringify(payload),
-                type: "UPDATE",
+                type: 'UPDATE',
             });
             return {
                 success: true,
@@ -228,7 +229,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
     getContactUsData(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyB2CUser;
+                const { agency_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const siteConfig = yield configModel.getSiteConfig({ agency_id });
                 if (!siteConfig) {
@@ -261,30 +262,27 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                 updated_by: user_id,
             };
             if (body.content) {
-                payload.about_us_content = body.content;
+                payload.privacy_policy_content = body.content;
             }
             yield AgencyB2CConfigModel.updateConfig(payload, { agency_id });
             yield this.insertAgentAudit(undefined, {
                 agency_id,
                 created_by: user_id,
-                details: "Updated site config privacy policy data.",
+                details: 'Updated site config privacy policy data.',
                 payload: JSON.stringify(payload),
-                type: "UPDATE",
+                type: 'UPDATE',
             });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: {
-                    about_us_thumbnail: payload.about_us_thumbnail,
-                },
             };
         });
     }
     getPrivacyPolicyData(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyB2CUser;
+                const { agency_id } = req.agencyUser;
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const siteConfig = yield configModel.getSiteConfig({ agency_id });
                 if (!siteConfig) {
@@ -322,9 +320,9 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
             yield this.insertAgentAudit(undefined, {
                 agency_id,
                 created_by: user_id,
-                details: "Updated site config terms and conditions data.",
+                details: 'Updated site config terms and conditions data.',
                 payload: JSON.stringify(payload),
-                type: "UPDATE",
+                type: 'UPDATE',
             });
             return {
                 success: true,
@@ -338,7 +336,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
     }
     getTermsAndConditionsData(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyUser;
             const configModel = this.Model.AgencyB2CConfigModel();
             const siteConfig = yield configModel.getSiteConfig({ agency_id });
             if (!siteConfig) {
@@ -362,7 +360,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
     getSocialLinks(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
-            const { agency_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyUser;
             const social_links = yield configModel.getSocialLink({
                 agency_id,
             });
@@ -378,7 +376,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const id = Number(req.params.id);
                 const check = yield configModel.checkSocialLink({ agency_id, id });
                 if (!check) {
@@ -396,7 +394,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     agency_id,
                     created_by: user_id,
                     details: `Deleted social media link [${check.media}(${check.link})]`,
-                    type: "DELETE",
+                    type: 'DELETE',
                 });
                 if (check.icon) {
                     yield this.manageFile.deleteFromCloud([check.icon]);
@@ -413,7 +411,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const body = req.body;
                 const files = req.files || [];
                 const lastNo = yield configModel.getSocialLinkLastNo({ agency_id });
@@ -427,7 +425,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     created_by: user_id,
                     details: `Created new social link.`,
                     payload: JSON.stringify(payload),
-                    type: "CREATE",
+                    type: 'CREATE',
                 });
                 return {
                     success: true,
@@ -444,7 +442,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const id = Number(req.params.id);
                 const check = yield configModel.checkSocialLink({ agency_id, id });
                 if (!check) {
@@ -466,7 +464,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     created_by: user_id,
                     details: `Updated Social link(${id}).`,
                     payload: JSON.stringify(payload),
-                    type: "UPDATE",
+                    type: 'UPDATE',
                 });
                 if (payload.icon && check.icon) {
                     yield this.manageFile.deleteFromCloud([check.icon]);
@@ -485,10 +483,10 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
     getPopUpBanner(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
-            const { agency_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyUser;
             const popUpBanners = yield configModel.getPopUpBanner({ agency_id });
-            const b2cPopUp = popUpBanners.find((banner) => banner.pop_up_for === "B2C");
-            const agentPopUp = popUpBanners.find((banner) => banner.pop_up_for === "AGENT");
+            const b2cPopUp = popUpBanners.find((banner) => banner.pop_up_for === 'B2C');
+            const agentPopUp = popUpBanners.find((banner) => banner.pop_up_for === 'AGENT');
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -504,7 +502,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { agency_id, user_id } = req.agencyUser;
                 const _a = req.body, { pop_up_for } = _a, restBody = __rest(_a, ["pop_up_for"]);
                 const files = req.files || [];
                 const payload = restBody;
@@ -515,22 +513,22 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     agency_id,
                     pop_up_for: pop_up_for,
                 });
-                let auditDesc = "";
+                let auditDesc = '';
                 if (checkPopUp.length) {
                     yield configModel.updatePopUpBanner(payload, { agency_id, pop_up_for });
-                    auditDesc = "Created new pop up banner for " + pop_up_for;
+                    auditDesc = 'Created new pop up banner for ' + pop_up_for;
                 }
                 else {
                     yield configModel.insertPopUpBanner(Object.assign(Object.assign({}, payload), { pop_up_for,
                         agency_id }));
-                    auditDesc = "Updated " + pop_up_for + " Pop up banner.";
+                    auditDesc = 'Updated ' + pop_up_for + ' Pop up banner.';
                 }
                 yield this.insertAgentAudit(trx, {
                     agency_id,
                     created_by: user_id,
                     details: auditDesc,
                     payload: JSON.stringify(payload),
-                    type: "UPDATE",
+                    type: 'UPDATE',
                 });
                 return {
                     success: true,

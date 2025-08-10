@@ -126,5 +126,21 @@ class PublicCommonService extends abstract_service_1.default {
             }));
         });
     }
+    //get banks
+    getBank(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const CommonModel = this.Model.CommonModel(trx);
+                const { filter } = req.query;
+                const banks = yield CommonModel.getBanks({ name: filter });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: banks,
+                };
+            }));
+        });
+    }
 }
 exports.default = PublicCommonService;

@@ -89,10 +89,16 @@ export default class PublicCommonValidator {
     filter: Joi.string().optional(),
   });
 
+  //get banks
+  public getBanks = Joi.object({
+    filter: Joi.string().optional(),
+  });
+
   // get country
   public getCountry = Joi.object({
     name: Joi.string().optional(),
   });
+
   // get city
   public getCity = Joi.object({
     name: Joi.string().optional(),
