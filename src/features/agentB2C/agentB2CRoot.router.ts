@@ -11,6 +11,7 @@ import AgentB2CVisaRouter from './routers/agentB2CVisa.router';
 import AuthChecker from '../../middleware/authChecker/authChecker';
 import BlogRouter from './routers/agentB2CBlog.router';
 import AgentB2CConfigRouter from './routers/agentB2CConfig.router';
+import AgentB2CPaymentRouter from './routers/agentB2CPayment.router';
 
 export default class AgentB2CRootRouter {
   public Router = Router();
@@ -29,6 +30,7 @@ export default class AgentB2CRootRouter {
   private visaRouter = new AgentB2CVisaRouter();
   private blogRouter = new BlogRouter();
   private agentB2CConfigRouter = new AgentB2CConfigRouter();
+  private agentB2CPaymentRouter = new AgentB2CPaymentRouter();
 
   constructor() {
     this.callRouter();
@@ -59,5 +61,6 @@ export default class AgentB2CRootRouter {
     this.Router.use('/visa', this.visaRouter.router);
 
     this.Router.use('/blog', this.blogRouter.router);
+    this.Router.use('/payment', this.agentB2CPaymentRouter.router);
   }
 }

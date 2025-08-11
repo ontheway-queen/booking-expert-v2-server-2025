@@ -105,6 +105,7 @@ export default class AuthAgentB2CService extends AbstractServices {
       const { agency_id } = req.agencyB2CWhiteLabel;
       const AgentB2CUserModel = this.Model.AgencyB2CUserModel(trx);
       const AgentModel = this.Model.AgencyModel(trx);
+      const AgencyB2CPaymentModel = this.Model.AgencyB2CPaymentModel(trx);
 
       const checkAgentB2C = await AgentB2CUserModel.checkUser({
         username: user_or_email,
@@ -159,6 +160,11 @@ export default class AuthAgentB2CService extends AbstractServices {
         };
       }
 
+      const balance = await AgencyB2CPaymentModel.getUserBalance(
+        agency_id,
+        checkAgentB2C.id
+      );
+
       const tokenData: ITokenParseAgencyB2CUser = {
         agency_id,
         agency_name: String(agent_details?.agency_name),
@@ -187,6 +193,7 @@ export default class AuthAgentB2CService extends AbstractServices {
         data: {
           id: tokenData.user_id,
           username: checkAgentB2C.username,
+          balance,
           email: tokenData.user_email,
           name: tokenData.name,
           photo: tokenData.photo,

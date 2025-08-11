@@ -90,8 +90,8 @@ export default class AdminConfigValidator {
   });
 
   public getBanks = Joi.object({
-    status: Joi.string().optional(),
-    filer: Joi.string().optional(),
+    status: Joi.boolean().optional(),
+    filter: Joi.string().optional(),
   });
 
   public updateBank = Joi.object({

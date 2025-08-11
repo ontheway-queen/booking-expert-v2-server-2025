@@ -358,7 +358,7 @@ class AdminConfigService extends abstract_service_1.default {
                 const { filter, status } = req.query;
                 const banks = yield CommonModel.getBanks({
                     name: filter,
-                    status: Boolean(status),
+                    status: status,
                 });
                 return {
                     success: true,

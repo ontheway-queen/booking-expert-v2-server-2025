@@ -121,6 +121,7 @@ export interface IGetInvoiceQueryFilter {
 export interface IGetSingleInvoiceParams {
   id?: number;
   ref_id?: number;
+  user_id?: number;
   ref_type?:
     | typeof TYPE_FLIGHT
     | typeof TYPE_HOTEL
@@ -136,6 +137,7 @@ export interface IGetSingleInvoiceParams {
 }
 export interface IDeleteSingleInvoiceParams {
   id?: number;
+  user_id?: number;
   source_type?:
     | typeof SOURCE_AGENT
     | typeof SOURCE_SUB_AGENT

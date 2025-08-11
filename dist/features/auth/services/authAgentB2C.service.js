@@ -97,6 +97,7 @@ class AuthAgentB2CService extends abstract_service_1.default {
                 const { agency_id } = req.agencyB2CWhiteLabel;
                 const AgentB2CUserModel = this.Model.AgencyB2CUserModel(trx);
                 const AgentModel = this.Model.AgencyModel(trx);
+                const AgencyB2CPaymentModel = this.Model.AgencyB2CPaymentModel(trx);
                 const checkAgentB2C = yield AgentB2CUserModel.checkUser({
                     username: user_or_email,
                     email: user_or_email,
@@ -139,6 +140,7 @@ class AuthAgentB2CService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
+                const balance = yield AgencyB2CPaymentModel.getUserBalance(agency_id, checkAgentB2C.id);
                 const tokenData = {
                     agency_id,
                     agency_name: String(agent_details === null || agent_details === void 0 ? void 0 : agent_details.agency_name),
@@ -161,6 +163,7 @@ class AuthAgentB2CService extends abstract_service_1.default {
                     data: {
                         id: tokenData.user_id,
                         username: checkAgentB2C.username,
+                        balance,
                         email: tokenData.user_email,
                         name: tokenData.name,
                         photo: tokenData.photo,

@@ -133,6 +133,10 @@ export default class InvoiceModel extends Schema {
         if (params.id) {
           qb.andWhere('id', params.id);
         }
+
+        if (params.user_id) {
+          qb.andWhere('user_id', params.user_id);
+        }
         if (params.ref_id) {
           qb.andWhere('ref_id', params.ref_id);
         }
@@ -154,7 +158,9 @@ export default class InvoiceModel extends Schema {
         if (params.source_type) {
           qb.andWhere('source_type', params.source_type);
         }
-
+        if (params.user_id) {
+          qb.andWhere('user_id', params.user_id);
+        }
         if (params.id) {
           qb.andWhere('id', params.id);
         }

@@ -569,8 +569,9 @@ class CommonModel extends Schema {
   public async getBanks(query: {
     name?: string;
     id?: number;
-    status?: boolean;
+    status?: boolean | 'true' | 'false';
   }): Promise<IGetBanksData[]> {
+    console.log({ query });
     return await this.db('banks')
       .withSchema(this.PUBLIC_SCHEMA)
       .select('*')
@@ -578,10 +579,12 @@ class CommonModel extends Schema {
         if (query.name) {
           qb.andWhereILike('name', `%${query.name}%`);
         }
+
         if (query.id) {
           qb.andWhere('id', query.id);
         }
-        if (query.status === undefined) {
+
+        if (query.status !== undefined) {
           qb.andWhere('status', query.status);
         }
       });

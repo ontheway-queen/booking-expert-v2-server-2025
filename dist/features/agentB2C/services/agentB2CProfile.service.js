@@ -25,6 +25,7 @@ class AgentB2CProfileService extends abstract_service_1.default {
                 const { blog, flight, group_fare, holiday, hotel, umrah, visa } = req.agencyB2CWhiteLabel;
                 const AgencyB2CUserModel = this.Model.AgencyB2CUserModel(trx);
                 const AgentModel = this.Model.AgencyModel(trx);
+                const AgencyB2CPaymentModel = this.Model.AgencyB2CPaymentModel(trx);
                 const checkAgentB2C = yield AgencyB2CUserModel.checkUser({
                     id: user_id,
                     agency_id,
@@ -37,6 +38,7 @@ class AgentB2CProfileService extends abstract_service_1.default {
                     };
                 }
                 const agent_details = yield AgentModel.getSingleAgency(agency_id);
+                const balance = yield AgencyB2CPaymentModel.getUserBalance(agency_id, user_id);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -47,6 +49,7 @@ class AgentB2CProfileService extends abstract_service_1.default {
                         agency_logo: String(agent_details === null || agent_details === void 0 ? void 0 : agent_details.agency_logo),
                         agency_address: String(agent_details === null || agent_details === void 0 ? void 0 : agent_details.address),
                         user_id: checkAgentB2C.id,
+                        balance,
                         photo: checkAgentB2C.photo,
                         user_email: checkAgentB2C.email,
                         username: checkAgentB2C.username,

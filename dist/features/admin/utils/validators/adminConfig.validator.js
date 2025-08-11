@@ -79,8 +79,8 @@ class AdminConfigValidator {
             hotel_set_id: joi_1.default.number().optional(),
         });
         this.getBanks = joi_1.default.object({
-            status: joi_1.default.string().optional(),
-            filer: joi_1.default.string().optional(),
+            status: joi_1.default.boolean().optional(),
+            filter: joi_1.default.string().optional(),
         });
         this.updateBank = joi_1.default.object({
             name: joi_1.default.string().optional(),

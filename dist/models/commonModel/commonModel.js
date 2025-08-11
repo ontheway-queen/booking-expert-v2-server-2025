@@ -480,6 +480,7 @@ class CommonModel extends schema_1.default {
     }
     getBanks(query) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log({ query });
             return yield this.db('banks')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .select('*')
@@ -490,7 +491,7 @@ class CommonModel extends schema_1.default {
                 if (query.id) {
                     qb.andWhere('id', query.id);
                 }
-                if (query.status === undefined) {
+                if (query.status !== undefined) {
                     qb.andWhere('status', query.status);
                 }
             });

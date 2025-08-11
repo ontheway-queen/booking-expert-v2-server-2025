@@ -122,7 +122,7 @@ export default class PublicCommonService extends AbstractServices {
 
       const { filter } = req.query as { filter: string };
 
-      const banks = await CommonModel.getBanks({ name: filter });
+      const banks = await CommonModel.getBanks({ name: filter, status: true });
 
       return {
         success: true,

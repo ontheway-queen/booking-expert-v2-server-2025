@@ -19,6 +19,7 @@ export default class AgentB2CProfileService extends AbstractServices {
         req.agencyB2CWhiteLabel;
       const AgencyB2CUserModel = this.Model.AgencyB2CUserModel(trx);
       const AgentModel = this.Model.AgencyModel(trx);
+      const AgencyB2CPaymentModel = this.Model.AgencyB2CPaymentModel(trx);
 
       const checkAgentB2C = await AgencyB2CUserModel.checkUser({
         id: user_id,
@@ -35,6 +36,11 @@ export default class AgentB2CProfileService extends AbstractServices {
 
       const agent_details = await AgentModel.getSingleAgency(agency_id);
 
+      const balance = await AgencyB2CPaymentModel.getUserBalance(
+        agency_id,
+        user_id
+      );
+
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
@@ -45,6 +51,7 @@ export default class AgentB2CProfileService extends AbstractServices {
           agency_logo: String(agent_details?.agency_logo),
           agency_address: String(agent_details?.address),
           user_id: checkAgentB2C.id,
+          balance,
           photo: checkAgentB2C.photo,
           user_email: checkAgentB2C.email,
           username: checkAgentB2C.username,

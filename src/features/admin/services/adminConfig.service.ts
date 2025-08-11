@@ -399,12 +399,12 @@ export class AdminConfigService extends AbstractServices {
 
       const { filter, status } = req.query as {
         filter?: string;
-        status?: string;
+        status?: 'true' | 'false';
       };
 
       const banks = await CommonModel.getBanks({
         name: filter,
-        status: Boolean(status),
+        status: status,
       });
 
       return {

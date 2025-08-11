@@ -40,6 +40,7 @@ import UmrahPackageModel from './umrahPackageModel/umrahPackageModel';
 import UmrahBookingModel from './umrahPackageModel/umrahBookingModel';
 import BlogModel from './blogModel/blogModel';
 import AgencyB2CConfigModel from './agencyB2CModel/agencyB2CConfigModel';
+import AgencyB2CPaymentModel from './agencyB2CModel/agencyB2CPaymentModel';
 
 export default class Models {
   //Common model
@@ -235,5 +236,10 @@ export default class Models {
   //Agent B2C Config Model
   public AgencyB2CConfigModel(trx?: Knex.Transaction) {
     return new AgencyB2CConfigModel(trx || db);
+  }
+
+  //Agent B2C Payment Model
+  public AgencyB2CPaymentModel(trx?: Knex.Transaction) {
+    return new AgencyB2CPaymentModel(trx || db);
   }
 }

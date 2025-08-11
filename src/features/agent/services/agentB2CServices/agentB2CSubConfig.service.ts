@@ -1,5 +1,5 @@
-import AbstractServices from "../../../../abstract/abstract.service";
-import { Request } from "express";
+import AbstractServices from '../../../../abstract/abstract.service';
+import { Request } from 'express';
 import {
   ICreateBankAccountReqBody,
   ICreateHeroBGContentReqBody,
@@ -11,13 +11,13 @@ import {
   IUpdateHotDealsReqBody,
   IUpdatePopularDestinationReqBody,
   IUpdatePopularPlaceReqBody,
-} from "../../utils/types/agentB2CSubTypes/agentB2CSubConfig.types";
+} from '../../utils/types/agentB2CSubTypes/agentB2CSubConfig.types';
 import {
   IUpdateAgencyB2CHeroBgContentPayload,
   IUpdateAgencyB2CHotDealsPayload,
   IUpdateAgencyB2CPopularDestinationPayload,
   IUpdateAgencyB2CPopularPlace,
-} from "../../../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types";
+} from '../../../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types';
 
 export class AgentB2CSubConfigService extends AbstractServices {
   public async getB2CMarkup(req: Request) {
@@ -28,7 +28,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: "No markup has been set for B2C",
+        message: 'No markup has been set for B2C',
         data: {},
       };
     }
@@ -52,15 +52,15 @@ export class AgentB2CSubConfigService extends AbstractServices {
     await this.insertAgentAudit(undefined, {
       agency_id,
       created_by: user_id,
-      details: "Updated/Inserted B2C markup.",
+      details: 'Updated/Inserted B2C markup.',
       payload: JSON.stringify(req.body),
-      type: "UPDATE",
+      type: 'UPDATE',
     });
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
-      message: "Markup has been updated for B2C",
+      message: 'Markup has been updated for B2C',
     };
   }
 
@@ -69,7 +69,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
     const configModel = this.Model.OthersModel();
     const accounts = await configModel.getAccount({
-      source_type: "AGENT",
+      source_type: 'AGENT',
       source_id: agency_id,
     });
 
@@ -90,7 +90,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       const account_id = Number(id);
 
       const account = await configModel.checkAccount({
-        source_type: "AGENT",
+        source_type: 'AGENT',
         source_id: agency_id,
         id: account_id,
       });
@@ -105,16 +105,16 @@ export class AgentB2CSubConfigService extends AbstractServices {
       }
 
       await configModel.updateAccount(
-        { id: account_id, source_type: "AGENT", source_id: agency_id },
+        { id: account_id, source_type: 'AGENT', source_id: agency_id },
         payload
       );
 
       await this.insertAgentAudit(trx, {
         agency_id,
         created_by: user_id,
-        details: "Updated Account data.",
+        details: 'Updated Account data.',
         payload: JSON.stringify(payload),
-        type: "UPDATE",
+        type: 'UPDATE',
       });
 
       return {
@@ -133,29 +133,32 @@ export class AgentB2CSubConfigService extends AbstractServices {
       const CommonModel = this.Model.CommonModel(trx);
 
       const body = req.body as ICreateBankAccountReqBody;
-
-      const checkBank = await CommonModel.getBanks({ id: body.bank_id });
+      console.log({ body });
+      const checkBank = await CommonModel.getBanks({
+        id: body.bank_id,
+        status: true,
+      });
 
       if (!checkBank.length) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: "Bank not found.",
+          message: 'Bank not found.',
         };
       }
 
       const account = await OtersModel.createAccount({
         ...body,
-        source_type: "AGENT",
+        source_type: 'AGENT',
         source_id: agency_id,
       });
 
       await this.insertAgentAudit(undefined, {
         agency_id,
         created_by: user_id,
-        details: "New Account created.",
+        details: 'New Account created.',
         payload: JSON.stringify({ ...body, bank: checkBank[0].name }),
-        type: "CREATE",
+        type: 'CREATE',
       });
 
       return {
@@ -178,7 +181,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
     const account_id = Number(id);
 
     const account = await OthersModel.checkAccount({
-      source_type: "AGENT",
+      source_type: 'AGENT',
       source_id: agency_id,
       id: account_id,
     });
@@ -193,7 +196,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
     await OthersModel.deleteAccount({
       id: account_id,
-      source_type: "AGENT",
+      source_type: 'AGENT',
       source_id: agency_id,
     });
 
@@ -201,7 +204,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       agency_id,
       created_by: user_id,
       details: `Account ${account.account_name}(${account.bank_name})[${account.account_number}] is deleted.`,
-      type: "DELETE",
+      type: 'DELETE',
     });
 
     return {
@@ -240,7 +243,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "Content is required",
+          message: 'Content is required',
         };
       }
 
@@ -259,14 +262,14 @@ export class AgentB2CSubConfigService extends AbstractServices {
         agency_id,
         created_by: user_id,
         details: `New bg content(${body.type}) created for ${
-          body.tab || "all tab"
+          body.tab || 'all tab'
         }(${files[0].filename}).`,
         payload: JSON.stringify({
           ...body,
           content: files[0].filename,
           order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
         }),
-        type: "CREATE",
+        type: 'CREATE',
       });
 
       return {
@@ -326,7 +329,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         created_by: user_id,
         details: `BG content(${id}) is updated.`,
         payload: JSON.stringify(payload),
-        type: "CREATE",
+        type: 'CREATE',
       });
 
       return {
@@ -365,7 +368,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         agency_id,
         created_by: user_id,
         details: `Deleted BG content(${id}).`,
-        type: "DELETE",
+        type: 'DELETE',
       });
 
       return {
@@ -406,7 +409,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "Thumbnail is required",
+          message: 'Thumbnail is required',
         };
       }
 
@@ -418,7 +421,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: "Country not found.",
+          message: 'Country not found.',
         };
       }
       const checkFromAirport = await CommonModel.getAirport({
@@ -429,7 +432,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: "From Airport not found.",
+          message: 'From Airport not found.',
         };
       }
       const toAirport = await CommonModel.getAirport({
@@ -440,7 +443,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: "To Airport not found.",
+          message: 'To Airport not found.',
         };
       }
 
@@ -464,7 +467,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
           thumbnail: files[0].filename,
           order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
         }),
-        type: "CREATE",
+        type: 'CREATE',
       });
 
       return {
@@ -507,7 +510,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_NOT_FOUND,
-            message: "Country not found.",
+            message: 'Country not found.',
           };
         }
       }
@@ -521,7 +524,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_NOT_FOUND,
-            message: "From Airport not found.",
+            message: 'From Airport not found.',
           };
         }
       }
@@ -535,7 +538,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_NOT_FOUND,
-            message: "To Airport not found.",
+            message: 'To Airport not found.',
           };
         }
       }
@@ -566,7 +569,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         created_by: user_id,
         details: `Popular destination(${id}) is updated.`,
         payload: JSON.stringify(payload),
-        type: "UPDATE",
+        type: 'UPDATE',
       });
 
       return {
@@ -604,7 +607,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         agency_id,
         created_by: user_id,
         details: `Deleted Popular destination(${id}).`,
-        type: "DELETE",
+        type: 'DELETE',
       });
 
       if (check.thumbnail) {
@@ -649,7 +652,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "Thumbnail is required",
+          message: 'Thumbnail is required',
         };
       }
 
@@ -661,7 +664,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: "Country not found.",
+          message: 'Country not found.',
         };
       }
 
@@ -685,7 +688,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
           thumbnail: files[0].filename,
           order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
         }),
-        type: "CREATE",
+        type: 'CREATE',
       });
 
       return {
@@ -728,7 +731,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_NOT_FOUND,
-            message: "Country not found.",
+            message: 'Country not found.',
           };
         }
       }
@@ -760,7 +763,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         created_by: user_id,
         details: `Popular place(${id}) is updated.`,
         payload: JSON.stringify(payload),
-        type: "UPDATE",
+        type: 'UPDATE',
       });
 
       return {
@@ -798,7 +801,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         agency_id,
         created_by: user_id,
         details: `Deleted Popular place(${id}).`,
-        type: "DELETE",
+        type: 'DELETE',
       });
 
       if (check.thumbnail) {
@@ -842,7 +845,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "Thumbnail is required",
+          message: 'Thumbnail is required',
         };
       }
 
@@ -866,7 +869,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
           thumbnail: files[0].filename,
           order_number: lastOrderNumber ? lastOrderNumber.order_number + 1 : 1,
         }),
-        type: "CREATE",
+        type: 'CREATE',
       });
 
       return {
@@ -926,7 +929,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         created_by: user_id,
         details: `Hot deals(${id}) is updated.`,
         payload: JSON.stringify(payload),
-        type: "UPDATE",
+        type: 'UPDATE',
       });
 
       return {
@@ -968,7 +971,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         agency_id,
         created_by: user_id,
         details: `Deleted Hot deals(${id}).`,
-        type: "DELETE",
+        type: 'DELETE',
       });
 
       return {
