@@ -45,6 +45,7 @@ const umrahBookingModel_1 = __importDefault(require("./umrahPackageModel/umrahBo
 const blogModel_1 = __importDefault(require("./blogModel/blogModel"));
 const agencyB2CConfigModel_1 = __importDefault(require("./agencyB2CModel/agencyB2CConfigModel"));
 const agencyB2CPaymentModel_1 = __importDefault(require("./agencyB2CModel/agencyB2CPaymentModel"));
+const depositRequestModel_1 = __importDefault(require("./commonModel/depositRequestModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -209,6 +210,10 @@ class Models {
     //Agent B2C Payment Model
     AgencyB2CPaymentModel(trx) {
         return new agencyB2CPaymentModel_1.default(trx || database_1.db);
+    }
+    //Deposit Request Model
+    DepositRequestModel(trx) {
+        return new depositRequestModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

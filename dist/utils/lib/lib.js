@@ -152,6 +152,9 @@ class Lib {
                 case 'Agent_Deposit_Request':
                     NoCode = 'ADR';
                     break;
+                case 'B2C_Deposit_Request':
+                    NoCode = 'DRQ';
+                    break;
                 case 'User_Flight':
                     NoCode = 'CF';
                     break;

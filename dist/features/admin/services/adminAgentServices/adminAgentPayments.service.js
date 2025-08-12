@@ -107,32 +107,32 @@ class AdminAgentPaymentsService extends abstract_service_1.default {
     getDepositRequestList(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const query = req.query;
-            const depositModel = this.Model.AgencyPaymentModel();
-            const data = yield depositModel.getDepositRequestList(query, true);
+            const depositModel = this.Model.DepositRequestModel();
+            const data = yield depositModel.getAgentDepositRequestList(query, true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 total: data.total,
-                data: data.data
+                data: data.data,
             };
         });
     }
     getSingleDepositRequest(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const depositModel = this.Model.AgencyPaymentModel();
-            const data = yield depositModel.getSingleDepositRequest(Number(id));
+            const depositModel = this.Model.DepositRequestModel();
+            const data = yield depositModel.getSingleAgentDepositRequest(Number(id));
             if (!data) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_NOT_FOUND,
-                    message: this.ResMsg.HTTP_NOT_FOUND
+                    message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
-                data: data
+                data: data,
             };
         });
     }
@@ -140,20 +140,21 @@ class AdminAgentPaymentsService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
-                const depositModel = this.Model.AgencyPaymentModel(trx);
-                const data = yield depositModel.getSingleDepositRequest(Number(id));
+                const depositModel = this.Model.DepositRequestModel(trx);
+                const AgencyPaymentModel = this.Model.AgencyPaymentModel(trx);
+                const data = yield depositModel.getSingleAgentDepositRequest(Number(id));
                 if (!data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 if (data.status !== constants_1.DEPOSIT_STATUS_PENDING) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: this.ResMsg.REQUEST_STATUS_NOT_ALLOWED_TO_CHANGE
+                        message: this.ResMsg.REQUEST_STATUS_NOT_ALLOWED_TO_CHANGE,
                     };
                 }
                 const { status } = req.body;
@@ -162,18 +163,18 @@ class AdminAgentPaymentsService extends abstract_service_1.default {
                 }
                 else if (status === constants_1.DEPOSIT_STATUS_APPROVED) {
                     yield depositModel.updateDepositRequest({ status }, Number(id));
-                    yield depositModel.insertAgencyLedger({
+                    yield AgencyPaymentModel.insertAgencyLedger({
                         agency_id: data.agency_id,
                         amount: data.amount,
                         voucher_no: data.request_no,
-                        type: "Credit",
-                        details: `Deposit request - ${data.request_no} has been approved.`
+                        type: 'Credit',
+                        details: `Deposit request - ${data.request_no} has been approved.`,
                     });
                 }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: `Deposit request has been updated`
+                    message: `Deposit request has been updated`,
                 };
             }));
         });
@@ -183,17 +184,20 @@ class AdminAgentPaymentsService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const body = req.body;
                 const paymentModel = this.Model.AgencyPaymentModel(trx);
-                const voucher_no = yield lib_1.default.generateNo({ trx, type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent_deposit_request });
+                const voucher_no = yield lib_1.default.generateNo({
+                    trx,
+                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent_deposit_request,
+                });
                 const ledger_body = Object.assign({ voucher_no }, body);
                 const res = yield paymentModel.insertAgencyLedger(ledger_body);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "Agency Balance has been updated",
+                    message: 'Agency Balance has been updated',
                     data: {
                         id: res[0].id,
-                        voucher_no
-                    }
+                        voucher_no,
+                    },
                 };
             }));
         });
@@ -207,17 +211,22 @@ class AdminAgentPaymentsService extends abstract_service_1.default {
                 const agentPaymentModel = this.Model.AgencyPaymentModel(trx);
                 const { booking_id, amount, note } = req.body;
                 //get booking
-                const getBooking = yield flightBookingModel.getSingleFlightBooking({ id: Number(booking_id), booked_by: constants_1.SOURCE_AGENT });
+                const getBooking = yield flightBookingModel.getSingleFlightBooking({
+                    id: Number(booking_id),
+                    booked_by: constants_1.SOURCE_AGENT,
+                });
                 if (!getBooking) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: "No booking has been found with this ID"
+                        message: 'No booking has been found with this ID',
                     };
                 }
-                ;
                 //create ADM
-                const ref_no = yield lib_1.default.generateNo({ trx, type: constants_1.GENERATE_AUTO_UNIQUE_ID.adm_management });
+                const ref_no = yield lib_1.default.generateNo({
+                    trx,
+                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.adm_management,
+                });
                 const adm_body = {
                     ref_no,
                     booking_id,
@@ -225,21 +234,21 @@ class AdminAgentPaymentsService extends abstract_service_1.default {
                     source_id: getBooking.source_id,
                     amount,
                     note,
-                    created_by: user_id
+                    created_by: user_id,
                 };
                 yield admModel.createADMManagement(adm_body);
                 //Create Transaction (DEBIT)
                 yield agentPaymentModel.insertAgencyLedger({
                     agency_id: Number(getBooking.source_id),
                     amount,
-                    type: "Debit",
+                    type: 'Debit',
                     voucher_no: ref_no,
-                    details: `An ADM charge has been applied for booking - ${getBooking.booking_ref}`
+                    details: `An ADM charge has been applied for booking - ${getBooking.booking_ref}`,
                 });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "New data has been created for ADM Management"
+                    message: 'New data has been created for ADM Management',
                 };
             }));
         });
@@ -254,7 +263,7 @@ class AdminAgentPaymentsService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     total: data.total,
-                    data: data.data
+                    data: data.data,
                 };
             }));
         });
@@ -264,18 +273,21 @@ class AdminAgentPaymentsService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
                 const admModel = this.Model.ADMManagementModel(trx);
-                const data = yield admModel.getSingleADMManagementData({ id: Number(id), adm_for: constants_1.SOURCE_AGENT });
+                const data = yield admModel.getSingleADMManagementData({
+                    id: Number(id),
+                    adm_for: constants_1.SOURCE_AGENT,
+                });
                 if (!data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    data
+                    data,
                 };
             }));
         });
@@ -285,30 +297,36 @@ class AdminAgentPaymentsService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
                 const admModel = this.Model.ADMManagementModel(trx);
-                const data = yield admModel.getSingleADMManagementData({ id: Number(id), adm_for: constants_1.SOURCE_AGENT });
+                const data = yield admModel.getSingleADMManagementData({
+                    id: Number(id),
+                    adm_for: constants_1.SOURCE_AGENT,
+                });
                 if (!data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 const body = req.body;
                 yield admModel.updateADMmanagement(body, Number(id));
-                if (body.amount && (Number(body.amount) !== Number(data.amount))) {
+                if (body.amount && Number(body.amount) !== Number(data.amount)) {
                     const paymentModel = this.Model.AgencyPaymentModel(trx);
-                    const getLedger = yield paymentModel.getAgencyLedger({ voucher_no: data.ref_no });
+                    const getLedger = yield paymentModel.getAgencyLedger({
+                        voucher_no: data.ref_no,
+                    });
                     if (getLedger.data.length) {
                         yield paymentModel.updateAgencyLedgerByVoucherNo({
                             amount: body.amount,
-                            details: getLedger.data[0].details + `. ADM Amount has been updated from ${data.amount}/= to ${body.amount}`
+                            details: getLedger.data[0].details +
+                                `. ADM Amount has been updated from ${data.amount}/= to ${body.amount}`,
                         }, data.ref_no);
                     }
                 }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "ADM has been updated"
+                    message: 'ADM has been updated',
                 };
             }));
         });
@@ -318,24 +336,29 @@ class AdminAgentPaymentsService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
                 const admModel = this.Model.ADMManagementModel(trx);
-                const data = yield admModel.getSingleADMManagementData({ id: Number(id), adm_for: constants_1.SOURCE_AGENT });
+                const data = yield admModel.getSingleADMManagementData({
+                    id: Number(id),
+                    adm_for: constants_1.SOURCE_AGENT,
+                });
                 if (!data) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 yield admModel.deleteADMmanagement(Number(id));
                 const paymentModel = this.Model.AgencyPaymentModel(trx);
-                const getLedger = yield paymentModel.getAgencyLedger({ voucher_no: data.ref_no });
+                const getLedger = yield paymentModel.getAgencyLedger({
+                    voucher_no: data.ref_no,
+                });
                 if (getLedger.data.length) {
                     yield paymentModel.deleteAgencyLedgerByVoucherNo(data.ref_no);
                 }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "ADM has been deleted"
+                    message: 'ADM has been deleted',
                 };
             }));
         });

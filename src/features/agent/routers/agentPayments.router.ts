@@ -12,8 +12,11 @@ export default class AgentPaymentsRouter extends AbstractRouter {
     this.router
       .route('/deposit')
       .post(this.controller.createDepositRequest)
-      .get(this.controller.getCurrentDepositRequest)
       .delete(this.controller.cancelCurrentDepositRequest);
+
+    this.router
+      .route('/deposit/:id')
+      .get(this.controller.getSingleDepositRequest);
 
     this.router
       .route('/deposit/history')

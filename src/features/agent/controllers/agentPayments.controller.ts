@@ -18,12 +18,10 @@ export default class AgentPaymentsController extends AbstractController {
     }
   );
 
-  public getCurrentDepositRequest = this.asyncWrapper.wrap(
-    { bodySchema: this.validator.getDeposit },
+  public getSingleDepositRequest = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
     async (req: Request, res: Response) => {
-      const { code, ...rest } = await this.service.getCurrentDepositRequest(
-        req
-      );
+      const { code, ...rest } = await this.service.getSingleDepositReq(req);
       res.status(code).json(rest);
     }
   );

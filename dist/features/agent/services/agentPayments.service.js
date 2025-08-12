@@ -53,9 +53,9 @@ class AgentPaymentsService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id, agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
+                const depositRequestModel = this.Model.DepositRequestModel(trx);
                 const othersModel = this.Model.OthersModel(trx);
-                const check_duplicate = yield paymentModel.getDepositRequestList({
+                const check_duplicate = yield depositRequestModel.getAgentDepositRequestList({
                     agency_id,
                     status: constants_1.DEPOSIT_STATUS_PENDING,
                 });
@@ -69,8 +69,15 @@ class AgentPaymentsService extends abstract_service_1.default {
                 const body = req.body;
                 const checkAccount = yield othersModel.checkAccount({
                     id: body.account_id,
-                    source_type: 'ADMIN',
+                    source_type: constants_1.SOURCE_ADMIN,
                 });
+                if (!checkAccount) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
+                        message: 'Invalid account id.',
+                    };
+                }
                 const request_no = yield lib_1.default.generateNo({
                     trx,
                     type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent_deposit_request,
@@ -86,9 +93,18 @@ class AgentPaymentsService extends abstract_service_1.default {
                             throw new customError_1.default('Invalid files. Please provide valid docs', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                 });
-                const deposit_body = Object.assign(Object.assign({ request_no,
-                    agency_id }, body), { docs, created_by: user_id });
-                const res = yield paymentModel.createDepositRequest(deposit_body);
+                const deposit_body = {
+                    request_no,
+                    agency_id,
+                    docs,
+                    created_by: user_id,
+                    account_id: body.account_id,
+                    amount: body.amount,
+                    payment_date: body.payment_date,
+                    source: constants_1.SOURCE_AGENT,
+                    remarks: body.remarks,
+                };
+                const res = yield depositRequestModel.createDepositRequest(deposit_body);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -100,33 +116,12 @@ class AgentPaymentsService extends abstract_service_1.default {
             }));
         });
     }
-    getCurrentDepositRequest(req) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
-                const getCurrentDepositData = yield paymentModel.getDepositRequestList({ agency_id, status: constants_1.DEPOSIT_STATUS_PENDING, limit: 1 }, false);
-                if (!getCurrentDepositData.data.length) {
-                    return {
-                        success: true,
-                        code: this.StatusCode.HTTP_OK,
-                        data: [],
-                    };
-                }
-                return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    data: getCurrentDepositData.data[0],
-                };
-            }));
-        });
-    }
     cancelCurrentDepositRequest(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
-                const getCurrentDepositData = yield paymentModel.getDepositRequestList({ agency_id, status: constants_1.DEPOSIT_STATUS_PENDING, limit: 1 }, false);
+                const { agency_id, name, username } = req.agencyUser;
+                const paymentModel = this.Model.DepositRequestModel(trx);
+                const getCurrentDepositData = yield paymentModel.getAgentDepositRequestList({ agency_id, status: constants_1.DEPOSIT_STATUS_PENDING, limit: 1 }, false);
                 if (!getCurrentDepositData.data.length) {
                     return {
                         success: false,
@@ -134,7 +129,10 @@ class AgentPaymentsService extends abstract_service_1.default {
                         message: 'No Pending deposit request has been found!',
                     };
                 }
-                yield paymentModel.updateDepositRequest({ status: constants_1.DEPOSIT_STATUS_CANCELLED }, getCurrentDepositData.data[0].id);
+                yield paymentModel.updateDepositRequest({
+                    status: constants_1.DEPOSIT_STATUS_CANCELLED,
+                    update_note: 'Deposit Cancelled by agent.' + `(${name}[${username}])`,
+                }, getCurrentDepositData.data[0].id);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -147,14 +145,36 @@ class AgentPaymentsService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
+                const paymentModel = this.Model.DepositRequestModel(trx);
                 const query = req.query;
-                const depositData = yield paymentModel.getDepositRequestList(Object.assign(Object.assign({}, query), { agency_id }), true);
+                const depositData = yield paymentModel.getAgentDepositRequestList(Object.assign(Object.assign({}, query), { agency_id }), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     total: depositData.total,
                     data: depositData.data,
+                };
+            }));
+        });
+    }
+    getSingleDepositReq(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const id = Number(req.params.id);
+                const paymentModel = this.Model.DepositRequestModel(trx);
+                const depositData = yield paymentModel.getSingleAgentDepositRequest(id, agency_id);
+                if (!depositData) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    data: depositData,
                 };
             }));
         });

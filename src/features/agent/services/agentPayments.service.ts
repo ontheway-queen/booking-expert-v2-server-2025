@@ -7,6 +7,7 @@ import {
   DEPOSIT_STATUS_PENDING,
   GENERATE_AUTO_UNIQUE_ID,
   PAYMENT_GATEWAYS,
+  SOURCE_ADMIN,
   SOURCE_AGENT,
 } from '../../../utils/miscellaneous/constants';
 import { PaymentSupportService } from '../../../utils/supportServices/paymentSupportServices/paymentSupport.service';
@@ -16,6 +17,7 @@ import {
   IGetAgentLoanHistoryQuery,
   ITopUpUsingPaymentGatewayReqBody,
 } from '../utils/types/agentPayment.types';
+import { ICreateDepositRequestPayload } from '../../../utils/modelTypes/commonModelTypes/depositRequestModel.types';
 
 export class AgentPaymentsService extends AbstractServices {
   public async getLoanHistory(req: Request) {
@@ -66,13 +68,14 @@ export class AgentPaymentsService extends AbstractServices {
     return await this.db.transaction(async (trx) => {
       const { user_id, agency_id } = req.agencyUser;
 
-      const paymentModel = this.Model.AgencyPaymentModel(trx);
+      const depositRequestModel = this.Model.DepositRequestModel(trx);
       const othersModel = this.Model.OthersModel(trx);
 
-      const check_duplicate = await paymentModel.getDepositRequestList({
-        agency_id,
-        status: DEPOSIT_STATUS_PENDING,
-      });
+      const check_duplicate =
+        await depositRequestModel.getAgentDepositRequestList({
+          agency_id,
+          status: DEPOSIT_STATUS_PENDING,
+        });
 
       if (check_duplicate.data.length) {
         return {
@@ -87,8 +90,16 @@ export class AgentPaymentsService extends AbstractServices {
 
       const checkAccount = await othersModel.checkAccount({
         id: body.account_id,
-        source_type: 'ADMIN',
+        source_type: SOURCE_ADMIN,
       });
+
+      if (!checkAccount) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
+          message: 'Invalid account id.',
+        };
+      }
 
       const request_no = await Lib.generateNo({
         trx,
@@ -110,15 +121,19 @@ export class AgentPaymentsService extends AbstractServices {
         }
       });
 
-      const deposit_body = {
+      const deposit_body: ICreateDepositRequestPayload = {
         request_no,
         agency_id,
-        ...body,
         docs,
         created_by: user_id,
+        account_id: body.account_id,
+        amount: body.amount,
+        payment_date: body.payment_date,
+        source: SOURCE_AGENT,
+        remarks: body.remarks,
       };
 
-      const res = await paymentModel.createDepositRequest(deposit_body);
+      const res = await depositRequestModel.createDepositRequest(deposit_body);
 
       return {
         success: true,
@@ -131,37 +146,16 @@ export class AgentPaymentsService extends AbstractServices {
     });
   }
 
-  public async getCurrentDepositRequest(req: Request) {
-    return await this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
-      const paymentModel = this.Model.AgencyPaymentModel(trx);
-      const getCurrentDepositData = await paymentModel.getDepositRequestList(
-        { agency_id, status: DEPOSIT_STATUS_PENDING, limit: 1 },
-        false
-      );
-      if (!getCurrentDepositData.data.length) {
-        return {
-          success: true,
-          code: this.StatusCode.HTTP_OK,
-          data: [],
-        };
-      }
-      return {
-        success: true,
-        code: this.StatusCode.HTTP_OK,
-        data: getCurrentDepositData.data[0],
-      };
-    });
-  }
-
   public async cancelCurrentDepositRequest(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
-      const paymentModel = this.Model.AgencyPaymentModel(trx);
-      const getCurrentDepositData = await paymentModel.getDepositRequestList(
-        { agency_id, status: DEPOSIT_STATUS_PENDING, limit: 1 },
-        false
-      );
+      const { agency_id, name, username } = req.agencyUser;
+      const paymentModel = this.Model.DepositRequestModel(trx);
+      const getCurrentDepositData =
+        await paymentModel.getAgentDepositRequestList(
+          { agency_id, status: DEPOSIT_STATUS_PENDING, limit: 1 },
+          false
+        );
+
       if (!getCurrentDepositData.data.length) {
         return {
           success: false,
@@ -171,7 +165,10 @@ export class AgentPaymentsService extends AbstractServices {
       }
 
       await paymentModel.updateDepositRequest(
-        { status: DEPOSIT_STATUS_CANCELLED },
+        {
+          status: DEPOSIT_STATUS_CANCELLED,
+          update_note: 'Deposit Cancelled by agent.' + `(${name}[${username}])`,
+        },
         getCurrentDepositData.data[0].id
       );
 
@@ -186,9 +183,9 @@ export class AgentPaymentsService extends AbstractServices {
   public async getDepositHistory(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { agency_id } = req.agencyUser;
-      const paymentModel = this.Model.AgencyPaymentModel(trx);
+      const paymentModel = this.Model.DepositRequestModel(trx);
       const query = req.query;
-      const depositData = await paymentModel.getDepositRequestList(
+      const depositData = await paymentModel.getAgentDepositRequestList(
         { ...query, agency_id },
         true
       );
@@ -198,6 +195,31 @@ export class AgentPaymentsService extends AbstractServices {
         code: this.StatusCode.HTTP_OK,
         total: depositData.total,
         data: depositData.data,
+      };
+    });
+  }
+
+  public async getSingleDepositReq(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const id = Number(req.params.id);
+      const paymentModel = this.Model.DepositRequestModel(trx);
+      const depositData = await paymentModel.getSingleAgentDepositRequest(
+        id,
+        agency_id
+      );
+
+      if (!depositData) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        data: depositData,
       };
     });
   }

@@ -3,7 +3,7 @@
 -- dbo.type_invoice_ref new type, and change invoice ref_type column data type to this 
 -- new column added agent_b2c.site_config favicon,site_thumbnail
 -- new column added agent_b2c.hero_bg_content quote,sub_quote, tab
-
+-- new table dbo.deposit_request, delete table agent.deposit_request
 
 CREATE TYPE dbo.discount_type AS ENUM
     ('PERCENTAGE', 'FLAT');

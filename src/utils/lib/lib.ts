@@ -165,6 +165,9 @@ class Lib {
       case 'Agent_Deposit_Request':
         NoCode = 'ADR';
         break;
+      case 'B2C_Deposit_Request':
+        NoCode = 'DRQ';
+        break;
       case 'User_Flight':
         NoCode = 'CF';
         break;
@@ -336,6 +339,7 @@ interface IGenNoParams {
     | 'Agent_SupportTicket'
     | 'Agent_Hotel'
     | 'Agent_Deposit_Request'
+    | 'B2C_Deposit_Request'
     | 'User_Flight'
     | 'User_Visa'
     | 'User_Tour'

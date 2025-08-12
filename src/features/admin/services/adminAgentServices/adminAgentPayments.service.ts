@@ -5,7 +5,13 @@ import {
   IGetLoanHistoryQuery,
 } from '../../utils/types/adminAgentTypes/adminAgentPayments.types';
 import { IUpdateAgencyPayload } from '../../../../utils/modelTypes/agentModel/agencyModelTypes';
-import { DEPOSIT_STATUS_APPROVED, DEPOSIT_STATUS_PENDING, DEPOSIT_STATUS_REJECTED, GENERATE_AUTO_UNIQUE_ID, SOURCE_AGENT } from '../../../../utils/miscellaneous/constants';
+import {
+  DEPOSIT_STATUS_APPROVED,
+  DEPOSIT_STATUS_PENDING,
+  DEPOSIT_STATUS_REJECTED,
+  GENERATE_AUTO_UNIQUE_ID,
+  SOURCE_AGENT,
+} from '../../../../utils/miscellaneous/constants';
 import { IInsertAgencyLedgerReqBody } from '../../utils/types/adminAgentPayment.types';
 import Lib from '../../../../utils/lib/lib';
 
@@ -115,56 +121,57 @@ export default class AdminAgentPaymentsService extends AbstractServices {
 
   public async getDepositRequestList(req: Request) {
     const query = req.query;
-    const depositModel = this.Model.AgencyPaymentModel();
-    const data = await depositModel.getDepositRequestList(query, true);
+    const depositModel = this.Model.DepositRequestModel();
+    const data = await depositModel.getAgentDepositRequestList(query, true);
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       total: data.total,
-      data: data.data
-    }
+      data: data.data,
+    };
   }
 
   public async getSingleDepositRequest(req: Request) {
     const { id } = req.params;
-    const depositModel = this.Model.AgencyPaymentModel();
-    const data = await depositModel.getSingleDepositRequest(Number(id));
+    const depositModel = this.Model.DepositRequestModel();
+    const data = await depositModel.getSingleAgentDepositRequest(Number(id));
 
     if (!data) {
       return {
         success: false,
         code: this.StatusCode.HTTP_NOT_FOUND,
-        message: this.ResMsg.HTTP_NOT_FOUND
-      }
+        message: this.ResMsg.HTTP_NOT_FOUND,
+      };
     }
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
-      data: data
-    }
+      data: data,
+    };
   }
 
   public async updateDepositRequest(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
-      const depositModel = this.Model.AgencyPaymentModel(trx);
-      const data = await depositModel.getSingleDepositRequest(Number(id));
+      const depositModel = this.Model.DepositRequestModel(trx);
+      const AgencyPaymentModel = this.Model.AgencyPaymentModel(trx);
+      const data = await depositModel.getSingleAgentDepositRequest(Number(id));
 
       if (!data) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: this.ResMsg.HTTP_NOT_FOUND
-        }
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
       }
 
       if (data.status !== DEPOSIT_STATUS_PENDING) {
         return {
           success: false,
           code: this.StatusCode.HTTP_CONFLICT,
-          message: this.ResMsg.REQUEST_STATUS_NOT_ALLOWED_TO_CHANGE
-        }
+          message: this.ResMsg.REQUEST_STATUS_NOT_ALLOWED_TO_CHANGE,
+        };
       }
 
       const { status } = req.body;
@@ -174,20 +181,20 @@ export default class AdminAgentPaymentsService extends AbstractServices {
       } else if (status === DEPOSIT_STATUS_APPROVED) {
         await depositModel.updateDepositRequest({ status }, Number(id));
 
-        await depositModel.insertAgencyLedger({
+        await AgencyPaymentModel.insertAgencyLedger({
           agency_id: data.agency_id,
           amount: data.amount,
           voucher_no: data.request_no,
-          type: "Credit",
-          details: `Deposit request - ${data.request_no} has been approved.`
+          type: 'Credit',
+          details: `Deposit request - ${data.request_no} has been approved.`,
         });
       }
 
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: `Deposit request has been updated`
-      }
+        message: `Deposit request has been updated`,
+      };
     });
   }
 
@@ -195,21 +202,24 @@ export default class AdminAgentPaymentsService extends AbstractServices {
     return await this.db.transaction(async (trx) => {
       const body = req.body as IInsertAgencyLedgerReqBody;
       const paymentModel = this.Model.AgencyPaymentModel(trx);
-      const voucher_no = await Lib.generateNo({ trx, type: GENERATE_AUTO_UNIQUE_ID.agent_deposit_request });
+      const voucher_no = await Lib.generateNo({
+        trx,
+        type: GENERATE_AUTO_UNIQUE_ID.agent_deposit_request,
+      });
       const ledger_body = {
         voucher_no,
-        ...body
-      }
+        ...body,
+      };
       const res = await paymentModel.insertAgencyLedger(ledger_body);
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: "Agency Balance has been updated",
+        message: 'Agency Balance has been updated',
         data: {
           id: res[0].id,
-          voucher_no
-        }
-      }
+          voucher_no,
+        },
+      };
     });
   }
 
@@ -223,17 +233,23 @@ export default class AdminAgentPaymentsService extends AbstractServices {
       const { booking_id, amount, note } = req.body;
 
       //get booking
-      const getBooking = await flightBookingModel.getSingleFlightBooking({ id: Number(booking_id), booked_by: SOURCE_AGENT });
+      const getBooking = await flightBookingModel.getSingleFlightBooking({
+        id: Number(booking_id),
+        booked_by: SOURCE_AGENT,
+      });
       if (!getBooking) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: "No booking has been found with this ID"
-        }
-      };
+          message: 'No booking has been found with this ID',
+        };
+      }
 
       //create ADM
-      const ref_no = await Lib.generateNo({ trx, type: GENERATE_AUTO_UNIQUE_ID.adm_management });
+      const ref_no = await Lib.generateNo({
+        trx,
+        type: GENERATE_AUTO_UNIQUE_ID.adm_management,
+      });
       const adm_body = {
         ref_no,
         booking_id,
@@ -241,7 +257,7 @@ export default class AdminAgentPaymentsService extends AbstractServices {
         source_id: getBooking.source_id,
         amount,
         note,
-        created_by: user_id
+        created_by: user_id,
       };
 
       await admModel.createADMManagement(adm_body);
@@ -250,15 +266,15 @@ export default class AdminAgentPaymentsService extends AbstractServices {
       await agentPaymentModel.insertAgencyLedger({
         agency_id: Number(getBooking.source_id),
         amount,
-        type: "Debit",
+        type: 'Debit',
         voucher_no: ref_no,
-        details: `An ADM charge has been applied for booking - ${getBooking.booking_ref}`
+        details: `An ADM charge has been applied for booking - ${getBooking.booking_ref}`,
       });
 
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: "New data has been created for ADM Management"
+        message: 'New data has been created for ADM Management',
       };
     });
   }
@@ -267,12 +283,15 @@ export default class AdminAgentPaymentsService extends AbstractServices {
     return await this.db.transaction(async (trx) => {
       const query = req.query;
       const admModel = this.Model.ADMManagementModel(trx);
-      const data = await admModel.getADMManagementList({ ...query, adm_for: SOURCE_AGENT }, true);
+      const data = await admModel.getADMManagementList(
+        { ...query, adm_for: SOURCE_AGENT },
+        true
+      );
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
         total: data.total,
-        data: data.data
+        data: data.data,
       };
     });
   }
@@ -281,55 +300,67 @@ export default class AdminAgentPaymentsService extends AbstractServices {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
       const admModel = this.Model.ADMManagementModel(trx);
-      const data = await admModel.getSingleADMManagementData({ id: Number(id), adm_for: SOURCE_AGENT });
+      const data = await admModel.getSingleADMManagementData({
+        id: Number(id),
+        adm_for: SOURCE_AGENT,
+      });
       if (!data) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: this.ResMsg.HTTP_NOT_FOUND
-        }
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
       }
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        data
-      }
-    })
+        data,
+      };
+    });
   }
 
   public async updateADM(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
       const admModel = this.Model.ADMManagementModel(trx);
-      const data = await admModel.getSingleADMManagementData({ id: Number(id), adm_for: SOURCE_AGENT });
+      const data = await admModel.getSingleADMManagementData({
+        id: Number(id),
+        adm_for: SOURCE_AGENT,
+      });
       if (!data) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: this.ResMsg.HTTP_NOT_FOUND
-        }
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
       }
 
       const body = req.body;
       await admModel.updateADMmanagement(body, Number(id));
 
-      if (body.amount && (Number(body.amount) !== Number(data.amount))) {
+      if (body.amount && Number(body.amount) !== Number(data.amount)) {
         const paymentModel = this.Model.AgencyPaymentModel(trx);
-        const getLedger = await paymentModel.getAgencyLedger({ voucher_no: data.ref_no });
+        const getLedger = await paymentModel.getAgencyLedger({
+          voucher_no: data.ref_no,
+        });
         if (getLedger.data.length) {
-          await paymentModel.updateAgencyLedgerByVoucherNo({
-            amount: body.amount,
-            details: getLedger.data[0].details + `. ADM Amount has been updated from ${data.amount}/= to ${body.amount}`
-          },
-            data.ref_no);
+          await paymentModel.updateAgencyLedgerByVoucherNo(
+            {
+              amount: body.amount,
+              details:
+                getLedger.data[0].details +
+                `. ADM Amount has been updated from ${data.amount}/= to ${body.amount}`,
+            },
+            data.ref_no
+          );
         }
       }
 
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: "ADM has been updated"
-      }
+        message: 'ADM has been updated',
+      };
     });
   }
 
@@ -337,30 +368,33 @@ export default class AdminAgentPaymentsService extends AbstractServices {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
       const admModel = this.Model.ADMManagementModel(trx);
-      const data = await admModel.getSingleADMManagementData({ id: Number(id), adm_for: SOURCE_AGENT });
+      const data = await admModel.getSingleADMManagementData({
+        id: Number(id),
+        adm_for: SOURCE_AGENT,
+      });
       if (!data) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: this.ResMsg.HTTP_NOT_FOUND
-        }
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
       }
 
       await admModel.deleteADMmanagement(Number(id));
 
       const paymentModel = this.Model.AgencyPaymentModel(trx);
-      const getLedger = await paymentModel.getAgencyLedger({ voucher_no: data.ref_no });
+      const getLedger = await paymentModel.getAgencyLedger({
+        voucher_no: data.ref_no,
+      });
       if (getLedger.data.length) {
-        await paymentModel.deleteAgencyLedgerByVoucherNo(
-          data.ref_no
-        );
+        await paymentModel.deleteAgencyLedgerByVoucherNo(data.ref_no);
       }
 
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: "ADM has been deleted"
-      }
+        message: 'ADM has been deleted',
+      };
     });
   }
 }

@@ -35,8 +35,8 @@ class AgentPaymentsController extends abstract_controller_1.default {
             const _a = yield this.service.createDepositRequest(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
-        this.getCurrentDepositRequest = this.asyncWrapper.wrap({ bodySchema: this.validator.getDeposit }, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.getCurrentDepositRequest(req), { code } = _a, rest = __rest(_a, ["code"]);
+        this.getSingleDepositRequest = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getSingleDepositReq(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.cancelCurrentDepositRequest = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {

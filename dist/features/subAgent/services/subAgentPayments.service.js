@@ -52,9 +52,9 @@ class SubAgentPaymentsService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id, agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
+                const paymentModel = this.Model.DepositRequestModel(trx);
                 const othersModel = this.Model.OthersModel(trx);
-                const check_duplicate = yield paymentModel.getDepositRequestList({
+                const check_duplicate = yield paymentModel.getSubAgentDepositRequestList({
                     agency_id,
                     status: constants_1.DEPOSIT_STATUS_PENDING,
                 });
@@ -62,36 +62,44 @@ class SubAgentPaymentsService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "Your previous deposit request is still in pending. New deposit request cannot be made",
+                        message: 'Your previous deposit request is still in pending. New deposit request cannot be made',
                     };
                 }
                 const body = req.body;
                 const checkAccount = yield othersModel.checkAccount({
                     id: body.account_id,
-                    source_type: "ADMIN",
+                    source_type: constants_1.SOURCE_AGENT,
+                    source_id: agency_id,
                 });
+                if (!checkAccount) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: 'Invalid account id.',
+                    };
+                }
                 const request_no = yield lib_1.default.generateNo({
                     trx,
                     type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent_deposit_request,
                 });
                 const files = req.files || [];
-                let docs = "";
+                let docs = '';
                 files.forEach((file) => {
                     switch (file.fieldname) {
-                        case "docs":
+                        case 'docs':
                             docs = file.filename;
                             break;
                         default:
-                            throw new customError_1.default("Invalid files. Please provide valid docs", this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
+                            throw new customError_1.default('Invalid files. Please provide valid docs', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                 });
                 const deposit_body = Object.assign(Object.assign({ request_no,
-                    agency_id }, body), { docs, created_by: user_id });
+                    agency_id }, body), { docs, created_by: user_id, source: constants_1.SOURCE_SUB_AGENT });
                 const res = yield paymentModel.createDepositRequest(deposit_body);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "Deposit request has been created",
+                    message: 'Deposit request has been created',
                     data: {
                         id: res[0].id,
                     },
@@ -99,23 +107,25 @@ class SubAgentPaymentsService extends abstract_service_1.default {
             }));
         });
     }
-    getCurrentDepositRequest(req) {
+    getSingleDepositRequest(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
-                const getCurrentDepositData = yield paymentModel.getDepositRequestList({ agency_id, status: constants_1.DEPOSIT_STATUS_PENDING, limit: 1 }, false);
-                if (!getCurrentDepositData.data.length) {
+                const id = Number(req.params.id);
+                const paymentModel = this.Model.DepositRequestModel(trx);
+                const singleDeposit = yield paymentModel.getSingleSubAgentDepositRequest(id, agency_id);
+                if (!singleDeposit) {
                     return {
-                        success: true,
-                        code: this.StatusCode.HTTP_OK,
-                        data: [],
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    data: getCurrentDepositData.data[0],
+                    message: this.ResMsg.HTTP_OK,
+                    data: singleDeposit,
                 };
             }));
         });
@@ -124,20 +134,20 @@ class SubAgentPaymentsService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
-                const getCurrentDepositData = yield paymentModel.getDepositRequestList({ agency_id, status: constants_1.DEPOSIT_STATUS_PENDING, limit: 1 }, false);
+                const paymentModel = this.Model.DepositRequestModel(trx);
+                const getCurrentDepositData = yield paymentModel.getSubAgentDepositRequestList({ agency_id, status: constants_1.DEPOSIT_STATUS_PENDING, limit: 1 }, false);
                 if (!getCurrentDepositData.data.length) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: "No Pending deposit request has been found!",
+                        message: 'No Pending deposit request has been found!',
                     };
                 }
                 yield paymentModel.updateDepositRequest({ status: constants_1.DEPOSIT_STATUS_CANCELLED }, getCurrentDepositData.data[0].id);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "Deposit request has been cancelled",
+                    message: 'Deposit request has been cancelled',
                 };
             }));
         });
@@ -146,30 +156,14 @@ class SubAgentPaymentsService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
+                const paymentModel = this.Model.DepositRequestModel(trx);
                 const query = req.query;
-                const depositData = yield paymentModel.getDepositRequestList(Object.assign(Object.assign({}, query), { agency_id }), true);
+                const depositData = yield paymentModel.getSubAgentDepositRequestList(Object.assign(Object.assign({}, query), { agency_id }), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     total: depositData.total,
                     data: depositData.data,
-                };
-            }));
-        });
-    }
-    getADMList(req) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
-                const admModel = this.Model.ADMManagementModel(trx);
-                const query = req.query;
-                const data = yield admModel.getADMManagementList(Object.assign(Object.assign({}, query), { agency_id, adm_for: constants_1.SOURCE_AGENT }), true);
-                return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    total: data.total,
-                    data: data.data,
                 };
             }));
         });
@@ -240,7 +234,7 @@ class SubAgentPaymentsService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "No due has been found with this invoice",
+                        message: 'No due has been found with this invoice',
                     };
                 }
                 let balance_trans = data.due;
@@ -255,7 +249,7 @@ class SubAgentPaymentsService extends abstract_service_1.default {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "There is insufficient balance in your account.",
+                            message: 'There is insufficient balance in your account.',
                         };
                     }
                     loan_trans =
@@ -269,7 +263,7 @@ class SubAgentPaymentsService extends abstract_service_1.default {
                 const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
                 yield invoiceModel.updateInvoice({ due: 0 }, Number(id));
                 yield moneyReceiptModel.createMoneyReceipt({
-                    mr_no: yield lib_1.default.generateNo({ trx, type: "Money_Receipt" }),
+                    mr_no: yield lib_1.default.generateNo({ trx, type: 'Money_Receipt' }),
                     invoice_id: Number(id),
                     amount: data.due,
                     user_id,
@@ -278,7 +272,7 @@ class SubAgentPaymentsService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "Due has been cleared",
+                    message: 'Due has been cleared',
                 };
             }));
         });

@@ -1,20 +1,22 @@
-import { Request } from "express";
-import AbstractServices from "../../../abstract/abstract.service";
-import CustomError from "../../../utils/lib/customError";
-import Lib from "../../../utils/lib/lib";
+import { Request } from 'express';
+import AbstractServices from '../../../abstract/abstract.service';
+import CustomError from '../../../utils/lib/customError';
+import Lib from '../../../utils/lib/lib';
 import {
   DEPOSIT_STATUS_CANCELLED,
   DEPOSIT_STATUS_PENDING,
   GENERATE_AUTO_UNIQUE_ID,
   PAYMENT_GATEWAYS,
   SOURCE_AGENT,
-} from "../../../utils/miscellaneous/constants";
-import { PaymentSupportService } from "../../../utils/supportServices/paymentSupportServices/paymentSupport.service";
+  SOURCE_SUB_AGENT,
+} from '../../../utils/miscellaneous/constants';
+import { PaymentSupportService } from '../../../utils/supportServices/paymentSupportServices/paymentSupport.service';
 import {
   ISubAgentCreateDepositPayload,
   IGetSubAgentLedgerHistoryQuery,
   IGetSubAgentLoanHistoryQuery,
-} from "../utils/types/subAgentPayment.types";
+} from '../utils/types/subAgentPayment.types';
+import { ICreateDepositRequestPayload } from '../../../utils/modelTypes/commonModelTypes/depositRequestModel.types';
 
 export class SubAgentPaymentsService extends AbstractServices {
   public async getLoanHistory(req: Request) {
@@ -65,10 +67,10 @@ export class SubAgentPaymentsService extends AbstractServices {
     return await this.db.transaction(async (trx) => {
       const { user_id, agency_id } = req.agencyUser;
 
-      const paymentModel = this.Model.AgencyPaymentModel(trx);
+      const paymentModel = this.Model.DepositRequestModel(trx);
       const othersModel = this.Model.OthersModel(trx);
 
-      const check_duplicate = await paymentModel.getDepositRequestList({
+      const check_duplicate = await paymentModel.getSubAgentDepositRequestList({
         agency_id,
         status: DEPOSIT_STATUS_PENDING,
       });
@@ -78,7 +80,7 @@ export class SubAgentPaymentsService extends AbstractServices {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
           message:
-            "Your previous deposit request is still in pending. New deposit request cannot be made",
+            'Your previous deposit request is still in pending. New deposit request cannot be made',
         };
       }
 
@@ -86,8 +88,17 @@ export class SubAgentPaymentsService extends AbstractServices {
 
       const checkAccount = await othersModel.checkAccount({
         id: body.account_id,
-        source_type: "ADMIN",
+        source_type: SOURCE_AGENT,
+        source_id: agency_id,
       });
+
+      if (!checkAccount) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: 'Invalid account id.',
+        };
+      }
 
       const request_no = await Lib.generateNo({
         trx,
@@ -95,26 +106,27 @@ export class SubAgentPaymentsService extends AbstractServices {
       });
 
       const files = (req.files as Express.Multer.File[]) || [];
-      let docs = "";
+      let docs = '';
       files.forEach((file) => {
         switch (file.fieldname) {
-          case "docs":
+          case 'docs':
             docs = file.filename;
             break;
           default:
             throw new CustomError(
-              "Invalid files. Please provide valid docs",
+              'Invalid files. Please provide valid docs',
               this.StatusCode.HTTP_UNPROCESSABLE_ENTITY
             );
         }
       });
 
-      const deposit_body = {
+      const deposit_body: ICreateDepositRequestPayload = {
         request_no,
         agency_id,
         ...body,
         docs,
         created_by: user_id,
+        source: SOURCE_SUB_AGENT,
       };
 
       const res = await paymentModel.createDepositRequest(deposit_body);
@@ -122,7 +134,7 @@ export class SubAgentPaymentsService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: "Deposit request has been created",
+        message: 'Deposit request has been created',
         data: {
           id: res[0].id,
         },
@@ -130,25 +142,27 @@ export class SubAgentPaymentsService extends AbstractServices {
     });
   }
 
-  public async getCurrentDepositRequest(req: Request) {
+  public async getSingleDepositRequest(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { agency_id } = req.agencyUser;
-      const paymentModel = this.Model.AgencyPaymentModel(trx);
-      const getCurrentDepositData = await paymentModel.getDepositRequestList(
-        { agency_id, status: DEPOSIT_STATUS_PENDING, limit: 1 },
-        false
+      const id = Number(req.params.id);
+      const paymentModel = this.Model.DepositRequestModel(trx);
+      const singleDeposit = await paymentModel.getSingleSubAgentDepositRequest(
+        id,
+        agency_id
       );
-      if (!getCurrentDepositData.data.length) {
+      if (!singleDeposit) {
         return {
-          success: true,
-          code: this.StatusCode.HTTP_OK,
-          data: [],
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        data: getCurrentDepositData.data[0],
+        message: this.ResMsg.HTTP_OK,
+        data: singleDeposit,
       };
     });
   }
@@ -156,16 +170,17 @@ export class SubAgentPaymentsService extends AbstractServices {
   public async cancelCurrentDepositRequest(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { agency_id } = req.agencyUser;
-      const paymentModel = this.Model.AgencyPaymentModel(trx);
-      const getCurrentDepositData = await paymentModel.getDepositRequestList(
-        { agency_id, status: DEPOSIT_STATUS_PENDING, limit: 1 },
-        false
-      );
+      const paymentModel = this.Model.DepositRequestModel(trx);
+      const getCurrentDepositData =
+        await paymentModel.getSubAgentDepositRequestList(
+          { agency_id, status: DEPOSIT_STATUS_PENDING, limit: 1 },
+          false
+        );
       if (!getCurrentDepositData.data.length) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: "No Pending deposit request has been found!",
+          message: 'No Pending deposit request has been found!',
         };
       }
 
@@ -177,7 +192,7 @@ export class SubAgentPaymentsService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: "Deposit request has been cancelled",
+        message: 'Deposit request has been cancelled',
       };
     });
   }
@@ -185,9 +200,9 @@ export class SubAgentPaymentsService extends AbstractServices {
   public async getDepositHistory(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { agency_id } = req.agencyUser;
-      const paymentModel = this.Model.AgencyPaymentModel(trx);
+      const paymentModel = this.Model.DepositRequestModel(trx);
       const query = req.query;
-      const depositData = await paymentModel.getDepositRequestList(
+      const depositData = await paymentModel.getSubAgentDepositRequestList(
         { ...query, agency_id },
         true
       );
@@ -197,25 +212,6 @@ export class SubAgentPaymentsService extends AbstractServices {
         code: this.StatusCode.HTTP_OK,
         total: depositData.total,
         data: depositData.data,
-      };
-    });
-  }
-
-  public async getADMList(req: Request) {
-    return await this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyUser;
-      const admModel = this.Model.ADMManagementModel(trx);
-      const query = req.query;
-      const data = await admModel.getADMManagementList(
-        { ...query, agency_id, adm_for: SOURCE_AGENT },
-        true
-      );
-
-      return {
-        success: true,
-        code: this.StatusCode.HTTP_OK,
-        total: data.total,
-        data: data.data,
       };
     });
   }
@@ -299,7 +295,7 @@ export class SubAgentPaymentsService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "No due has been found with this invoice",
+          message: 'No due has been found with this invoice',
         };
       }
 
@@ -316,7 +312,7 @@ export class SubAgentPaymentsService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: "There is insufficient balance in your account.",
+            message: 'There is insufficient balance in your account.',
           };
         }
         loan_trans =
@@ -331,7 +327,7 @@ export class SubAgentPaymentsService extends AbstractServices {
       const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
       await invoiceModel.updateInvoice({ due: 0 }, Number(id));
       await moneyReceiptModel.createMoneyReceipt({
-        mr_no: await Lib.generateNo({ trx, type: "Money_Receipt" }),
+        mr_no: await Lib.generateNo({ trx, type: 'Money_Receipt' }),
         invoice_id: Number(id),
         amount: data.due,
         user_id,
@@ -341,7 +337,7 @@ export class SubAgentPaymentsService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: "Due has been cleared",
+        message: 'Due has been cleared',
       };
     });
   }

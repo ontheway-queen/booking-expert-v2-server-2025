@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
+const customError_1 = __importDefault(require("../../../utils/lib/customError"));
 class AgentB2CPaymentService extends abstract_service_1.default {
     constructor() {
         super();
@@ -22,7 +23,8 @@ class AgentB2CPaymentService extends abstract_service_1.default {
     // Get invoice
     getInvoices(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id, user_id } = req.agencyB2CUser;
+            const { user_id } = req.agencyB2CUser;
+            const { agency_id } = req.agencyB2CWhiteLabel;
             const invoiceModel = this.Model.InvoiceModel();
             const query = req.query;
             const data = yield invoiceModel.getInvoiceList(Object.assign({ source_type: constants_1.SOURCE_AGENT_B2C, source_id: agency_id, user_id }, query), true);
@@ -37,7 +39,8 @@ class AgentB2CPaymentService extends abstract_service_1.default {
     getSingleInvoice(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyB2CUser;
+                const { user_id } = req.agencyB2CUser;
+                const { agency_id } = req.agencyB2CWhiteLabel;
                 const invoiceModel = this.Model.InvoiceModel(trx);
                 const { id } = req.params;
                 const data = yield invoiceModel.getSingleInvoice({
@@ -68,7 +71,8 @@ class AgentB2CPaymentService extends abstract_service_1.default {
     clearDueOfInvoice(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, user_id } = req.agencyUser;
+                const { user_id } = req.agencyB2CUser;
+                const { agency_id } = req.agencyB2CWhiteLabel;
                 const invoiceModel = this.Model.InvoiceModel(trx);
                 const { id } = req.params;
                 const data = yield invoiceModel.getSingleInvoice({
@@ -124,12 +128,14 @@ class AgentB2CPaymentService extends abstract_service_1.default {
     createDepositRequest(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { user_id, agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
+                const { user_id } = req.agencyB2CUser;
+                const { agency_id } = req.agencyB2CWhiteLabel;
+                const depositRequestModel = this.Model.DepositRequestModel(trx);
                 const othersModel = this.Model.OthersModel(trx);
-                const check_duplicate = yield paymentModel.getDepositRequestList({
+                const check_duplicate = yield depositRequestModel.getAgentB2CDepositRequestList({
                     agency_id,
                     status: constants_1.DEPOSIT_STATUS_PENDING,
+                    created_by: user_id,
                 });
                 if (check_duplicate.data.length) {
                     return {
@@ -141,11 +147,18 @@ class AgentB2CPaymentService extends abstract_service_1.default {
                 const body = req.body;
                 const checkAccount = yield othersModel.checkAccount({
                     id: body.account_id,
-                    source_type: 'ADMIN',
+                    source_type: constants_1.SOURCE_AGENT,
                 });
+                if (!checkAccount) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
+                        message: 'Invalid account id.',
+                    };
+                }
                 const request_no = yield lib_1.default.generateNo({
                     trx,
-                    type: GENERATE_AUTO_UNIQUE_ID.agent_deposit_request,
+                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.b2c_deposit_request,
                 });
                 const files = req.files || [];
                 let docs = '';
@@ -155,12 +168,21 @@ class AgentB2CPaymentService extends abstract_service_1.default {
                             docs = file.filename;
                             break;
                         default:
-                            throw new CustomError('Invalid files. Please provide valid docs', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
+                            throw new customError_1.default('Invalid files. Please provide valid docs', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                 });
-                const deposit_body = Object.assign(Object.assign({ request_no,
-                    agency_id }, body), { docs, created_by: user_id });
-                const res = yield paymentModel.createDepositRequest(deposit_body);
+                const deposit_body = {
+                    request_no,
+                    agency_id,
+                    docs,
+                    created_by: user_id,
+                    account_id: body.account_id,
+                    amount: body.amount,
+                    payment_date: body.payment_date,
+                    source: constants_1.SOURCE_AGENT_B2C,
+                    remarks: body.remarks,
+                };
+                const res = yield depositRequestModel.createDepositRequest(deposit_body);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -172,34 +194,18 @@ class AgentB2CPaymentService extends abstract_service_1.default {
             }));
         });
     }
-    // Get Deposit req
-    getCurrentDepositRequest(req) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
-                const getCurrentDepositData = yield paymentModel.getDepositRequestList({ agency_id, status: constants_1.DEPOSIT_STATUS_PENDING, limit: 1 }, false);
-                if (!getCurrentDepositData.data.length) {
-                    return {
-                        success: true,
-                        code: this.StatusCode.HTTP_OK,
-                        data: [],
-                    };
-                }
-                return {
-                    success: true,
-                    code: this.StatusCode.HTTP_OK,
-                    data: getCurrentDepositData.data[0],
-                };
-            }));
-        });
-    }
     cancelCurrentDepositRequest(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
-                const getCurrentDepositData = yield paymentModel.getDepositRequestList({ agency_id, status: constants_1.DEPOSIT_STATUS_PENDING, limit: 1 }, false);
+                const { user_id } = req.agencyB2CUser;
+                const { agency_id } = req.agencyB2CWhiteLabel;
+                const paymentModel = this.Model.DepositRequestModel(trx);
+                const getCurrentDepositData = yield paymentModel.getAgentB2CDepositRequestList({
+                    agency_id,
+                    status: constants_1.DEPOSIT_STATUS_PENDING,
+                    limit: 1,
+                    created_by: user_id,
+                }, false);
                 if (!getCurrentDepositData.data.length) {
                     return {
                         success: false,
@@ -207,7 +213,10 @@ class AgentB2CPaymentService extends abstract_service_1.default {
                         message: 'No Pending deposit request has been found!',
                     };
                 }
-                yield paymentModel.updateDepositRequest({ status: DEPOSIT_STATUS_CANCELLED }, getCurrentDepositData.data[0].id);
+                yield paymentModel.updateDepositRequest({
+                    status: constants_1.DEPOSIT_STATUS_CANCELLED,
+                    update_note: 'Deposit Cancelled by user.',
+                }, getCurrentDepositData.data[0].id);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -219,15 +228,39 @@ class AgentB2CPaymentService extends abstract_service_1.default {
     getDepositHistory(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyUser;
-                const paymentModel = this.Model.AgencyPaymentModel(trx);
+                const { user_id } = req.agencyB2CUser;
+                const { agency_id } = req.agencyB2CWhiteLabel;
+                const paymentModel = this.Model.DepositRequestModel(trx);
                 const query = req.query;
-                const depositData = yield paymentModel.getDepositRequestList(Object.assign(Object.assign({}, query), { agency_id }), true);
+                const depositData = yield paymentModel.getAgentB2CDepositRequestList(Object.assign(Object.assign({}, query), { agency_id, created_by: user_id }), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     total: depositData.total,
                     data: depositData.data,
+                };
+            }));
+        });
+    }
+    getSingleDepositReq(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { user_id } = req.agencyB2CUser;
+                const { agency_id } = req.agencyB2CWhiteLabel;
+                const id = Number(req.params.id);
+                const paymentModel = this.Model.DepositRequestModel(trx);
+                const depositData = yield paymentModel.getSingleAgentB2CDepositRequest(id, agency_id, user_id);
+                if (!depositData) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    data: depositData,
                 };
             }));
         });

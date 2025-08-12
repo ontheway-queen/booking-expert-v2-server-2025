@@ -177,7 +177,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
       data: {
-        about_us_thumbnail: payload.about_us_thumbnail,
+        thumbnail: payload.about_us_thumbnail,
       },
     };
   }
@@ -204,8 +204,8 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
         data: {
-          about_us_content,
-          about_us_thumbnail,
+          content: about_us_content,
+          thumbnail: about_us_thumbnail,
         },
       };
     });
@@ -256,7 +256,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
       data: {
-        about_us_thumbnail: payload.contact_us_content,
+        thumbnail: payload.contact_us_content,
       },
     };
   }
@@ -283,8 +283,8 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
         data: {
-          contact_us_content,
-          contact_us_thumbnail,
+          content: contact_us_content,
+          thumbnail: contact_us_thumbnail,
         },
       };
     });
@@ -344,7 +344,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
         data: {
-          privacy_policy_content,
+          content: privacy_policy_content,
         },
       };
     });
@@ -403,7 +403,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
       data: {
-        terms_and_conditions_content,
+        content: terms_and_conditions_content,
       },
     };
   }
