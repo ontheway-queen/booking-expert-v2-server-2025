@@ -8,7 +8,7 @@ import {
   FUNCTION_TYPE_HOLIDAY,
   FUNCTION_TYPE_UMRAH,
   FUNCTION_TYPE_VISA,
-} from "../../../../../utils/miscellaneous/constants";
+} from '../../../../../utils/miscellaneous/constants';
 
 export interface IUpdateBankAccountReqBody {
   account_name?: string;
@@ -28,7 +28,7 @@ export interface ICreateBankAccountReqBody {
 }
 export interface IUpSertPopUpBannerReqBody {
   title?: string;
-  pop_up_for: "AGENT" | "B2C";
+  pop_up_for: 'AGENT' | 'B2C';
   status?: boolean;
   description?: string;
   link?: string;
@@ -65,12 +65,10 @@ export interface IUpdateHeroBGContentReqBody {
 }
 
 export interface ICreatePopularDestinationReqBody {
-  country_id: number;
   from_airport: number;
   to_airport: number;
 }
 export interface IUpdatePopularDestinationReqBody {
-  country_id?: number;
   from_airport?: number;
   to_airport?: number;
   status?: boolean;

@@ -37,7 +37,11 @@ export default class AdminAgentAgencyController extends AbstractController {
     },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.updateAgencyUser(req);
-      res.status(code).json(rest);
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
     }
   );
 
@@ -50,7 +54,11 @@ export default class AdminAgentAgencyController extends AbstractController {
       const { code, ...rest } = await this.services.updateAgencyApplication(
         req
       );
-      res.status(code).json(rest);
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
     }
   );
 
@@ -82,7 +90,11 @@ export default class AdminAgentAgencyController extends AbstractController {
     { bodySchema: this.validator.createAgency },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.createAgency(req);
-      res.status(code).json(rest);
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
     }
   );
 }

@@ -88,13 +88,11 @@ export class AgentB2CSubConfigValidator {
   });
 
   public createPopularDestination = Joi.object({
-    country_id: Joi.number().required(),
     from_airport: Joi.number().required(),
     to_airport: Joi.number().required(),
   });
 
   public updatePopularDestination = Joi.object({
-    country_id: Joi.number().optional(),
     from_airport: Joi.number().optional(),
     to_airport: Joi.number().optional(),
     status: Joi.boolean().optional(),

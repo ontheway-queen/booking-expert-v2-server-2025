@@ -25,6 +25,7 @@ import {
   IInsertAgencyRolePermissionPayload,
   IUpdateAgencyUserPayload,
 } from '../../../../utils/modelTypes/agentModel/agencyUserModelTypes';
+import { SiteConfigSupportService } from '../../../../utils/supportServices/otherSupportServices/siteConfigSupport.service';
 
 export default class AdminAgentAgencyService extends AbstractServices {
   constructor() {
@@ -571,6 +572,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
           message: 'Invalid KAM ID',
         };
       }
+
       if (ref_id) {
         const checkRef = await adminModel.checkUserAdmin({ id: ref_id });
 
@@ -649,6 +651,17 @@ export default class AdminAgentAgencyService extends AbstractServices {
           agency_id: newAgency[0].id,
           ...white_label_permissions,
           token: uuid,
+        });
+
+        const siteService = new SiteConfigSupportService(trx);
+
+        await siteService.insertSiteConfigData({
+          agency_id: newAgency[0].id,
+          address: body.address,
+          email: body.email,
+          phone: body.phone,
+          site_name: body.agency_name,
+          logo: agency_logo,
         });
 
         if (white_label_permissions.flight || white_label_permissions.hotel) {

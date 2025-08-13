@@ -32,7 +32,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
     updateSiteConfig(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const _a = req.body, { emails, numbers, addresses } = _a, body = __rest(_a, ["emails", "numbers", "addresses"]);
+                const _a = req.body, { emails, numbers, address } = _a, body = __rest(_a, ["emails", "numbers", "address"]);
                 const files = req.files || [];
                 const { agency_id, user_id } = req.agencyUser;
                 const AgencyB2CConfigModel = this.Model.AgencyB2CConfigModel(trx);
@@ -52,14 +52,14 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     }
                 });
                 if (emails) {
-                    payload.emails = JSON.stringify(emails.emails);
+                    payload.emails = JSON.stringify(emails);
                 }
                 if (numbers) {
-                    payload.numbers = JSON.stringify(numbers.numbers);
+                    payload.numbers = JSON.stringify(numbers);
                 }
-                if (addresses) {
-                    console.log(addresses);
-                    payload.address = JSON.stringify(addresses.addresses);
+                if (address) {
+                    console.log(address);
+                    payload.address = JSON.stringify(address);
                 }
                 yield AgencyB2CConfigModel.updateConfig(payload, { agency_id });
                 const deletedFiles = [];

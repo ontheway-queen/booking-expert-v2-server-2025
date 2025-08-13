@@ -1,11 +1,20 @@
-import { SOURCE_ADMIN, SOURCE_AGENT } from "../../miscellaneous/constants";
+import {
+  SOURCE_ADMIN,
+  SOURCE_AGENT,
+  TYPE_EMAIL_SERVER_CPANEL,
+  TYPE_EMAIL_SERVER_GMAIL,
+  TYPE_EMAIL_SERVER_HOSTINGER,
+  TYPE_EMAIL_SERVER_NAMECHEAP,
+  TYPE_EMAIL_SERVER_OTHER,
+  TYPE_EMAIL_SERVER_ZOHO,
+} from '../../miscellaneous/constants';
 
 export interface IInsertHotelSearchHistoryPayload {
-  user_type: "Agent" | "B2C" | "Agent B2C" | "Admin";
+  user_type: 'Agent' | 'B2C' | 'Agent B2C' | 'Admin';
   check_in_date: string;
   check_out_date: string;
   guest_n_rooms: string;
-  destination_type: "Hotel" | "City";
+  destination_type: 'Hotel' | 'City';
   user_id?: number;
   code: number;
   agency_id?: number;
@@ -16,7 +25,7 @@ export interface IInsertHotelSearchHistoryPayload {
 export interface IGetHotelSearchHistoryQuery {
   limit?: string;
   skip?: string;
-  user_type?: "Agent" | "B2C" | "Agent B2C" | "Admin" | "All";
+  user_type?: 'Agent' | 'B2C' | 'Agent B2C' | 'Admin' | 'All';
   agency_id?: number;
   user_id?: number;
   from_date?: string;
@@ -43,7 +52,7 @@ export interface ICreateBankAccountPayload {
   account_name: string;
   account_number: string;
   branch?: string; // Nullable
-  source_type?: "ADMIN" | "AGENT";
+  source_type?: 'ADMIN' | 'AGENT';
   source_id?: number; // Nullable
   routing_no?: string; // Nullable
   swift_code?: string; // Nullable
@@ -74,4 +83,39 @@ export interface IUpdateBankAccountPayload {
   routing_no?: string; // Nullable
   swift_code?: string; // Nullable
   status?: boolean;
+}
+
+export type email_server_type =
+  | typeof TYPE_EMAIL_SERVER_GMAIL
+  | typeof TYPE_EMAIL_SERVER_HOSTINGER
+  | typeof TYPE_EMAIL_SERVER_NAMECHEAP
+  | typeof TYPE_EMAIL_SERVER_ZOHO
+  | typeof TYPE_EMAIL_SERVER_CPANEL
+  | typeof TYPE_EMAIL_SERVER_OTHER;
+
+export interface ICreateEmailCredPayload {
+  type: email_server_type;
+  agency_id: number;
+  email: string;
+  password: string;
+  host?: string;
+  port?: string;
+}
+export interface IUpdateEmailCredPayload {
+  type?: email_server_type;
+  email?: string;
+  password?: string;
+  host?: string;
+  port?: string;
+}
+
+export interface IGetEmailCredData {
+  type: email_server_type;
+  agency_id: number;
+  email: string;
+  password: string;
+  host?: string;
+  port?: number;
+  status: boolean;
+  created_at: string;
 }

@@ -13,6 +13,14 @@ export const OTP_TYPES = {
   register_agent_b2c: 'register_agent_b2c',
 };
 
+// Email server type
+export const TYPE_EMAIL_SERVER_GMAIL = 'GMAIL';
+export const TYPE_EMAIL_SERVER_HOSTINGER = 'HOSTINGER';
+export const TYPE_EMAIL_SERVER_NAMECHEAP = 'NAMECHEAP';
+export const TYPE_EMAIL_SERVER_ZOHO = 'ZOHO';
+export const TYPE_EMAIL_SERVER_CPANEL = 'CPANEL';
+export const TYPE_EMAIL_SERVER_OTHER = 'OTHER';
+
 //Project Info
 export const PROJECT_NAME = 'Booking Expert V2';
 export const PROJECT_LOGO =

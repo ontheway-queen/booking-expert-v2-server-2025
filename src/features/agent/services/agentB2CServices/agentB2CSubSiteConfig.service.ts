@@ -16,7 +16,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
 
   public async updateSiteConfig(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { emails, numbers, addresses, ...body } =
+      const { emails, numbers, address, ...body } =
         req.body as IAgencyB2CSubUpdateSiteConfigReqBody;
       const files = (req.files as Express.Multer.File[]) || [];
       const { agency_id, user_id } = req.agencyUser;
@@ -46,15 +46,15 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
       });
 
       if (emails) {
-        payload.emails = JSON.stringify(emails.emails);
+        payload.emails = JSON.stringify(emails);
       }
 
       if (numbers) {
-        payload.numbers = JSON.stringify(numbers.numbers);
+        payload.numbers = JSON.stringify(numbers);
       }
-      if (addresses) {
-        console.log(addresses);
-        payload.address = JSON.stringify(addresses.addresses);
+      if (address) {
+        console.log(address);
+        payload.address = JSON.stringify(address);
       }
 
       await AgencyB2CConfigModel.updateConfig(payload, { agency_id });

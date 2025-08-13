@@ -61,15 +61,11 @@ class AgentB2CMainService extends abstract_service_1.default {
                 const otp = lib_1.default.otpGenNumber(6);
                 const hashed_otp = yield lib_1.default.hashValue(otp);
                 try {
-                    const [send_email] = yield Promise.all([
-                        email
-                            ? emailSendLib_1.default.sendEmail({
-                                email,
-                                emailSub: constants_1.OTP_EMAIL_SUBJECT,
-                                emailBody: (0, sendEmailOtpTemplate_1.sendEmailOtpTemplate)(otp, OTP_FOR),
-                            })
-                            : undefined,
-                    ]);
+                    const send_email = yield emailSendLib_1.default.sendEmailAgent(trx, agency_id, {
+                        email,
+                        emailSub: constants_1.OTP_EMAIL_SUBJECT,
+                        emailBody: (0, sendEmailOtpTemplate_1.sendEmailOtpTemplate)(otp, OTP_FOR),
+                    });
                     if (send_email) {
                         yield commonModel.insertOTP({
                             hashed_otp: hashed_otp,

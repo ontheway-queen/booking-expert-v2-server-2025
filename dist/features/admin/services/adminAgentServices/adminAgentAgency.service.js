@@ -31,6 +31,7 @@ const config_1 = __importDefault(require("../../../../config/config"));
 const constants_1 = require("../../../../utils/miscellaneous/constants");
 const emailSendLib_1 = __importDefault(require("../../../../utils/lib/emailSendLib"));
 const registrationVerificationCompletedTemplate_1 = require("../../../../utils/templates/registrationVerificationCompletedTemplate");
+const siteConfigSupport_service_1 = require("../../../../utils/supportServices/otherSupportServices/siteConfigSupport.service");
 class AdminAgentAgencyService extends abstract_service_1.default {
     constructor() {
         super();
@@ -514,6 +515,15 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 if (body.white_label && white_label_permissions) {
                     const uuid = (0, uuid_1.v4)();
                     yield agencyModel.createWhiteLabelPermission(Object.assign(Object.assign({ agency_id: newAgency[0].id }, white_label_permissions), { token: uuid }));
+                    const siteService = new siteConfigSupport_service_1.SiteConfigSupportService(trx);
+                    yield siteService.insertSiteConfigData({
+                        agency_id: newAgency[0].id,
+                        address: body.address,
+                        email: body.email,
+                        phone: body.phone,
+                        site_name: body.agency_name,
+                        logo: agency_logo,
+                    });
                     if (white_label_permissions.flight || white_label_permissions.hotel) {
                         yield agencyModel.createAgentB2CMarkup({
                             agency_id: newAgency[0].id,

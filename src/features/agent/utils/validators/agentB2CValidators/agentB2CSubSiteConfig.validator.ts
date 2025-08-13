@@ -1,23 +1,17 @@
 import Joi from 'joi';
 
 export class AgentB2CSubSiteConfigValidator {
-  private SiteConfigEmail = Joi.object({
-    emails: Joi.array().min(1).items({
-      email: Joi.string().email().lowercase().trim().required(),
-    }),
+  private SiteConfigEmail = Joi.array().min(1).items({
+    email: Joi.string().email().lowercase().trim().required(),
   });
 
-  private SiteConfigPhone = Joi.object({
-    numbers: Joi.array().min(1).items({
-      number: Joi.string().trim().required(),
-    }),
+  private SiteConfigPhone = Joi.array().min(1).items({
+    number: Joi.string().trim().required(),
   });
 
-  private SiteConfigAddress = Joi.object({
-    addresses: Joi.array().min(1).items({
-      title: Joi.string().required().trim(),
-      address: Joi.string().required().trim(),
-    }),
+  private SiteConfigAddress = Joi.array().min(1).items({
+    title: Joi.string().required().trim(),
+    address: Joi.string().required().trim(),
   });
 
   public updateSiteConfig = Joi.object({
@@ -33,7 +27,9 @@ export class AgentB2CSubSiteConfigValidator {
     emails: Joi.string()
       .custom((value, helpers) => {
         try {
+          console.log({ value });
           const parsed = JSON.parse(value);
+          console.log({ parsed });
           const { error } = this.SiteConfigEmail.validate(parsed);
           if (error) {
             return helpers.error('any.invalid', {
@@ -68,7 +64,7 @@ export class AgentB2CSubSiteConfigValidator {
         }
       })
       .optional(),
-    addresses: Joi.string()
+    address: Joi.string()
       .custom((value, helpers) => {
         try {
           const parsed = JSON.parse(value);

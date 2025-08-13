@@ -1,6 +1,7 @@
 export const origin: string[] = [
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:3002',
   'http://localhost:5000',
   'http://10.10.220.47:5000',
   'http://10.10.220.31:3000',
@@ -34,4 +35,6 @@ export const origin: string[] = [
   'https://www.firoztrip.com',
   'https://ayatairtravels.com',
   'https://www.ayatairtravels.com',
+  'https://hopngo.net',
+  'https://www.hopngo.net',
 ];

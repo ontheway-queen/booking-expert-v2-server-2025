@@ -59,12 +59,10 @@ class AgentB2CSubConfigValidator {
                 .optional(),
         });
         this.createPopularDestination = joi_1.default.object({
-            country_id: joi_1.default.number().required(),
             from_airport: joi_1.default.number().required(),
             to_airport: joi_1.default.number().required(),
         });
         this.updatePopularDestination = joi_1.default.object({
-            country_id: joi_1.default.number().optional(),
             from_airport: joi_1.default.number().optional(),
             to_airport: joi_1.default.number().optional(),
             status: joi_1.default.boolean().optional(),

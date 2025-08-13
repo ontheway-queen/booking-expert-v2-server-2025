@@ -47,14 +47,24 @@ class AdminAgentAgencyController extends abstract_controller_1.default {
             bodySchema: this.validator.updateAgencyUser,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.services.updateAgencyUser(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
         }));
         this.updateAgencyApplication = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator('id'),
             bodySchema: this.validator.updateAgencyApplication,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.services.updateAgencyApplication(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
         }));
         this.updateAgency = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator('id'),
@@ -74,7 +84,12 @@ class AdminAgentAgencyController extends abstract_controller_1.default {
         }));
         this.createAgency = this.asyncWrapper.wrap({ bodySchema: this.validator.createAgency }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.services.createAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
         }));
     }
 }

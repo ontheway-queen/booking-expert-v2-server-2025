@@ -61,15 +61,11 @@ export class AgentB2CMainService extends AbstractServices {
       const hashed_otp = await Lib.hashValue(otp);
 
       try {
-        const [send_email] = await Promise.all([
-          email
-            ? EmailSendLib.sendEmail({
-                email,
-                emailSub: OTP_EMAIL_SUBJECT,
-                emailBody: sendEmailOtpTemplate(otp, OTP_FOR),
-              })
-            : undefined,
-        ]);
+        const send_email = await EmailSendLib.sendEmailAgent(trx, agency_id, {
+          email,
+          emailSub: OTP_EMAIL_SUBJECT,
+          emailBody: sendEmailOtpTemplate(otp, OTP_FOR),
+        });
 
         if (send_email) {
           await commonModel.insertOTP({

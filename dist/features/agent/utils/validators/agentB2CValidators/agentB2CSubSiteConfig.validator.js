@@ -7,21 +7,15 @@ exports.AgentB2CSubSiteConfigValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
 class AgentB2CSubSiteConfigValidator {
     constructor() {
-        this.SiteConfigEmail = joi_1.default.object({
-            emails: joi_1.default.array().min(1).items({
-                email: joi_1.default.string().email().lowercase().trim().required(),
-            }),
+        this.SiteConfigEmail = joi_1.default.array().min(1).items({
+            email: joi_1.default.string().email().lowercase().trim().required(),
         });
-        this.SiteConfigPhone = joi_1.default.object({
-            numbers: joi_1.default.array().min(1).items({
-                number: joi_1.default.string().trim().required(),
-            }),
+        this.SiteConfigPhone = joi_1.default.array().min(1).items({
+            number: joi_1.default.string().trim().required(),
         });
-        this.SiteConfigAddress = joi_1.default.object({
-            addresses: joi_1.default.array().min(1).items({
-                title: joi_1.default.string().required().trim(),
-                address: joi_1.default.string().required().trim(),
-            }),
+        this.SiteConfigAddress = joi_1.default.array().min(1).items({
+            title: joi_1.default.string().required().trim(),
+            address: joi_1.default.string().required().trim(),
         });
         this.updateSiteConfig = joi_1.default.object({
             hero_quote: joi_1.default.string().trim().optional(),
@@ -36,7 +30,9 @@ class AgentB2CSubSiteConfigValidator {
             emails: joi_1.default.string()
                 .custom((value, helpers) => {
                 try {
+                    console.log({ value });
                     const parsed = JSON.parse(value);
+                    console.log({ parsed });
                     const { error } = this.SiteConfigEmail.validate(parsed);
                     if (error) {
                         return helpers.error('any.invalid', {
@@ -71,7 +67,7 @@ class AgentB2CSubSiteConfigValidator {
                 }
             })
                 .optional(),
-            addresses: joi_1.default.string()
+            address: joi_1.default.string()
                 .custom((value, helpers) => {
                 try {
                     const parsed = JSON.parse(value);

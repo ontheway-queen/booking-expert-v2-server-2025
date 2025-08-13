@@ -413,17 +413,6 @@ export class AgentB2CSubConfigService extends AbstractServices {
         };
       }
 
-      const checkCountry = await CommonModel.getCountry({
-        id: body.country_id,
-      });
-
-      if (!checkCountry.length) {
-        return {
-          success: false,
-          code: this.StatusCode.HTTP_NOT_FOUND,
-          message: 'Country not found.',
-        };
-      }
       const checkFromAirport = await CommonModel.getAirport({
         id: body.from_airport,
       });
@@ -499,20 +488,6 @@ export class AgentB2CSubConfigService extends AbstractServices {
           code: this.StatusCode.HTTP_NOT_FOUND,
           message: this.ResMsg.HTTP_NOT_FOUND,
         };
-      }
-
-      if (body.country_id) {
-        const checkCountry = await CommonModel.getCountry({
-          id: body.country_id,
-        });
-
-        if (!checkCountry.length) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_NOT_FOUND,
-            message: 'Country not found.',
-          };
-        }
       }
 
       if (body.from_airport) {

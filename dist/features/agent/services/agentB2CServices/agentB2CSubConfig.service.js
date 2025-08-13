@@ -347,16 +347,6 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                         message: 'Thumbnail is required',
                     };
                 }
-                const checkCountry = yield CommonModel.getCountry({
-                    id: body.country_id,
-                });
-                if (!checkCountry.length) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: 'Country not found.',
-                    };
-                }
                 const checkFromAirport = yield CommonModel.getAirport({
                     id: body.from_airport,
                 });
@@ -415,18 +405,6 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_NOT_FOUND,
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
-                }
-                if (body.country_id) {
-                    const checkCountry = yield CommonModel.getCountry({
-                        id: body.country_id,
-                    });
-                    if (!checkCountry.length) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_NOT_FOUND,
-                            message: 'Country not found.',
-                        };
-                    }
                 }
                 if (body.from_airport) {
                     const checkFromAirport = yield CommonModel.getAirport({

@@ -62,17 +62,16 @@ export interface ICreateAgencyB2CPopularDestinationPayload {
   agency_id: number;
   thumbnail: string;
   order_number: number;
-  country_id: number;
   from_airport: number;
   to_airport: number;
 }
 export interface IUpdateAgencyB2CPopularDestinationPayload {
   thumbnail?: string;
   order_number?: number;
-  country_id?: number;
   from_airport?: number;
   to_airport?: number;
 }
+
 export interface IGetAgencyB2CPopularDestinationQuery {
   agency_id: number;
   status?: boolean;
@@ -83,13 +82,15 @@ export interface IGetAgencyB2CPopularDestinationData {
   agency_id: number;
   thumbnail: string;
   order_number: number;
-  country_id: number;
-  country_name: string;
   from_airport: number;
   from_airport_name: string;
+  from_airport_country: string;
+  from_airport_city: string;
   from_airport_code: string;
   to_airport: number;
   to_airport_name: string;
+  to_airport_country: string;
+  to_airport_city: string;
   to_airport_code: string;
   status: boolean;
 }
@@ -114,7 +115,6 @@ export interface ICreateAgencyB2CPopularPlace {
   location_type?: string;
   location_name?: string;
   country_id?: number;
-  status?: boolean;
 }
 
 export interface IGetAgencyB2CPopularPlaceQuery {
@@ -155,9 +155,9 @@ export interface ICreateAgencyB2CSiteConfig {
   hero_quote?: string;
   hero_sub_quote?: string;
   site_name?: string;
-  emails?: any; // Replace `any` with a defined structure if known
-  numbers?: any;
-  address?: any;
+  emails?: string; // Replace `any` with a defined structure if known
+  numbers?: string;
+  address?: string;
   contact_us_content?: string;
   contact_us_thumbnail?: string;
   about_us_content?: string;

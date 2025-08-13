@@ -3,6 +3,8 @@ import config from '../../config/config';
 import nodemailer from 'nodemailer';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { Knex } from 'knex';
+import OthersModel from '../../models/othersModel/othersModel';
 puppeteer.use(StealthPlugin());
 
 export default class EmailSendLib {
@@ -12,69 +14,80 @@ export default class EmailSendLib {
     emailBody: string;
     attachments?: Attachment[];
   }) {
-    return await this.sendEmailHostinger({
-      ...payload,
+    return await this.sendEmailHostinger(payload, {
       senderEmail: config.EMAIL_SEND_EMAIL_ID,
       senderPassword: config.EMAIL_SEND_PASSWORD,
     });
   }
 
-  // send email by nodemailer
-  public static async sendEmailDefault({
-    email,
-    emailBody,
-    emailSub,
-    attachments,
-  }: {
-    email: string;
-    emailSub: string;
-    emailBody: string;
-    attachments?: Attachment[];
-  }) {
-    try {
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: 'smtp.gmail.com',
-        port: 465,
-        auth: {
-          user: config.EMAIL_SEND_EMAIL_ID,
-          pass: config.EMAIL_SEND_PASSWORD,
-        },
+  public static async sendEmailAgent(
+    trx: Knex.Transaction,
+    agency_id: number,
+    payload: {
+      email: string;
+      emailSub: string;
+      emailBody: string;
+      attachments?: Attachment[];
+    }
+  ) {
+    const otherModel = new OthersModel(trx);
+
+    const creds = await otherModel.getEmailCreds(agency_id);
+
+    if (!creds) {
+      return await this.sendEmailHostinger(payload, {
+        senderEmail: config.EMAIL_SEND_EMAIL_ID,
+        senderPassword: config.EMAIL_SEND_PASSWORD,
       });
+    } else {
+      switch (creds.type) {
+        case 'GMAIL':
+          return await this.sendEmailGoogle(payload, {
+            senderEmail: creds.email,
+            senderPassword: creds.password,
+          });
+        case 'HOSTINGER':
+          return await this.sendEmailHostinger(payload, {
+            senderEmail: creds.email,
+            senderPassword: creds.password,
+          });
+        case 'NAMECHEAP':
+          return await this.sendEmailNameCheap(payload, {
+            senderEmail: creds.email,
+            senderPassword: creds.password,
+          });
+        case 'CPANEL':
+          return await this.sendEmailCpanel(payload, {
+            senderEmail: creds.email,
+            senderPassword: creds.password,
+            host: creds.host || '',
+            port: creds.port || 587,
+          });
 
-      const info = await transporter.sendMail({
-        from: config.EMAIL_SEND_EMAIL_ID,
-        to: email,
-        subject: emailSub,
-        html: emailBody,
-        attachments: attachments || undefined,
-      });
-
-      console.log('Message send: %s', info);
-
-      return true;
-    } catch (err: any) {
-      console.log({ err });
-      return false;
+        default:
+          break;
+      }
     }
   }
 
   // send email google
-  public static async sendEmailGoogle({
-    email,
-    emailBody,
-    emailSub,
-    attachments,
-    senderEmail,
-    senderPassword,
-  }: {
-    email: string;
-    emailSub: string;
-    emailBody: string;
-    attachments?: Attachment[];
-    senderEmail: string;
-    senderPassword: string;
-  }) {
+  public static async sendEmailGoogle(
+    {
+      email,
+      emailBody,
+      emailSub,
+      attachments,
+    }: {
+      email: string;
+      emailSub: string;
+      emailBody: string;
+      attachments?: Attachment[];
+    },
+    {
+      senderEmail,
+      senderPassword,
+    }: { senderEmail: string; senderPassword: string }
+  ) {
     try {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -104,24 +117,126 @@ export default class EmailSendLib {
   }
 
   // send email hostinger
-  public static async sendEmailHostinger({
-    email,
-    emailBody,
-    emailSub,
-    attachments,
-    senderEmail,
-    senderPassword,
-  }: {
-    email: string;
-    emailSub: string;
-    emailBody: string;
-    attachments?: Attachment[];
-    senderEmail: string;
-    senderPassword: string;
-  }) {
+  public static async sendEmailHostinger(
+    {
+      email,
+      emailBody,
+      emailSub,
+      attachments,
+    }: {
+      email: string;
+      emailSub: string;
+      emailBody: string;
+      attachments?: Attachment[];
+    },
+    {
+      senderEmail,
+      senderPassword,
+    }: { senderEmail: string; senderPassword: string }
+  ) {
     try {
       const transporter = nodemailer.createTransport({
         host: 'smtp.hostinger.com',
+        port: 465,
+        auth: {
+          user: senderEmail,
+          pass: senderPassword,
+        },
+      });
+
+      const info = await transporter.sendMail({
+        from: senderEmail,
+        to: email,
+        subject: emailSub,
+        html: emailBody,
+        attachments: attachments || undefined,
+      });
+
+      console.log('Message send: %s', info);
+
+      return true;
+    } catch (err: any) {
+      console.log({ err });
+      return false;
+    }
+  }
+
+  // send email by nodemailer
+  public static async sendEmailCpanel(
+    {
+      email,
+      emailBody,
+      emailSub,
+      attachments,
+    }: {
+      email: string;
+      emailSub: string;
+      emailBody: string;
+      attachments?: Attachment[];
+    },
+    {
+      host,
+      port,
+      senderEmail,
+      senderPassword,
+    }: {
+      host: string;
+      port: number;
+      senderEmail: string;
+      senderPassword: string;
+    }
+  ) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: host,
+        port: port,
+        auth: {
+          user: senderEmail,
+          pass: senderPassword,
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+      });
+
+      const info = await transporter.sendMail({
+        from: senderEmail,
+        to: email,
+        subject: emailSub,
+        html: emailBody,
+        attachments: attachments || undefined,
+      });
+
+      console.log('Message send: %s', info);
+
+      return true;
+    } catch (err: any) {
+      console.log({ err });
+      return false;
+    }
+  }
+
+  // send email by namecheap
+  public static async sendEmailNameCheap(
+    {
+      email,
+      emailBody,
+      emailSub,
+      attachments,
+    }: {
+      email: string;
+      emailSub: string;
+      emailBody: string;
+      attachments?: Attachment[];
+    },
+    {
+      senderEmail,
+      senderPassword,
+    }: { senderEmail: string; senderPassword: string }
+  ) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: 'mail.privateemail.com',
         port: 465,
         auth: {
           user: senderEmail,
