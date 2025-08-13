@@ -1,4 +1,5 @@
 import { createClient } from 'redis';
+import { Queue, Worker } from 'bullmq';
 
 const redis_url = 'redis://localhost';
 
@@ -33,3 +34,35 @@ export const deleteRedis = async (key: string) => {
 export const redisFlush = async () => {
   await client.flushAll();
 };
+
+const redisConfig = {
+  connection: {
+    host: 'localhost',
+    port: 6379,
+  },
+};
+
+const emailQueue = new Queue('emailQueue', redisConfig);
+
+const worker = new Worker(
+  'emailQueue',
+  async (job) => {
+    const { to, subject, text, html } = job.data;
+
+    try {
+      // const info = await transporter.sendMail({
+      //   from: '"Your Service" <noreply@yourservice.com>',
+      //   to,
+      //   subject,
+      //   text,
+      //   html,
+      // });
+      // console.log('Email sent:', info.messageId);
+      // return info;
+    } catch (error) {
+      console.error('Email sending failed:', error);
+      throw error; // This will trigger a retry if configured
+    }
+  },
+  redisConfig
+);

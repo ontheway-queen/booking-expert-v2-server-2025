@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.redisFlush = exports.deleteRedis = exports.getRedisTTL = exports.getRedis = exports.setRedis = void 0;
 const redis_1 = require("redis");
+const bullmq_1 = require("bullmq");
 const redis_url = 'redis://localhost';
 const client = (0, redis_1.createClient)({ url: redis_url });
 client.on('error', (err) => console.log('Redis Client Error', err));
@@ -42,3 +43,28 @@ const redisFlush = () => __awaiter(void 0, void 0, void 0, function* () {
     yield client.flushAll();
 });
 exports.redisFlush = redisFlush;
+const redisConfig = {
+    connection: {
+        host: 'localhost',
+        port: 6379,
+    },
+};
+const emailQueue = new bullmq_1.Queue('emailQueue', redisConfig);
+const worker = new bullmq_1.Worker('emailQueue', (job) => __awaiter(void 0, void 0, void 0, function* () {
+    const { to, subject, text, html } = job.data;
+    try {
+        // const info = await transporter.sendMail({
+        //   from: '"Your Service" <noreply@yourservice.com>',
+        //   to,
+        //   subject,
+        //   text,
+        //   html,
+        // });
+        // console.log('Email sent:', info.messageId);
+        // return info;
+    }
+    catch (error) {
+        console.error('Email sending failed:', error);
+        throw error; // This will trigger a retry if configured
+    }
+}), redisConfig);
