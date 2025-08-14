@@ -31,10 +31,6 @@ export class AgentB2CSubBlogValidator {
       'string.max': 'Meta description must be less than 160 characters',
       'any.required': 'Meta description is required',
     }),
-    blog_for: Joi.string().valid('AGENT', 'B2C', 'BOTH').required().messages({
-      'string.base': 'Enter valid blog for',
-      'any.required': 'Blog for is required',
-    }),
   });
 
   public getBlogListQuerySchema = Joi.object({

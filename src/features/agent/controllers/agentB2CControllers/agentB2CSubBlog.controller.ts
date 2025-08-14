@@ -13,7 +13,12 @@ export class AgentB2CSubBlogController extends AbstractController {
     },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.controller.createBlog(req);
-      res.status(code).json(data);
+
+      if (data.success) {
+        res.status(code).json(data);
+      } else {
+        this.error(data.message, code);
+      }
     }
   );
 
@@ -44,10 +49,13 @@ export class AgentB2CSubBlogController extends AbstractController {
     },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.controller.updateBlog(req);
-      res.status(code).json(data);
+      if (data.success) {
+        res.status(code).json(data);
+      } else {
+        this.error(data.message, code);
+      }
     }
   );
-
 
   public deleteBlog = this.asyncWrapper.wrap(
     {

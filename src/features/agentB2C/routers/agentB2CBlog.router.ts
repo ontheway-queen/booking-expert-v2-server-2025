@@ -9,7 +9,6 @@ export default class AgentB2CBlogRouter extends AbstractRouter {
   }
 
   private callRouter() {
-
     this.router.route('/').get(this.controller.getBlogList);
 
     this.router.route('/:slug').get(this.controller.getSingleBlog);

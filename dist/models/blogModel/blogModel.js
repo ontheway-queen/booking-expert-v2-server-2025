@@ -21,7 +21,9 @@ class BlogModel extends schema_1.default {
     }
     createBlog(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('blog').withSchema(this.SERVICE_SCHEMA).insert(payload);
+            return yield this.db('blog')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload);
         });
     }
     getSingleBlogPost(query) {
@@ -94,12 +96,11 @@ class BlogModel extends schema_1.default {
             const { is_deleted = false } = query;
             return yield this.db('blog as b')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('b.id', 'b.title', 'b.summary', 'b.cover_image', 'b.slug', 'b.meta_title', 'b.meta_description', 'b.created_at as created_date')
+                .select('b.id', 'b.title', 'b.summary', 'b.cover_image', 'b.slug', 'b.created_at as created_date')
                 .where((qb) => {
                 qb.andWhere('b.source_type', constants_1.SOURCE_AGENT);
                 qb.andWhere('b.source_id', query.source_id);
                 qb.andWhere('b.is_deleted', is_deleted);
-                qb.andWhere('b.blog_for', 'B2C').orWhere('b.blog_for', 'BOTH');
                 if (query.status !== undefined) {
                     qb.andWhere('b.status', query.status);
                 }

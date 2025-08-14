@@ -36,7 +36,12 @@ class AgentB2CSubBlogController extends abstract_controller_1.default {
             bodySchema: this.validator.createBlogSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.controller.createBlog(req), { code } = _a, data = __rest(_a, ["code"]);
-            res.status(code).json(data);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
         }));
         this.getBlogList = this.asyncWrapper.wrap({
             querySchema: this.validator.getBlogListQuerySchema,
@@ -55,7 +60,12 @@ class AgentB2CSubBlogController extends abstract_controller_1.default {
             paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.controller.updateBlog(req), { code } = _a, data = __rest(_a, ["code"]);
-            res.status(code).json(data);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
         }));
         this.deleteBlog = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),
