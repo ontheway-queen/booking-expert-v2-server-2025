@@ -14,7 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const statusCode_1 = __importDefault(require("../../utils/miscellaneous/statusCode"));
 const customError_1 = __importDefault(require("../../utils/lib/customError"));
+const manageFile_1 = __importDefault(require("../../utils/lib/manageFile"));
 class Wrapper {
+    constructor() {
+        this.manageFile = new manageFile_1.default();
+    }
     // CONTROLLER ASYNCWRAPPER
     wrap(schema, cb) {
         return (req, res, next) => __awaiter(this, void 0, void 0, function* () {
@@ -38,6 +42,9 @@ class Wrapper {
             }
             catch (err) {
                 console.log({ err }, 'error from wrap');
+                if (req.upFiles.length) {
+                    this.manageFile.deleteFromCloud(req.upFiles);
+                }
                 if (err.isJoi) {
                     res.status(statusCode_1.default.HTTP_UNPROCESSABLE_ENTITY).json({
                         success: false,

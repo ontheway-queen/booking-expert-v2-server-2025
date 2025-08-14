@@ -35,4 +35,5 @@ FileFolder.AGENT_B2C_FLIGHT_BOOKING_FILES = 'agent/b2c/flight-booking-files';
 FileFolder.AGENT_B2C_HOTEL_BOOKING_FILES = 'agent/b2c/hotel-booking-files';
 FileFolder.AGENT_HOTEL_BOOKING_FILES = 'agent/hotel-booking-files';
 FileFolder.AGENCY_REGISTRATION_REQUEST = 'agency-registration-request';
+FileFolder.AGENT_VISA_FILES = 'agent/visa-files';
 exports.default = FileFolder;

@@ -20,17 +20,12 @@ class VisaModel extends schema_1.default {
     }
     createVisa(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
+            return yield this.db('visa').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
         });
     }
     updateVisa(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.db('visa')
-                .withSchema(this.SERVICE_SCHEMA)
-                .update(payload)
-                .where({ id });
+            return this.db('visa').withSchema(this.SERVICE_SCHEMA).update(payload).where({ id });
         });
     }
     checkVisa(query) {
@@ -49,8 +44,8 @@ class VisaModel extends schema_1.default {
                 if (query.country_id) {
                     qb.andWhere('country_id', query.country_id);
                 }
-                if (query.agency_id) {
-                    qb.andWhere('agency_id', query.agency_id);
+                if (query.source_id) {
+                    qb.andWhere('source_id', query.source_id);
                 }
                 if (query.status !== undefined) {
                     qb.andWhere('status', query.status);

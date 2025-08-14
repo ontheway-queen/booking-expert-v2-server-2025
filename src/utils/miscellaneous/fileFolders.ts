@@ -35,5 +35,6 @@ class FileFolder {
     'agent/b2c/hotel-booking-files';
   static readonly AGENT_HOTEL_BOOKING_FILES = 'agent/hotel-booking-files';
   static readonly AGENCY_REGISTRATION_REQUEST = 'agency-registration-request';
+  static readonly AGENT_VISA_FILES = 'agent/visa-files';
 }
 export default FileFolder;

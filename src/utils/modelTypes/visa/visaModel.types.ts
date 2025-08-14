@@ -1,11 +1,5 @@
 interface IVisaType {
-  type:
-    | 'Student'
-    | 'Government Delegates'
-    | 'Business'
-    | 'Tourist'
-    | 'Investor'
-    | 'Work';
+  type: 'Student' | 'Government Delegates' | 'Business' | 'Tourist' | 'Investor' | 'Work';
 }
 
 export interface ICreateVisaPayload {
@@ -26,6 +20,8 @@ export interface ICreateVisaPayload {
   image?: string;
   meta_tag?: string;
   meta_description?: string;
+  source_id: number;
+  source_type: string;
 }
 
 export interface IUpdateVisaPayload {
@@ -52,7 +48,16 @@ export interface ICheckVisaQuery {
   slug?: string;
   id?: number;
   country_id?: number;
-  agency_id?: number;
+  source_id?: number;
+  status?: boolean;
+  is_deleted: boolean;
+}
+
+
+export interface IGetVisaListQuery{
+  slug?: string;
+  country_id?: number;
+  source_id?: number;
   status?: boolean;
   is_deleted: boolean;
 }
@@ -80,4 +85,6 @@ export interface ICheckVisaData {
   visa_for: string | null;
   agency_id: number | null;
   is_deleted: boolean;
+  source_id: number;
+  source_type: string;
 }
