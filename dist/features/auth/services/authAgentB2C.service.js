@@ -40,7 +40,10 @@ class AuthAgentB2CService extends abstract_service_1.default {
                         message: 'Email already exist. Please use another email.',
                     };
                 }
-                const agent_details = yield AgentModel.getSingleAgency(agency_id);
+                const agent_details = yield AgentModel.getSingleAgency({
+                    id: agency_id,
+                    type: 'Agent',
+                });
                 let username = lib_1.default.generateUsername(name);
                 let suffix = 1;
                 while (yield AgentB2CUserModel.checkUser({ username, agency_id })) {
@@ -117,7 +120,10 @@ class AuthAgentB2CService extends abstract_service_1.default {
                         message: 'Your account is disabled. Please contact with the authority!',
                     };
                 }
-                const agent_details = yield AgentModel.getSingleAgency(agency_id);
+                const agent_details = yield AgentModel.getSingleAgency({
+                    id: agency_id,
+                    type: 'Agent',
+                });
                 if (!agent_details) {
                     return {
                         success: false,

@@ -172,7 +172,7 @@ class AgentSubAgentService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const query = req.query;
             const AgencyModel = this.Model.AgencyModel();
-            const data = yield AgencyModel.getAgencyList(Object.assign(Object.assign({}, query), { ref_id: agency_id }), true);
+            const data = yield AgencyModel.getAgencyList(Object.assign(Object.assign({}, query), { ref_id: agency_id, agency_type: 'Sub Agent' }), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -189,7 +189,11 @@ class AgentSubAgentService extends abstract_service_1.default {
                 const { id } = req.params;
                 const AgencyModel = this.Model.AgencyModel(trx);
                 const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
-                const data = yield AgencyModel.getSingleAgency(Number(id), agency_id);
+                const data = yield AgencyModel.getSingleAgency({
+                    id: Number(id),
+                    type: 'Sub Agent',
+                    ref_agent_id: agency_id,
+                });
                 if (!data) {
                     return {
                         success: false,

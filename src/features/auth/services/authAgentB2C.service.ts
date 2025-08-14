@@ -37,7 +37,10 @@ export default class AuthAgentB2CService extends AbstractServices {
         };
       }
 
-      const agent_details = await AgentModel.getSingleAgency(agency_id);
+      const agent_details = await AgentModel.getSingleAgency({
+        id: agency_id,
+        type: 'Agent',
+      });
 
       let username = Lib.generateUsername(name);
 
@@ -130,7 +133,10 @@ export default class AuthAgentB2CService extends AbstractServices {
         };
       }
 
-      const agent_details = await AgentModel.getSingleAgency(agency_id);
+      const agent_details = await AgentModel.getSingleAgency({
+        id: agency_id,
+        type: 'Agent',
+      });
       if (!agent_details) {
         return {
           success: false,

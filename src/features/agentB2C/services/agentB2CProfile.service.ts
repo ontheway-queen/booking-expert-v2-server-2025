@@ -34,7 +34,10 @@ export default class AgentB2CProfileService extends AbstractServices {
         };
       }
 
-      const agent_details = await AgentModel.getSingleAgency(agency_id);
+      const agent_details = await AgentModel.getSingleAgency({
+        id: agency_id,
+        type: 'Agent',
+      });
 
       const balance = await AgencyB2CPaymentModel.getUserBalance(
         agency_id,

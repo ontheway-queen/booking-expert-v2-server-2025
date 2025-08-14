@@ -328,9 +328,10 @@ export class AdminAgentFlightService extends AbstractServices {
       }
       if (status !== null) {
         const agencyModel = this.Model.AgencyModel(trx);
-        const agency_data = await agencyModel.getSingleAgency(
-          Number(booking_data.source_id)
-        );
+        const agency_data = await agencyModel.getSingleAgency({
+          id: Number(booking_data.source_id),
+          type: 'Agent',
+        });
         if (!agency_data) {
           return {
             success: false,

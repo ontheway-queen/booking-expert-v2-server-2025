@@ -190,7 +190,7 @@ export default class AgentSubAgentService extends AbstractServices {
     const AgencyModel = this.Model.AgencyModel();
 
     const data = await AgencyModel.getAgencyList(
-      { ...query, ref_id: agency_id },
+      { ...query, ref_id: agency_id, agency_type: 'Sub Agent' },
       true
     );
 
@@ -210,7 +210,11 @@ export default class AgentSubAgentService extends AbstractServices {
       const AgencyModel = this.Model.AgencyModel(trx);
       const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
 
-      const data = await AgencyModel.getSingleAgency(Number(id), agency_id);
+      const data = await AgencyModel.getSingleAgency({
+        id: Number(id),
+        type: 'Sub Agent',
+        ref_agent_id: agency_id,
+      });
 
       if (!data) {
         return {

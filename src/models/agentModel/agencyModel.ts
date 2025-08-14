@@ -79,10 +79,16 @@ export default class AgencyModel extends Schema {
         if (query.ref_id) {
           qb.andWhere('ag.ref_id', query.ref_id);
         }
+        if (query.ref_agent_id) {
+          qb.andWhere('ag.ref_agent_id', query.ref_agent_id);
+        }
+        if (query.agency_type) {
+          qb.andWhere('ag.agency_type', query.agency_type);
+        }
       })
       .limit(Number(query.limit) || DATA_LIMIT)
       .offset(Number(query.skip) || 0)
-      .orderBy('ag.id', query.order || 'desc');
+      .orderBy('ag.agency_name', query.order || 'asc');
 
     let total: any[] = [];
 
@@ -101,6 +107,9 @@ export default class AgencyModel extends Schema {
           }
           if (query.ref_id) {
             qb.andWhere('ag.ref_id', query.ref_id);
+          }
+          if (query.ref_agent_id) {
+            qb.andWhere('ag.ref_agent_id', query.ref_agent_id);
           }
         });
     }
@@ -454,10 +463,15 @@ export default class AgencyModel extends Schema {
   }
 
   // get single agency
-  public async getSingleAgency(
-    id: number,
-    ref_agent_id?: number
-  ): Promise<IGetSingleAgencyData | null> {
+  public async getSingleAgency({
+    id,
+    type,
+    ref_agent_id,
+  }: {
+    id: number;
+    type: 'Agent' | 'Sub Agent';
+    ref_agent_id?: number;
+  }): Promise<IGetSingleAgencyData | null> {
     return await this.db('agency AS ag')
       .withSchema(this.AGENT_SCHEMA)
       .select(
@@ -505,6 +519,7 @@ export default class AgencyModel extends Schema {
       .joinRaw('LEFT JOIN admin.user_admin AS ua ON ag.created_by = ua.id')
       .joinRaw('LEFT JOIN agent.agency AS ar ON ag.ref_agent_id = ar.id')
       .where('ag.id', id)
+      .andWhere('ag.agency_type', type)
       .andWhere((qb) => {
         if (ref_agent_id) {
           qb.andWhere('ag.ref_agent_id', ref_agent_id);

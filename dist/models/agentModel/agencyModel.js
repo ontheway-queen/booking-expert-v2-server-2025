@@ -55,10 +55,16 @@ class AgencyModel extends schema_1.default {
                 if (query.ref_id) {
                     qb.andWhere('ag.ref_id', query.ref_id);
                 }
+                if (query.ref_agent_id) {
+                    qb.andWhere('ag.ref_agent_id', query.ref_agent_id);
+                }
+                if (query.agency_type) {
+                    qb.andWhere('ag.agency_type', query.agency_type);
+                }
             })
                 .limit(Number(query.limit) || constants_1.DATA_LIMIT)
                 .offset(Number(query.skip) || 0)
-                .orderBy('ag.id', query.order || 'desc');
+                .orderBy('ag.agency_name', query.order || 'asc');
             let total = [];
             if (need_total) {
                 total = yield this.db('agency AS ag')
@@ -75,6 +81,9 @@ class AgencyModel extends schema_1.default {
                     }
                     if (query.ref_id) {
                         qb.andWhere('ag.ref_id', query.ref_id);
+                    }
+                    if (query.ref_agent_id) {
+                        qb.andWhere('ag.ref_agent_id', query.ref_agent_id);
                     }
                 });
             }
@@ -340,8 +349,8 @@ class AgencyModel extends schema_1.default {
         });
     }
     // get single agency
-    getSingleAgency(id, ref_agent_id) {
-        return __awaiter(this, void 0, void 0, function* () {
+    getSingleAgency(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ id, type, ref_agent_id, }) {
             return yield this.db('agency AS ag')
                 .withSchema(this.AGENT_SCHEMA)
                 .select('ag.id', 'ag.agent_no', 'ag.agency_logo', 'ag.agency_name', 'ag.email', 'ag.kam_id', 'ag.phone', 'ag.book_permission', 'ag.address', 'ag.status', 'ag.flight_markup_set', 'ag.hotel_markup_set', this.db.raw(`(
@@ -358,6 +367,7 @@ class AgencyModel extends schema_1.default {
                 .joinRaw('LEFT JOIN admin.user_admin AS ua ON ag.created_by = ua.id')
                 .joinRaw('LEFT JOIN agent.agency AS ar ON ag.ref_agent_id = ar.id')
                 .where('ag.id', id)
+                .andWhere('ag.agency_type', type)
                 .andWhere((qb) => {
                 if (ref_agent_id) {
                     qb.andWhere('ag.ref_agent_id', ref_agent_id);
