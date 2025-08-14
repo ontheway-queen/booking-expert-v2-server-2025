@@ -170,7 +170,6 @@ export default class AgentB2CPaymentService extends AbstractServices {
       }
 
       const body = req.body as ICreateDepositPayload;
-
       const checkAccount = await othersModel.checkAccount({
         id: body.account_id,
         source_type: SOURCE_AGENT,
@@ -193,12 +192,12 @@ export default class AgentB2CPaymentService extends AbstractServices {
       let docs = '';
       files.forEach((file) => {
         switch (file.fieldname) {
-          case 'docs':
+          case 'document':
             docs = file.filename;
             break;
           default:
             throw new CustomError(
-              'Invalid files. Please provide valid docs',
+              'Invalid files. Please provide valid document',
               this.StatusCode.HTTP_UNPROCESSABLE_ENTITY
             );
         }
@@ -268,12 +267,13 @@ export default class AgentB2CPaymentService extends AbstractServices {
     });
   }
 
-  public async getDepositHistory(req: Request) {
+  public async getDepositRequest(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { user_id } = req.agencyB2CUser;
       const { agency_id } = req.agencyB2CWhiteLabel;
       const paymentModel = this.Model.DepositRequestModel(trx);
       const query = req.query;
+
       const depositData = await paymentModel.getAgentB2CDepositRequestList(
         { ...query, agency_id, created_by: user_id },
         true

@@ -66,18 +66,16 @@ export default class ErrorHandler {
     };
     try {
       if (err.status == 500 || !err.status) {
-        await new Models()
-          .ErrorLogsModel()
-          .insertErrorLogs({
-            level: err.level || 'ERROR',
-            message: errorDetails.message || 'Internal Server Error',
-            stack_trace: errorDetails.stack,
-            source: errorDetails.source,
-            user_id: errorDetails.user_id,
-            url: errorDetails.route,
-            http_method: errorDetails.method,
-            metadata: err.metadata,
-          });
+        await new Models().ErrorLogsModel().insertErrorLogs({
+          level: err.level || 'ERROR',
+          message: errorDetails.message || 'Internal Server Error',
+          stack_trace: errorDetails.stack,
+          source: errorDetails.source,
+          user_id: errorDetails.user_id,
+          url: errorDetails.route,
+          http_method: errorDetails.method,
+          metadata: err.metadata,
+        });
       }
     } catch (err: any) {
       console.log({ err });

@@ -50,8 +50,13 @@ class AgentB2CSubUmrahValidator {
             meta_description: joi_1.default.string().optional(),
             package_price_details: joi_1.default.string().optional(),
             package_accommodation_details: joi_1.default.string().optional(),
-            add_package_include: joi_1.default.array().items(joi_1.default.string().allow('')).optional().optional(),
-            remove_package_include: joi_1.default.array().items(joi_1.default.number().allow('')).optional(),
+            add_package_include: joi_1.default.array()
+                .items(joi_1.default.string().allow(''))
+                .optional()
+                .optional(),
+            remove_package_include: joi_1.default.array()
+                .items(joi_1.default.number().allow(''))
+                .optional(),
             remove_images: joi_1.default.array().items(joi_1.default.number().allow('')).optional(),
         });
         this.getUmrahBooking = joi_1.default.object({

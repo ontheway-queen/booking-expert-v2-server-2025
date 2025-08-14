@@ -61,6 +61,11 @@ export default class AgentB2CRootRouter {
     this.Router.use('/visa', this.visaRouter.router);
 
     this.Router.use('/blog', this.blogRouter.router);
-    this.Router.use('/payment', this.agentB2CPaymentRouter.router);
+
+    this.Router.use(
+      '/payments',
+      this.authChecker.agencyB2CUserAuthChecker,
+      this.agentB2CPaymentRouter.router
+    );
   }
 }

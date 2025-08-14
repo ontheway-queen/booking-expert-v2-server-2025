@@ -14,7 +14,9 @@ class AgentPaymentsRouter extends abstract_router_1.default {
     callRouter() {
         this.router
             .route('/deposit')
-            .post(this.controller.createDepositRequest)
+            .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_DEPOSIT_FILES, [
+            'document',
+        ]), this.controller.createDepositRequest)
             .delete(this.controller.cancelCurrentDepositRequest);
         this.router
             .route('/deposit/:id')

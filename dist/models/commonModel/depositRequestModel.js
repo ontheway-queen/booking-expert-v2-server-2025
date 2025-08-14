@@ -208,7 +208,6 @@ class DepositRequestModel extends schema_1.default {
             const data = yield this.db('deposit_request as dr')
                 .withSchema(this.DBO_SCHEMA)
                 .select('dr.id', 'ad.bank_name', 'ad.bank_logo', 'dr.amount', 'dr.request_no', 'dr.status', 'dr.payment_date', 'dr.created_at')
-                .joinRaw('agent.agency as a ON a.id = dr.agency_id')
                 .leftJoin('view_account_details AS ad', 'dr.account_id', 'ad.id')
                 .where((qb) => {
                 qb.andWhere('dr.source', constants_1.SOURCE_AGENT_B2C);
@@ -228,10 +227,7 @@ class DepositRequestModel extends schema_1.default {
                     qb.andWhere('dr.status', query.status);
                 }
                 if (query.filter) {
-                    qb.andWhere((qbc) => {
-                        qbc.whereILike('dr.request_no', `${query.filter}%`);
-                        qbc.orWhereILike('a.agency_name', `%${query.filter}%`);
-                    });
+                    qb.whereILike('dr.request_no', `${query.filter}%`);
                 }
             })
                 .limit(query.limit || 100)
@@ -240,9 +236,8 @@ class DepositRequestModel extends schema_1.default {
             let total = [];
             if (is_total) {
                 total = yield this.db('deposit_request as dr')
-                    .withSchema(this.AGENT_SCHEMA)
+                    .withSchema(this.DBO_SCHEMA)
                     .count('dr.id as total')
-                    .join('agency as a', 'a.id', 'dr.agency_id')
                     .where((qb) => {
                     qb.andWhere('dr.source', constants_1.SOURCE_AGENT);
                     if (query.agency_id) {
@@ -258,10 +253,7 @@ class DepositRequestModel extends schema_1.default {
                         qb.andWhere('dr.status', query.status);
                     }
                     if (query.filter) {
-                        qb.andWhere((qbc) => {
-                            qbc.whereILike('dr.request_no', `${query.filter}%`);
-                            qbc.orWhereILike('a.agency_name', `%${query.filter}%`);
-                        });
+                        qb.whereILike('dr.request_no', `${query.filter}%`);
                     }
                 });
             }
@@ -274,14 +266,13 @@ class DepositRequestModel extends schema_1.default {
     getSingleAgentB2CDepositRequest(id, agency_id, created_by) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('deposit_request as dr')
-                .withSchema(this.AGENT_SCHEMA)
-                .select('dr.id', 'dr.bank_name', 'dr.amount', 'dr.remarks', 'dr.request_no', 'dr.status', 'dr.payment_date', 'dr.created_at', 'dr.docs', 'dr.created_by', 'dr.updated_by', 'dr.updated_by_name', 'dr.updated_at', 'dr.update_note', 'au.name AS created_by_name')
-                .joinRaw('agent.agency as a ON dr.agency_id = a.id')
-                .joinRaw('agent.agency_user AS au ON dr.created_by = au.id')
+                .withSchema(this.DBO_SCHEMA)
+                .select('dr.id', 'dr.request_no', 'ad.bank_name', 'ad.bank_logo', 'ad.account_name', 'ad.account_number', 'ad.branch', 'dr.amount', 'dr.remarks', 'dr.status', 'dr.payment_date', 'dr.created_at', 'dr.docs', 'dr.created_by', 'dr.updated_at', 'dr.update_note', 'au.name AS created_by_name')
+                .joinRaw('LEFT JOIN agent_b2c.users AS au ON dr.created_by = au.id')
                 .leftJoin('view_account_details AS ad', 'dr.account_id', 'ad.id')
                 .where((qb) => {
                 qb.andWhere('dr.id', id);
-                qb.andWhere('dr.source', constants_1.SOURCE_AGENT);
+                qb.andWhere('dr.source', constants_1.SOURCE_AGENT_B2C);
                 if (agency_id) {
                     qb.andWhere('dr.agency_id', agency_id);
                 }
