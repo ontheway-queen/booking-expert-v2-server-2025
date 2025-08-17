@@ -77,16 +77,19 @@ export default class VisaModel extends Schema {
           qb.andWhere('v.country_id', query.country_id);
         }
         if (query.filter) {
-          qb.andWhere('v.title', 'like', `%${query.filter}%`)
-            .orWhere('v.slug', 'like', `%${query.filter}%`)
-            .orWhere('v.visa_type', 'like', `%${query.filter}%`)
-            .orWhere('v.visa_mode', 'like', `%${query.filter}%`);
+          qb.andWhere((subQb) => {
+            subQb
+              .where('v.title', 'like', `%${query.filter}%`)
+              .orWhere('v.slug', 'like', `%${query.filter}%`)
+              .orWhere('v.visa_type', 'like', `%${query.filter}%`)
+              .orWhere('v.visa_mode', 'like', `%${query.filter}%`);
+          });
         }
       })
       .orderBy('v.id', 'desc')
       .limit(query.limit)
       .offset(query.skip);
-``
+
     const total = await this.db('visa')
       .withSchema(this.SERVICE_SCHEMA)
       .count('id as total')
@@ -101,10 +104,13 @@ export default class VisaModel extends Schema {
           qb.andWhere('country_id', query.country_id);
         }
         if (query.filter) {
-          qb.andWhere('title', 'like', `%${query.filter}%`)
-            .orWhere('slug', 'like', `%${query.filter}%`)
-            .orWhere('visa_type', 'like', `%${query.filter}%`)
-            .orWhere('visa_mode', 'like', `%${query.filter}%`);
+          qb.andWhere((subQb) => {
+            subQb
+              .where('title', 'like', `%${query.filter}%`)
+              .orWhere('slug', 'like', `%${query.filter}%`)
+              .orWhere('visa_type', 'like', `%${query.filter}%`)
+              .orWhere('visa_mode', 'like', `%${query.filter}%`);
+          });
         }
       });
 
@@ -153,5 +159,4 @@ export default class VisaModel extends Schema {
       })
       .first();
   }
-
 }
