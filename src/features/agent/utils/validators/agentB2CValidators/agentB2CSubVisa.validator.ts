@@ -5,6 +5,7 @@ export class AgentB2CSubVisaValidator {
     country_id: Joi.number().required(),
     visa_fee: Joi.number().required().max(9999999999999999.99),
     processing_fee: Joi.number().required().max(9999999999999999.99),
+    processing_type: Joi.string().required(),
     max_validity: Joi.number().required(),
     stay_validity: Joi.number().required(),
     visa_type: Joi.string().required(),

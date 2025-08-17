@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const blogConstants_1 = require("../../utils/miscellaneous/blogConstants");
 const constants_1 = require("../../utils/miscellaneous/constants");
 const schema_1 = __importDefault(require("../../utils/miscellaneous/schema"));
 class BlogModel extends schema_1.default {
@@ -99,7 +100,9 @@ class BlogModel extends schema_1.default {
                 qb.andWhere('b.source_type', constants_1.SOURCE_AGENT);
                 qb.andWhere('b.source_id', query.source_id);
                 qb.andWhere('b.is_deleted', is_deleted);
-                qb.andWhere('b.blog_for', 'B2C').orWhere('b.blog_for', 'BOTH');
+                qb.andWhere((subQb) => {
+                    subQb.where('b.blog_for', blogConstants_1.BLOG_FOR_B2C).orWhere('b.blog_for', blogConstants_1.BLOG_FOR_BOTH);
+                });
                 if (query.status !== undefined) {
                     qb.andWhere('b.status', query.status);
                 }
@@ -115,7 +118,9 @@ class BlogModel extends schema_1.default {
                 qb.andWhere('b.source_type', constants_1.SOURCE_AGENT);
                 qb.andWhere('b.source_id', query.source_id);
                 qb.andWhere('b.is_deleted', is_deleted);
-                qb.andWhere('b.blog_for', 'B2C').orWhere('b.blog_for', 'BOTH');
+                qb.andWhere((subQb) => {
+                    subQb.where('b.blog_for', blogConstants_1.BLOG_FOR_B2C).orWhere('b.blog_for', blogConstants_1.BLOG_FOR_BOTH);
+                });
                 if (query.status !== undefined) {
                     qb.andWhere('b.status', query.status);
                 }

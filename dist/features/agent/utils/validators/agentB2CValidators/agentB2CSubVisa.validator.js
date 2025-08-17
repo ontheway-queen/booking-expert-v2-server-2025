@@ -11,6 +11,7 @@ class AgentB2CSubVisaValidator {
             country_id: joi_1.default.number().required(),
             visa_fee: joi_1.default.number().required().max(9999999999999999.99),
             processing_fee: joi_1.default.number().required().max(9999999999999999.99),
+            processing_type: joi_1.default.string().required(),
             max_validity: joi_1.default.number().required(),
             stay_validity: joi_1.default.number().required(),
             visa_type: joi_1.default.string().required(),
