@@ -8,5 +8,8 @@ export default class AgentB2CVisaRouter extends AbstractRouter {
     this.callRouter();
   }
 
-  private callRouter() {}
+  private callRouter() {
+    this.router.route('/').get(this.controller.getAllVisaList);
+    this.router.route('/:slug').get(this.controller.getSingleVisa);
+  }
 }

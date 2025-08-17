@@ -17,6 +17,7 @@ export class AgentB2CSubVisaService extends AbstractServices {
     const check_slug = await model.checkVisa({
       slug,
       is_deleted: false,
+      source_id: agency_id,
     });
 
     if (check_slug.length) {

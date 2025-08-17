@@ -12,16 +12,17 @@ export interface ICreateVisaPayload {
   max_validity: number;
   created_by: number;
   stay_validity: number;
-  visa_type: IVisaType;
-  visa_mode?: string;
+  visa_type_id: IVisaType;
+  visa_mode_id: string;
   description?: string;
   documents_details?: string;
   required_fields?: string;
-  image?: string;
-  meta_tag?: string;
-  meta_description?: string;
+  image: string;
+  meta_tag: string;
+  meta_description: string;
   source_id: number;
   source_type: string;
+  slug: string;
 }
 
 export interface IUpdateVisaPayload {
@@ -32,8 +33,8 @@ export interface IUpdateVisaPayload {
   processing_fee?: number;
   max_validity?: number;
   stay_validity?: number;
-  visa_type?: IVisaType;
-  visa_mode?: string;
+  visa_type_id?: IVisaType;
+  visa_mode_id?: string;
   description?: string;
   documents_details?: string;
   required_fields?: string;
@@ -42,6 +43,7 @@ export interface IUpdateVisaPayload {
   image?: string;
   meta_tag?: string;
   meta_description?: string;
+  slug?: string;
 }
 
 export interface ICheckVisaQuery {
@@ -72,8 +74,8 @@ export interface ICheckVisaData {
   max_validity: number;
   stay_validity: number;
   created_by: number;
-  visa_type: string | null;
-  visa_mode: string | null;
+  visa_type_id: string | null;
+  visa_mode_id: string | null;
   description: string | null;
   documents_details: string | null;
   status: boolean;
@@ -118,8 +120,8 @@ export interface IGetSingleVisaData {
   image: string;
   status: boolean;
   country_id: number;
-  visa_type: string;
-  visa_mode: string;
+  visa_type_id: number;
+  visa_mode_id: number;
   visa_fee: number;
   processing_fee: number;
   max_validity: number;
@@ -137,4 +139,39 @@ interface IVisaRequiredField {
   birth_certificate?: boolean;
   marriage_certificate?: boolean;
   bank_statement?: boolean;
+}
+
+export interface IGetAgentB2CVisaListQuery {
+  country_id: number;
+  visa_type_id:number;
+  source_id:number;
+  is_deleted: boolean;
+  status: boolean;
+}
+
+
+export interface IGetAgentB2CSingleVisaQuery{
+  is_deleted: boolean;
+  source_id: number;
+  slug: string;
+  status:Boolean
+}
+
+
+export interface IGetAgentB2CSingleVisaData{
+  id:number;
+  country_name:string,
+  title:string,
+  visa_fee:number,
+  processing_fee:number,
+  max_validity:number,
+  stay_validity:number,
+  visa_type:string,
+  visa_mode:string,
+  description:string,
+  documents_details:string,
+  required_fields:string,
+  image:string,
+  meta_title:string,
+  meta_description:string
 }

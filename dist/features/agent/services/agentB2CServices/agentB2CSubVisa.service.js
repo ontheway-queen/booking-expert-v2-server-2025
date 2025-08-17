@@ -37,6 +37,7 @@ class AgentB2CSubVisaService extends abstract_service_1.default {
             const check_slug = yield model.checkVisa({
                 slug,
                 is_deleted: false,
+                source_id: agency_id,
             });
             if (check_slug.length) {
                 return {

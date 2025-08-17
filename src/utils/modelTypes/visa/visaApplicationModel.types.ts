@@ -3,7 +3,7 @@ export interface ICreateVisaApplicationPayload {
   source_type: 'AGENT' | 'SUB AGENT' | 'B2C' | 'EXTERNAL' | 'AGENT B2C';
   source_id: number;
   user_id: number;
-  visa_id: bigint;
+  visa_id: number;
   from_date: string;
   to_date: string;
   traveler: number;
@@ -17,7 +17,7 @@ export interface ICreateVisaApplicationPayload {
   whatsapp_number: string | null;
   nationality: string | null;
   residence: string | null;
-  application_date: string;
+  application_date: Date;
 }
 
 export interface ICreateVisaApplicationTracking {
@@ -26,7 +26,7 @@ export interface ICreateVisaApplicationTracking {
 }
 
 export interface ICreateVisaApplicationTraveler {
-  application_id: bigint;
+  application_id: number;
   title: string;
   type: string;
   first_name: string;

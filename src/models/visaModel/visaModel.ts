@@ -1,9 +1,14 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
+import { SOURCE_AGENT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
+import { VISA_FOR_B2C, VISA_FOR_BOTH } from '../../utils/miscellaneous/visaConstants';
 import {
   ICheckVisaData,
   ICheckVisaQuery,
   ICreateVisaPayload,
+  IGetAgentB2CSingleVisaData,
+  IGetAgentB2CSingleVisaQuery,
+  IGetAgentB2CVisaListQuery,
   IGetSingleVisa,
   IGetSingleVisaData,
   IGetVisaListData,
@@ -60,12 +65,14 @@ export default class VisaModel extends Schema {
         'v.id',
         'c.nice_name as country_name',
         'v.title',
-        'v.visa_type',
-        'v.visa_mode',
+        'vt.name as visa_type',
+        'vm.name as visa_mode',
         'v.max_validity',
         'v.image'
       )
       .joinRaw(`LEFT JOIN public.country AS c ON c.id = v.country_id`)
+      .leftJoin('visa_type as vt', 'vt.id', 'v.visa_type_id')
+      .leftJoin('visa_mode as vm', 'vm.id', 'v.visa_mode_id')
       .where((qb) => {
         qb.andWhere('v.is_deleted', query.is_deleted);
         qb.andWhere('v.source_id', query.source_id);
@@ -80,9 +87,9 @@ export default class VisaModel extends Schema {
           qb.andWhere((subQb) => {
             subQb
               .where('v.title', 'like', `%${query.filter}%`)
-              .orWhere('v.slug', 'like', `%${query.filter}%`)
-              .orWhere('v.visa_type', 'like', `%${query.filter}%`)
-              .orWhere('v.visa_mode', 'like', `%${query.filter}%`);
+              .orWhere('v.slug', 'like', `%${query.filter}%`);
+            // .orWhere('v.visa_type', 'like', `%${query.filter}%`)
+            // .orWhere('v.visa_mode', 'like', `%${query.filter}%`);
           });
         }
       })
@@ -107,9 +114,9 @@ export default class VisaModel extends Schema {
           qb.andWhere((subQb) => {
             subQb
               .where('title', 'like', `%${query.filter}%`)
-              .orWhere('slug', 'like', `%${query.filter}%`)
-              .orWhere('visa_type', 'like', `%${query.filter}%`)
-              .orWhere('visa_mode', 'like', `%${query.filter}%`);
+              .orWhere('slug', 'like', `%${query.filter}%`);
+            // .orWhere('visa_type', 'like', `%${query.filter}%`)
+            // .orWhere('visa_mode', 'like', `%${query.filter}%`);
           });
         }
       });
@@ -131,8 +138,8 @@ export default class VisaModel extends Schema {
         'image',
         'status',
         'country_id',
-        'visa_type',
-        'visa_mode',
+        'visa_type_id',
+        'visa_mode_id',
         'visa_fee',
         'processing_fee',
         'max_validity',
@@ -159,4 +166,67 @@ export default class VisaModel extends Schema {
       })
       .first();
   }
+
+  public async getAgentB2CVisaList(query: IGetAgentB2CVisaListQuery) {
+    return this.db('visa as v')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select(
+        'v.id',
+        'v.title',
+        'v.image',
+        'v.processing_fee',
+        'v.visa_fee',
+        'v.max_validity',
+        'v.slug'
+      )
+      .where((qb) => {
+        qb.andWhere('v.is_deleted', query.is_deleted);
+        qb.andWhere('v.source_id', query.source_id);
+        qb.andWhere('v.source_type', SOURCE_AGENT);
+        qb.andWhere('v.country_id', query.country_id);
+        qb.andWhere('v.visa_type_id', query.visa_type_id);
+        qb.andWhere('v.status', query.status);
+        qb.andWhere((subQb) => {
+          subQb.andWhere('v.visa_for', VISA_FOR_B2C).orWhere('v.visa_for', VISA_FOR_BOTH);
+        });
+      });
+  }
+
+  public async getAgentB2CSingleVisa(
+    query: IGetAgentB2CSingleVisaQuery
+  ): Promise<IGetAgentB2CSingleVisaData> {
+    return this.db('visa as v')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select(
+        'v.id',
+        'c.nice_name as country_name',
+        'v.title',
+        'v.visa_fee',
+        'v.processing_fee',
+        'v.max_validity',
+        'v.stay_validity',
+        'vt.name as visa_type',
+        'vm.name as visa_mode',
+        'v.description',
+        'v.documents_details',
+        'v.required_fields',
+        'v.image',
+        'v.meta_title',
+        'v.meta_description'
+      )
+      .leftJoin('visa_type as vt', 'vt.id', 'v.visa_type_id')
+      .leftJoin('visa_mode as vm', 'vm.id', 'v.visa_mode_id')
+      .joinRaw(`LEFT JOIN public.country AS c ON v.country_id = c.id`)
+      .where((qb) => {
+        qb.andWhere('v.is_deleted', query.is_deleted);
+        qb.andWhere('v.source_id', query.source_id);
+        qb.andWhere('v.source_type', SOURCE_AGENT);
+        qb.andWhere('v.slug', query.slug);
+        qb.andWhere('v.status', query.status);
+      })
+      .first();
+  }
+
+
+  
 }

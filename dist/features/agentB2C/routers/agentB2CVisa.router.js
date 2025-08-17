@@ -11,6 +11,9 @@ class AgentB2CVisaRouter extends abstract_router_1.default {
         this.controller = new agentB2CVisa_controller_1.AgentB2CVisaController();
         this.callRouter();
     }
-    callRouter() { }
+    callRouter() {
+        this.router.route('/').get(this.controller.getAllVisaList);
+        this.router.route('/:slug').get(this.controller.getSingleVisa);
+    }
 }
 exports.default = AgentB2CVisaRouter;
