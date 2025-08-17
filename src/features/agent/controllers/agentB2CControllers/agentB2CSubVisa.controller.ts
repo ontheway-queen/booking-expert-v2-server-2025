@@ -7,8 +7,9 @@ export class AgentB2CSubVisaController extends AbstractController {
   private service = new AgentB2CSubVisaService();
   private validator = new AgentB2CSubVisaValidator();
 
+  //create visa
   public createVisa = this.asyncWrapper.wrap(
-    { bodySchema: this.validator.createVisaValidator },
+    { bodySchema: this.validator.createVisaValidatorSchema },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.service.createVisa(req);
       if (rest.success) {
@@ -16,6 +17,44 @@ export class AgentB2CSubVisaController extends AbstractController {
       } else {
         this.error(rest.message, code);
       }
+    }
+  );
+
+  //get visa list
+  public getVisaList = this.asyncWrapper.wrap(
+    { querySchema: this.validator.getVisaListValidatorSchema },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getVisaList(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  //get single visa
+  public getSingleVisa = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getSingleVisa(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public updateVisa = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.updateVisaValidatorSchema },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.updateVisa(req);
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
+    }
+  );
+
+  public deleteVisa = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.deleteVisa(req);
+      res.status(code).json(rest);
     }
   );
 }

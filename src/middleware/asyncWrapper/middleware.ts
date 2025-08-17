@@ -37,7 +37,7 @@ export default class Wrapper {
         await cb(req, res, next);
       } catch (err: any) {
         console.log({ err }, 'error from wrap');
-        if (req.upFiles.length) {
+        if (req.upFiles?.length) {
           this.manageFile.deleteFromCloud(req.upFiles);
         }
         if (err.isJoi) {

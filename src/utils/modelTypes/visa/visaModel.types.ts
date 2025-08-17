@@ -27,7 +27,7 @@ export interface ICreateVisaPayload {
 export interface IUpdateVisaPayload {
   country_id?: number;
   title?: string;
-  visa_for?: 'AGENT' | 'B2C' | 'AGENT B2C';
+  visa_for?: 'AGENT' | 'B2C' | 'BOTH';
   visa_fee?: number;
   processing_fee?: number;
   max_validity?: number;
@@ -53,13 +53,15 @@ export interface ICheckVisaQuery {
   is_deleted: boolean;
 }
 
-
-export interface IGetVisaListQuery{
-  slug?: string;
+export interface IGetVisaListQuery {
+  filter?: string;
   country_id?: number;
-  source_id?: number;
+  source_id: number;
+  source_type: string;
   status?: boolean;
   is_deleted: boolean;
+  limit: number;
+  skip: number;
 }
 
 export interface ICheckVisaData {
@@ -87,4 +89,52 @@ export interface ICheckVisaData {
   is_deleted: boolean;
   source_id: number;
   source_type: string;
+}
+
+export interface IGetVisaListData {
+  id: number;
+  country_name: string;
+  title: string;
+  visa_type: string;
+  visa_mode: string;
+  max_validity: number;
+  image: string;
+}
+
+export interface IGetSingleVisa {
+  id?: number;
+  slug?: string;
+  is_deleted: boolean;
+  status?: boolean;
+  source_id: number;
+  source_type: string;
+}
+
+export interface IGetSingleVisaData {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string;
+  image: string;
+  status: boolean;
+  country_id: number;
+  visa_type: string;
+  visa_mode: string;
+  visa_fee: number;
+  processing_fee: number;
+  max_validity: number;
+  stay_validity: number;
+  documents_details?: string;
+  required_fields?: IVisaRequiredField;
+  meta_title: string;
+  meta_description: string;
+  visa_for: string;
+}
+
+interface IVisaRequiredField {
+  passport?: boolean;
+  nid?: boolean;
+  birth_certificate?: boolean;
+  marriage_certificate?: boolean;
+  bank_statement?: boolean;
 }

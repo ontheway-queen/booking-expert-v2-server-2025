@@ -32,7 +32,8 @@ class AgentB2CSubVisaController extends abstract_controller_1.default {
         super(...arguments);
         this.service = new agentB2CSubVisa_service_1.AgentB2CSubVisaService();
         this.validator = new agentB2CSubVisa_validator_1.AgentB2CSubVisaValidator();
-        this.createVisa = this.asyncWrapper.wrap({ bodySchema: this.validator.createVisaValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        //create visa
+        this.createVisa = this.asyncWrapper.wrap({ bodySchema: this.validator.createVisaValidatorSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.createVisa(req), { code } = _a, rest = __rest(_a, ["code"]);
             if (rest.success) {
                 res.status(code).json(rest);
@@ -40,6 +41,29 @@ class AgentB2CSubVisaController extends abstract_controller_1.default {
             else {
                 this.error(rest.message, code);
             }
+        }));
+        //get visa list
+        this.getVisaList = this.asyncWrapper.wrap({ querySchema: this.validator.getVisaListValidatorSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getVisaList(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        //get single visa
+        this.getSingleVisa = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getSingleVisa(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.updateVisa = this.asyncWrapper.wrap({ bodySchema: this.validator.updateVisaValidatorSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.updateVisa(req), { code } = _a, rest = __rest(_a, ["code"]);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
+        }));
+        this.deleteVisa = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.deleteVisa(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
         }));
     }
 }

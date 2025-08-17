@@ -14,6 +14,16 @@ export default class AgentB2CSubVisaRouter extends AbstractRouter {
       .post(
         this.uploader.cloudUploadRaw(this.fileFolders.AGENT_VISA_FILES),
         this.controller.createVisa
-      );
+      )
+      .get(this.controller.getVisaList);
+
+    this.router
+      .route('/:id')
+      .get(this.controller.getSingleVisa)
+      .patch(
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENT_VISA_FILES),
+        this.controller.updateVisa
+      )
+      .delete(this.controller.deleteVisa);
   }
 }

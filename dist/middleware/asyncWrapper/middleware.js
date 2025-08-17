@@ -22,6 +22,7 @@ class Wrapper {
     // CONTROLLER ASYNCWRAPPER
     wrap(schema, cb) {
         return (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const { params, query, body } = req;
                 if (schema) {
@@ -42,7 +43,7 @@ class Wrapper {
             }
             catch (err) {
                 console.log({ err }, 'error from wrap');
-                if (req.upFiles.length) {
+                if ((_a = req.upFiles) === null || _a === void 0 ? void 0 : _a.length) {
                     this.manageFile.deleteFromCloud(req.upFiles);
                 }
                 if (err.isJoi) {

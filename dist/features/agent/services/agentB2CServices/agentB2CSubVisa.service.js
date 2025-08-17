@@ -66,5 +66,134 @@ class AgentB2CSubVisaService extends abstract_service_1.default {
             };
         });
     }
+    getVisaList(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { filter, country_id, limit, skip, status } = req.query;
+            const { agency_id } = req.agencyUser;
+            const visaModel = this.Model.VisaModel();
+            const { data, total } = yield visaModel.getVisaList({
+                filter,
+                country_id,
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+                status,
+                limit,
+                skip,
+                is_deleted: false,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data,
+                total,
+            };
+        });
+    }
+    getSingleVisa(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const { agency_id } = req.agencyUser;
+            const visaModel = this.Model.VisaModel();
+            const data = yield visaModel.getSingleVisa({
+                is_deleted: false,
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+                id: Number(id),
+            });
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data,
+            };
+        });
+    }
+    updateVisa(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const { agency_id } = req.agencyUser;
+            const visaModel = this.Model.VisaModel();
+            const checkExist = yield visaModel.getSingleVisa({
+                is_deleted: false,
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+                id: Number(id),
+            });
+            if (!checkExist) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            const payload = req.body;
+            if (payload.slug) {
+                const check_slug = yield visaModel.checkVisa({
+                    is_deleted: false,
+                    source_id: agency_id,
+                    slug: payload.slug,
+                });
+                if (check_slug.length && check_slug[0].id !== Number(id)) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_CONFLICT,
+                        message: this.ResMsg.SLUG_EXISTS,
+                    };
+                }
+            }
+            const files = req.files || [];
+            const image = files.find((file) => file.fieldname === 'image');
+            const deleteImage = [];
+            if (image) {
+                payload.image = image.filename;
+                deleteImage.push(checkExist.image);
+            }
+            if (Object.entries(payload).length) {
+                yield visaModel.updateVisa(payload, Number(id));
+            }
+            if (deleteImage.length) {
+                this.manageFile.deleteFromCloud(deleteImage);
+            }
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: 'Visa updated successfully',
+            };
+        });
+    }
+    deleteVisa(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const { agency_id } = req.agencyUser;
+            const visaModel = this.Model.VisaModel();
+            const checkExist = yield visaModel.getSingleVisa({
+                is_deleted: false,
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+                id: Number(id),
+            });
+            if (!checkExist) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            yield visaModel.updateVisa({ is_deleted: true }, Number(id));
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: 'Visa deleted successfully',
+            };
+        });
+    }
 }
 exports.AgentB2CSubVisaService = AgentB2CSubVisaService;
