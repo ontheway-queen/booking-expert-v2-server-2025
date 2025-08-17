@@ -61,6 +61,27 @@ export interface IGetAgencySupportTicketListQuery {
     | 'Accounts'
     | 'Payments';
 }
+export interface IGetAgencyB2CSupportTicketListQuery {
+  source_id: number;
+  status?: 'Open' | 'Closed' | 'ReOpen';
+  created_by_user_id?: number;
+  reply_by?: 'Admin' | 'Customer';
+  priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
+  limit?: number;
+  skip?: number;
+  from_date?: string;
+  to_date?: string;
+  ref_type?:
+    | 'Flight'
+    | 'Visa'
+    | 'Hotel'
+    | 'Holiday'
+    | 'Umrah'
+    | 'Others'
+    | 'Accounts'
+    | 'Payments';
+}
+
 export interface IGetSingleAgentSupportTicketData {
   id: number;
   support_no: string;

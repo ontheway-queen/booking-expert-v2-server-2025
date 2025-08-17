@@ -337,6 +337,7 @@ interface IGenNoParams {
     | 'Agent_Umrah'
     | 'Agent_GroupFare'
     | 'Agent_SupportTicket'
+    | 'Agent_B2C_SupportTicket'
     | 'Agent_Hotel'
     | 'Agent_Deposit_Request'
     | 'B2C_Deposit_Request'

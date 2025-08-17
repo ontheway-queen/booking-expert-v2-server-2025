@@ -1,7 +1,10 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 import Lib from '../../../utils/lib/lib';
-import { SOURCE_AGENT } from '../../../utils/miscellaneous/constants';
+import {
+  SOURCE_AGENT,
+  SOURCE_AGENT_B2C,
+} from '../../../utils/miscellaneous/constants';
 import { IUpdateSupportTicketPayload } from '../../../utils/modelTypes/othersModelTypes/supportTicketModelTypes';
 import {
   IAgentB2CCreateSupportTicketReqBody,
@@ -16,7 +19,7 @@ export class AgentB2CSupportTicketService extends AbstractServices {
   public async createSupportTicket(req: Request) {
     return this.db.transaction(async (trx) => {
       const data = req.body as IAgentB2CCreateSupportTicketReqBody;
-      const { user_id, agency_id } = req.agencyUser;
+      const { user_id, agency_id } = req.agencyB2CUser;
       const supportTicketModel = this.Model.SupportTicketModel(trx);
 
       const support_no = await Lib.generateNo({
@@ -34,7 +37,7 @@ export class AgentB2CSupportTicketService extends AbstractServices {
         created_by_user_id: user_id,
         created_by: 'Customer',
         source_id: agency_id,
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_AGENT_B2C,
         support_no,
       });
 
@@ -51,7 +54,7 @@ export class AgentB2CSupportTicketService extends AbstractServices {
           last_message_id: msg[0].id,
         },
         ticket[0].id,
-        SOURCE_AGENT
+        SOURCE_AGENT_B2C
       );
 
       return {
@@ -73,13 +76,14 @@ export class AgentB2CSupportTicketService extends AbstractServices {
   }
 
   public async getSupportTicket(req: Request) {
-    const { agency_id } = req.agencyUser;
+    const { agency_id, user_id } = req.agencyB2CUser;
     const supportTicketModel = this.Model.SupportTicketModel();
     const query = req.query as IAgentB2CGetSupportTicketReqQuery;
 
-    const data = await supportTicketModel.getAgentSupportTicket(
+    const data = await supportTicketModel.getAgentB2CSupportTicket(
       {
-        agent_id: agency_id,
+        source_id: agency_id,
+        created_by_user_id: user_id,
         ...query,
       },
       true
@@ -95,15 +99,16 @@ export class AgentB2CSupportTicketService extends AbstractServices {
   }
 
   public async getSingleSupportTicketWithMsg(req: Request) {
-    const { agency_id } = req.agencyUser;
+    const { agency_id, user_id } = req.agencyB2CUser;
     const { id } = req.params;
     const ticket_id = Number(id);
 
     const supportTicketModel = this.Model.SupportTicketModel();
 
-    const ticket = await supportTicketModel.getSingleAgentSupportTicket({
+    const ticket = await supportTicketModel.getSingleAgentB2CSupportTicket({
       id: ticket_id,
-      agent_id: agency_id,
+      source_id: agency_id,
+      created_by_user_id: user_id,
     });
 
     if (!ticket) {
@@ -132,7 +137,7 @@ export class AgentB2CSupportTicketService extends AbstractServices {
   }
 
   public async getSupportTicketMsg(req: Request) {
-    const { agency_id } = req.agencyUser;
+    const { agency_id, user_id } = req.agencyB2CUser;
     const { id } = req.params;
     const query = req.query as {
       limit?: number;
@@ -141,9 +146,10 @@ export class AgentB2CSupportTicketService extends AbstractServices {
     const ticket_id = Number(id);
     const supportTicketModel = this.Model.SupportTicketModel();
 
-    const ticket = await supportTicketModel.getSingleAgentSupportTicket({
+    const ticket = await supportTicketModel.getSingleAgentB2CSupportTicket({
       id: ticket_id,
-      agent_id: agency_id,
+      source_id: agency_id,
+      created_by_user_id: user_id,
     });
 
     if (!ticket) {
@@ -170,14 +176,15 @@ export class AgentB2CSupportTicketService extends AbstractServices {
 
   public async sendSupportTicketReplay(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { user_id, agency_id } = req.agencyUser;
+      const { user_id, agency_id } = req.agencyB2CUser;
       const support_ticket_id = Number(req.params.id);
       const { message } = req.body as { message: string };
       const supportTicketModel = this.Model.SupportTicketModel(trx);
 
-      const ticket = await supportTicketModel.getSingleAgentSupportTicket({
+      const ticket = await supportTicketModel.getSingleAgentB2CSupportTicket({
         id: support_ticket_id,
-        agent_id: agency_id,
+        source_id: agency_id,
+        created_by_user_id: user_id,
       });
 
       if (!ticket) {
@@ -228,13 +235,14 @@ export class AgentB2CSupportTicketService extends AbstractServices {
   public async closeSupportTicket(req: Request) {
     return this.db.transaction(async (trx) => {
       const support_ticket_id = Number(req.params.id);
-      const { user_id, agency_id } = req.agencyUser;
+      const { user_id, agency_id } = req.agencyB2CUser;
 
       const supportTicketModel = this.Model.SupportTicketModel(trx);
 
-      const ticket = await supportTicketModel.getSingleAgentSupportTicket({
+      const ticket = await supportTicketModel.getSingleAgentB2CSupportTicket({
         id: support_ticket_id,
-        agent_id: agency_id,
+        source_id: agency_id,
+        created_by_user_id: user_id,
       });
 
       if (!ticket) {
@@ -261,7 +269,7 @@ export class AgentB2CSupportTicketService extends AbstractServices {
           status: 'Closed',
         },
         support_ticket_id,
-        SOURCE_AGENT
+        SOURCE_AGENT_B2C
       );
 
       return {

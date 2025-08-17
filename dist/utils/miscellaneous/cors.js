@@ -40,4 +40,6 @@ exports.origin = [
     'https://www.ayatairtravels.com',
     'https://hopngo.net',
     'https://www.hopngo.net',
+    'https://fgtoursntravels.com',
+    'https://www.fgtoursntravels.com',
 ];

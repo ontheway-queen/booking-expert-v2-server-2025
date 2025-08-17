@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-export default class AgentSupportTicketValidator {
+export default class AgentB2CSupportTicketValidator {
   public createSupportTicket = Joi.object({
     subject: Joi.string().trim().required(),
     priority: Joi.string().valid('Low', 'Medium', 'High', 'Urgent').required(),

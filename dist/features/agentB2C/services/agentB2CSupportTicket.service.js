@@ -35,7 +35,7 @@ class AgentB2CSupportTicketService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const data = req.body;
-                const { user_id, agency_id } = req.agencyUser;
+                const { user_id, agency_id } = req.agencyB2CUser;
                 const supportTicketModel = this.Model.SupportTicketModel(trx);
                 const support_no = yield lib_1.default.generateNo({
                     trx,
@@ -50,7 +50,7 @@ class AgentB2CSupportTicketService extends abstract_service_1.default {
                     created_by_user_id: user_id,
                     created_by: 'Customer',
                     source_id: agency_id,
-                    source_type: constants_1.SOURCE_AGENT,
+                    source_type: constants_1.SOURCE_AGENT_B2C,
                     support_no,
                 });
                 const msg = yield supportTicketModel.insertSupportTicketMessage({
@@ -62,7 +62,7 @@ class AgentB2CSupportTicketService extends abstract_service_1.default {
                 });
                 yield supportTicketModel.updateSupportTicket({
                     last_message_id: msg[0].id,
-                }, ticket[0].id, constants_1.SOURCE_AGENT);
+                }, ticket[0].id, constants_1.SOURCE_AGENT_B2C);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -83,10 +83,10 @@ class AgentB2CSupportTicketService extends abstract_service_1.default {
     }
     getSupportTicket(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyUser;
+            const { agency_id, user_id } = req.agencyB2CUser;
             const supportTicketModel = this.Model.SupportTicketModel();
             const query = req.query;
-            const data = yield supportTicketModel.getAgentSupportTicket(Object.assign({ agent_id: agency_id }, query), true);
+            const data = yield supportTicketModel.getAgentB2CSupportTicket(Object.assign({ source_id: agency_id, created_by_user_id: user_id }, query), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -98,13 +98,14 @@ class AgentB2CSupportTicketService extends abstract_service_1.default {
     }
     getSingleSupportTicketWithMsg(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyUser;
+            const { agency_id, user_id } = req.agencyB2CUser;
             const { id } = req.params;
             const ticket_id = Number(id);
             const supportTicketModel = this.Model.SupportTicketModel();
-            const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
+            const ticket = yield supportTicketModel.getSingleAgentB2CSupportTicket({
                 id: ticket_id,
-                agent_id: agency_id,
+                source_id: agency_id,
+                created_by_user_id: user_id,
             });
             if (!ticket) {
                 return {
@@ -127,14 +128,15 @@ class AgentB2CSupportTicketService extends abstract_service_1.default {
     }
     getSupportTicketMsg(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyUser;
+            const { agency_id, user_id } = req.agencyB2CUser;
             const { id } = req.params;
             const query = req.query;
             const ticket_id = Number(id);
             const supportTicketModel = this.Model.SupportTicketModel();
-            const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
+            const ticket = yield supportTicketModel.getSingleAgentB2CSupportTicket({
                 id: ticket_id,
-                agent_id: agency_id,
+                source_id: agency_id,
+                created_by_user_id: user_id,
             });
             if (!ticket) {
                 return {
@@ -159,13 +161,14 @@ class AgentB2CSupportTicketService extends abstract_service_1.default {
     sendSupportTicketReplay(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { user_id, agency_id } = req.agencyUser;
+                const { user_id, agency_id } = req.agencyB2CUser;
                 const support_ticket_id = Number(req.params.id);
                 const { message } = req.body;
                 const supportTicketModel = this.Model.SupportTicketModel(trx);
-                const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
+                const ticket = yield supportTicketModel.getSingleAgentB2CSupportTicket({
                     id: support_ticket_id,
-                    agent_id: agency_id,
+                    source_id: agency_id,
+                    created_by_user_id: user_id,
                 });
                 if (!ticket) {
                     return {
@@ -206,11 +209,12 @@ class AgentB2CSupportTicketService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const support_ticket_id = Number(req.params.id);
-                const { user_id, agency_id } = req.agencyUser;
+                const { user_id, agency_id } = req.agencyB2CUser;
                 const supportTicketModel = this.Model.SupportTicketModel(trx);
-                const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
+                const ticket = yield supportTicketModel.getSingleAgentB2CSupportTicket({
                     id: support_ticket_id,
-                    agent_id: agency_id,
+                    source_id: agency_id,
+                    created_by_user_id: user_id,
                 });
                 if (!ticket) {
                     return {
@@ -231,7 +235,7 @@ class AgentB2CSupportTicketService extends abstract_service_1.default {
                     closed_by: 'Customer',
                     closed_by_user_id: user_id,
                     status: 'Closed',
-                }, support_ticket_id, constants_1.SOURCE_AGENT);
+                }, support_ticket_id, constants_1.SOURCE_AGENT_B2C);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,

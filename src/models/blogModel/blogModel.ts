@@ -41,7 +41,6 @@ export default class BlogModel extends Schema {
         'meta_title',
         'meta_description',
         'cover_image',
-        'blog_for',
         'status'
       )
       .where((qb) => {
@@ -172,7 +171,6 @@ export default class BlogModel extends Schema {
         qb.andWhere('b.source_type', SOURCE_AGENT);
         qb.andWhere('b.source_id', query.source_id);
         qb.andWhere('b.is_deleted', is_deleted);
-        qb.andWhere('b.blog_for', 'B2C').orWhere('b.blog_for', 'BOTH');
 
         if (query.status !== undefined) {
           qb.andWhere('b.status', query.status);
