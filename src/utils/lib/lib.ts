@@ -331,6 +331,7 @@ interface IGenNoParams {
   trx: TDB;
   type:
     | 'Agent'
+    | 'Sub_Agent'
     | 'Agent_Flight'
     | 'Agent_Visa'
     | 'Agent_Tour'

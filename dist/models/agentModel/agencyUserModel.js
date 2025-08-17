@@ -99,7 +99,7 @@ class AgencyUserModel extends schema_1.default {
     }
     // check agency user
     checkUser(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ email, username, id, agency_id, is_main_user, }) {
+        return __awaiter(this, arguments, void 0, function* ({ email, username, id, agency_id, is_main_user, agency_type, }) {
             return yield this.db('agency_user AS au')
                 .withSchema(this.AGENT_SCHEMA)
                 .select('au.id', 'au.agency_id', 'au.email', 'au.phone_number', 'au.photo', 'au.name', 'au.username', 'au.hashed_password', 'au.two_fa', 'au.role_id', 'au.status', 'au.socket_id', 'au.is_main_user', 'a.status AS agency_status', 'a.agent_no', 'a.email AS agency_email', 'a.phone AS agency_phone_number', 'a.agency_name', 'a.agency_logo', 'a.allow_api', 'a.white_label', 'a.ref_id', 'a.ref_agent_id', 'a.agency_type', 'a.civil_aviation', 'a.trade_license', 'a.national_id', 'a.kam_id', 'a.address')
@@ -107,6 +107,9 @@ class AgencyUserModel extends schema_1.default {
                 .where((qb) => {
                 if (email) {
                     qb.orWhere('au.email', email);
+                }
+                if (agency_type) {
+                    qb.orWhere('a.agency_type', agency_type);
                 }
                 if (username) {
                     qb.orWhere('au.username', username);

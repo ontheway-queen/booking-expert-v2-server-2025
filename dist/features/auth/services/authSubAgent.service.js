@@ -46,47 +46,50 @@ class AuthSubAgentService extends abstract_service_1.default {
                 const checkAgentName = yield AgentModel.checkAgency({
                     name: agency_name,
                 });
-                const checkAgentUser = yield AgencyUserModel.checkUser({ email });
+                const checkAgentUser = yield AgencyUserModel.checkUser({
+                    email,
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
+                });
                 if (checkAgentUser) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: "Email already exist. Please use another email.",
+                        message: 'Email already exist. Please use another email.',
                     };
                 }
                 if (checkAgentName) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: "Duplicate agency name! Already exist an agency with this name.",
+                        message: 'Duplicate agency name! Already exist an agency with this name.',
                     };
                 }
-                let agency_logo = "";
-                let civil_aviation = "";
-                let trade_license = "";
-                let national_id = "";
+                let agency_logo = '';
+                let civil_aviation = '';
+                let trade_license = '';
+                let national_id = '';
                 files.forEach((file) => {
                     switch (file.fieldname) {
-                        case "agency_logo":
+                        case 'agency_logo':
                             agency_logo = file.filename;
                             break;
-                        case "civil_aviation":
+                        case 'civil_aviation':
                             civil_aviation = file.filename;
                             break;
-                        case "trade_license":
+                        case 'trade_license':
                             trade_license = file.filename;
                             break;
-                        case "national_id":
+                        case 'national_id':
                             national_id = file.filename;
                             break;
                         default:
-                            throw new customError_1.default("Invalid files. Please provide valid trade license, civil aviation, NID, logo.", this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
+                            throw new customError_1.default('Invalid files. Please provide valid trade license, civil aviation, NID, logo.', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                 });
-                const agent_no = yield lib_1.default.generateNo({ trx, type: "Agent" });
+                const agent_no = yield lib_1.default.generateNo({ trx, type: 'Sub_Agent' });
                 const newAgency = yield AgentModel.createAgency({
                     address,
-                    status: "Incomplete",
+                    status: 'Incomplete',
                     agent_no,
                     agency_name,
                     email,
@@ -95,11 +98,11 @@ class AuthSubAgentService extends abstract_service_1.default {
                     civil_aviation,
                     trade_license,
                     national_id,
-                    agency_type: "Agent",
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
                 });
                 const newRole = yield AgencyUserModel.createRole({
                     agency_id: newAgency[0].id,
-                    name: "Super Admin",
+                    name: 'Super Admin',
                     is_main_role: true,
                 });
                 const permissions = yield AgencyUserModel.getAllPermissions();
@@ -136,11 +139,11 @@ class AuthSubAgentService extends abstract_service_1.default {
                     role_id: newRole[0].id,
                     username,
                 });
-                const verificationToken = lib_1.default.createToken({ agency_id: newAgency[0].id, email, user_id: newUser[0].id }, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent, "24h");
+                const verificationToken = lib_1.default.createToken({ agency_id: newAgency[0].id, email, user_id: newUser[0].id }, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent, '24h');
                 yield emailSendLib_1.default.sendEmail({
                     email,
                     emailSub: `Booking Expert Agency Registration Verification`,
-                    emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, "/sign-up/verification?token=" + verificationToken),
+                    emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, '/sign-up/verification?token=' + verificationToken),
                 });
                 return {
                     success: true,
@@ -164,11 +167,11 @@ class AuthSubAgentService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_UNAUTHORIZED,
-                        message: "Invalid token or token expired. Please contact us.",
+                        message: 'Invalid token or token expired. Please contact us.',
                     };
                 }
                 const { agency_id, email, user_id, agency_name } = parsedToken;
-                yield AgentModel.updateAgency({ status: "Pending" }, agency_id);
+                yield AgentModel.updateAgency({ status: 'Pending' }, agency_id);
                 const password = lib_1.default.generateRandomPassword(12);
                 const hashed_password = yield lib_1.default.hashValue(password);
                 yield AgencyUserModel.updateUser({
@@ -208,14 +211,14 @@ class AuthSubAgentService extends abstract_service_1.default {
                     };
                 }
                 const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, white_label, agency_email, agency_phone_number, agency_logo, agency_name, is_main_user, ref_id, agency_type, ref_agent_id, allow_api, civil_aviation, kam_id, national_id, trade_license, address, } = checkUserAgency;
-                if (agency_status === "Inactive" ||
-                    agency_status === "Incomplete" ||
-                    agency_status === "Rejected" ||
-                    agency_status === "Pending") {
+                if (agency_status === 'Inactive' ||
+                    agency_status === 'Incomplete' ||
+                    agency_status === 'Rejected' ||
+                    agency_status === 'Pending') {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "Unauthorized agency! Please contact with us.",
+                        message: 'Unauthorized agency! Please contact with us.',
                     };
                 }
                 if (!status) {
@@ -287,7 +290,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                     address,
                     agency_logo,
                 };
-                const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, "24h");
+                const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
                 const role = yield AgentUserModel.getSingleRoleWithPermissions(role_id, agency_id);
                 return {
                     success: true,
@@ -353,11 +356,11 @@ class AuthSubAgentService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_ACCOUNT_INACTIVE,
                     };
                 }
-                if (agency_status === "Inactive") {
+                if (agency_status === 'Inactive') {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "Unauthorized agency! Please contact with us.",
+                        message: 'Unauthorized agency! Please contact with us.',
                     };
                 }
                 const data = yield new publicEmailOTP_service_1.default(trx).matchEmailOtpService({
@@ -402,7 +405,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                     address,
                     agency_logo,
                 };
-                const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, "24h");
+                const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
                 const role = yield AgencyUserModel.getSingleRoleWithPermissions(role_id, agency_id);
                 return {
                     success: true,

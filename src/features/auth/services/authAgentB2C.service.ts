@@ -8,7 +8,10 @@ import {
   IRegisterAgentB2CReqBody,
   IResetPassReqBody,
 } from '../utils/types/authTypes';
-import { OTP_TYPES } from '../../../utils/miscellaneous/constants';
+import {
+  OTP_TYPES,
+  SOURCE_AGENT,
+} from '../../../utils/miscellaneous/constants';
 
 export default class AuthAgentB2CService extends AbstractServices {
   constructor() {
@@ -39,7 +42,7 @@ export default class AuthAgentB2CService extends AbstractServices {
 
       const agent_details = await AgentModel.getSingleAgency({
         id: agency_id,
-        type: 'Agent',
+        type: SOURCE_AGENT,
       });
 
       let username = Lib.generateUsername(name);
@@ -135,7 +138,7 @@ export default class AuthAgentB2CService extends AbstractServices {
 
       const agent_details = await AgentModel.getSingleAgency({
         id: agency_id,
-        type: 'Agent',
+        type: SOURCE_AGENT,
       });
       if (!agent_details) {
         return {

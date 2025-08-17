@@ -33,32 +33,32 @@ class AgentSubAgentController extends abstract_controller_1.default {
         this.service = new agentSubAgent_service_1.default();
         this.validator = new agentSubAgent_validator_1.AgentSubAgentValidator();
         this.createSubAgency = this.asyncWrapper.wrap({
-            bodySchema: this.validator.createSubAgencySchema
+            bodySchema: this.validator.createSubAgencySchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.createSubAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.getAllSubAgency = this.asyncWrapper.wrap({
-            querySchema: this.validator.getSubAgencyQuerySchema
+            querySchema: this.validator.getSubAgencyQuerySchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getAllSubAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.getSingleSubAgency = this.asyncWrapper.wrap({
-            paramSchema: this.commonValidator.singleParamNumValidator()
+            paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getSingleSubAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.updateAgency = this.asyncWrapper.wrap({
-            bodySchema: this.validator.updateSubAgencySchema
+            bodySchema: this.validator.updateSubAgencySchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.updateAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
         this.getAllUsersOfAgency = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),
-            querySchema: this.validator.getSubAgencyUsersQuerySchema
+            querySchema: this.validator.getSubAgencyUsersQuerySchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getAllUsersOfAgency(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);

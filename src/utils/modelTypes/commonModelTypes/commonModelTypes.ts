@@ -50,6 +50,7 @@ export interface IInsertLastNoPayload {
   last_id: number;
   type:
     | 'Agent'
+    | 'Sub_Agent'
     | 'Agent_Flight'
     | 'Agent_Visa'
     | 'Agent_Tour'
@@ -79,6 +80,7 @@ export interface IUpdateLastNoPayload {
 export interface IGetLastIdParams {
   type:
     | 'Agent'
+    | 'Sub_Agent'
     | 'Agent_Flight'
     | 'Agent_Visa'
     | 'Agent_Tour'

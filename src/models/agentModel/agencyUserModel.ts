@@ -1,5 +1,9 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { DATA_LIMIT } from '../../utils/miscellaneous/constants';
+import {
+  DATA_LIMIT,
+  SOURCE_AGENT,
+  SOURCE_SUB_AGENT,
+} from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   ICheckAgencyRoleData,
@@ -128,8 +132,10 @@ export default class AgencyUserModel extends Schema {
     id,
     agency_id,
     is_main_user,
+    agency_type,
   }: {
     agency_id?: number;
+    agency_type?: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
     email?: string;
     username?: string;
     id?: number;
@@ -173,6 +179,11 @@ export default class AgencyUserModel extends Schema {
         if (email) {
           qb.orWhere('au.email', email);
         }
+
+        if (agency_type) {
+          qb.orWhere('a.agency_type', agency_type);
+        }
+
         if (username) {
           qb.orWhere('au.username', username);
         }

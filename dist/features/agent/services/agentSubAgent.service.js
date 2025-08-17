@@ -51,16 +51,18 @@ class AgentSubAgentService extends abstract_service_1.default {
                 const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
                 const checkSubAgentName = yield agencyModel.checkAgency({
                     name: agency_name,
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
                 });
                 if (checkSubAgentName) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_CONFLICT,
-                        message: 'Duplicate agency name! Agency already exists with this name',
+                        message: 'Duplicate agency name! Agency already exists with this name.',
                     };
                 }
                 const checkAgentUser = yield agencyUserModel.checkUser({
                     email,
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
                 });
                 if (checkAgentUser) {
                     return {
@@ -94,7 +96,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                 });
                 const sub_agent_no = yield lib_1.default.generateNo({
                     trx,
-                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent,
+                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.sub_agent,
                 });
                 const newSubAgency = yield agencyModel.createAgency({
                     address,
@@ -109,7 +111,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                     national_id,
                     ref_agent_id: agency_id,
                     created_by: user_id,
-                    agency_type: 'Sub Agent',
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
                 });
                 const newRole = yield agencyUserModel.createRole({
                     agency_id: newSubAgency[0].id,
@@ -172,7 +174,7 @@ class AgentSubAgentService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const query = req.query;
             const AgencyModel = this.Model.AgencyModel();
-            const data = yield AgencyModel.getAgencyList(Object.assign(Object.assign({}, query), { ref_id: agency_id, agency_type: 'Sub Agent' }), true);
+            const data = yield AgencyModel.getAgencyList(Object.assign(Object.assign({}, query), { ref_agent_id: agency_id, agency_type: constants_1.SOURCE_SUB_AGENT }), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -191,7 +193,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                 const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
                 const data = yield AgencyModel.getSingleAgency({
                     id: Number(id),
-                    type: 'Sub Agent',
+                    type: constants_1.SOURCE_SUB_AGENT,
                     ref_agent_id: agency_id,
                 });
                 if (!data) {
@@ -220,7 +222,8 @@ class AgentSubAgentService extends abstract_service_1.default {
                 const agencyUserModel = this.Model.AgencyUserModel(trx);
                 const checkAgency = yield AgentModel.checkAgency({
                     agency_id: Number(id),
-                    ref_id: agency_id,
+                    ref_agent_id: agency_id,
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
                 });
                 if (!checkAgency) {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
@@ -302,12 +305,6 @@ class AgentSubAgentService extends abstract_service_1.default {
                         hotel_markup,
                     }, Number(id));
                 }
-                // await this.insertAdminAudit(trx, {
-                //     created_by: user_id,
-                //     type: 'UPDATE',
-                //     details: `Agency Updated. Data: ${JSON.stringify(payload)}`,
-                //     payload,
-                // });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,

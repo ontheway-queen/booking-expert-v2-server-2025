@@ -4,6 +4,7 @@ import config from '../../../config/config';
 import Lib from '../../../utils/lib/lib';
 import {
   OTP_TYPES,
+  SOURCE_AGENT,
   WHITE_LABEL_PERMISSIONS_MODULES,
 } from '../../../utils/miscellaneous/constants';
 import PublicEmailOTPService from '../../public/services/publicEmailOTP.service';
@@ -96,7 +97,7 @@ export default class AuthAgentService extends AbstractServices {
         civil_aviation,
         trade_license,
         national_id,
-        agency_type: 'Agent',
+        agency_type: SOURCE_AGENT,
       });
 
       const newRole = await AgencyUserModel.createRole({

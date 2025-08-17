@@ -1,25 +1,26 @@
-import { Request } from "express";
-import AbstractServices from "../../../abstract/abstract.service";
-import config from "../../../config/config";
-import Lib from "../../../utils/lib/lib";
+import { Request } from 'express';
+import AbstractServices from '../../../abstract/abstract.service';
+import config from '../../../config/config';
+import Lib from '../../../utils/lib/lib';
 import {
   OTP_TYPES,
+  SOURCE_SUB_AGENT,
   WHITE_LABEL_PERMISSIONS_MODULES,
-} from "../../../utils/miscellaneous/constants";
-import PublicEmailOTPService from "../../public/services/publicEmailOTP.service";
+} from '../../../utils/miscellaneous/constants';
+import PublicEmailOTPService from '../../public/services/publicEmailOTP.service';
 import {
   ICompleteAgencyRegisterParsedTokenData,
   ILogin2FAReqBody,
   ILoginReqBody,
   IRegisterAgentReqBody,
   IResetPassReqBody,
-} from "../utils/types/authTypes";
-import { ITokenParseAgencyUser } from "../../public/utils/types/publicCommon.types";
-import CustomError from "../../../utils/lib/customError";
-import { IInsertAgencyRolePermissionPayload } from "../../../utils/modelTypes/agentModel/agencyUserModelTypes";
-import { registrationVerificationTemplate } from "../../../utils/templates/registrationVerificationTemplate";
-import { registrationVerificationCompletedTemplate } from "../../../utils/templates/registrationVerificationCompletedTemplate";
-import EmailSendLib from "../../../utils/lib/emailSendLib";
+} from '../utils/types/authTypes';
+import { ITokenParseAgencyUser } from '../../public/utils/types/publicCommon.types';
+import CustomError from '../../../utils/lib/customError';
+import { IInsertAgencyRolePermissionPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
+import { registrationVerificationTemplate } from '../../../utils/templates/registrationVerificationTemplate';
+import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
+import EmailSendLib from '../../../utils/lib/emailSendLib';
 
 export default class AuthSubAgentService extends AbstractServices {
   constructor() {
@@ -38,13 +39,16 @@ export default class AuthSubAgentService extends AbstractServices {
         name: agency_name,
       });
 
-      const checkAgentUser = await AgencyUserModel.checkUser({ email });
+      const checkAgentUser = await AgencyUserModel.checkUser({
+        email,
+        agency_type: SOURCE_SUB_AGENT,
+      });
 
       if (checkAgentUser) {
         return {
           success: false,
           code: this.StatusCode.HTTP_CONFLICT,
-          message: "Email already exist. Please use another email.",
+          message: 'Email already exist. Please use another email.',
         };
       }
 
@@ -53,42 +57,42 @@ export default class AuthSubAgentService extends AbstractServices {
           success: false,
           code: this.StatusCode.HTTP_CONFLICT,
           message:
-            "Duplicate agency name! Already exist an agency with this name.",
+            'Duplicate agency name! Already exist an agency with this name.',
         };
       }
 
-      let agency_logo = "";
-      let civil_aviation = "";
-      let trade_license = "";
-      let national_id = "";
+      let agency_logo = '';
+      let civil_aviation = '';
+      let trade_license = '';
+      let national_id = '';
 
       files.forEach((file) => {
         switch (file.fieldname) {
-          case "agency_logo":
+          case 'agency_logo':
             agency_logo = file.filename;
             break;
-          case "civil_aviation":
+          case 'civil_aviation':
             civil_aviation = file.filename;
             break;
-          case "trade_license":
+          case 'trade_license':
             trade_license = file.filename;
             break;
-          case "national_id":
+          case 'national_id':
             national_id = file.filename;
             break;
           default:
             throw new CustomError(
-              "Invalid files. Please provide valid trade license, civil aviation, NID, logo.",
+              'Invalid files. Please provide valid trade license, civil aviation, NID, logo.',
               this.StatusCode.HTTP_UNPROCESSABLE_ENTITY
             );
         }
       });
 
-      const agent_no = await Lib.generateNo({ trx, type: "Agent" });
+      const agent_no = await Lib.generateNo({ trx, type: 'Sub_Agent' });
 
       const newAgency = await AgentModel.createAgency({
         address,
-        status: "Incomplete",
+        status: 'Incomplete',
         agent_no,
         agency_name,
         email,
@@ -97,12 +101,12 @@ export default class AuthSubAgentService extends AbstractServices {
         civil_aviation,
         trade_license,
         national_id,
-        agency_type: "Agent",
+        agency_type: SOURCE_SUB_AGENT,
       });
 
       const newRole = await AgencyUserModel.createRole({
         agency_id: newAgency[0].id,
-        name: "Super Admin",
+        name: 'Super Admin',
         is_main_role: true,
       });
 
@@ -152,7 +156,7 @@ export default class AuthSubAgentService extends AbstractServices {
       const verificationToken = Lib.createToken(
         { agency_id: newAgency[0].id, email, user_id: newUser[0].id },
         config.JWT_SECRET_AGENT + OTP_TYPES.register_agent,
-        "24h"
+        '24h'
       );
 
       await EmailSendLib.sendEmail({
@@ -161,7 +165,7 @@ export default class AuthSubAgentService extends AbstractServices {
         emailBody: registrationVerificationTemplate(
           agency_name,
 
-          "/sign-up/verification?token=" + verificationToken
+          '/sign-up/verification?token=' + verificationToken
         ),
       });
 
@@ -191,13 +195,13 @@ export default class AuthSubAgentService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_UNAUTHORIZED,
-          message: "Invalid token or token expired. Please contact us.",
+          message: 'Invalid token or token expired. Please contact us.',
         };
       }
 
       const { agency_id, email, user_id, agency_name } = parsedToken;
 
-      await AgentModel.updateAgency({ status: "Pending" }, agency_id);
+      await AgentModel.updateAgency({ status: 'Pending' }, agency_id);
 
       const password = Lib.generateRandomPassword(12);
       const hashed_password = await Lib.hashValue(password);
@@ -277,15 +281,15 @@ export default class AuthSubAgentService extends AbstractServices {
       } = checkUserAgency;
 
       if (
-        agency_status === "Inactive" ||
-        agency_status === "Incomplete" ||
-        agency_status === "Rejected" ||
-        agency_status === "Pending"
+        agency_status === 'Inactive' ||
+        agency_status === 'Incomplete' ||
+        agency_status === 'Rejected' ||
+        agency_status === 'Pending'
       ) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "Unauthorized agency! Please contact with us.",
+          message: 'Unauthorized agency! Please contact with us.',
         };
       }
 
@@ -369,7 +373,7 @@ export default class AuthSubAgentService extends AbstractServices {
         agency_logo,
       };
 
-      const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, "24h");
+      const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
 
       const role = await AgentUserModel.getSingleRoleWithPermissions(
         role_id,
@@ -472,11 +476,11 @@ export default class AuthSubAgentService extends AbstractServices {
         };
       }
 
-      if (agency_status === "Inactive") {
+      if (agency_status === 'Inactive') {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "Unauthorized agency! Please contact with us.",
+          message: 'Unauthorized agency! Please contact with us.',
         };
       }
 
@@ -531,7 +535,7 @@ export default class AuthSubAgentService extends AbstractServices {
       const authToken = Lib.createToken(
         tokenData,
         config.JWT_SECRET_AGENT,
-        "24h"
+        '24h'
       );
 
       const role = await AgencyUserModel.getSingleRoleWithPermissions(

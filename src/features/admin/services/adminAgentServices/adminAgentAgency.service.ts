@@ -16,6 +16,7 @@ import config from '../../../../config/config';
 import {
   ADMIN_NOTIFY_EMAIL,
   GENERATE_AUTO_UNIQUE_ID,
+  SOURCE_AGENT,
   TYPE_FLIGHT,
   TYPE_HOTEL,
 } from '../../../../utils/miscellaneous/constants';
@@ -56,7 +57,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       const data = await AgencyModel.getSingleAgency({
         id: agency_id,
-        type: 'Agent',
+        type: SOURCE_AGENT,
       });
 
       if (!data) {
@@ -597,7 +598,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         national_id,
         created_by: user_id,
         ...rest,
-        agency_type: 'Agent',
+        agency_type: SOURCE_AGENT,
         ref_id,
       });
 

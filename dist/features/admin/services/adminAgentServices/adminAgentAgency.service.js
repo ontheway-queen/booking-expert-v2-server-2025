@@ -59,7 +59,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
                 const data = yield AgencyModel.getSingleAgency({
                     id: agency_id,
-                    type: 'Agent',
+                    type: constants_1.SOURCE_AGENT,
                 });
                 if (!data) {
                     return {
@@ -477,7 +477,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const newAgency = yield agencyModel.createAgency(Object.assign(Object.assign({ status: 'Active', agent_no: agent_no, agency_logo,
                     civil_aviation,
                     trade_license,
-                    national_id, created_by: user_id }, rest), { agency_type: 'Agent', ref_id }));
+                    national_id, created_by: user_id }, rest), { agency_type: constants_1.SOURCE_AGENT, ref_id }));
                 const newRole = yield agencyUserModel.createRole({
                     agency_id: newAgency[0].id,
                     name: 'Super Admin',

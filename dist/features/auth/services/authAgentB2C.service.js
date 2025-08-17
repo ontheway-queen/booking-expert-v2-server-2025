@@ -42,7 +42,7 @@ class AuthAgentB2CService extends abstract_service_1.default {
                 }
                 const agent_details = yield AgentModel.getSingleAgency({
                     id: agency_id,
-                    type: 'Agent',
+                    type: constants_1.SOURCE_AGENT,
                 });
                 let username = lib_1.default.generateUsername(name);
                 let suffix = 1;
@@ -122,7 +122,7 @@ class AuthAgentB2CService extends abstract_service_1.default {
                 }
                 const agent_details = yield AgentModel.getSingleAgency({
                     id: agency_id,
-                    type: 'Agent',
+                    type: constants_1.SOURCE_AGENT,
                 });
                 if (!agent_details) {
                     return {

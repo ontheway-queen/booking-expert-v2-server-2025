@@ -377,7 +377,7 @@ export class AgentPaymentsService extends AbstractServices {
       if (check_balance < data.due) {
         const agency_details = await agencyModel.getSingleAgency({
           id: agency_id,
-          type: 'Agent',
+          type: SOURCE_AGENT,
         });
         const usable_loan_balance = Number(agency_details?.usable_loan);
         if (check_balance + usable_loan_balance < data.due) {

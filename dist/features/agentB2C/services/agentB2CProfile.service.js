@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
+const constants_1 = require("../../../utils/miscellaneous/constants");
 class AgentB2CProfileService extends abstract_service_1.default {
     constructor() {
         super();
@@ -39,7 +40,7 @@ class AgentB2CProfileService extends abstract_service_1.default {
                 }
                 const agent_details = yield AgentModel.getSingleAgency({
                     id: agency_id,
-                    type: 'Agent',
+                    type: constants_1.SOURCE_AGENT,
                 });
                 const balance = yield AgencyB2CPaymentModel.getUserBalance(agency_id, user_id);
                 return {

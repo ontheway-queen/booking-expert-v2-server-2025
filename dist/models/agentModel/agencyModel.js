@@ -85,6 +85,9 @@ class AgencyModel extends schema_1.default {
                     if (query.ref_agent_id) {
                         qb.andWhere('ag.ref_agent_id', query.ref_agent_id);
                     }
+                    if (query.agency_type) {
+                        qb.andWhere('ag.agency_type', query.agency_type);
+                    }
                 });
             }
             return { data, total: (_a = total[0]) === null || _a === void 0 ? void 0 : _a.total };

@@ -94,6 +94,7 @@ export const FUNCTION_TYPE_BLOG = 'BLOG';
 //generate auto unique id
 export const GENERATE_AUTO_UNIQUE_ID = {
   agent: 'Agent',
+  sub_agent: 'Sub_Agent',
   agent_flight: 'Agent_Flight',
   agent_visa: 'Agent_Visa',
   agent_holiday: 'Agent_Tour',
