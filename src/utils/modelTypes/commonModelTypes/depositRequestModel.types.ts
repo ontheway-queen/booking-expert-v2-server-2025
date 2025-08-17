@@ -8,7 +8,7 @@ import {
   SOURCE_SUB_AGENT,
 } from '../../miscellaneous/constants';
 
-type deposit_status =
+export type deposit_status =
   | typeof DEPOSIT_STATUS_PENDING
   | typeof DEPOSIT_STATUS_APPROVED
   | typeof DEPOSIT_STATUS_CANCELLED
@@ -102,11 +102,22 @@ export interface IGetSingleAgentB2CDepositRequestData {
   update_note?: string;
 }
 
-export interface IGetDepositRequestListFilterQuery {
+export interface IGetAgentDepositRequestListFilterQuery {
   agency_id?: number;
   status?: deposit_status;
   from_date?: Date;
   to_date?: Date;
+  limit?: number;
+  skip?: number;
+  filter?: string;
+  created_by?: number;
+}
+
+export interface IGetAgentB2CDepositRequestListFilterQuery {
+  agency_id: number;
+  status?: deposit_status;
+  from_date?: string;
+  to_date?: string;
   limit?: number;
   skip?: number;
   filter?: string;

@@ -7,8 +7,9 @@ import {
 import Schema from '../../utils/miscellaneous/schema';
 import {
   ICreateDepositRequestPayload,
+  IGetAgentB2CDepositRequestListFilterQuery,
   IGetAgentDepositRequestData,
-  IGetDepositRequestListFilterQuery,
+  IGetAgentDepositRequestListFilterQuery,
   IGetSingleAgentB2CDepositRequestData,
   IGetSingleAgentDepositRequestData,
   IUpdateDepositRequestPayload,
@@ -41,7 +42,7 @@ export default class DepositRequestModel extends Schema {
   }
 
   public async getAgentDepositRequestList(
-    query: IGetDepositRequestListFilterQuery,
+    query: IGetAgentDepositRequestListFilterQuery,
     is_total: boolean = false
   ): Promise<{ data: IGetAgentDepositRequestData[]; total?: number }> {
     const data = await this.db('deposit_request as dr')
@@ -162,7 +163,7 @@ export default class DepositRequestModel extends Schema {
   }
 
   public async getSubAgentDepositRequestList(
-    query: IGetDepositRequestListFilterQuery,
+    query: IGetAgentB2CDepositRequestListFilterQuery,
     is_total: boolean = false
   ): Promise<{ data: IGetAgentDepositRequestData[]; total?: number }> {
     const data = await this.db('deposit_request as dr')
@@ -283,7 +284,7 @@ export default class DepositRequestModel extends Schema {
   }
 
   public async getAgentB2CDepositRequestList(
-    query: IGetDepositRequestListFilterQuery,
+    query: IGetAgentB2CDepositRequestListFilterQuery,
     is_total: boolean = false
   ): Promise<{ data: IGetAgentDepositRequestData[]; total?: number }> {
     const data = await this.db('deposit_request as dr')

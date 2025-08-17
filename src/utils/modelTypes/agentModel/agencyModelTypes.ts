@@ -140,7 +140,7 @@ export interface ICheckAgencyData {
   email: string;
   phone: string;
   status: string;
-  agency_logo?: string;
+  agency_logo: string;
   civil_aviation?: string;
   trade_license?: string;
   national_id?: string;

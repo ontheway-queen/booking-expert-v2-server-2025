@@ -27,6 +27,9 @@ class AgentB2CSubSiteConfigValidator {
             notice: joi_1.default.string().trim().optional(),
             android_app_link: joi_1.default.string().trim().optional(),
             ios_app_link: joi_1.default.string().trim().optional(),
+            show_developer: joi_1.default.boolean().optional(),
+            developer_name: joi_1.default.string().trim().optional(),
+            developer_link: joi_1.default.string().trim().optional(),
             emails: joi_1.default.string()
                 .custom((value, helpers) => {
                 try {

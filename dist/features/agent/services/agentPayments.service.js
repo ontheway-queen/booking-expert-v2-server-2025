@@ -370,7 +370,7 @@ class AgentPaymentsService extends abstract_service_1.default {
             }));
         });
     }
-    getAccounts(req) {
+    getAccounts(_req) {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.OthersModel();
             const accounts = yield configModel.getAccount({

@@ -138,6 +138,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const { id } = req.params;
                 const agency_id = Number(id);
                 const AgentModel = this.Model.AgencyModel(trx);
+                const SiteConfigModel = this.Model.AgencyB2CConfigModel(trx);
                 const checkAgency = yield AgentModel.checkAgency({
                     agency_id,
                 });
@@ -174,7 +175,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: 'Invalid KAM ID',
+                            message: 'Invalid Ref ID',
                         };
                     }
                     else {
@@ -203,6 +204,18 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     const checkPermission = yield AgentModel.getWhiteLabelPermission({
                         agency_id,
                     });
+                    const checkConfig = yield SiteConfigModel.getSiteConfig({ agency_id });
+                    if (!checkConfig) {
+                        const siteService = new siteConfigSupport_service_1.SiteConfigSupportService(trx);
+                        yield siteService.insertSiteConfigData({
+                            agency_id: agency_id,
+                            address: checkAgency.address,
+                            email: checkAgency.email,
+                            phone: checkAgency.phone,
+                            site_name: checkAgency.agency_name,
+                            logo: checkAgency.agency_logo,
+                        });
+                    }
                     if (!checkPermission) {
                         const uuid = (0, uuid_1.v4)();
                         yield AgentModel.createWhiteLabelPermission({

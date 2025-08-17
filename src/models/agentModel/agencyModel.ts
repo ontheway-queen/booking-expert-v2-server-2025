@@ -133,7 +133,7 @@ export default class AgencyModel extends Schema {
     ref_agent_id,
     status,
     ref_id,
-  }: ICheckAgencyQuery): Promise<ICheckAgencyData | undefined> {
+  }: ICheckAgencyQuery): Promise<ICheckAgencyData | null> {
     return await this.db('agency')
       .withSchema(this.AGENT_SCHEMA)
       .select(

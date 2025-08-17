@@ -45,7 +45,9 @@ export default class AdminAgentPaymentsController extends AbstractController {
   public getSingleDepositRequest = this.asyncWrapper.wrap(
     { paramSchema: this.commonValidator.singleParamNumValidator() },
     async (req: Request, res: Response) => {
-      const { code, ...rest } = await this.services.getSingleDepositRequest(req);
+      const { code, ...rest } = await this.services.getSingleDepositRequest(
+        req
+      );
       res.status(code).json(rest);
     }
   );
@@ -53,7 +55,7 @@ export default class AdminAgentPaymentsController extends AbstractController {
   public updateDepositRequest = this.asyncWrapper.wrap(
     {
       paramSchema: this.commonValidator.singleParamNumValidator(),
-      bodySchema: this.validator.updateDepositRequest
+      bodySchema: this.validator.updateDepositRequest,
     },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.updateDepositRequest(req);
@@ -63,7 +65,7 @@ export default class AdminAgentPaymentsController extends AbstractController {
 
   public adjustBalance = this.asyncWrapper.wrap(
     {
-      bodySchema: this.validator.adjustBalance
+      bodySchema: this.validator.adjustBalance,
     },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.adjustBalance(req);
@@ -73,7 +75,7 @@ export default class AdminAgentPaymentsController extends AbstractController {
 
   public createADM = this.asyncWrapper.wrap(
     {
-      bodySchema: this.validator.createADM
+      bodySchema: this.validator.createADM,
     },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.createADM(req);
@@ -83,7 +85,7 @@ export default class AdminAgentPaymentsController extends AbstractController {
 
   public getADMList = this.asyncWrapper.wrap(
     {
-      querySchema: this.validator.getADM
+      querySchema: this.validator.getADM,
     },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.getADMList(req);
@@ -93,7 +95,7 @@ export default class AdminAgentPaymentsController extends AbstractController {
 
   public getSingleADM = this.asyncWrapper.wrap(
     {
-      paramSchema: this.commonValidator.singleParamNumValidator()
+      paramSchema: this.commonValidator.singleParamNumValidator(),
     },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.getSingleADM(req);
@@ -104,7 +106,7 @@ export default class AdminAgentPaymentsController extends AbstractController {
   public updateADM = this.asyncWrapper.wrap(
     {
       paramSchema: this.commonValidator.singleParamNumValidator(),
-      bodySchema: this.validator.updateADM
+      bodySchema: this.validator.updateADM,
     },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.updateADM(req);
@@ -114,7 +116,7 @@ export default class AdminAgentPaymentsController extends AbstractController {
 
   public deleteADM = this.asyncWrapper.wrap(
     {
-      paramSchema: this.commonValidator.singleParamNumValidator()
+      paramSchema: this.commonValidator.singleParamNumValidator(),
     },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.services.deleteADM(req);

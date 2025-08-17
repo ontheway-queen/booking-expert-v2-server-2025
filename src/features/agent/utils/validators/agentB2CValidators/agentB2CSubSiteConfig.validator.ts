@@ -24,6 +24,9 @@ export class AgentB2CSubSiteConfigValidator {
     notice: Joi.string().trim().optional(),
     android_app_link: Joi.string().trim().optional(),
     ios_app_link: Joi.string().trim().optional(),
+    show_developer: Joi.boolean().optional(),
+    developer_name: Joi.string().trim().optional(),
+    developer_link: Joi.string().trim().optional(),
     emails: Joi.string()
       .custom((value, helpers) => {
         try {

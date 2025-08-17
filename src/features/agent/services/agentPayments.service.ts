@@ -453,7 +453,7 @@ export class AgentPaymentsService extends AbstractServices {
     });
   }
 
-  public async getAccounts(req: Request) {
+  public async getAccounts(_req: Request) {
     const configModel = this.Model.OthersModel();
     const accounts = await configModel.getAccount({
       source_type: 'ADMIN',

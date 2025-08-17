@@ -5,6 +5,10 @@ import { ICreateBlogPayloadReqBody } from '../../utils/types/agentB2CSubTypes/ag
 import { ICreateBlogPayload } from '../../../../utils/modelTypes/blogModelTypes/blogModelTypes';
 
 export class AgentB2CSubBlogService extends AbstractServices {
+  constructor() {
+    super();
+  }
+
   public async createBlog(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { agency_id, user_id } = req.agencyUser;
