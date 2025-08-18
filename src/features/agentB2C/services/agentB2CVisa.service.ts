@@ -70,6 +70,7 @@ export class AgentB2CVisaService extends AbstractServices {
         residence,
         passengers,
       } = req.body as IVisaApplicationPayload;
+      const files = (req.files as Express.Multer.File[]) || [];
 
       const visaModel = this.Model.VisaModel(trx);
       const visaApplicationModel = this.Model.VisaApplicationModel(trx);
@@ -106,7 +107,7 @@ export class AgentB2CVisaService extends AbstractServices {
         nationality,
         residence,
         application_ref,
-        traveler:passengers.length,
+        traveler: passengers.length,
         visa_id: singleVisa.id,
         source_id: agency_id,
         source_type: SOURCE_AGENT_B2C,
@@ -117,7 +118,16 @@ export class AgentB2CVisaService extends AbstractServices {
 
       const application = await visaApplicationModel.createVisaApplication(applicationPayload);
 
+
       const applicationTravelerPayload = passengers.map((passenger) => {
+
+        let required_fields: { [key: string]: string } = {};
+        for (let file of files) {
+          if (Number(file.fieldname.split('-')[1]) === Number(passenger.key)) {
+            required_fields[file.fieldname.split('-')[0]] = file.filename;
+          }
+        }
+
         return {
           application_id: application[0].id,
           title: passenger.title,
@@ -131,7 +141,7 @@ export class AgentB2CVisaService extends AbstractServices {
           city: passenger.city,
           country_id: passenger.country_id,
           address: passenger.address,
-          required_fields: passenger.required_fields,
+          required_fields: required_fields,
         };
       });
 

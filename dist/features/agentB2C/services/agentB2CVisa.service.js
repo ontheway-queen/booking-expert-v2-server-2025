@@ -70,6 +70,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
                 const { user_id, name } = req.agencyB2CUser;
                 const { id } = req.params;
                 const { from_date, to_date, contact_email, contact_number, whatsapp_number, nationality, residence, passengers, } = req.body;
+                const files = req.files || [];
                 const visaModel = this.Model.VisaModel(trx);
                 const visaApplicationModel = this.Model.VisaApplicationModel(trx);
                 const singleVisa = yield visaModel.getSingleVisa({
@@ -110,6 +111,12 @@ class AgentB2CVisaService extends abstract_service_1.default {
                 };
                 const application = yield visaApplicationModel.createVisaApplication(applicationPayload);
                 const applicationTravelerPayload = passengers.map((passenger) => {
+                    let required_fields = {};
+                    for (let file of files) {
+                        if (Number(file.fieldname.split('-')[1]) === Number(passenger.key)) {
+                            required_fields[file.fieldname.split('-')[0]] = file.filename;
+                        }
+                    }
                     return {
                         application_id: application[0].id,
                         title: passenger.title,
@@ -123,7 +130,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
                         city: passenger.city,
                         country_id: passenger.country_id,
                         address: passenger.address,
-                        required_fields: passenger.required_fields,
+                        required_fields: required_fields,
                     };
                 });
                 yield visaApplicationModel.createVisaApplicationTraveler(applicationTravelerPayload);

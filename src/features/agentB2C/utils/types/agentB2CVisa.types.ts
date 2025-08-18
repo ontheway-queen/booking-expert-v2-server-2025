@@ -11,6 +11,7 @@ export interface IVisaApplicationPayload {
 }
 
 interface IVisaApplicationPassengerPayload {
+  key:number;
   title: string;
   type: string;
   first_name: string;
@@ -22,5 +23,4 @@ interface IVisaApplicationPassengerPayload {
   city: string | null;
   country_id: number | null;
   address: string | null;
-  required_fields: string;
 }

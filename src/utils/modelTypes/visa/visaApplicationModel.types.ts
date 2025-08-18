@@ -38,5 +38,5 @@ export interface ICreateVisaApplicationTraveler {
   city: string | null;
   country_id: number | null;
   address: string | null;
-  required_fields: string;
+  required_fields: { [key: string]: string };
 }
