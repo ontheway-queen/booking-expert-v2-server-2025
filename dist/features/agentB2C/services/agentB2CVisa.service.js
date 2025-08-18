@@ -69,7 +69,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
                 const { agency_id } = req.agencyB2CWhiteLabel;
                 const { user_id, name } = req.agencyB2CUser;
                 const { id } = req.params;
-                const { from_date, to_date, traveler, contact_email, contact_number, whatsapp_number, nationality, residence, passengers, } = req.body;
+                const { from_date, to_date, contact_email, contact_number, whatsapp_number, nationality, residence, passengers, } = req.body;
                 const visaModel = this.Model.VisaModel(trx);
                 const visaApplicationModel = this.Model.VisaApplicationModel(trx);
                 const singleVisa = yield visaModel.getSingleVisa({
@@ -88,19 +88,19 @@ class AgentB2CVisaService extends abstract_service_1.default {
                 }
                 const application_ref = yield lib_1.default.generateNo({ trx, type: 'Agent_Visa' });
                 const total_fee = singleVisa.visa_fee + singleVisa.processing_fee;
-                const payable = total_fee * req.body.traveler;
+                const payable = total_fee * passengers.length;
                 const applicationPayload = {
                     user_id,
                     payable,
                     from_date,
                     to_date,
-                    traveler,
                     contact_email,
                     contact_number,
                     whatsapp_number,
                     nationality,
                     residence,
                     application_ref,
+                    traveler: passengers.length,
                     visa_id: singleVisa.id,
                     source_id: agency_id,
                     source_type: constants_1.SOURCE_AGENT_B2C,

@@ -63,7 +63,6 @@ export class AgentB2CVisaService extends AbstractServices {
       const {
         from_date,
         to_date,
-        traveler,
         contact_email,
         contact_number,
         whatsapp_number,
@@ -94,20 +93,20 @@ export class AgentB2CVisaService extends AbstractServices {
       const application_ref = await Lib.generateNo({ trx, type: 'Agent_Visa' });
 
       const total_fee = singleVisa.visa_fee + singleVisa.processing_fee;
-      const payable = total_fee * req.body.traveler;
+      const payable = total_fee * passengers.length;
 
       const applicationPayload = {
         user_id,
         payable,
         from_date,
         to_date,
-        traveler,
         contact_email,
         contact_number,
         whatsapp_number,
         nationality,
         residence,
         application_ref,
+        traveler:passengers.length,
         visa_id: singleVisa.id,
         source_id: agency_id,
         source_type: SOURCE_AGENT_B2C,
