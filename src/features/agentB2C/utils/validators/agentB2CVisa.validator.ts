@@ -74,4 +74,14 @@ export class AgentB2CVisaValidator {
       })
       .required(),
   });
+
+  public getVisaApplicationListQuerySchema = Joi.object({
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+    status: Joi.string().optional(),
+    filter: Joi.string().optional(),
+    from_date: Joi.date().raw().optional(),
+    to_date: Joi.date().raw().optional(),
+    application_ref: Joi.string().optional(),
+  });
 }

@@ -7,6 +7,7 @@ export class AgentB2CVisaController extends AbstractController {
   private service = new AgentB2CVisaService();
   private validator = new AgentB2CVisaValidator();
 
+  //get all visa list
   public getAllVisaList = this.asyncWrapper.wrap(
     {
       querySchema: this.validator.getAllVisaListQuerySchema,
@@ -17,6 +18,7 @@ export class AgentB2CVisaController extends AbstractController {
     }
   );
 
+  //get single visa
   public getSingleVisa = this.asyncWrapper.wrap(
     {
       paramSchema: this.commonValidator.singleParamStringValidator('slug'),
@@ -27,14 +29,42 @@ export class AgentB2CVisaController extends AbstractController {
     }
   );
 
+  //create visa
   public createVisaApplication = this.asyncWrapper.wrap(
     {
-      paramSchema:this.commonValidator.singleParamNumValidator(),
+      paramSchema: this.commonValidator.singleParamNumValidator(),
       bodySchema: this.validator.createVisaValidatorSchema,
     },
-    async(req: Request, res: Response) => {
+    async (req: Request, res: Response) => {
       const { code, ...rest } = await this.service.createVisaApplication(req);
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
+    }
+  );
+
+
+  //get visa application list
+  public getVisaApplicationList = this.asyncWrapper.wrap(
+    {
+      querySchema: this.validator.getVisaApplicationListQuerySchema,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getVisaApplicationList(req);
       res.status(code).json(rest);
     }
-  )
+  );
+
+  //get single visa application
+  public getSingleVisaApplication = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getSingleVisaApplication(req);
+      res.status(code).json(rest);
+    }
+  );
 }

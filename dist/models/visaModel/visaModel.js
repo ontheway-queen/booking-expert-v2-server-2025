@@ -76,10 +76,8 @@ class VisaModel extends schema_1.default {
                 if (query.filter) {
                     qb.andWhere((subQb) => {
                         subQb
-                            .where('v.title', 'like', `%${query.filter}%`)
-                            .orWhere('v.slug', 'like', `%${query.filter}%`);
-                        // .orWhere('v.visa_type', 'like', `%${query.filter}%`)
-                        // .orWhere('v.visa_mode', 'like', `%${query.filter}%`);
+                            .where('v.title', 'Ilike', `%${query.filter}%`)
+                            .orWhere('v.slug', 'Ilike', `%${query.filter}%`);
                     });
                 }
             })
@@ -102,10 +100,8 @@ class VisaModel extends schema_1.default {
                 if (query.filter) {
                     qb.andWhere((subQb) => {
                         subQb
-                            .where('title', 'like', `%${query.filter}%`)
-                            .orWhere('slug', 'like', `%${query.filter}%`);
-                        // .orWhere('visa_type', 'like', `%${query.filter}%`)
-                        // .orWhere('visa_mode', 'like', `%${query.filter}%`);
+                            .where('title', 'Ilike', `%${query.filter}%`)
+                            .orWhere('slug', 'Ilike', `%${query.filter}%`);
                     });
                 }
             });

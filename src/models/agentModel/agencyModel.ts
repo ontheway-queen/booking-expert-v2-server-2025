@@ -469,7 +469,7 @@ export default class AgencyModel extends Schema {
     ref_agent_id,
   }: {
     id: number;
-    type: 'Agent' | 'Sub Agent';
+    type: 'AGENT' | 'Sub Agent';
     ref_agent_id?: number;
   }): Promise<IGetSingleAgencyData | null> {
     return await this.db('agency AS ag')

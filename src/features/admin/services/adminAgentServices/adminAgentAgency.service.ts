@@ -56,7 +56,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       const data = await AgencyModel.getSingleAgency({
         id: agency_id,
-        type: 'Agent',
+        type: 'AGENT',
       });
 
       if (!data) {

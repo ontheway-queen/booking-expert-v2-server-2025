@@ -73,6 +73,15 @@ class AgentB2CVisaValidator {
             })
                 .required(),
         });
+        this.getVisaApplicationListQuerySchema = joi_1.default.object({
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
+            status: joi_1.default.string().optional(),
+            filter: joi_1.default.string().optional(),
+            from_date: joi_1.default.date().raw().optional(),
+            to_date: joi_1.default.date().raw().optional(),
+            application_ref: joi_1.default.string().optional(),
+        });
     }
 }
 exports.AgentB2CVisaValidator = AgentB2CVisaValidator;

@@ -40,3 +40,36 @@ export interface ICreateVisaApplicationTraveler {
   address: string | null;
   required_fields: { [key: string]: string };
 }
+
+export interface IGetAgentB2CVisaApplicationQuery {
+  source_id: number;
+  source_type: string;
+  user_id: number;
+  limit?: number;
+  skip?: number;
+  from_date?: Date;
+  to_date?: Date;
+  status?: string;
+  application_ref?: string;
+  filter?: string;
+}
+
+export interface IGetAgentB2CVisaApplicationData {
+  id: number;
+  application_ref: string;
+  title: string;
+  visa_type: string;
+  visa_mode: string;
+  country_name: string;
+  status: string;
+  traveler: number;
+  application_date: Date;
+}
+
+
+export interface IGetAgentB2CSingleVisaApplicationQuery{
+  id:number;
+  source_id:number;
+  source_type:string;
+  user_id:number
+}

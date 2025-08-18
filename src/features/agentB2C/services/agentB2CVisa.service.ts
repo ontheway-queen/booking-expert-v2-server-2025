@@ -5,6 +5,8 @@ import { SOURCE_AGENT, SOURCE_AGENT_B2C } from '../../../utils/miscellaneous/con
 import { IVisaApplicationPayload } from '../utils/types/agentB2CVisa.types';
 
 export class AgentB2CVisaService extends AbstractServices {
+
+  //Get all visa list
   public async getAllVisaList(req: Request) {
     const { country_id, visa_type_id } = req.query;
     const { agency_id } = req.agencyB2CWhiteLabel;
@@ -26,6 +28,7 @@ export class AgentB2CVisaService extends AbstractServices {
     };
   }
 
+  //get single visa
   public async getSingleVisa(req: Request) {
     const { slug } = req.params;
     const { agency_id } = req.agencyB2CWhiteLabel;
@@ -55,6 +58,7 @@ export class AgentB2CVisaService extends AbstractServices {
     };
   }
 
+  //create visa application
   public async createVisaApplication(req: Request) {
     return this.db.transaction(async (trx) => {
       const { agency_id } = req.agencyB2CWhiteLabel;
@@ -93,8 +97,8 @@ export class AgentB2CVisaService extends AbstractServices {
 
       const application_ref = await Lib.generateNo({ trx, type: 'Agent_Visa' });
 
-      const total_fee = singleVisa.visa_fee + singleVisa.processing_fee;
-      const payable = total_fee * passengers?.length;
+      const total_fee = Number(singleVisa.visa_fee) + Number(singleVisa.processing_fee);
+      const payable = Number(total_fee * passengers?.length);
 
       const applicationPayload = {
         user_id,
@@ -118,9 +122,7 @@ export class AgentB2CVisaService extends AbstractServices {
 
       const application = await visaApplicationModel.createVisaApplication(applicationPayload);
 
-
       const applicationTravelerPayload = passengers?.map((passenger) => {
-
         let required_fields: { [key: string]: string } = {};
         for (let file of files) {
           if (Number(file.fieldname.split('-')[1]) === Number(passenger.key)) {
@@ -161,5 +163,82 @@ export class AgentB2CVisaService extends AbstractServices {
         },
       };
     });
+  }
+
+  //get visa application list
+  public async getVisaApplicationList(req: Request) {
+    const { user_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyB2CWhiteLabel;
+    const query = req.query as unknown as {
+      limit: number;
+      skip: number;
+      application_ref: string;
+      filter: string;
+      from_date: Date;
+      to_date: Date;
+      status: string;
+    };
+
+    const visaApplicationModel = this.Model.VisaApplicationModel();
+
+    const { data, total } = await visaApplicationModel.getAgentB2CVisaApplicationList({
+      user_id,
+      source_id: agency_id,
+      source_type: SOURCE_AGENT_B2C,
+      limit: query.limit,
+      skip: query.skip,
+      application_ref: query.application_ref,
+      filter: query.filter,
+      from_date: query.from_date,
+      to_date: query.to_date,
+      status: query.status,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data,
+      total,
+    };
+  }
+
+  //get single visa
+  public async getSingleVisaApplication(req: Request) {
+    const { id } = req.params;
+    const { user_id } = req.agencyB2CUser;
+    const { agency_id } = req.agencyB2CWhiteLabel;
+    const visaApplicationModel = this.Model.VisaApplicationModel();
+
+    const application_data = await visaApplicationModel.getAgentB2CSingleVisaApplication({
+      user_id,
+      source_id: agency_id,
+      source_type: SOURCE_AGENT_B2C,
+      id: Number(id),
+    });
+
+    if (!application_data) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_NOT_FOUND,
+        message: this.ResMsg.HTTP_NOT_FOUND,
+      };
+    }
+
+    const applicationTraveler = await visaApplicationModel.getAgentB2CSingleVisaApplicationTraveler(
+      {
+        application_id: application_data.id,
+      }
+    );
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: {
+        ...application_data,
+        travelers: applicationTraveler,
+      },
+    };
   }
 }

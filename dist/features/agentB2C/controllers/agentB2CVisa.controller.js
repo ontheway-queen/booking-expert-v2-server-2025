@@ -32,23 +32,45 @@ class AgentB2CVisaController extends abstract_controller_1.default {
         super(...arguments);
         this.service = new agentB2CVisa_service_1.AgentB2CVisaService();
         this.validator = new agentB2CVisa_validator_1.AgentB2CVisaValidator();
+        //get all visa list
         this.getAllVisaList = this.asyncWrapper.wrap({
             querySchema: this.validator.getAllVisaListQuerySchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getAllVisaList(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        //get single visa
         this.getSingleVisa = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamStringValidator('slug'),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getSingleVisa(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        //create visa
         this.createVisaApplication = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),
             bodySchema: this.validator.createVisaValidatorSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.createVisaApplication(req), { code } = _a, rest = __rest(_a, ["code"]);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
+        }));
+        //get visa application list
+        this.getVisaApplicationList = this.asyncWrapper.wrap({
+            querySchema: this.validator.getVisaApplicationListQuerySchema,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getVisaApplicationList(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        //get single visa application
+        this.getSingleVisaApplication = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getSingleVisaApplication(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
     }

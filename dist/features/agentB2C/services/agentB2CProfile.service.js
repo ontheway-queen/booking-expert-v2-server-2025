@@ -39,7 +39,7 @@ class AgentB2CProfileService extends abstract_service_1.default {
                 }
                 const agent_details = yield AgentModel.getSingleAgency({
                     id: agency_id,
-                    type: 'Agent',
+                    type: 'AGENT',
                 });
                 const balance = yield AgencyB2CPaymentModel.getUserBalance(agency_id, user_id);
                 return {

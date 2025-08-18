@@ -39,7 +39,7 @@ export default class AuthAgentB2CService extends AbstractServices {
 
       const agent_details = await AgentModel.getSingleAgency({
         id: agency_id,
-        type: 'Agent',
+        type: 'AGENT',
       });
 
       let username = Lib.generateUsername(name);
@@ -135,7 +135,7 @@ export default class AuthAgentB2CService extends AbstractServices {
 
       const agent_details = await AgentModel.getSingleAgency({
         id: agency_id,
-        type: 'Agent',
+        type: 'AGENT',
       });
       if (!agent_details) {
         return {

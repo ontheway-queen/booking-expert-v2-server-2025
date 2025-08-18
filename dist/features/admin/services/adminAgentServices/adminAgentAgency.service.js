@@ -59,7 +59,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
                 const data = yield AgencyModel.getSingleAgency({
                     id: agency_id,
-                    type: 'Agent',
+                    type: 'AGENT',
                 });
                 if (!data) {
                     return {

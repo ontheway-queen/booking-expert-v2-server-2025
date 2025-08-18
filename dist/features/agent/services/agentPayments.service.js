@@ -303,7 +303,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                 if (check_balance < data.due) {
                     const agency_details = yield agencyModel.getSingleAgency({
                         id: agency_id,
-                        type: 'Agent',
+                        type: 'AGENT',
                     });
                     const usable_loan_balance = Number(agency_details === null || agency_details === void 0 ? void 0 : agency_details.usable_loan);
                     if (check_balance + usable_loan_balance < data.due) {
