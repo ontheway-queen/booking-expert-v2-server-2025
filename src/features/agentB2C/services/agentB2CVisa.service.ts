@@ -94,7 +94,7 @@ export class AgentB2CVisaService extends AbstractServices {
       const application_ref = await Lib.generateNo({ trx, type: 'Agent_Visa' });
 
       const total_fee = singleVisa.visa_fee + singleVisa.processing_fee;
-      const payable = total_fee * passengers.length;
+      const payable = total_fee * passengers?.length;
 
       const applicationPayload = {
         user_id,
@@ -107,7 +107,7 @@ export class AgentB2CVisaService extends AbstractServices {
         nationality,
         residence,
         application_ref,
-        traveler: passengers.length,
+        traveler: passengers?.length,
         visa_id: singleVisa.id,
         source_id: agency_id,
         source_type: SOURCE_AGENT_B2C,
@@ -119,7 +119,7 @@ export class AgentB2CVisaService extends AbstractServices {
       const application = await visaApplicationModel.createVisaApplication(applicationPayload);
 
 
-      const applicationTravelerPayload = passengers.map((passenger) => {
+      const applicationTravelerPayload = passengers?.map((passenger) => {
 
         let required_fields: { [key: string]: string } = {};
         for (let file of files) {

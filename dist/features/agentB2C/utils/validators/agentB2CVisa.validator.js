@@ -26,7 +26,8 @@ class AgentB2CVisaValidator {
             'C11',
         ];
         this.traveler_titles = ['MISS', 'MASTER', 'MS', 'MR', 'MRS'];
-        this.passengerSchema = joi_1.default.array().items(joi_1.default.object({
+        this.passengerSchema = joi_1.default.array()
+            .items(joi_1.default.object({
             key: joi_1.default.number().required(),
             title: joi_1.default.string()
                 .trim()
@@ -45,35 +46,32 @@ class AgentB2CVisaValidator {
             city: joi_1.default.string().optional(),
             country_id: joi_1.default.number().optional(),
             address: joi_1.default.string().optional(),
-        }));
+        }))
+            .min(1)
+            .required();
         this.createVisaValidatorSchema = joi_1.default.object({
-            application_ref: joi_1.default.string().required(),
-            source_type: joi_1.default.string().required(),
-            source_id: joi_1.default.number().required(),
-            user_id: joi_1.default.number().required(),
-            visa_is: joi_1.default.number().required(),
             from_date: joi_1.default.date().raw().required(),
             to_date: joi_1.default.date().raw().required(),
-            traveler: joi_1.default.number().required(),
-            visa_fee: joi_1.default.number().required(),
-            processing_fee: joi_1.default.number().required(),
             contact_email: joi_1.default.string().email().trim().required(),
             contact_number: joi_1.default.string().trim().required(),
             whatsapp_number: joi_1.default.string().trim().optional(),
             nationality: joi_1.default.string().trim().optional(),
             residence: joi_1.default.string().trim().optional(),
-            passengers: joi_1.default.string().custom((value, helpers) => {
+            passengers: joi_1.default.string()
+                .custom((value, helpers) => {
                 try {
                     const parsed = JSON.parse(value);
                     const { error } = this.passengerSchema.validate(parsed);
-                    if (error)
-                        throw new Error(error.details[0].message);
+                    if (error) {
+                        return helpers.message(error.details[0].message);
+                    }
                     return parsed;
                 }
                 catch (err) {
                     return helpers.error('any.invalid', { message: err.message });
                 }
-            }),
+            })
+                .required(),
         });
     }
 }

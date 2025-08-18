@@ -20,9 +20,7 @@ class VisaApplicationModel extends schema_1.default {
     }
     createVisaApplication(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_application')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
+            return yield this.db('visa_application').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
         });
     }
     createVisaApplicationTracking(payload) {
@@ -34,7 +32,7 @@ class VisaApplicationModel extends schema_1.default {
     }
     createVisaApplicationTraveler(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_application_traveler')
+            return yield this.db('visa_application_traveller')
                 .withSchema(this.SERVICE_SCHEMA)
                 .insert(payload, 'id');
         });

@@ -15,9 +15,7 @@ export default class VisaApplicationModel extends Schema {
   }
 
   public async createVisaApplication(payload: ICreateVisaApplicationPayload) {
-    return await this.db('visa_application')
-      .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload, 'id');
+    return await this.db('visa_application').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
   }
 
   public async createVisaApplicationTracking(
@@ -31,7 +29,7 @@ export default class VisaApplicationModel extends Schema {
   public async createVisaApplicationTraveler(
     payload: ICreateVisaApplicationTraveler | ICreateVisaApplicationTraveler[]
   ) {
-    return await this.db('visa_application_traveler')
+    return await this.db('visa_application_traveller')
       .withSchema(this.SERVICE_SCHEMA)
       .insert(payload, 'id');
   }

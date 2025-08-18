@@ -89,7 +89,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
                 }
                 const application_ref = yield lib_1.default.generateNo({ trx, type: 'Agent_Visa' });
                 const total_fee = singleVisa.visa_fee + singleVisa.processing_fee;
-                const payable = total_fee * passengers.length;
+                const payable = total_fee * (passengers === null || passengers === void 0 ? void 0 : passengers.length);
                 const applicationPayload = {
                     user_id,
                     payable,
@@ -101,7 +101,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
                     nationality,
                     residence,
                     application_ref,
-                    traveler: passengers.length,
+                    traveler: passengers === null || passengers === void 0 ? void 0 : passengers.length,
                     visa_id: singleVisa.id,
                     source_id: agency_id,
                     source_type: constants_1.SOURCE_AGENT_B2C,
@@ -110,7 +110,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
                     application_date: new Date(),
                 };
                 const application = yield visaApplicationModel.createVisaApplication(applicationPayload);
-                const applicationTravelerPayload = passengers.map((passenger) => {
+                const applicationTravelerPayload = passengers === null || passengers === void 0 ? void 0 : passengers.map((passenger) => {
                     let required_fields = {};
                     for (let file of files) {
                         if (Number(file.fieldname.split('-')[1]) === Number(passenger.key)) {
