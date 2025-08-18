@@ -27,6 +27,9 @@ exports.AgentB2CSubBlogService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
 const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AgentB2CSubBlogService extends abstract_service_1.default {
+    constructor() {
+        super();
+    }
     createBlog(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {

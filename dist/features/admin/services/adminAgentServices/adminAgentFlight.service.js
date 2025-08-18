@@ -261,7 +261,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                     const agencyModel = this.Model.AgencyModel(trx);
                     const agency_data = yield agencyModel.getSingleAgency({
                         id: Number(booking_data.source_id),
-                        type: 'AGENT',
+                        type: constants_1.SOURCE_AGENT,
                     });
                     if (!agency_data) {
                         return {

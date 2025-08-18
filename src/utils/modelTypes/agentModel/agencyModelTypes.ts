@@ -1,3 +1,5 @@
+import { SOURCE_AGENT, SOURCE_SUB_AGENT } from '../../miscellaneous/constants';
+
 type markup_type = 'PER' | 'FLAT';
 type markup_mode = 'INCREASE' | 'DECREASE';
 export interface ICreateAgencyPayload {
@@ -8,7 +10,7 @@ export interface ICreateAgencyPayload {
   phone: string;
   address: string;
   ref_agent_id?: number;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
   national_id?: string;
   civil_aviation?: string;
   trade_license?: string;
@@ -49,7 +51,7 @@ export interface IGetAgencyListQuery {
   status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   ref_id?: number;
   ref_agent_id?: number;
-  agency_type?: 'Agent' | 'Sub Agent';
+  agency_type?: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
   order?: 'asc' | 'desc';
 }
 export interface IGetAgencyListWithBalanceQuery {
@@ -59,7 +61,7 @@ export interface IGetAgencyListWithBalanceQuery {
   status?: string;
   ref_id?: number;
   ref_agent_id?: number;
-  agency_type?: 'Agent' | 'Sub Agent';
+  agency_type?: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
 }
 
 export interface IGetAgencyListData {
@@ -73,7 +75,7 @@ export interface IGetAgencyListData {
   status: string;
   white_label: boolean;
   allow_api: boolean;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
 }
 
 export interface IGetAgencyListWithBalanceData {
@@ -91,7 +93,7 @@ export interface IGetAgencyListWithBalanceData {
   allow_api: boolean;
   flight_markup_set: string;
   hotel_markup_set: string;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
 }
 
 export interface IGetSingleAgencyData {
@@ -111,7 +113,7 @@ export interface IGetSingleAgencyData {
   hotel_markup_set: string;
   ref_id?: number;
   ref_agent_id?: number;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
   kam_id?: number;
   civil_aviation: string;
   referred_by: string;
@@ -128,7 +130,7 @@ export interface ICheckAgencyQuery {
   status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   ref_id?: number;
   ref_agent_id?: number;
-  agency_type?: 'Agent' | 'Sub Agent';
+  agency_type?: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
 }
 
 export interface ICheckAgencyData {
@@ -138,7 +140,7 @@ export interface ICheckAgencyData {
   email: string;
   phone: string;
   status: string;
-  agency_logo?: string;
+  agency_logo: string;
   civil_aviation?: string;
   trade_license?: string;
   national_id?: string;
@@ -150,7 +152,7 @@ export interface ICheckAgencyData {
   kam_id?: number;
   address: string;
   ref_agent_id?: number;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
   book_permission: boolean;
 }
 

@@ -6,6 +6,7 @@ import {
   IAgentB2CChangePasswordReqBody,
   IUpdateAgentB2CProfileReqBody,
 } from '../utils/types/agentB2CProfile.types';
+import { SOURCE_AGENT } from '../../../utils/miscellaneous/constants';
 
 export default class AgentB2CProfileService extends AbstractServices {
   constructor() {
@@ -36,7 +37,7 @@ export default class AgentB2CProfileService extends AbstractServices {
 
       const agent_details = await AgentModel.getSingleAgency({
         id: agency_id,
-        type: 'AGENT',
+        type: SOURCE_AGENT,
       });
 
       const balance = await AgencyB2CPaymentModel.getUserBalance(

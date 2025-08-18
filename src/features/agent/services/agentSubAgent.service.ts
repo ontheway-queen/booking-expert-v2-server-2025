@@ -8,7 +8,10 @@ import {
 } from '../utils/types/agentSubAgent.types';
 import CustomError from '../../../utils/lib/customError';
 import Lib from '../../../utils/lib/lib';
-import { GENERATE_AUTO_UNIQUE_ID } from '../../../utils/miscellaneous/constants';
+import {
+  GENERATE_AUTO_UNIQUE_ID,
+  SOURCE_SUB_AGENT,
+} from '../../../utils/miscellaneous/constants';
 import EmailSendLib from '../../../utils/lib/emailSendLib';
 import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
 
@@ -27,6 +30,7 @@ export default class AgentSubAgentService extends AbstractServices {
           message: 'No authority has been found to create a sub agent',
         };
       }
+
       const body = req.body as IAgentCreateSubAgentReqBody;
       const {
         email,
@@ -48,6 +52,7 @@ export default class AgentSubAgentService extends AbstractServices {
 
       const checkSubAgentName = await agencyModel.checkAgency({
         name: agency_name,
+        agency_type: SOURCE_SUB_AGENT,
       });
 
       if (checkSubAgentName) {
@@ -55,12 +60,13 @@ export default class AgentSubAgentService extends AbstractServices {
           success: false,
           code: this.StatusCode.HTTP_CONFLICT,
           message:
-            'Duplicate agency name! Agency already exists with this name',
+            'Duplicate agency name! Agency already exists with this name.',
         };
       }
 
       const checkAgentUser = await agencyUserModel.checkUser({
         email,
+        agency_type: SOURCE_SUB_AGENT,
       });
 
       if (checkAgentUser) {
@@ -101,7 +107,7 @@ export default class AgentSubAgentService extends AbstractServices {
 
       const sub_agent_no = await Lib.generateNo({
         trx,
-        type: GENERATE_AUTO_UNIQUE_ID.agent,
+        type: GENERATE_AUTO_UNIQUE_ID.sub_agent,
       });
 
       const newSubAgency = await agencyModel.createAgency({
@@ -117,7 +123,7 @@ export default class AgentSubAgentService extends AbstractServices {
         national_id,
         ref_agent_id: agency_id,
         created_by: user_id,
-        agency_type: 'Sub Agent',
+        agency_type: SOURCE_SUB_AGENT,
       });
 
       const newRole = await agencyUserModel.createRole({
@@ -190,7 +196,7 @@ export default class AgentSubAgentService extends AbstractServices {
     const AgencyModel = this.Model.AgencyModel();
 
     const data = await AgencyModel.getAgencyList(
-      { ...query, ref_id: agency_id, agency_type: 'Sub Agent' },
+      { ...query, ref_agent_id: agency_id, agency_type: SOURCE_SUB_AGENT },
       true
     );
 
@@ -212,7 +218,7 @@ export default class AgentSubAgentService extends AbstractServices {
 
       const data = await AgencyModel.getSingleAgency({
         id: Number(id),
-        type: 'Sub Agent',
+        type: SOURCE_SUB_AGENT,
         ref_agent_id: agency_id,
       });
 
@@ -248,7 +254,8 @@ export default class AgentSubAgentService extends AbstractServices {
       const agencyUserModel = this.Model.AgencyUserModel(trx);
       const checkAgency = await AgentModel.checkAgency({
         agency_id: Number(id),
-        ref_id: agency_id,
+        ref_agent_id: agency_id,
+        agency_type: SOURCE_SUB_AGENT,
       });
 
       if (!checkAgency) {
@@ -374,13 +381,6 @@ export default class AgentSubAgentService extends AbstractServices {
           Number(id)
         );
       }
-
-      // await this.insertAdminAudit(trx, {
-      //     created_by: user_id,
-      //     type: 'UPDATE',
-      //     details: `Agency Updated. Data: ${JSON.stringify(payload)}`,
-      //     payload,
-      // });
 
       return {
         success: true,

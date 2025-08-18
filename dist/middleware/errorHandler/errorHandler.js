@@ -48,9 +48,7 @@ class ErrorHandler {
             };
             try {
                 if (err.status == 500 || !err.status) {
-                    yield new rootModel_1.default()
-                        .ErrorLogsModel()
-                        .insertErrorLogs({
+                    yield new rootModel_1.default().ErrorLogsModel().insertErrorLogs({
                         level: err.level || 'ERROR',
                         message: errorDetails.message || 'Internal Server Error',
                         stack_trace: errorDetails.stack,

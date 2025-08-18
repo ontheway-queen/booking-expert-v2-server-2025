@@ -303,7 +303,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                 if (check_balance < data.due) {
                     const agency_details = yield agencyModel.getSingleAgency({
                         id: agency_id,
-                        type: 'AGENT',
+                        type: constants_1.SOURCE_AGENT,
                     });
                     const usable_loan_balance = Number(agency_details === null || agency_details === void 0 ? void 0 : agency_details.usable_loan);
                     if (check_balance + usable_loan_balance < data.due) {
@@ -370,7 +370,7 @@ class AgentPaymentsService extends abstract_service_1.default {
             }));
         });
     }
-    getAccounts(req) {
+    getAccounts(_req) {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.OthersModel();
             const accounts = yield configModel.getAccount({

@@ -11,4 +11,7 @@ export interface IAgencyB2CSubUpdateSiteConfigReqBody {
   notice?: string;
   android_app_link?: string;
   ios_app_link?: string;
+  show_developer?: boolean;
+  developer_name?: string;
+  developer_link?: string;
 }

@@ -95,7 +95,7 @@ class AuthAgentService extends abstract_service_1.default {
                     civil_aviation,
                     trade_license,
                     national_id,
-                    agency_type: 'Agent',
+                    agency_type: constants_1.SOURCE_AGENT,
                 });
                 const newRole = yield AgencyUserModel.createRole({
                     agency_id: newAgency[0].id,

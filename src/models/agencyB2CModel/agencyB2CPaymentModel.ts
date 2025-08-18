@@ -49,7 +49,7 @@ export default class AgencyB2CPaymentModel extends Schema {
         'a.agency_name',
         'a.agency_logo'
       )
-      .joinRaw('agent.agency as a ON ul.agency_id = a.id')
+      .joinRaw('LEFT JOIN agent.agency as a ON ul.agency_id = a.id')
       .leftJoin('users AS u', 'ul.user_id', 'u.id')
       .andWhere('ul.agency_id', agency_id)
       .where((qb) => {
@@ -137,8 +137,8 @@ export default class AgencyB2CPaymentModel extends Schema {
       .select(
         this.db.raw(`(
   SELECT 
-    COALESCE(SUM(CASE WHEN al.type = 'Credit' THEN amount ELSE 0 END), 0) - 
-    COALESCE(SUM(CASE WHEN al.type = 'Debit' THEN amount ELSE 0 END), 0) 
+    COALESCE(SUM(CASE WHEN ul.type = 'Credit' THEN amount ELSE 0 END), 0) - 
+    COALESCE(SUM(CASE WHEN ul.type = 'Debit' THEN amount ELSE 0 END), 0) 
   AS balance 
   FROM agent_b2c.user_ledger as ul
   WHERE u.id = ul.user_id

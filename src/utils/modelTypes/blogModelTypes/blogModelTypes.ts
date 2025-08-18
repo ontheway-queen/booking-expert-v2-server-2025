@@ -7,8 +7,8 @@ export interface ICreateBlogPayload {
   meta_description: string;
   cover_image: string;
   source_type: string;
-  source_id: string;
-  blog_for: string;
+  source_id?: number;
+  created_by: number;
 }
 
 export interface ISingleBlogPostQuery {
@@ -81,8 +81,6 @@ export interface IGetAgentB2CBlogListPayload {
   summary: string;
   cover_image: string;
   slug: boolean;
-  meta_title: string;
-  meta_description: string;
   created_date: string;
 }
 

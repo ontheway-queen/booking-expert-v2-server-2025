@@ -1,5 +1,9 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { DATA_LIMIT, SOURCE_AGENT } from '../../utils/miscellaneous/constants';
+import {
+  DATA_LIMIT,
+  SOURCE_AGENT,
+  SOURCE_SUB_AGENT,
+} from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   ICheckAgencyData,
@@ -111,6 +115,9 @@ export default class AgencyModel extends Schema {
           if (query.ref_agent_id) {
             qb.andWhere('ag.ref_agent_id', query.ref_agent_id);
           }
+          if (query.agency_type) {
+            qb.andWhere('ag.agency_type', query.agency_type);
+          }
         });
     }
     return { data, total: total[0]?.total };
@@ -126,7 +133,7 @@ export default class AgencyModel extends Schema {
     ref_agent_id,
     status,
     ref_id,
-  }: ICheckAgencyQuery): Promise<ICheckAgencyData | undefined> {
+  }: ICheckAgencyQuery): Promise<ICheckAgencyData | null> {
     return await this.db('agency')
       .withSchema(this.AGENT_SCHEMA)
       .select(
@@ -469,7 +476,7 @@ export default class AgencyModel extends Schema {
     ref_agent_id,
   }: {
     id: number;
-    type: 'AGENT' | 'Sub Agent';
+    type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
     ref_agent_id?: number;
   }): Promise<IGetSingleAgencyData | null> {
     return await this.db('agency AS ag')

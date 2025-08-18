@@ -1,13 +1,18 @@
 import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
 import { SOURCE_AGENT } from '../../../../utils/miscellaneous/constants';
-import { IBlogPayload } from '../../utils/types/agentB2CSubTypes/agentB2CSubBlog.types';
+import { ICreateBlogPayloadReqBody } from '../../utils/types/agentB2CSubTypes/agentB2CSubBlog.types';
+import { ICreateBlogPayload } from '../../../../utils/modelTypes/blogModelTypes/blogModelTypes';
 
 export class AgentB2CSubBlogService extends AbstractServices {
+  constructor() {
+    super();
+  }
+
   public async createBlog(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { agency_id, user_id } = req.agencyUser;
-      const { slug, ...restPayload } = req.body;
+      const { slug, ...restPayload } = req.body as ICreateBlogPayloadReqBody;
       const files = (req.files as Express.Multer.File[]) || [];
       const blogModel = this.Model.BlogModel(trx);
 
@@ -38,7 +43,7 @@ export class AgentB2CSubBlogService extends AbstractServices {
         };
       }
 
-      const payload: IBlogPayload = {
+      const payload: ICreateBlogPayload = {
         ...restPayload,
         slug: slug,
         source_type: SOURCE_AGENT,

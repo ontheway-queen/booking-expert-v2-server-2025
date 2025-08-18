@@ -1,4 +1,4 @@
-import Joi, { ref } from 'joi';
+import Joi from 'joi';
 
 export default class AgentSupportTicketValidator {
   public createSupportTicket = Joi.object({

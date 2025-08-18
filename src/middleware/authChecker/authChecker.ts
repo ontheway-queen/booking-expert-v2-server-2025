@@ -181,7 +181,6 @@ export default class AuthChecker {
 
     console.log(verify);
 
-
     if (!verify) {
       res
         .status(StatusCode.HTTP_UNAUTHORIZED)
@@ -347,8 +346,6 @@ export default class AuthChecker {
         token: token,
       });
 
-      console.log({ check_token });
-
       if (!check_token) {
         res
           .status(StatusCode.HTTP_UNAUTHORIZED)
@@ -359,8 +356,6 @@ export default class AuthChecker {
       const check_agency = await agencyModel.checkAgency({
         agency_id: check_token?.agency_id,
       });
-
-      console.log({ check_agency });
 
       if (
         !check_agency ||

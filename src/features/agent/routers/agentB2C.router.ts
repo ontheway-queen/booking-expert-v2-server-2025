@@ -10,6 +10,7 @@ import AgentB2CSubVisaRouter from './agentB2CRouters/agentB2CSubVisa.router';
 import AbstractRouter from '../../../abstract/abstract.router';
 import AgentB2CSubBlogRouter from './agentB2CRouters/agentB2CSubBlog.router';
 import AgentB2CSubSiteConfigRouter from './agentB2CRouters/agentB2CSubSiteConfig.router';
+import AgentB2CSubPaymentRouter from './agentB2CRouters/agentB2CSubPayment.router';
 
 export default class AgentB2CRouter extends AbstractRouter {
   // Agent B2C Sub Classes
@@ -24,6 +25,7 @@ export default class AgentB2CRouter extends AbstractRouter {
   private agentB2CSubVisaRouter = new AgentB2CSubVisaRouter();
   private agentB2CSubBlogRouter = new AgentB2CSubBlogRouter();
   private agentB2CSubSiteConfigRouter = new AgentB2CSubSiteConfigRouter();
+  private agentB2CSubPaymentRouter = new AgentB2CSubPaymentRouter();
 
 
   constructor() {
@@ -43,5 +45,6 @@ export default class AgentB2CRouter extends AbstractRouter {
     this.router.use('/group-fare', this.agentB2CSubGroupFareRouter.router);
     this.router.use('/blog', this.agentB2CSubBlogRouter.router);
     this.router.use('/site-config', this.agentB2CSubSiteConfigRouter.router);
+    this.router.use('/payments', this.agentB2CSubPaymentRouter.router);
   }
 }

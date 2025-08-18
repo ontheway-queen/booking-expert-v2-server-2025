@@ -16,6 +16,7 @@ import config from '../../../../config/config';
 import {
   ADMIN_NOTIFY_EMAIL,
   GENERATE_AUTO_UNIQUE_ID,
+  SOURCE_AGENT,
   TYPE_FLIGHT,
   TYPE_HOTEL,
 } from '../../../../utils/miscellaneous/constants';
@@ -56,7 +57,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       const data = await AgencyModel.getSingleAgency({
         id: agency_id,
-        type: 'AGENT',
+        type: SOURCE_AGENT,
       });
 
       if (!data) {
@@ -155,6 +156,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
       const { id } = req.params;
       const agency_id = Number(id);
       const AgentModel = this.Model.AgencyModel(trx);
+      const SiteConfigModel = this.Model.AgencyB2CConfigModel(trx);
       const checkAgency = await AgentModel.checkAgency({
         agency_id,
       });
@@ -206,7 +208,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Invalid KAM ID',
+            message: 'Invalid Ref ID',
           };
         } else {
           payload.ref_id = ref_id;
@@ -239,6 +241,21 @@ export default class AdminAgentAgencyService extends AbstractServices {
         const checkPermission = await AgentModel.getWhiteLabelPermission({
           agency_id,
         });
+
+        const checkConfig = await SiteConfigModel.getSiteConfig({ agency_id });
+
+        if (!checkConfig) {
+          const siteService = new SiteConfigSupportService(trx);
+
+          await siteService.insertSiteConfigData({
+            agency_id: agency_id,
+            address: checkAgency.address,
+            email: checkAgency.email,
+            phone: checkAgency.phone,
+            site_name: checkAgency.agency_name,
+            logo: checkAgency.agency_logo,
+          });
+        }
 
         if (!checkPermission) {
           const uuid = uuidv4();
@@ -597,7 +614,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         national_id,
         created_by: user_id,
         ...rest,
-        agency_type: 'Agent',
+        agency_type: SOURCE_AGENT,
         ref_id,
       });
 

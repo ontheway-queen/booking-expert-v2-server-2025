@@ -35,22 +35,24 @@ class AdminAgentPaymentsValidator {
             status: joi_1.default.string().valid(constants_1.DEPOSIT_STATUS_PENDING, constants_1.DEPOSIT_STATUS_APPROVED, constants_1.DEPOSIT_STATUS_CANCELLED, constants_1.DEPOSIT_STATUS_REJECTED),
             limit: joi_1.default.number().optional(),
             skip: joi_1.default.number().optional(),
-            filter: joi_1.default.string()
+            filter: joi_1.default.string(),
         });
         this.updateDepositRequest = joi_1.default.object({
-            status: joi_1.default.string().valid(constants_1.DEPOSIT_STATUS_APPROVED, constants_1.DEPOSIT_STATUS_REJECTED).required()
+            status: joi_1.default.string()
+                .valid(constants_1.DEPOSIT_STATUS_APPROVED, constants_1.DEPOSIT_STATUS_REJECTED)
+                .required(),
         });
         this.adjustBalance = joi_1.default.object({
             agency_id: joi_1.default.number().required(),
-            type: joi_1.default.string().valid("Debit", "Credit"),
+            type: joi_1.default.string().valid('Debit', 'Credit'),
             amount: joi_1.default.number().required(),
             details: joi_1.default.string().required(),
-            ledger_date: joi_1.default.date().required()
+            ledger_date: joi_1.default.date().required(),
         });
         this.createADM = joi_1.default.object({
             booking_id: joi_1.default.number().required(),
             amount: joi_1.default.number().required(),
-            note: joi_1.default.string().optional()
+            note: joi_1.default.string().optional(),
         });
         this.getADM = joi_1.default.object({
             filter: joi_1.default.string(),
@@ -61,7 +63,7 @@ class AdminAgentPaymentsValidator {
         });
         this.updateADM = joi_1.default.object({
             amount: joi_1.default.number().optional(),
-            note: joi_1.default.string().optional()
+            note: joi_1.default.string().optional(),
         });
     }
 }

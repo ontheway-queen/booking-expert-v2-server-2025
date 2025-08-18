@@ -10,9 +10,11 @@ class FileFolder {
   static readonly B2C_TRAVELER_FILES = 'b2c/traveler-files';
   static readonly AGENCY_USER = 'agent/agency-user';
   static readonly AGENCY_FILES = 'agent/agency-files';
+  static readonly AGENCY_DEPOSIT_FILES = 'agent/deposit-files';
   static readonly AGENCY_Traveler_FILES = 'agent/traveler-files';
   static readonly AGENCY_B2C_FILES = 'agent/b2c/files';
   static readonly AGENCY_B2C_SITE_CONFIG = 'agent/b2c/site-config';
+  static readonly AGENCY_B2C_DEPOSIT_FILES = 'agent/b2c/deposit-files';
   static readonly AGENCY_B2C_SITE_CONFIG_HERO_BG = 'agent/b2c/hero-bg';
   static readonly AGENCY_B2C_SITE_CONFIG_OTHERS = 'agent/b2c/others';
   static readonly AGENCY_B2C_SITE_CONFIG_SOCIAL_ICONS =
@@ -26,9 +28,10 @@ class FileFolder {
   static readonly PACKAGE_FILE = 'package-file';
   static readonly VISA_FILES = 'visa-files';
   static readonly SPECIAL_OFFER = 'special-offer';
-  static readonly BANK_INVOICE_FILES = 'bank-invoice-files';
   static readonly AGENT_FLIGHT_BOOKING_FILES = 'agent/flight-booking-files';
   static readonly AGENT_SUPPORT_TICKET_FILES = 'agent/support-ticket-files';
+  static readonly AGENT_B2C_SUPPORT_TICKET_FILES =
+    'agent/b2c/support-ticket-files';
   static readonly AGENT_B2C_FLIGHT_BOOKING_FILES =
     'agent/b2c/flight-booking-files';
   static readonly AGENT_B2C_HOTEL_BOOKING_FILES =

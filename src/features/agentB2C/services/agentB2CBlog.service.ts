@@ -2,7 +2,7 @@ import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 
 export class AgentB2CBlogService extends AbstractServices {
-    //get blog list
+  //get blog list
   public async getBlogList(req: Request) {
     const { agency_id } = req.agencyB2CWhiteLabel;
 

@@ -33,7 +33,12 @@ class AgentPaymentsController extends abstract_controller_1.default {
         this.validator = new agentPayments_validator_1.AgentPaymentsValidator();
         this.createDepositRequest = this.asyncWrapper.wrap({ bodySchema: this.validator.createDeposit }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.createDepositRequest(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
         }));
         this.getSingleDepositRequest = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getSingleDepositReq(req), { code } = _a, rest = __rest(_a, ["code"]);

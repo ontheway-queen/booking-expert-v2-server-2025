@@ -135,7 +135,10 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const model = this.Model.UmrahPackageModel();
-            const data = yield model.getSingleUmrahPackage({ umrah_id: Number(id), is_deleted: false });
+            const data = yield model.getSingleUmrahPackage({
+                umrah_id: Number(id),
+                is_deleted: false,
+            });
             if (!data) {
                 return {
                     success: false,
@@ -231,10 +234,10 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                 //update images
                 if (files === null || files === void 0 ? void 0 : files.length) {
                     const imagePayload = [];
+                    const deletedFiles = [];
                     for (const file of files) {
                         if (file.fieldname === 'thumbnail') {
                             payload.thumbnail = file.filename;
-                            yield this.manageFile.deleteFromCloud([check.thumbnail]);
                         }
                         else {
                             imagePayload.push({
@@ -247,6 +250,7 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                     if (imagePayload.length) {
                         yield model.insertUmrahPackageImage(imagePayload);
                     }
+                    yield this.manageFile.deleteFromCloud(deletedFiles);
                 }
                 if (Object.keys(payload).length) {
                     yield model.updateUmrahPackage({ data: payload, umrah_id: Number(id) });
@@ -276,7 +280,9 @@ class AgentB2CSubUmrahService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: `You can't delete this package because ${booking.length > 1 ? `${booking.length} bookings` : `${booking.length} booking`} found for this package`,
+                        message: `You can't delete this package because ${booking.length > 1
+                            ? `${booking.length} bookings`
+                            : `${booking.length} booking`} found for this package`,
                     };
                 }
                 if (!data) {

@@ -177,15 +177,15 @@ export interface ICreateAgencyB2CSiteConfig {
 export interface IGetAgencyB2CSiteConfigData {
   id: number;
   agency_id: number;
-  main_logo?: string;
-  favicon?: string;
-  site_thumbnail?: string;
-  hero_quote?: string;
-  hero_sub_quote?: string;
-  site_name?: string;
-  emails?: string;
-  numbers?: string;
-  address?: string;
+  main_logo: string;
+  favicon: string;
+  site_thumbnail: string;
+  hero_quote: string;
+  hero_sub_quote: string;
+  site_name: string;
+  emails: string;
+  numbers: string;
+  address: string;
   contact_us_content?: string;
   contact_us_thumbnail?: string;
   about_us_content?: string;
@@ -201,6 +201,9 @@ export interface IGetAgencyB2CSiteConfigData {
   updated_by_name?: string;
   android_app_link?: string;
   ios_app_link?: string;
+  show_developer: boolean;
+  developer_name: string;
+  developer_link: string;
 }
 
 export interface IUpdateAgencyB2CSiteConfigPayload {
@@ -227,6 +230,9 @@ export interface IUpdateAgencyB2CSiteConfigPayload {
   updated_by: number;
   android_app_link?: string;
   ios_app_link?: string;
+  show_developer?: boolean;
+  developer_name?: string;
+  developer_link?: string;
 }
 
 export interface ICreateAgencyB2CSocialLinkPayload {

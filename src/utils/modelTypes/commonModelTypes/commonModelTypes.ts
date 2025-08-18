@@ -50,6 +50,7 @@ export interface IInsertLastNoPayload {
   last_id: number;
   type:
     | 'Agent'
+    | 'Sub_Agent'
     | 'Agent_Flight'
     | 'Agent_Visa'
     | 'Agent_Tour'
@@ -58,6 +59,7 @@ export interface IInsertLastNoPayload {
     | 'Agent_SupportTicket'
     | 'Agent_Hotel'
     | 'Agent_Deposit_Request'
+    | 'Agent_B2C_SupportTicket'
     | 'B2C_Deposit_Request'
     | 'User_Flight'
     | 'User_Visa'
@@ -78,6 +80,7 @@ export interface IUpdateLastNoPayload {
 export interface IGetLastIdParams {
   type:
     | 'Agent'
+    | 'Sub_Agent'
     | 'Agent_Flight'
     | 'Agent_Visa'
     | 'Agent_Tour'
@@ -86,6 +89,7 @@ export interface IGetLastIdParams {
     | 'Agent_SupportTicket'
     | 'Agent_Hotel'
     | 'Agent_Deposit_Request'
+    | 'Agent_B2C_SupportTicket'
     | 'B2C_Deposit_Request'
     | 'User_Flight'
     | 'User_Visa'

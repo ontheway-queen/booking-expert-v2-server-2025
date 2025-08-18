@@ -36,7 +36,12 @@ class AgentB2CSubUmrahController extends abstract_controller_1.default {
             bodySchema: this.validator.createUmrahSchema,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.services.createUmrahPackage(req), { code } = _a, data = __rest(_a, ["code"]);
-            res.status(code).json(data);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
         }));
         this.getUmrahPackageList = this.asyncWrapper.wrap({
             querySchema: this.validator.getUmrahListQuerySchema,
@@ -55,7 +60,12 @@ class AgentB2CSubUmrahController extends abstract_controller_1.default {
             paramSchema: this.commonValidator.singleParamNumValidator(),
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.services.updateUmrahPackage(req), { code } = _a, data = __rest(_a, ["code"]);
-            res.status(code).json(data);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
         }));
         this.deleteUmrahPackage = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),

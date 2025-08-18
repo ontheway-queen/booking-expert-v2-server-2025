@@ -23,10 +23,14 @@ export default class BlogModel extends Schema {
   }
 
   public async createBlog(payload: ICreateBlogPayload) {
-    return await this.db('blog').withSchema(this.SERVICE_SCHEMA).insert(payload);
+    return await this.db('blog')
+      .withSchema(this.SERVICE_SCHEMA)
+      .insert(payload);
   }
 
-  public async getSingleBlogPost(query: ISingleBlogPostQuery): Promise<IGetSingleBlogPayload> {
+  public async getSingleBlogPost(
+    query: ISingleBlogPostQuery
+  ): Promise<IGetSingleBlogPayload> {
     const { is_deleted = false } = query;
     return await this.db('blog')
       .withSchema(this.SERVICE_SCHEMA)
@@ -38,7 +42,6 @@ export default class BlogModel extends Schema {
         'meta_title',
         'meta_description',
         'cover_image',
-        'blog_for',
         'status'
       )
       .where((qb) => {
@@ -57,11 +60,20 @@ export default class BlogModel extends Schema {
       .first();
   }
 
-  public async getBlogList(query: IGetBlogListQuery): Promise<IGetBlogListPayloadWithTotal> {
+  public async getBlogList(
+    query: IGetBlogListQuery
+  ): Promise<IGetBlogListPayloadWithTotal> {
     const { is_deleted = false } = query;
     const result = await this.db('blog as b')
       .withSchema(this.SERVICE_SCHEMA)
-      .select('b.id', 'b.title', 'b.summary', 'b.cover_image', 'b.status', 'b.created_at')
+      .select(
+        'b.id',
+        'b.title',
+        'b.summary',
+        'b.cover_image',
+        'b.status',
+        'b.created_at'
+      )
       .where((qb) => {
         qb.andWhere('b.source_id', query.source_id);
         qb.andWhere('b.source_type', query.source_type);
@@ -126,17 +138,12 @@ export default class BlogModel extends Schema {
         'b.summary',
         'b.cover_image',
         'b.slug',
-        'b.meta_title',
-        'b.meta_description',
         'b.created_at as created_date'
       )
       .where((qb) => {
         qb.andWhere('b.source_type', SOURCE_AGENT);
         qb.andWhere('b.source_id', query.source_id);
         qb.andWhere('b.is_deleted', is_deleted);
-        qb.andWhere((subQb) => {
-          subQb.where('b.blog_for', BLOG_FOR_B2C).orWhere('b.blog_for', BLOG_FOR_BOTH);
-        });
 
         if (query.status !== undefined) {
           qb.andWhere('b.status', query.status);
@@ -165,9 +172,6 @@ export default class BlogModel extends Schema {
         qb.andWhere('b.source_type', SOURCE_AGENT);
         qb.andWhere('b.source_id', query.source_id);
         qb.andWhere('b.is_deleted', is_deleted);
-        qb.andWhere((subQb) => {
-          subQb.where('b.blog_for', BLOG_FOR_B2C).orWhere('b.blog_for', BLOG_FOR_BOTH);
-        });
 
         if (query.status !== undefined) {
           qb.andWhere('b.status', query.status);

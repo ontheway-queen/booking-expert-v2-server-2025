@@ -14,7 +14,12 @@ export default class AgentPaymentsController extends AbstractController {
     { bodySchema: this.validator.createDeposit },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.service.createDepositRequest(req);
-      res.status(code).json(rest);
+
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
     }
   );
 

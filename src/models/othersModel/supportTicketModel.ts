@@ -1,7 +1,12 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { DATA_LIMIT, SOURCE_AGENT } from '../../utils/miscellaneous/constants';
+import {
+  DATA_LIMIT,
+  SOURCE_AGENT,
+  SOURCE_AGENT_B2C,
+} from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
+  IGetAgencyB2CSupportTicketListQuery,
   IGetAgencySupportTicketListData,
   IGetAgencySupportTicketListQuery,
   IGetSingleAgentSupportTicketData,
@@ -74,6 +79,40 @@ export default class SupportTicketModel extends Schema {
       )
       .joinRaw(
         `LEFT JOIN admin.user_admin AS ua ON stm.reply_by = 'Admin' AND ua.id = stm.sender_id`
+      )
+      .where('stm.support_ticket_id', support_ticket_id)
+      .orderBy('stm.created_at', 'desc')
+      .limit(limit || DATA_LIMIT)
+      .offset(skip || 0);
+  }
+
+  public async getAgentB2CSupportTicketMessages({
+    support_ticket_id,
+    limit,
+    skip,
+  }: {
+    support_ticket_id: number;
+    limit?: number;
+    skip?: number;
+  }): Promise<IGetSupportTicketMessagesData[]> {
+    return this.db('support_ticket_messages AS stm')
+      .withSchema(this.DBO_SCHEMA)
+      .select(
+        'stm.id',
+        'stm.support_ticket_id',
+        'stm.sender_id',
+        this.db.raw('COALESCE(u.name, ua.name) as sender_name'),
+        this.db.raw('COALESCE(u.photo, au.photo) as sender_photo'),
+        'stm.message',
+        'stm.attachments',
+        'stm.reply_by',
+        'stm.created_at'
+      )
+      .joinRaw(
+        `LEFT JOIN agent_b2c.users AS u ON stm.reply_by = 'Customer' AND u.id = stm.sender_id`
+      )
+      .joinRaw(
+        `LEFT JOIN agent.agency_user AS au ON stm.reply_by = 'Admin' AND au.id = stm.sender_id`
       )
       .where('stm.support_ticket_id', support_ticket_id)
       .orderBy('stm.created_at', 'desc')
@@ -181,6 +220,106 @@ export default class SupportTicketModel extends Schema {
     return { data, total: total[0]?.total || 0 };
   }
 
+  public async getAgentB2CSupportTicket(
+    {
+      source_id,
+      limit,
+      priority,
+      reply_by,
+      skip,
+      status,
+      created_by_user_id,
+      from_date,
+      to_date,
+      ref_type,
+    }: IGetAgencyB2CSupportTicketListQuery,
+    need_total: boolean = false
+  ): Promise<{ data: IGetAgencySupportTicketListData[]; total: number }> {
+    const data = await this.db('support_tickets AS st')
+      .withSchema(this.DBO_SCHEMA)
+      .select(
+        'st.id',
+        'st.support_no',
+        'st.subject',
+        'st.priority',
+        'st.status',
+        'st.ref_type',
+        'u.username',
+        'u.name',
+        'u.email',
+        'u.photo',
+        'stm.message AS last_message',
+        'stm.reply_by',
+        'stm.created_at AS last_message_created_at',
+        'st.created_at'
+      )
+      .joinRaw(`LEFT JOIN agent_b2c.users AS u ON st.created_by_user_id = u.id`)
+      .leftJoin(
+        'support_ticket_messages AS stm',
+        'st.last_message_id',
+        'stm.id'
+      )
+      .where((qb) => {
+        qb.where('st.source_type', SOURCE_AGENT_B2C);
+        qb.where('st.source_id', source_id);
+
+        if (created_by_user_id) {
+          qb.where('st.created_by_user_id', created_by_user_id);
+        }
+        if (status) {
+          qb.where('st.status', status);
+        }
+        if (reply_by) {
+          qb.where('stm.reply_by', reply_by);
+        }
+        if (priority) {
+          qb.where('st.priority', priority);
+        }
+        if (ref_type) {
+          qb.where('st.ref_type', ref_type);
+        }
+        if (from_date && to_date) {
+          qb.whereBetween('st.created_at', [from_date, to_date]);
+        }
+      })
+      .orderBy('stm.created_at', 'desc')
+      .limit(limit || DATA_LIMIT)
+      .offset(skip || 0);
+
+    let total: any[] = [];
+
+    if (need_total) {
+      total = await this.db('support_tickets AS st')
+        .withSchema(this.DBO_SCHEMA)
+        .count('st.id AS total')
+        .where((qb) => {
+          qb.where('st.source_type', SOURCE_AGENT_B2C);
+          qb.where('st.source_id', source_id);
+
+          if (created_by_user_id) {
+            qb.where('st.created_by_user_id', created_by_user_id);
+          }
+          if (status) {
+            qb.where('st.status', status);
+          }
+          if (reply_by) {
+            qb.where('stm.reply_by', reply_by);
+          }
+          if (ref_type) {
+            qb.where('st.ref_type', ref_type);
+          }
+          if (priority) {
+            qb.where('st.priority', priority);
+          }
+          if (from_date && to_date) {
+            qb.whereBetween('st.created_at', [from_date, to_date]);
+          }
+        });
+    }
+
+    return { data, total: total[0]?.total || 0 };
+  }
+
   public async getSingleAgentSupportTicket({
     id,
     agent_id,
@@ -214,6 +353,48 @@ export default class SupportTicketModel extends Schema {
         qb.andWhere('st.source_type', SOURCE_AGENT);
         if (agent_id) {
           qb.andWhere('st.source_id', agent_id);
+        }
+      })
+      .first();
+  }
+
+  public async getSingleAgentB2CSupportTicket({
+    id,
+    source_id,
+    created_by_user_id,
+  }: {
+    id: number;
+    source_id: number;
+    created_by_user_id?: number;
+  }): Promise<IGetSingleAgentSupportTicketData | null> {
+    return await this.db('support_tickets AS st')
+      .withSchema(this.DBO_SCHEMA)
+      .select(
+        'st.id',
+        'st.support_no',
+        'st.ref_type',
+        'st.close_date',
+        'st.closed_by',
+        'st.reopen_date',
+        'st.reopen_by',
+        'st.created_by_user_id',
+        'st.created_by',
+        'st.ref_id',
+        'st.subject',
+        'st.status',
+        'u.username',
+        'u.name',
+        'u.email',
+        'u.photo',
+        'st.created_at'
+      )
+      .joinRaw(`LEFT JOIN agent_b2c.users AS u ON st.created_by_user_id = u.id`)
+      .where((qb) => {
+        qb.andWhere('st.id', id);
+        qb.andWhere('st.source_type', SOURCE_AGENT_B2C);
+        qb.andWhere('st.source_id', source_id);
+        if (created_by_user_id) {
+          qb.andWhere('st.created_by_user_id', created_by_user_id);
         }
       })
       .first();

@@ -289,7 +289,6 @@ class AuthChecker {
                 const check_token = yield agencyModel.getWhiteLabelPermission({
                     token: token,
                 });
-                console.log({ check_token });
                 if (!check_token) {
                     res
                         .status(statusCode_1.default.HTTP_UNAUTHORIZED)
@@ -299,7 +298,6 @@ class AuthChecker {
                 const check_agency = yield agencyModel.checkAgency({
                     agency_id: check_token === null || check_token === void 0 ? void 0 : check_token.agency_id,
                 });
-                console.log({ check_agency });
                 if (!check_agency ||
                     check_agency.status !== 'Active' ||
                     !check_agency.white_label) {
