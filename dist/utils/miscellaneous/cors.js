@@ -42,4 +42,6 @@ exports.origin = [
     'https://www.hopngo.net',
     'https://fgtoursntravels.com',
     'https://www.fgtoursntravels.com',
+    'https://travelarchitect.net',
+    'https://www.travelarchitect.net',
 ];
