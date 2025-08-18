@@ -8,8 +8,8 @@ const joi_1 = __importDefault(require("joi"));
 class AgentB2CVisaValidator {
     constructor() {
         this.getAllVisaListQuerySchema = joi_1.default.object({
-            country_id: joi_1.default.number().required(),
-            visa_type_id: joi_1.default.number().required(),
+            country_id: joi_1.default.number().optional(),
+            visa_type_id: joi_1.default.number().optional(),
         });
         this.traveler_types = [
             'ADT',

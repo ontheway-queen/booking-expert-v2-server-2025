@@ -55,4 +55,9 @@ export default class PublicCommonController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public getVisaType = this.asyncWrapper.wrap(null, async (req: Request, res: Response) => {
+    const { code, ...rest } = await this.service.getVisaType(req);
+    res.status(code).json(rest);
+  });
 }

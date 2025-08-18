@@ -142,8 +142,12 @@ class VisaModel extends schema_1.default {
                 qb.andWhere('v.is_deleted', query.is_deleted);
                 qb.andWhere('v.source_id', query.source_id);
                 qb.andWhere('v.source_type', constants_1.SOURCE_AGENT);
-                qb.andWhere('v.country_id', query.country_id);
-                qb.andWhere('v.visa_type_id', query.visa_type_id);
+                if (query.country_id) {
+                    qb.andWhere('v.country_id', query.country_id);
+                }
+                if (query.visa_type_id) {
+                    qb.andWhere('v.visa_type_id', query.visa_type_id);
+                }
                 qb.andWhere('v.status', query.status);
                 qb.andWhere((subQb) => {
                     subQb.andWhere('v.visa_for', visaConstants_1.VISA_FOR_B2C).orWhere('v.visa_for', visaConstants_1.VISA_FOR_BOTH);

@@ -142,5 +142,20 @@ class PublicCommonService extends abstract_service_1.default {
             }));
         });
     }
+    //get visa type
+    getVisaType(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const CommonModel = this.Model.CommonModel(trx);
+                const visaType = yield CommonModel.getVisaType();
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: visaType,
+                };
+            }));
+        });
+    }
 }
 exports.default = PublicCommonService;
