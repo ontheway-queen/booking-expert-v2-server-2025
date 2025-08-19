@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentB2CSubConfigService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
+const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AgentB2CSubConfigService extends abstract_service_1.default {
     getB2CMarkup(req) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -780,6 +781,178 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     created_by: user_id,
                     details: `Deleted Hot deals(${id}).`,
                     type: 'DELETE',
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }));
+        });
+    }
+    createVisaType(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const { name } = req.body;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const existingVisaType = yield configModel.getSingleVisaTypeByName({
+                    name: name,
+                    source_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT,
+                });
+                if (existingVisaType) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_CONFLICT,
+                        message: this.ResMsg.HTTP_CONFLICT,
+                    };
+                }
+                const payload = {
+                    name: name,
+                    source_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT,
+                };
+                yield configModel.createVisaType(payload);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                };
+            }));
+        });
+    }
+    getAllVisaType(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const configModel = this.Model.AgencyB2CConfigModel();
+            const visaTypes = yield configModel.getAllVisaType({
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: visaTypes,
+            };
+        });
+    }
+    deleteVisaType(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const { id } = req.params;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const checkVisaType = yield configModel.getSingleVisaType({
+                    id: Number(id),
+                });
+                if (!checkVisaType) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                // Check if any visa exists with this visa type
+                const visaModel = this.Model.VisaModel(trx);
+                const checkVisa = yield visaModel.checkVisaExistsByVisaType({ visa_type_id: Number(id) });
+                if (checkVisa.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'Cannot delete this visa type as it is associated with existing visas.',
+                    };
+                }
+                yield configModel.deleteVisaType({
+                    id: Number(id),
+                    source_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT,
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }));
+        });
+    }
+    createVisaMode(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const { name } = req.body;
+            const configModel = this.Model.AgencyB2CConfigModel();
+            const existingVisaMode = yield configModel.getSingleVisaModeByName({
+                name: name,
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+            });
+            if (existingVisaMode) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_CONFLICT,
+                    message: this.ResMsg.HTTP_CONFLICT,
+                };
+            }
+            const payload = {
+                name: name,
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+            };
+            yield configModel.createVisaMode(payload);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_SUCCESSFUL,
+                message: this.ResMsg.HTTP_SUCCESSFUL,
+            };
+        });
+    }
+    getAllVisaMode(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const configModel = this.Model.AgencyB2CConfigModel();
+            const visaModes = yield configModel.getAllVisaMode({
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: visaModes,
+            };
+        });
+    }
+    deleteVisaMode(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const { id } = req.params;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const checkVisaMode = yield configModel.getSingleVisaMode({
+                    id: Number(id),
+                });
+                if (!checkVisaMode) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                // Check if any visa exists with this visa mode
+                const visaModel = this.Model.VisaModel(trx);
+                const checkVisa = yield visaModel.checkVisaExistsByVisaMode({ visa_mode_id: Number(id) });
+                if (checkVisa.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'Cannot delete this visa mode as it is associated with existing visas.',
+                    };
+                }
+                yield configModel.deleteVisaMode({
+                    id: Number(id),
+                    source_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT,
                 });
                 return {
                     success: true,

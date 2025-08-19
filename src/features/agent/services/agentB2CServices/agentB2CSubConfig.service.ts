@@ -18,6 +18,7 @@ import {
   IUpdateAgencyB2CPopularDestinationPayload,
   IUpdateAgencyB2CPopularPlace,
 } from '../../../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types';
+import { SOURCE_AGENT } from '../../../../utils/miscellaneous/constants';
 
 export class AgentB2CSubConfigService extends AbstractServices {
   public async getB2CMarkup(req: Request) {
@@ -261,9 +262,9 @@ export class AgentB2CSubConfigService extends AbstractServices {
       await this.insertAgentAudit(trx, {
         agency_id,
         created_by: user_id,
-        details: `New bg content(${body.type}) created for ${
-          body.tab || 'all tab'
-        }(${files[0].filename}).`,
+        details: `New bg content(${body.type}) created for ${body.tab || 'all tab'}(${
+          files[0].filename
+        }).`,
         payload: JSON.stringify({
           ...body,
           content: files[0].filename,
@@ -947,6 +948,201 @@ export class AgentB2CSubConfigService extends AbstractServices {
         created_by: user_id,
         details: `Deleted Hot deals(${id}).`,
         type: 'DELETE',
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
+    });
+  }
+
+  public async createVisaType(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const { name } = req.body;
+
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+
+      const existingVisaType = await configModel.getSingleVisaTypeByName({
+        name: name,
+        source_id: agency_id,
+        source_type: SOURCE_AGENT,
+      });
+
+      if (existingVisaType) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_CONFLICT,
+          message: this.ResMsg.HTTP_CONFLICT,
+        };
+      }
+
+      const payload = {
+        name: name,
+        source_id: agency_id,
+        source_type: SOURCE_AGENT,
+      };
+
+      await configModel.createVisaType(payload);
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
+      };
+    });
+  }
+
+  public async getAllVisaType(req: Request) {
+    const { agency_id } = req.agencyUser;
+
+    const configModel = this.Model.AgencyB2CConfigModel();
+
+    const visaTypes = await configModel.getAllVisaType({
+      source_id: agency_id,
+      source_type: SOURCE_AGENT,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: visaTypes,
+    };
+  }
+
+  public async deleteVisaType(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const { id } = req.params;
+
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+
+      const checkVisaType = await configModel.getSingleVisaType({
+        id: Number(id),
+      });
+
+      if (!checkVisaType) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      // Check if any visa exists with this visa type
+      const visaModel = this.Model.VisaModel(trx);
+      const checkVisa = await visaModel.checkVisaExistsByVisaType({ visa_type_id: Number(id) });
+
+      if (checkVisa.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Cannot delete this visa type as it is associated with existing visas.',
+        };
+      }
+
+      await configModel.deleteVisaType({
+        id: Number(id),
+        source_id: agency_id,
+        source_type: SOURCE_AGENT,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
+    });
+  }
+
+  public async createVisaMode(req: Request) {
+    const { agency_id } = req.agencyUser;
+    const { name } = req.body;
+    const configModel = this.Model.AgencyB2CConfigModel();
+
+    const existingVisaMode = await configModel.getSingleVisaModeByName({
+      name: name,
+      source_id: agency_id,
+      source_type: SOURCE_AGENT,
+    });
+
+    if (existingVisaMode) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_CONFLICT,
+        message: this.ResMsg.HTTP_CONFLICT,
+      };
+    }
+
+    const payload = {
+      name: name,
+      source_id: agency_id,
+      source_type: SOURCE_AGENT,
+    };
+
+    await configModel.createVisaMode(payload);
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_SUCCESSFUL,
+      message: this.ResMsg.HTTP_SUCCESSFUL,
+    };
+  }
+
+  public async getAllVisaMode(req: Request) {
+    const { agency_id } = req.agencyUser;
+
+    const configModel = this.Model.AgencyB2CConfigModel();
+
+    const visaModes = await configModel.getAllVisaMode({
+      source_id: agency_id,
+      source_type: SOURCE_AGENT,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: visaModes,
+    };
+  }
+
+  public async deleteVisaMode(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const { id } = req.params;
+
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+
+      const checkVisaMode = await configModel.getSingleVisaMode({
+        id: Number(id),
+      });
+
+      if (!checkVisaMode) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      // Check if any visa exists with this visa mode
+      const visaModel = this.Model.VisaModel(trx);
+      const checkVisa = await visaModel.checkVisaExistsByVisaMode({ visa_mode_id: Number(id) });
+      if (checkVisa.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Cannot delete this visa mode as it is associated with existing visas.',
+        };
+      }
+
+      await configModel.deleteVisaMode({
+        id: Number(id),
+        source_id: agency_id,
+        source_type: SOURCE_AGENT,
       });
 
       return {

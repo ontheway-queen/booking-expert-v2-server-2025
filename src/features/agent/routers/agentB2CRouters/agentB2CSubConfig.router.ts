@@ -28,20 +28,14 @@ export default class AgentB2CSubConfigRouter extends AbstractRouter {
       .route('/hero-bg')
       .get(this.controller.getHeroBGContent)
       .post(
-        this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENCY_B2C_SITE_CONFIG_HERO_BG,
-          ['content']
-        ),
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG_HERO_BG, ['content']),
         this.controller.createHeroBGContent
       );
 
     this.router
       .route('/hero-bg/:id')
       .patch(
-        this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENCY_B2C_SITE_CONFIG_HERO_BG,
-          ['content']
-        ),
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG_HERO_BG, ['content']),
         this.controller.updateHeroBGContent
       )
       .delete(this.controller.deleteHeroBGContent);
@@ -50,20 +44,14 @@ export default class AgentB2CSubConfigRouter extends AbstractRouter {
       .route('/popular-dest')
       .get(this.controller.getPopularDestination)
       .post(
-        this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
-          ['thumbnail']
-        ),
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS, ['thumbnail']),
         this.controller.createPopularDestination
       );
 
     this.router
       .route('/popular-dest/:id')
       .patch(
-        this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
-          ['thumbnail']
-        ),
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS, ['thumbnail']),
         this.controller.updatePopularDestination
       )
       .delete(this.controller.deletePopularDestination);
@@ -72,20 +60,14 @@ export default class AgentB2CSubConfigRouter extends AbstractRouter {
       .route('/popular-place')
       .get(this.controller.getPopularPlace)
       .post(
-        this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
-          ['thumbnail']
-        ),
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS, ['thumbnail']),
         this.controller.createPopularPlace
       );
 
     this.router
       .route('/popular-place/:id')
       .patch(
-        this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
-          ['thumbnail']
-        ),
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS, ['thumbnail']),
         this.controller.updatePopularPlace
       )
       .delete(this.controller.deletePopularPlace);
@@ -94,22 +76,30 @@ export default class AgentB2CSubConfigRouter extends AbstractRouter {
       .route('/hot-deals')
       .get(this.controller.getHotDeals)
       .post(
-        this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
-          ['thumbnail']
-        ),
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS, ['thumbnail']),
         this.controller.createHotDeals
       );
 
     this.router
       .route('/hot-deals/:id')
       .patch(
-        this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS,
-          ['thumbnail']
-        ),
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS, ['thumbnail']),
         this.controller.updateHotDeals
       )
       .delete(this.controller.deleteHotDeals);
+
+    this.router
+      .route('/visa-type')
+      .post(this.controller.createVisaType)
+      .get(this.controller.getAllVisaType);
+
+    this.router.route('/visa-type/:id').delete(this.controller.deleteVisaType);
+
+    this.router
+      .route('/visa-mode')
+      .post(this.controller.createVisaMode)
+      .get(this.controller.getAllVisaMode);
+
+    this.router.route('/visa-mode/:id').delete(this.controller.deleteVisaMode);
   }
 }

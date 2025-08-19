@@ -179,7 +179,7 @@ export default class VisaModel extends Schema {
         qb.andWhere('v.is_deleted', query.is_deleted);
         qb.andWhere('v.source_id', query.source_id);
         qb.andWhere('v.source_type', SOURCE_AGENT);
-        
+
         if (query.country_id) {
           qb.andWhere('v.country_id', query.country_id);
         }
@@ -228,5 +228,27 @@ export default class VisaModel extends Schema {
         qb.andWhere('v.status', query.status);
       })
       .first();
+  }
+
+  public async getAgentB2CVisaTypeList(query: { source_id: number }) {
+    return this.db('visa_type')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('id', 'name')
+      .where('source_id', query.source_id)
+      .andWhere('source_type', SOURCE_AGENT);
+  }
+
+  public async checkVisaExistsByVisaType(query: { visa_type_id: number }) {
+    return this.db('visa')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('id')
+      .where('visa_type_id', query.visa_type_id);
+  }
+
+  public async checkVisaExistsByVisaMode(query: { visa_mode_id: number }) {
+    return this.db('visa')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('id')
+      .where('visa_mode_id', query.visa_mode_id);
   }
 }

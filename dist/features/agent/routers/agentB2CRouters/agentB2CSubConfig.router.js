@@ -56,6 +56,16 @@ class AgentB2CSubConfigRouter extends abstract_router_1.default {
             .route('/hot-deals/:id')
             .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_B2C_SITE_CONFIG_OTHERS, ['thumbnail']), this.controller.updateHotDeals)
             .delete(this.controller.deleteHotDeals);
+        this.router
+            .route('/visa-type')
+            .post(this.controller.createVisaType)
+            .get(this.controller.getAllVisaType);
+        this.router.route('/visa-type/:id').delete(this.controller.deleteVisaType);
+        this.router
+            .route('/visa-mode')
+            .post(this.controller.createVisaMode)
+            .get(this.controller.getAllVisaMode);
+        this.router.route('/visa-mode/:id').delete(this.controller.deleteVisaMode);
     }
 }
 exports.default = AgentB2CSubConfigRouter;

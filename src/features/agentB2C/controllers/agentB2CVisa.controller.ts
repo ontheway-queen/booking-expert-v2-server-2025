@@ -7,6 +7,15 @@ export class AgentB2CVisaController extends AbstractController {
   private service = new AgentB2CVisaService();
   private validator = new AgentB2CVisaValidator();
 
+  //get all visa type
+  public getAllVisaType = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getAllVisaType(req);
+      res.status(code).json(rest);
+    }
+  );
+
   //get all visa list
   public getAllVisaList = this.asyncWrapper.wrap(
     {

@@ -9,18 +9,10 @@ const constants_1 = require("../../../../../utils/miscellaneous/constants");
 class AgentB2CSubConfigValidator {
     constructor() {
         this.upsertB2CMarkup = joi_1.default.object({
-            flight_markup_type: joi_1.default.string()
-                .valid(constants_1.MARKUP_TYPE_PER, constants_1.MARKUP_TYPE_FLAT)
-                .required(),
-            hotel_markup_type: joi_1.default.string()
-                .valid(constants_1.MARKUP_TYPE_PER, constants_1.MARKUP_TYPE_FLAT)
-                .required(),
-            flight_markup_mode: joi_1.default.string()
-                .valid(constants_1.MARKUP_MODE_INCREASE, constants_1.MARKUP_MODE_DECREASE)
-                .required(),
-            hotel_markup_mode: joi_1.default.string()
-                .valid(constants_1.MARKUP_MODE_INCREASE, constants_1.MARKUP_MODE_DECREASE)
-                .required(),
+            flight_markup_type: joi_1.default.string().valid(constants_1.MARKUP_TYPE_PER, constants_1.MARKUP_TYPE_FLAT).required(),
+            hotel_markup_type: joi_1.default.string().valid(constants_1.MARKUP_TYPE_PER, constants_1.MARKUP_TYPE_FLAT).required(),
+            flight_markup_mode: joi_1.default.string().valid(constants_1.MARKUP_MODE_INCREASE, constants_1.MARKUP_MODE_DECREASE).required(),
+            hotel_markup_mode: joi_1.default.string().valid(constants_1.MARKUP_MODE_INCREASE, constants_1.MARKUP_MODE_DECREASE).required(),
             flight_markup: joi_1.default.number().required(),
             hotel_markup: joi_1.default.number().required(),
         });
@@ -93,6 +85,12 @@ class AgentB2CSubConfigValidator {
             link: joi_1.default.string().optional().trim(),
             status: joi_1.default.boolean().optional(),
             order_number: joi_1.default.number().optional(),
+        });
+        this.createVisaType = joi_1.default.object({
+            name: joi_1.default.string().required().trim(),
+        });
+        this.createVisaMode = joi_1.default.object({
+            name: joi_1.default.string().required().trim(),
         });
     }
 }

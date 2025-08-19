@@ -17,6 +17,22 @@ const abstract_service_1 = __importDefault(require("../../../abstract/abstract.s
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
 class AgentB2CVisaService extends abstract_service_1.default {
+    //get all visa type
+    getAllVisaType(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyB2CWhiteLabel;
+            const visaModel = this.Model.VisaModel();
+            const visaTypeList = yield visaModel.getAgentB2CVisaTypeList({
+                source_id: agency_id,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: visaTypeList,
+            };
+        });
+    }
     //Get all visa list
     getAllVisaList(req) {
         return __awaiter(this, void 0, void 0, function* () {

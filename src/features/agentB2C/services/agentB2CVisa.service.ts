@@ -5,6 +5,22 @@ import { SOURCE_AGENT, SOURCE_AGENT_B2C } from '../../../utils/miscellaneous/con
 import { IVisaApplicationPayload } from '../utils/types/agentB2CVisa.types';
 
 export class AgentB2CVisaService extends AbstractServices {
+  //get all visa type
+  public async getAllVisaType(req: Request) {
+    const { agency_id } = req.agencyB2CWhiteLabel;
+    const visaModel = this.Model.VisaModel();
+
+    const visaTypeList = await visaModel.getAgentB2CVisaTypeList({
+      source_id: agency_id,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: visaTypeList,
+    };
+  }
 
   //Get all visa list
   public async getAllVisaList(req: Request) {

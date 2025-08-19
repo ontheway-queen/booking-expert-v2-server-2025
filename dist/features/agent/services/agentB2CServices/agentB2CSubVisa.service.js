@@ -29,42 +29,44 @@ const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AgentB2CSubVisaService extends abstract_service_1.default {
     createVisa(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id, user_id } = req.agencyUser;
-            const model = this.Model.VisaModel();
-            const files = req.files || [];
-            const reqBody = req.body;
-            const { slug } = reqBody, payload = __rest(reqBody, ["slug"]);
-            const check_slug = yield model.checkVisa({
-                slug,
-                is_deleted: false,
-                source_id: agency_id,
-            });
-            if (check_slug.length) {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id, user_id } = req.agencyUser;
+                const model = this.Model.VisaModel(trx);
+                const files = req.files || [];
+                const reqBody = req.body;
+                const { slug } = reqBody, payload = __rest(reqBody, ["slug"]);
+                const check_slug = yield model.checkVisa({
+                    slug,
+                    is_deleted: false,
+                    source_id: agency_id,
+                });
+                if (check_slug.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_CONFLICT,
+                        message: this.ResMsg.SLUG_EXISTS,
+                    };
+                }
+                payload.slug = slug;
+                payload.source_type = constants_1.SOURCE_AGENT;
+                payload.source_id = agency_id;
+                payload.created_by = user_id;
+                const image = files.find((file) => file.fieldname === 'image');
+                if (!image) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'Image is required',
+                    };
+                }
+                payload.image = image.filename;
+                yield model.createVisa(payload);
                 return {
-                    success: false,
-                    code: this.StatusCode.HTTP_CONFLICT,
-                    message: this.ResMsg.SLUG_EXISTS,
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: 'Visa created successfully',
                 };
-            }
-            payload.slug = slug;
-            payload.source_type = constants_1.SOURCE_AGENT;
-            payload.source_id = agency_id;
-            payload.created_by = user_id;
-            const image = files.find((file) => file.fieldname === 'image');
-            if (!image) {
-                return {
-                    success: false,
-                    code: this.StatusCode.HTTP_BAD_REQUEST,
-                    message: 'Image is required',
-                };
-            }
-            payload.image = image.filename;
-            yield model.createVisa(payload);
-            return {
-                success: true,
-                code: this.StatusCode.HTTP_SUCCESSFUL,
-                message: 'Visa created successfully',
-            };
+            }));
         });
     }
     getVisaList(req) {
@@ -75,11 +77,11 @@ class AgentB2CSubVisaService extends abstract_service_1.default {
             const { data, total } = yield visaModel.getVisaList({
                 filter,
                 country_id,
-                source_id: agency_id,
-                source_type: constants_1.SOURCE_AGENT,
                 status,
                 limit,
                 skip,
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
                 is_deleted: false,
             });
             return {
@@ -119,55 +121,57 @@ class AgentB2CSubVisaService extends abstract_service_1.default {
     }
     updateVisa(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const { agency_id } = req.agencyUser;
-            const visaModel = this.Model.VisaModel();
-            const checkExist = yield visaModel.getSingleVisa({
-                is_deleted: false,
-                source_id: agency_id,
-                source_type: constants_1.SOURCE_AGENT,
-                id: Number(id),
-            });
-            if (!checkExist) {
-                return {
-                    success: false,
-                    code: this.StatusCode.HTTP_NOT_FOUND,
-                    message: this.ResMsg.HTTP_NOT_FOUND,
-                };
-            }
-            const payload = req.body;
-            if (payload.slug) {
-                const check_slug = yield visaModel.checkVisa({
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { id } = req.params;
+                const { agency_id } = req.agencyUser;
+                const visaModel = this.Model.VisaModel(trx);
+                const checkExist = yield visaModel.getSingleVisa({
                     is_deleted: false,
                     source_id: agency_id,
-                    slug: payload.slug,
+                    source_type: constants_1.SOURCE_AGENT,
+                    id: Number(id),
                 });
-                if (check_slug.length && check_slug[0].id !== Number(id)) {
+                if (!checkExist) {
                     return {
                         success: false,
-                        code: this.StatusCode.HTTP_CONFLICT,
-                        message: this.ResMsg.SLUG_EXISTS,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-            }
-            const files = req.files || [];
-            const image = files.find((file) => file.fieldname === 'image');
-            const deleteImage = [];
-            if (image) {
-                payload.image = image.filename;
-                deleteImage.push(checkExist.image);
-            }
-            if (payload && Object.keys(payload).length) {
-                yield visaModel.updateVisa(payload, Number(id));
-            }
-            if (deleteImage.length) {
-                this.manageFile.deleteFromCloud(deleteImage);
-            }
-            return {
-                success: true,
-                code: this.StatusCode.HTTP_OK,
-                message: 'Visa updated successfully',
-            };
+                const payload = req.body;
+                if (payload.slug) {
+                    const check_slug = yield visaModel.checkVisa({
+                        is_deleted: false,
+                        source_id: agency_id,
+                        slug: payload.slug,
+                    });
+                    if (check_slug.length && check_slug[0].id !== Number(id)) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_CONFLICT,
+                            message: this.ResMsg.SLUG_EXISTS,
+                        };
+                    }
+                }
+                const files = req.files || [];
+                const image = files.find((file) => file.fieldname === 'image');
+                const deleteImage = [];
+                if (image) {
+                    payload.image = image.filename;
+                    deleteImage.push(checkExist.image);
+                }
+                if (payload && Object.keys(payload).length) {
+                    yield visaModel.updateVisa(payload, Number(id));
+                }
+                if (deleteImage.length) {
+                    this.manageFile.deleteFromCloud(deleteImage);
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: 'Visa updated successfully',
+                };
+            }));
         });
     }
     deleteVisa(req) {

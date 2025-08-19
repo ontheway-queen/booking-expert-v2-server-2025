@@ -173,5 +173,30 @@ class VisaModel extends schema_1.default {
                 .first();
         });
     }
+    getAgentB2CVisaTypeList(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db('visa_type')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('id', 'name')
+                .where('source_id', query.source_id)
+                .andWhere('source_type', constants_1.SOURCE_AGENT);
+        });
+    }
+    checkVisaExistsByVisaType(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db('visa')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('id')
+                .where('visa_type_id', query.visa_type_id);
+        });
+    }
+    checkVisaExistsByVisaMode(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db('visa')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('id')
+                .where('visa_mode_id', query.visa_mode_id);
+        });
+    }
 }
 exports.default = VisaModel;

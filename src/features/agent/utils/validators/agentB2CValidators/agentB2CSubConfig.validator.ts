@@ -17,18 +17,10 @@ import {
 
 export class AgentB2CSubConfigValidator {
   public upsertB2CMarkup = Joi.object({
-    flight_markup_type: Joi.string()
-      .valid(MARKUP_TYPE_PER, MARKUP_TYPE_FLAT)
-      .required(),
-    hotel_markup_type: Joi.string()
-      .valid(MARKUP_TYPE_PER, MARKUP_TYPE_FLAT)
-      .required(),
-    flight_markup_mode: Joi.string()
-      .valid(MARKUP_MODE_INCREASE, MARKUP_MODE_DECREASE)
-      .required(),
-    hotel_markup_mode: Joi.string()
-      .valid(MARKUP_MODE_INCREASE, MARKUP_MODE_DECREASE)
-      .required(),
+    flight_markup_type: Joi.string().valid(MARKUP_TYPE_PER, MARKUP_TYPE_FLAT).required(),
+    hotel_markup_type: Joi.string().valid(MARKUP_TYPE_PER, MARKUP_TYPE_FLAT).required(),
+    flight_markup_mode: Joi.string().valid(MARKUP_MODE_INCREASE, MARKUP_MODE_DECREASE).required(),
+    hotel_markup_mode: Joi.string().valid(MARKUP_MODE_INCREASE, MARKUP_MODE_DECREASE).required(),
     flight_markup: Joi.number().required(),
     hotel_markup: Joi.number().required(),
   });
@@ -127,5 +119,14 @@ export class AgentB2CSubConfigValidator {
     link: Joi.string().optional().trim(),
     status: Joi.boolean().optional(),
     order_number: Joi.number().optional(),
+  });
+
+  public createVisaType = Joi.object({
+    name: Joi.string().required().trim(),
+  });
+
+
+  public createVisaMode = Joi.object({
+    name: Joi.string().required().trim(),
   });
 }
