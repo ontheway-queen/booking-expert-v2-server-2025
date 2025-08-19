@@ -157,7 +157,7 @@ class AgentB2CSubVisaService extends abstract_service_1.default {
                 payload.image = image.filename;
                 deleteImage.push(checkExist.image);
             }
-            if (Object.entries(payload).length) {
+            if (payload && Object.keys(payload).length) {
                 yield visaModel.updateVisa(payload, Number(id));
             }
             if (deleteImage.length) {

@@ -157,8 +157,7 @@ export class AgentB2CSubVisaService extends AbstractServices {
       deleteImage.push(checkExist.image);
     }
 
-
-    if (Object.entries(payload).length) {
+    if (payload && Object.keys(payload).length) {
       await visaModel.updateVisa(payload, Number(id));
     }
 
