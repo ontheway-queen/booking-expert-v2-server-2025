@@ -175,3 +175,12 @@ export interface IGetAgentB2CSingleVisaData{
   meta_title:string,
   meta_description:string
 }
+
+
+export interface IGetAllVisaCreatedCountryQuery{
+  is_deleted: boolean;
+  source_id: number;
+  source_type: string;
+  status: boolean;
+  visa_for: string;
+}

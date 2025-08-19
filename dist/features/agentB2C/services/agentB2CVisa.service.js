@@ -33,6 +33,27 @@ class AgentB2CVisaService extends abstract_service_1.default {
             };
         });
     }
+    //get all visa created country
+    getAllVisaCreatedCountry(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyB2CWhiteLabel;
+            const visaModel = this.Model.VisaModel();
+            console.log('agency_id', agency_id);
+            const countryList = yield visaModel.getAllVisaCreatedCountry({
+                is_deleted: false,
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+                status: true,
+                visa_for: constants_1.SOURCE_B2C
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: countryList,
+            };
+        });
+    }
     //Get all visa list
     getAllVisaList(req) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -22,6 +22,10 @@ class AgentB2CVisaRouter extends abstract_router_1.default {
             .post(this.authChecker.agencyB2CUserAuthChecker, this.uploader.cloudUploadRaw(this.fileFolders.AGENT_B2C_VISA_FILES), this.controller.createVisaApplication);
         //Get visa Type
         this.router.route('/visa-type').get(this.controller.getAllVisaType);
+        //Get all visa created country
+        this.router
+            .route('/country')
+            .get(this.controller.getAllVisaCreatedCountry);
         //get all visa application
         this.router
             .route('/applications')

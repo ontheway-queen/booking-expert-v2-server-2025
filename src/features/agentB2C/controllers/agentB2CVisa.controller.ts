@@ -8,10 +8,16 @@ export class AgentB2CVisaController extends AbstractController {
   private validator = new AgentB2CVisaValidator();
 
   //get all visa type
-  public getAllVisaType = this.asyncWrapper.wrap(
+  public getAllVisaType = this.asyncWrapper.wrap(null, async (req: Request, res: Response) => {
+    const { code, ...rest } = await this.service.getAllVisaType(req);
+    res.status(code).json(rest);
+  });
+
+  //get all visa created country
+  public getAllVisaCreatedCountry = this.asyncWrapper.wrap(
     null,
     async (req: Request, res: Response) => {
-      const { code, ...rest } = await this.service.getAllVisaType(req);
+      const { code, ...rest } = await this.service.getAllVisaCreatedCountry(req);
       res.status(code).json(rest);
     }
   );
@@ -53,7 +59,6 @@ export class AgentB2CVisaController extends AbstractController {
       }
     }
   );
-
 
   //get visa application list
   public getVisaApplicationList = this.asyncWrapper.wrap(

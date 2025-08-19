@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
 import Lib from '../../../utils/lib/lib';
-import { SOURCE_AGENT, SOURCE_AGENT_B2C } from '../../../utils/miscellaneous/constants';
+import { SOURCE_AGENT, SOURCE_AGENT_B2C, SOURCE_B2C } from '../../../utils/miscellaneous/constants';
 import { IVisaApplicationPayload } from '../utils/types/agentB2CVisa.types';
 
 export class AgentB2CVisaService extends AbstractServices {
@@ -19,6 +19,31 @@ export class AgentB2CVisaService extends AbstractServices {
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
       data: visaTypeList,
+    };
+  }
+
+
+  //get all visa created country
+  public async getAllVisaCreatedCountry(req:Request){
+    const { agency_id } = req.agencyB2CWhiteLabel;
+    const visaModel = this.Model.VisaModel();
+
+    console.log('agency_id', agency_id);
+
+    const countryList = await visaModel.getAllVisaCreatedCountry({
+      is_deleted: false,
+      source_id: agency_id,
+      source_type: SOURCE_AGENT,
+      status: true,
+      visa_for:SOURCE_B2C
+    });
+
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: countryList,
     };
   }
 

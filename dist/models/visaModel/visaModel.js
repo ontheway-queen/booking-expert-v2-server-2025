@@ -137,7 +137,8 @@ class VisaModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db('visa as v')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('v.id', 'v.title', 'v.image', 'v.processing_fee', 'v.visa_fee', 'v.max_validity', 'v.slug')
+                .select('v.id', 'v.title', 'c.nice_name as country_name', 'v.image', 'v.processing_fee', 'v.visa_fee', 'v.max_validity', 'v.slug')
+                .joinRaw(`LEFT JOIN public.country AS c ON v.country_id = c.id`)
                 .where((qb) => {
                 qb.andWhere('v.is_deleted', query.is_deleted);
                 qb.andWhere('v.source_id', query.source_id);
@@ -196,6 +197,24 @@ class VisaModel extends schema_1.default {
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id')
                 .where('visa_mode_id', query.visa_mode_id);
+        });
+    }
+    getAllVisaCreatedCountry(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('query', query);
+            return this.db('visa as v')
+                .withSchema(this.SERVICE_SCHEMA)
+                .distinct('c.id', 'c.name', 'c.iso', 'c.iso3', 'c.phone_code')
+                .joinRaw(`LEFT JOIN public.country AS c ON c.id = v.country_id`)
+                .where((qb) => {
+                qb.andWhere('is_deleted', query.is_deleted);
+                qb.andWhere('source_type', query.source_type);
+                qb.andWhere('source_id', query.source_id);
+                qb.andWhere('status', query.status);
+                qb.andWhere((subQb) => {
+                    subQb.where('v.visa_for', query.visa_for).orWhere('v.visa_for', visaConstants_1.VISA_FOR_BOTH);
+                });
+            });
         });
     }
 }

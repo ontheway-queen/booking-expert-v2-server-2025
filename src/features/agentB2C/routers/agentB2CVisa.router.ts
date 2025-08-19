@@ -25,6 +25,10 @@ export default class AgentB2CVisaRouter extends AbstractRouter {
 
     //Get visa Type
     this.router.route('/visa-type').get(this.controller.getAllVisaType);
+    //Get all visa created country
+    this.router
+      .route('/country')
+      .get(this.controller.getAllVisaCreatedCountry);
 
     //get all visa application
     this.router

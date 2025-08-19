@@ -37,6 +37,11 @@ class AgentB2CVisaController extends abstract_controller_1.default {
             const _a = yield this.service.getAllVisaType(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        //get all visa created country
+        this.getAllVisaCreatedCountry = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getAllVisaCreatedCountry(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
         //get all visa list
         this.getAllVisaList = this.asyncWrapper.wrap({
             querySchema: this.validator.getAllVisaListQuerySchema,
