@@ -132,4 +132,19 @@ export default class PublicCommonService extends AbstractServices {
       };
     });
   }
+
+
+  //get visa type
+  public async getVisaType(req: Request) {
+    return this.db.transaction(async (trx)=>{
+      const CommonModel = this.Model.CommonModel(trx);
+      const visaType = await CommonModel.getVisaType();
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: visaType,
+      };
+    })
+  }
 }

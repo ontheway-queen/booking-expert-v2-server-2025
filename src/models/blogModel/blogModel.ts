@@ -1,4 +1,5 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
+import { BLOG_FOR_B2C, BLOG_FOR_BOTH } from '../../utils/miscellaneous/blogConstants';
 import { SOURCE_AGENT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {

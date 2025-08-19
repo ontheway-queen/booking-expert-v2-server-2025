@@ -29,7 +29,7 @@ class AgentB2CRouter extends abstract_router_1.default {
         this.agentB2CSubUmrahRouter = new agentB2CSubUmrah_router_1.default();
         this.agentB2CSubUsersRouter = new agentB2CSubUsers_router_1.default();
         this.agentB2CSubVisaRouter = new agentB2CSubVisa_router_1.default();
-        this.AgentB2CSubBlogRouter = new agentB2CSubBlog_router_1.default();
+        this.agentB2CSubBlogRouter = new agentB2CSubBlog_router_1.default();
         this.agentB2CSubSiteConfigRouter = new agentB2CSubSiteConfig_router_1.default();
         this.agentB2CSubPaymentRouter = new agentB2CSubPayment_router_1.default();
         this.callRouter();
@@ -44,7 +44,7 @@ class AgentB2CRouter extends abstract_router_1.default {
         this.router.use('/hotel', this.agentB2CSubHotelRouter.router);
         this.router.use('/umrah', this.agentB2CSubUmrahRouter.router);
         this.router.use('/group-fare', this.agentB2CSubGroupFareRouter.router);
-        this.router.use('/blog', this.AgentB2CSubBlogRouter.router);
+        this.router.use('/blog', this.agentB2CSubBlogRouter.router);
         this.router.use('/site-config', this.agentB2CSubSiteConfigRouter.router);
         this.router.use('/payments', this.agentB2CSubPaymentRouter.router);
     }

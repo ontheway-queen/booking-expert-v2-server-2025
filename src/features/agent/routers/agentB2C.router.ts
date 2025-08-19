@@ -23,9 +23,10 @@ export default class AgentB2CRouter extends AbstractRouter {
   private agentB2CSubUmrahRouter = new AgentB2CSubUmrahRouter();
   private agentB2CSubUsersRouter = new AgentB2CSubUsersRouter();
   private agentB2CSubVisaRouter = new AgentB2CSubVisaRouter();
-  private AgentB2CSubBlogRouter = new AgentB2CSubBlogRouter();
+  private agentB2CSubBlogRouter = new AgentB2CSubBlogRouter();
   private agentB2CSubSiteConfigRouter = new AgentB2CSubSiteConfigRouter();
   private agentB2CSubPaymentRouter = new AgentB2CSubPaymentRouter();
+
 
   constructor() {
     super();
@@ -42,7 +43,7 @@ export default class AgentB2CRouter extends AbstractRouter {
     this.router.use('/hotel', this.agentB2CSubHotelRouter.router);
     this.router.use('/umrah', this.agentB2CSubUmrahRouter.router);
     this.router.use('/group-fare', this.agentB2CSubGroupFareRouter.router);
-    this.router.use('/blog', this.AgentB2CSubBlogRouter.router);
+    this.router.use('/blog', this.agentB2CSubBlogRouter.router);
     this.router.use('/site-config', this.agentB2CSubSiteConfigRouter.router);
     this.router.use('/payments', this.agentB2CSubPaymentRouter.router);
   }
