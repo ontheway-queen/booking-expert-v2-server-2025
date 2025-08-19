@@ -91,6 +91,17 @@ class AdminConfigValidator {
             name: joi_1.default.string().required(),
             type: joi_1.default.string().valid('Bank', 'MFS').required(),
         });
+        this.getSocialMedia = joi_1.default.object({
+            status: joi_1.default.boolean().optional(),
+            filter: joi_1.default.string().optional(),
+        });
+        this.updateSocialMedia = joi_1.default.object({
+            name: joi_1.default.string().optional(),
+            status: joi_1.default.boolean().optional(),
+        });
+        this.createSocialMedia = joi_1.default.object({
+            name: joi_1.default.string().required(),
+        });
     }
 }
 exports.default = AdminConfigValidator;

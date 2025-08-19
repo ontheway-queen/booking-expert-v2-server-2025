@@ -234,19 +234,20 @@ class AgencyB2CConfigModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('social_links')
                 .withSchema(this.AGENT_B2C_SCHEMA)
-                .insert(payload);
+                .insert(payload, 'id');
         });
     }
     getSocialLink(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('social_links')
+            return yield this.db('social_links AS sl')
                 .withSchema(this.AGENT_B2C_SCHEMA)
-                .select('*')
-                .orderBy('order_number', 'asc')
-                .andWhere('agency_id', query.agency_id)
+                .select('sl.id', 'sl.link', 'sl.status', 'sl.order_number', 'sl.social_media_id', 'sm.name AS media', 'sm.logo')
+                .joinRaw(`LEFT JOIN public.social_media AS sm ON sl.social_media_id = sm.id`)
+                .orderBy('sl.order_number', 'asc')
+                .andWhere('sl.agency_id', query.agency_id)
                 .where((qb) => {
                 if (query.status !== undefined) {
-                    qb.andWhere('status', query.status);
+                    qb.andWhere('sl.status', query.status);
                 }
             });
         });

@@ -103,11 +103,11 @@ class AgentB2CSubSiteConfigValidator {
             content: joi_1.default.string().optional(),
         });
         this.createSocialLinks = joi_1.default.object({
-            media: joi_1.default.string().required().trim(),
+            social_media_id: joi_1.default.number().required(),
             link: joi_1.default.string().required().trim(),
         });
         this.updateSocialLinks = joi_1.default.object({
-            media: joi_1.default.string().optional().trim(),
+            social_media_id: joi_1.default.number().optional(),
             link: joi_1.default.string().optional().trim(),
             status: joi_1.default.boolean().optional(),
             order_number: joi_1.default.number().optional(),

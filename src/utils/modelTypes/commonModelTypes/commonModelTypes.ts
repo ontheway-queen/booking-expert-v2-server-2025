@@ -146,3 +146,19 @@ export interface IGetBanksData {
   logo: string;
   status: boolean;
 }
+
+export interface IInsertSocialMedia {
+  name: string;
+  logo: string;
+}
+export interface IUpdateSocialMediaPayload {
+  name?: string;
+  logo?: string;
+  status?: boolean;
+}
+export interface IGetSocialMediaData {
+  id: number;
+  name: string;
+  logo: string;
+  status: boolean;
+}

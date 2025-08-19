@@ -54,24 +54,12 @@ export default class AgentB2CSubSiteConfigRouter extends AbstractRouter {
     this.router
       .route('/social-links')
       .get(this.controller.getSocialLinks)
-      .post(
-        this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENCY_B2C_SITE_CONFIG_SOCIAL_ICONS,
-          ['icon']
-        ),
-        this.controller.createSocialLinks
-      );
+      .post(this.controller.createSocialLinks);
 
     this.router
       .route('/social-links/:id')
       .delete(this.controller.deleteSocialLinks)
-      .patch(
-        this.uploader.cloudUploadRaw(
-          this.fileFolders.AGENCY_B2C_SITE_CONFIG_SOCIAL_ICONS,
-          ['icon']
-        ),
-        this.controller.updateSocialLinks
-      );
+      .patch(this.controller.updateSocialLinks);
 
     this.router
       .route('/pop-up-banner')

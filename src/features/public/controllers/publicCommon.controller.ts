@@ -56,8 +56,19 @@ export default class PublicCommonController extends AbstractController {
     }
   );
 
-  public getVisaType = this.asyncWrapper.wrap(null, async (req: Request, res: Response) => {
-    const { code, ...rest } = await this.service.getVisaType(req);
-    res.status(code).json(rest);
-  });
+  public getSocialMedia = this.asyncWrapper.wrap(
+    { bodySchema: this.commonValidator.getBanks },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getSocialMedia(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public getVisaType = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getVisaType(req);
+      res.status(code).json(rest);
+    }
+  );
 }

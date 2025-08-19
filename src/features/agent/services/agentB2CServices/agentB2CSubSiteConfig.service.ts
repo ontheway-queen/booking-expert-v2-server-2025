@@ -442,20 +442,12 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
 
       await configModel.deleteSocialLink({ agency_id, id });
 
-      if (check.icon) {
-        await this.manageFile.deleteFromCloud([check.icon]);
-      }
-
       await this.insertAgentAudit(trx, {
         agency_id,
         created_by: user_id,
         details: `Deleted social media link [${check.media}(${check.link})]`,
         type: 'DELETE',
       });
-
-      if (check.icon) {
-        await this.manageFile.deleteFromCloud([check.icon]);
-      }
 
       return {
         success: true,
@@ -468,28 +460,36 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
   public async createSocialLinks(req: Request) {
     return this.db.transaction(async (trx) => {
       const configModel = this.Model.AgencyB2CConfigModel(trx);
+      const CommonModel = this.Model.CommonModel(trx);
       const { agency_id, user_id } = req.agencyUser;
 
       const body = req.body as {
-        media: string;
+        social_media_id: number;
         link: string;
       };
 
-      const files = (req.files as Express.Multer.File[]) || [];
+      const socialMedia = await CommonModel.checkSocialMedia(
+        body.social_media_id
+      );
+
+      if (!socialMedia) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: 'Social media not found',
+        };
+      }
 
       const lastNo = await configModel.getSocialLinkLastNo({ agency_id });
 
       const payload: ICreateAgencyB2CSocialLinkPayload = {
         agency_id,
         order_number: lastNo?.order_number ? lastNo.order_number + 1 : 1,
-        ...body,
+        link: body.link,
+        social_media_id: body.social_media_id,
       };
 
-      if (files.length) {
-        payload.icon = files[0].filename;
-      }
-
-      await configModel.insertSocialLink(payload);
+      const newSocialMedia = await configModel.insertSocialLink(payload);
 
       await this.insertAgentAudit(trx, {
         agency_id,
@@ -504,7 +504,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: this.ResMsg.HTTP_SUCCESSFUL,
         data: {
-          icon: payload.icon,
+          id: newSocialMedia[0].id,
         },
       };
     });
@@ -533,13 +533,7 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         order_number?: number;
       };
 
-      const files = (req.files as Express.Multer.File[]) || [];
-
       const payload: IUpdateAgencyB2CSocialLinkPayload = body;
-
-      if (files.length) {
-        payload.icon = files[0].filename;
-      }
 
       await configModel.updateSocialLink(payload, { agency_id, id });
 
@@ -551,17 +545,10 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
         type: 'UPDATE',
       });
 
-      if (payload.icon && check.icon) {
-        await this.manageFile.deleteFromCloud([check.icon]);
-      }
-
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: this.ResMsg.HTTP_SUCCESSFUL,
-        data: {
-          icon: payload.icon,
-        },
       };
     });
   }

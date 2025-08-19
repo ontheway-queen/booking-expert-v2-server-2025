@@ -3,6 +3,7 @@ class FileFolder {
   static readonly PROMOTIONAL_FILES = 'promotional-files';
   static readonly ARTICLE_FILES = 'article-files';
   static readonly BANK_LOGO = 'bank-logo';
+  static readonly SOCIAL_MEDIA = 'social-media';
   static readonly ADMIN_FILES = 'admin/admin-files';
   static readonly COMMON_FILES = 'common-files';
   static readonly B2C_USER_FILES = 'b2c/user-files';
@@ -17,8 +18,6 @@ class FileFolder {
   static readonly AGENCY_B2C_DEPOSIT_FILES = 'agent/b2c/deposit-files';
   static readonly AGENCY_B2C_SITE_CONFIG_HERO_BG = 'agent/b2c/hero-bg';
   static readonly AGENCY_B2C_SITE_CONFIG_OTHERS = 'agent/b2c/others';
-  static readonly AGENCY_B2C_SITE_CONFIG_SOCIAL_ICONS =
-    'agent/b2c/social-icons';
   static readonly AGENCY_B2C_SITE_CONFIG_POP_UP = 'agent/b2c/pop-up';
   static readonly AGENCY_B2C_TRAVELER_FILES = 'agent/b2c/traveler';
   static readonly ADMIN_HOLIDAY_PACKAGE = 'admin/holiday-package';

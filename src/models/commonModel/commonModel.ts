@@ -1,5 +1,8 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { DATA_LIMIT, OTP_DEFAULT_EXPIRY } from '../../utils/miscellaneous/constants';
+import {
+  DATA_LIMIT,
+  OTP_DEFAULT_EXPIRY,
+} from '../../utils/miscellaneous/constants';
 import { PRIORITY_AIRPORTS } from '../../utils/miscellaneous/flightConstant';
 import Schema from '../../utils/miscellaneous/schema';
 import {
@@ -11,14 +14,17 @@ import {
   IGetLastIdData,
   IGetLastIdParams,
   IGetOTPPayload,
+  IGetSocialMediaData,
   IInsertBanks,
   IInsertEmailSubscriberPayload,
   IInsertLastNoPayload,
   IInsertOTPPayload,
+  IInsertSocialMedia,
   IUpdateAirlinesPayload,
   IUpdateAirportPayload,
   IUpdateBankPayload,
   IUpdateLastNoPayload,
+  IUpdateSocialMediaPayload,
 } from '../../utils/modelTypes/commonModelTypes/commonModelTypes';
 
 class CommonModel extends Schema {
@@ -37,7 +43,9 @@ class CommonModel extends Schema {
       .andWhere('email', payload.email)
       .andWhere('type', payload.type)
       .andWhere('matched', 0)
-      .andWhereRaw(`"create_date" + interval '${OTP_DEFAULT_EXPIRY} minutes' > NOW()`)
+      .andWhereRaw(
+        `"create_date" + interval '${OTP_DEFAULT_EXPIRY} minutes' > NOW()`
+      )
       .andWhere((qb) => {
         if (payload.agency_id) {
           qb.andWhere('agency_id', payload.agency_id);
@@ -49,7 +57,9 @@ class CommonModel extends Schema {
 
   // insert OTP
   public async insertOTP(payload: IInsertOTPPayload) {
-    return await this.db('email_otp').withSchema(this.DBO_SCHEMA).insert(payload);
+    return await this.db('email_otp')
+      .withSchema(this.DBO_SCHEMA)
+      .insert(payload);
   }
 
   // update otp
@@ -90,14 +100,21 @@ class CommonModel extends Schema {
   }
 
   public async insertLastNo(payload: IInsertLastNoPayload) {
-    return await this.db('last_no').withSchema(this.DBO_SCHEMA).insert(payload, 'id');
+    return await this.db('last_no')
+      .withSchema(this.DBO_SCHEMA)
+      .insert(payload, 'id');
   }
 
   public async updateLastNo(payload: IUpdateLastNoPayload, id: number) {
-    return await this.db('last_no').withSchema(this.DBO_SCHEMA).update(payload).where('id', id);
+    return await this.db('last_no')
+      .withSchema(this.DBO_SCHEMA)
+      .update(payload)
+      .where('id', id);
   }
 
-  public async getLastId({ type }: IGetLastIdParams): Promise<IGetLastIdData | null> {
+  public async getLastId({
+    type,
+  }: IGetLastIdParams): Promise<IGetLastIdData | null> {
     return await this.db('last_no')
       .withSchema(this.DBO_SCHEMA)
       .select('id', 'last_id')
@@ -106,7 +123,9 @@ class CommonModel extends Schema {
   }
 
   // Get airlines
-  public async getAirlineByCode(airlineCode: string): Promise<{ name: string; logo: string }> {
+  public async getAirlineByCode(
+    airlineCode: string
+  ): Promise<{ name: string; logo: string }> {
     const airline = await this.db('airlines')
       .withSchema(this.PUBLIC_SCHEMA)
       .select('name', 'logo')
@@ -255,7 +274,9 @@ class CommonModel extends Schema {
     lat?: string;
     lng?: string;
   }) {
-    return await this.db('city').withSchema(this.PUBLIC_SCHEMA).insert(payload, 'id');
+    return await this.db('city')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .insert(payload, 'id');
   }
 
   // update city
@@ -269,17 +290,25 @@ class CommonModel extends Schema {
     },
     id: number
   ) {
-    return await this.db('city').withSchema(this.PUBLIC_SCHEMA).update(payload).where('id', id);
+    return await this.db('city')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .update(payload)
+      .where('id', id);
   }
 
   // delete city
   public async deleteCity(id: number) {
-    return await this.db('city').withSchema(this.PUBLIC_SCHEMA).delete().where('id', id);
+    return await this.db('city')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .delete()
+      .where('id', id);
   }
 
   //insert airport
   public async insertAirport(payload: ICreateAirportPayload) {
-    return await this.db('airport').withSchema(this.PUBLIC_SCHEMA).insert(payload, 'id');
+    return await this.db('airport')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .insert(payload, 'id');
   }
 
   //get all airport
@@ -375,17 +404,25 @@ class CommonModel extends Schema {
 
   //update airport
   public async updateAirport(payload: IUpdateAirportPayload, id: number) {
-    return await this.db('airport').withSchema(this.PUBLIC_SCHEMA).update(payload).where({ id });
+    return await this.db('airport')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .update(payload)
+      .where({ id });
   }
 
   //delete airport
   public async deleteAirport(id: number) {
-    return await this.db('airport').withSchema(this.PUBLIC_SCHEMA).delete().where({ id });
+    return await this.db('airport')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .delete()
+      .where({ id });
   }
 
   //insert airline
   public async insertAirline(payload: ICreateAirlinesPayload) {
-    return await this.db('airlines').withSchema(this.PUBLIC_SCHEMA).insert(payload, 'id');
+    return await this.db('airlines')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .insert(payload, 'id');
   }
 
   //get all airlines
@@ -440,17 +477,25 @@ class CommonModel extends Schema {
 
   //update airlines
   public async updateAirlines(payload: IUpdateAirlinesPayload, id: number) {
-    return await this.db('airlines').withSchema(this.PUBLIC_SCHEMA).update(payload).where({ id });
+    return await this.db('airlines')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .update(payload)
+      .where({ id });
   }
 
   //delete airlines
   public async deleteAirlines(id: number) {
-    return await this.db('airlines').withSchema(this.PUBLIC_SCHEMA).delete().where({ id });
+    return await this.db('airlines')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .delete()
+      .where({ id });
   }
 
   // Insert email subscriber
   public async insertEmailSubscriber(payload: IInsertEmailSubscriberPayload) {
-    return await this.db('email_subscriber').withSchema(this.DBO_SCHEMA).insert(payload);
+    return await this.db('email_subscriber')
+      .withSchema(this.DBO_SCHEMA)
+      .insert(payload);
   }
 
   public async getEmailSubscriber({
@@ -512,11 +557,16 @@ class CommonModel extends Schema {
   }
 
   public async insertBanks(payload: IInsertBanks) {
-    return await this.db('banks').withSchema(this.PUBLIC_SCHEMA).insert(payload);
+    return await this.db('banks')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .insert(payload);
   }
 
   public async updateBanks(payload: IUpdateBankPayload, id: number) {
-    return await this.db('banks').withSchema(this.PUBLIC_SCHEMA).update(payload).where('id', id);
+    return await this.db('banks')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .update(payload)
+      .where('id', id);
   }
 
   public async getBanks(query: {
@@ -552,7 +602,57 @@ class CommonModel extends Schema {
   }
 
   public async getVisaType() {
-    return await this.db('visa_type').withSchema(this.SERVICE_SCHEMA).select('id', 'name');
+    return await this.db('visa_type')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('id', 'name');
+  }
+
+  public async insertSocialMedias(payload: IInsertSocialMedia) {
+    return await this.db('social_media')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .insert(payload, 'id');
+  }
+
+  public async updateSocialMedia(
+    payload: IUpdateSocialMediaPayload,
+    id: number
+  ) {
+    return await this.db('social_media')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .update(payload)
+      .where('id', id);
+  }
+
+  public async getSocialMedia(query: {
+    name?: string;
+    id?: number;
+    status?: boolean | 'true' | 'false';
+  }): Promise<IGetSocialMediaData[]> {
+    console.log({ query });
+    return await this.db('social_media')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .select('*')
+      .where((qb) => {
+        if (query.name) {
+          qb.andWhereILike('name', `%${query.name}%`);
+        }
+
+        if (query.id) {
+          qb.andWhere('id', query.id);
+        }
+
+        if (query.status !== undefined) {
+          qb.andWhere('status', query.status);
+        }
+      });
+  }
+
+  public async checkSocialMedia(id: number): Promise<IGetSocialMediaData> {
+    return await this.db('social_media')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .select('*')
+      .where('id', id)
+      .first();
   }
 }
 export default CommonModel;

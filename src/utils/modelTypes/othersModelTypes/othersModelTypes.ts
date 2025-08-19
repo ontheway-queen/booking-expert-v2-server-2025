@@ -57,8 +57,10 @@ export interface ICreateBankAccountPayload {
   routing_no?: string; // Nullable
   swift_code?: string; // Nullable
 }
+
 export interface IGetBankAccountData {
   id: number;
+  bank_id: number;
   bank_name: string;
   bank_type: string;
   bank_logo: string;

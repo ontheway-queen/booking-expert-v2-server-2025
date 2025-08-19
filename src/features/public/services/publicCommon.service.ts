@@ -133,10 +133,29 @@ export default class PublicCommonService extends AbstractServices {
     });
   }
 
+  public async getSocialMedia(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const { filter } = req.query as { filter: string };
+
+      const banks = await CommonModel.getSocialMedia({
+        name: filter,
+        status: true,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: banks,
+      };
+    });
+  }
 
   //get visa type
   public async getVisaType(req: Request) {
-    return this.db.transaction(async (trx)=>{
+    return this.db.transaction(async (trx) => {
       const CommonModel = this.Model.CommonModel(trx);
       const visaType = await CommonModel.getVisaType();
       return {
@@ -145,6 +164,6 @@ export default class PublicCommonService extends AbstractServices {
         message: this.ResMsg.HTTP_OK,
         data: visaType,
       };
-    })
+    });
   }
 }

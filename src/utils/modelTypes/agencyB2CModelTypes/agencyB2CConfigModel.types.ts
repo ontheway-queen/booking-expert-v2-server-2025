@@ -237,10 +237,9 @@ export interface IUpdateAgencyB2CSiteConfigPayload {
 
 export interface ICreateAgencyB2CSocialLinkPayload {
   agency_id: number;
-  media: string;
+  social_media_id: number;
   link: string;
   order_number: number;
-  icon?: string;
 }
 
 export interface IGetAgencyB2CSocialLinkQuery {
@@ -250,19 +249,18 @@ export interface IGetAgencyB2CSocialLinkQuery {
 
 export interface IGetAgencyB2CSocialLinkData {
   id: number;
-  agency_id: number;
   media: string;
   link: string;
   order_number: number;
-  icon: string;
+  social_media_id: number;
+  logo: string;
   status: boolean;
 }
 
 export interface IUpdateAgencyB2CSocialLinkPayload {
-  media?: string;
+  social_media_id?: number;
   link?: string;
   order_number?: number;
-  icon?: string;
   status?: boolean;
 }
 

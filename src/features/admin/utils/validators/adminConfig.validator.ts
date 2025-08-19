@@ -104,4 +104,18 @@ export default class AdminConfigValidator {
     name: Joi.string().required(),
     type: Joi.string().valid('Bank', 'MFS').required(),
   });
+
+  public getSocialMedia = Joi.object({
+    status: Joi.boolean().optional(),
+    filter: Joi.string().optional(),
+  });
+
+  public updateSocialMedia = Joi.object({
+    name: Joi.string().optional(),
+    status: Joi.boolean().optional(),
+  });
+
+  public createSocialMedia = Joi.object({
+    name: Joi.string().required(),
+  });
 }

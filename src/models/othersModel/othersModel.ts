@@ -96,6 +96,7 @@ export default class OthersModel extends Schema {
         'ad.routing_no',
         'ad.status',
         'ad.swift_code',
+        'ad.bank_id',
         'b.name AS bank_name',
         'b.type AS bank_type',
         'b.logo AS bank_logo'

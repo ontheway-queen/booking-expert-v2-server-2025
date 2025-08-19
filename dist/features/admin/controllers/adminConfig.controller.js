@@ -116,14 +116,49 @@ class AdminConfigController extends abstract_controller_1.default {
         }));
         this.createBank = this.asyncWrapper.wrap({ bodySchema: this.validator.createBank }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.createBank(req), { code } = _a, data = __rest(_a, ["code"]);
-            res.status(code).json(data);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
         }));
         this.updateBank = this.asyncWrapper.wrap({
             paramSchema: this.commonValidator.singleParamNumValidator(),
             bodySchema: this.validator.updateBank,
         }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.updateBank(req), { code } = _a, data = __rest(_a, ["code"]);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
+        }));
+        this.getSocialMedia = this.asyncWrapper.wrap({ querySchema: this.validator.getSocialMedia }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getSocialMedia(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
+        }));
+        this.createSocialMedia = this.asyncWrapper.wrap({ bodySchema: this.validator.createSocialMedia }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.createSocialMedia(req), { code } = _a, data = __rest(_a, ["code"]);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
+        }));
+        this.updateSocialMedia = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+            bodySchema: this.validator.updateSocialMedia,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.updateSocialMedia(req), { code } = _a, data = __rest(_a, ["code"]);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
         }));
     }
 }
