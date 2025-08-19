@@ -425,5 +425,84 @@ class AdminConfigService extends abstract_service_1.default {
             }));
         });
     }
+    // Get social media
+    getSocialMedia(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const CommonModel = this.Model.CommonModel(trx);
+                const { filter, status } = req.query;
+                const socialMedia = yield CommonModel.getSocialMedia({
+                    name: filter,
+                    status: status,
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: socialMedia,
+                };
+            }));
+        });
+    }
+    // Create social media
+    createSocialMedia(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                var _a, _b;
+                const CommonModel = this.Model.CommonModel(trx);
+                const body = req.body;
+                const files = req.files || [];
+                const socialMedia = yield CommonModel.insertSocialMedias(Object.assign(Object.assign({}, body), { logo: (_a = files[0]) === null || _a === void 0 ? void 0 : _a.filename }));
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                    data: {
+                        id: socialMedia[0].id,
+                        logo: (_b = files[0]) === null || _b === void 0 ? void 0 : _b.filename,
+                    },
+                };
+            }));
+        });
+    }
+    // Update social media
+    updateSocialMedia(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const CommonModel = this.Model.CommonModel(trx);
+                const social_media_id = Number(req.params.id);
+                const check = yield CommonModel.checkSocialMedia(social_media_id);
+                if (!check) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const body = req.body;
+                const files = req.files || [];
+                const payload = Object.assign({}, body);
+                if (files.length) {
+                    payload.logo = files[0].filename;
+                }
+                if (!Object.keys(payload).length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: this.ResMsg.HTTP_BAD_REQUEST,
+                    };
+                }
+                yield CommonModel.updateSocialMedia(payload, social_media_id);
+                if (check.logo && payload.logo) {
+                    yield this.manageFile.deleteFromCloud([check.logo]);
+                }
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                };
+            }));
+        });
+    }
 }
 exports.AdminConfigService = AdminConfigService;

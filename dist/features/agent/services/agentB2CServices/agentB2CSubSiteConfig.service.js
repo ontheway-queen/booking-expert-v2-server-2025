@@ -384,18 +384,12 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     };
                 }
                 yield configModel.deleteSocialLink({ agency_id, id });
-                if (check.icon) {
-                    yield this.manageFile.deleteFromCloud([check.icon]);
-                }
                 yield this.insertAgentAudit(trx, {
                     agency_id,
                     created_by: user_id,
                     details: `Deleted social media link [${check.media}(${check.link})]`,
                     type: 'DELETE',
                 });
-                if (check.icon) {
-                    yield this.manageFile.deleteFromCloud([check.icon]);
-                }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -408,15 +402,25 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const CommonModel = this.Model.CommonModel(trx);
                 const { agency_id, user_id } = req.agencyUser;
                 const body = req.body;
-                const files = req.files || [];
-                const lastNo = yield configModel.getSocialLinkLastNo({ agency_id });
-                const payload = Object.assign({ agency_id, order_number: (lastNo === null || lastNo === void 0 ? void 0 : lastNo.order_number) ? lastNo.order_number + 1 : 1 }, body);
-                if (files.length) {
-                    payload.icon = files[0].filename;
+                const socialMedia = yield CommonModel.checkSocialMedia(body.social_media_id);
+                if (!socialMedia) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: 'Social media not found',
+                    };
                 }
-                yield configModel.insertSocialLink(payload);
+                const lastNo = yield configModel.getSocialLinkLastNo({ agency_id });
+                const payload = {
+                    agency_id,
+                    order_number: (lastNo === null || lastNo === void 0 ? void 0 : lastNo.order_number) ? lastNo.order_number + 1 : 1,
+                    link: body.link,
+                    social_media_id: body.social_media_id,
+                };
+                const newSocialMedia = yield configModel.insertSocialLink(payload);
                 yield this.insertAgentAudit(trx, {
                     agency_id,
                     created_by: user_id,
@@ -429,7 +433,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: this.ResMsg.HTTP_SUCCESSFUL,
                     data: {
-                        icon: payload.icon,
+                        id: newSocialMedia[0].id,
                     },
                 };
             }));
@@ -450,11 +454,7 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     };
                 }
                 const body = req.body;
-                const files = req.files || [];
                 const payload = body;
-                if (files.length) {
-                    payload.icon = files[0].filename;
-                }
                 yield configModel.updateSocialLink(payload, { agency_id, id });
                 yield this.insertAgentAudit(trx, {
                     agency_id,
@@ -463,16 +463,10 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                     payload: JSON.stringify(payload),
                     type: 'UPDATE',
                 });
-                if (payload.icon && check.icon) {
-                    yield this.manageFile.deleteFromCloud([check.icon]);
-                }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: this.ResMsg.HTTP_SUCCESSFUL,
-                    data: {
-                        icon: payload.icon,
-                    },
                 };
             }));
         });

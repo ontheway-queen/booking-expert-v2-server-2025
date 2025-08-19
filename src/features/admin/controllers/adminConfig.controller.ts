@@ -157,7 +157,11 @@ export default class AdminConfigController extends AbstractController {
     { bodySchema: this.validator.createBank },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.createBank(req);
-      res.status(code).json(data);
+      if (data.success) {
+        res.status(code).json(data);
+      } else {
+        this.error(data.message, code);
+      }
     }
   );
 
@@ -168,7 +172,45 @@ export default class AdminConfigController extends AbstractController {
     },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.updateBank(req);
+      if (data.success) {
+        res.status(code).json(data);
+      } else {
+        this.error(data.message, code);
+      }
+    }
+  );
+  public getSocialMedia = this.asyncWrapper.wrap(
+    { querySchema: this.validator.getSocialMedia },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getSocialMedia(req);
       res.status(code).json(data);
+    }
+  );
+
+  public createSocialMedia = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.createSocialMedia },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.createSocialMedia(req);
+      if (data.success) {
+        res.status(code).json(data);
+      } else {
+        this.error(data.message, code);
+      }
+    }
+  );
+
+  public updateSocialMedia = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+      bodySchema: this.validator.updateSocialMedia,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.updateSocialMedia(req);
+      if (data.success) {
+        res.status(code).json(data);
+      } else {
+        this.error(data.message, code);
+      }
     }
   );
 }

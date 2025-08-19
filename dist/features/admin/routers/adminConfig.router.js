@@ -49,6 +49,13 @@ class AdminConfigRouter extends abstract_router_1.default {
         this.router
             .route('/bank/:id')
             .patch(this.uploader.cloudUploadRaw(this.fileFolders.BANK_LOGO, ['logo']), this.controller.updateBank);
+        this.router
+            .route('/social-media')
+            .get(this.controller.getSocialMedia)
+            .post(this.uploader.cloudUploadRaw(this.fileFolders.SOCIAL_MEDIA, ['logo']), this.controller.createSocialMedia);
+        this.router
+            .route('/social-media/:id')
+            .patch(this.uploader.cloudUploadRaw(this.fileFolders.SOCIAL_MEDIA, ['logo']), this.controller.updateSocialMedia);
     }
 }
 exports.default = AdminConfigRouter;

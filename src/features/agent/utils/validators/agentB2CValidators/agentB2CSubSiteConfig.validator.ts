@@ -105,12 +105,12 @@ export class AgentB2CSubSiteConfigValidator {
   });
 
   public createSocialLinks = Joi.object({
-    media: Joi.string().required().trim(),
+    social_media_id: Joi.number().required(),
     link: Joi.string().required().trim(),
   });
 
   public updateSocialLinks = Joi.object({
-    media: Joi.string().optional().trim(),
+    social_media_id: Joi.number().optional(),
     link: Joi.string().optional().trim(),
     status: Joi.boolean().optional(),
     order_number: Joi.number().optional(),

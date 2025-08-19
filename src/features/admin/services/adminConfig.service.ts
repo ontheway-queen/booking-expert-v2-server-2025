@@ -16,6 +16,7 @@ import {
   ICreateAirlinesPayload,
   IUpdateAirlinesPayload,
   IUpdateBankPayload,
+  IUpdateSocialMediaPayload,
 } from '../../../utils/modelTypes/commonModelTypes/commonModelTypes';
 
 export class AdminConfigService extends AbstractServices {
@@ -481,6 +482,110 @@ export class AdminConfigService extends AbstractServices {
       }
 
       await CommonModel.updateBanks(payload, bank_id);
+
+      if (check.logo && payload.logo) {
+        await this.manageFile.deleteFromCloud([check.logo]);
+      }
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
+      };
+    });
+  }
+
+  // Get social media
+  public async getSocialMedia(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const { filter, status } = req.query as {
+        filter?: string;
+        status?: 'true' | 'false';
+      };
+
+      const socialMedia = await CommonModel.getSocialMedia({
+        name: filter,
+        status: status,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: socialMedia,
+      };
+    });
+  }
+
+  // Create social media
+  public async createSocialMedia(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const body = req.body as {
+        name: string;
+      };
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      const socialMedia = await CommonModel.insertSocialMedias({
+        ...body,
+        logo: files[0]?.filename,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
+        data: {
+          id: socialMedia[0].id,
+          logo: files[0]?.filename,
+        },
+      };
+    });
+  }
+
+  // Update social media
+  public async updateSocialMedia(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const CommonModel = this.Model.CommonModel(trx);
+
+      const social_media_id = Number(req.params.id);
+
+      const check = await CommonModel.checkSocialMedia(social_media_id);
+
+      if (!check) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      const body = req.body as {
+        name?: string;
+        status?: boolean;
+      };
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      const payload: IUpdateSocialMediaPayload = { ...body };
+
+      if (files.length) {
+        payload.logo = files[0].filename;
+      }
+
+      if (!Object.keys(payload).length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: this.ResMsg.HTTP_BAD_REQUEST,
+        };
+      }
+
+      await CommonModel.updateSocialMedia(payload, social_media_id);
 
       if (check.logo && payload.logo) {
         await this.manageFile.deleteFromCloud([check.logo]);

@@ -41,7 +41,9 @@ class CommonModel extends schema_1.default {
     // insert OTP
     insertOTP(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('email_otp').withSchema(this.DBO_SCHEMA).insert(payload);
+            return yield this.db('email_otp')
+                .withSchema(this.DBO_SCHEMA)
+                .insert(payload);
         });
     }
     // update otp
@@ -84,16 +86,21 @@ class CommonModel extends schema_1.default {
     }
     insertLastNo(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('last_no').withSchema(this.DBO_SCHEMA).insert(payload, 'id');
+            return yield this.db('last_no')
+                .withSchema(this.DBO_SCHEMA)
+                .insert(payload, 'id');
         });
     }
     updateLastNo(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('last_no').withSchema(this.DBO_SCHEMA).update(payload).where('id', id);
+            return yield this.db('last_no')
+                .withSchema(this.DBO_SCHEMA)
+                .update(payload)
+                .where('id', id);
         });
     }
     getLastId(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ type }) {
+        return __awaiter(this, arguments, void 0, function* ({ type, }) {
             return yield this.db('last_no')
                 .withSchema(this.DBO_SCHEMA)
                 .select('id', 'last_id')
@@ -221,25 +228,35 @@ class CommonModel extends schema_1.default {
     //insert city
     insertCity(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('city').withSchema(this.PUBLIC_SCHEMA).insert(payload, 'id');
+            return yield this.db('city')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .insert(payload, 'id');
         });
     }
     // update city
     updateCity(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('city').withSchema(this.PUBLIC_SCHEMA).update(payload).where('id', id);
+            return yield this.db('city')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .update(payload)
+                .where('id', id);
         });
     }
     // delete city
     deleteCity(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('city').withSchema(this.PUBLIC_SCHEMA).delete().where('id', id);
+            return yield this.db('city')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .delete()
+                .where('id', id);
         });
     }
     //insert airport
     insertAirport(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('airport').withSchema(this.PUBLIC_SCHEMA).insert(payload, 'id');
+            return yield this.db('airport')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .insert(payload, 'id');
         });
     }
     //get all airport
@@ -303,19 +320,27 @@ class CommonModel extends schema_1.default {
     //update airport
     updateAirport(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('airport').withSchema(this.PUBLIC_SCHEMA).update(payload).where({ id });
+            return yield this.db('airport')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .update(payload)
+                .where({ id });
         });
     }
     //delete airport
     deleteAirport(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('airport').withSchema(this.PUBLIC_SCHEMA).delete().where({ id });
+            return yield this.db('airport')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .delete()
+                .where({ id });
         });
     }
     //insert airline
     insertAirline(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('airlines').withSchema(this.PUBLIC_SCHEMA).insert(payload, 'id');
+            return yield this.db('airlines')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .insert(payload, 'id');
         });
     }
     //get all airlines
@@ -370,19 +395,27 @@ class CommonModel extends schema_1.default {
     //update airlines
     updateAirlines(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('airlines').withSchema(this.PUBLIC_SCHEMA).update(payload).where({ id });
+            return yield this.db('airlines')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .update(payload)
+                .where({ id });
         });
     }
     //delete airlines
     deleteAirlines(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('airlines').withSchema(this.PUBLIC_SCHEMA).delete().where({ id });
+            return yield this.db('airlines')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .delete()
+                .where({ id });
         });
     }
     // Insert email subscriber
     insertEmailSubscriber(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('email_subscriber').withSchema(this.DBO_SCHEMA).insert(payload);
+            return yield this.db('email_subscriber')
+                .withSchema(this.DBO_SCHEMA)
+                .insert(payload);
         });
     }
     getEmailSubscriber(_a) {
@@ -432,12 +465,17 @@ class CommonModel extends schema_1.default {
     }
     insertBanks(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('banks').withSchema(this.PUBLIC_SCHEMA).insert(payload);
+            return yield this.db('banks')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .insert(payload);
         });
     }
     updateBanks(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('banks').withSchema(this.PUBLIC_SCHEMA).update(payload).where('id', id);
+            return yield this.db('banks')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .update(payload)
+                .where('id', id);
         });
     }
     getBanks(query) {
@@ -470,7 +508,52 @@ class CommonModel extends schema_1.default {
     }
     getVisaType() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_type').withSchema(this.SERVICE_SCHEMA).select('id', 'name');
+            return yield this.db('visa_type')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('id', 'name');
+        });
+    }
+    insertSocialMedias(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('social_media')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .insert(payload, 'id');
+        });
+    }
+    updateSocialMedia(payload, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('social_media')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .update(payload)
+                .where('id', id);
+        });
+    }
+    getSocialMedia(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log({ query });
+            return yield this.db('social_media')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .select('*')
+                .where((qb) => {
+                if (query.name) {
+                    qb.andWhereILike('name', `%${query.name}%`);
+                }
+                if (query.id) {
+                    qb.andWhere('id', query.id);
+                }
+                if (query.status !== undefined) {
+                    qb.andWhere('status', query.status);
+                }
+            });
+        });
+    }
+    checkSocialMedia(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('social_media')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .select('*')
+                .where('id', id)
+                .first();
         });
     }
 }
