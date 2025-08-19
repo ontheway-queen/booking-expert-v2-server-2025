@@ -65,6 +65,14 @@ class AgentB2CSubVisaController extends abstract_controller_1.default {
             const _a = yield this.service.deleteVisa(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.getAgentB2CApplicationList = this.asyncWrapper.wrap({ querySchema: this.validator.getAgentB2CApplicationListValidatorSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getAgentB2CApplicationList(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.getAgentB2CSingleApplication = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamNumValidator() }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getAgentB2CSingleVisaApplication(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.AgentB2CSubVisaController = AgentB2CSubVisaController;

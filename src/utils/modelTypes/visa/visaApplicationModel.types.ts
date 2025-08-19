@@ -50,7 +50,6 @@ export interface IGetAgentB2CVisaApplicationQuery {
   from_date?: Date;
   to_date?: Date;
   status?: string;
-  application_ref?: string;
   filter?: string;
 }
 
@@ -72,4 +71,36 @@ export interface IGetAgentB2CSingleVisaApplicationQuery{
   source_id:number;
   source_type:string;
   user_id:number
+}
+
+
+export interface IGetAllAgentB2CVisaApplicationQuery {
+  source_id: number;
+  source_type: string;
+  from_date?: Date;
+  to_date?:Date;
+  status?: string;
+  filter?: string;
+  limit?: number;
+  skip?: number;
+}
+
+
+export interface IGetAllAgentB2CVisaApplicationData{
+  id: number;
+  application_ref: string;
+  title: string;
+  visa_type: string;
+  visa_mode: string;
+  country_name: string;
+  applicant_name: string;
+  status: string;
+  traveler: number;
+  application_date: Date;
+}
+
+export interface IGetAgentB2CSingleVisaApplicationForAgentQuery{
+  id:number;
+  source_id:number;
+  source_type:string;
 }

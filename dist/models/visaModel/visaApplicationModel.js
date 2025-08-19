@@ -57,21 +57,20 @@ class VisaApplicationModel extends schema_1.default {
                 if (query.status) {
                     qb.andWhere('va.status', query.status);
                 }
-                if (query.application_ref) {
-                    qb.andWhere('va.application_ref', query.application_ref);
-                }
                 if (query.filter) {
                     qb.andWhere((subQb) => {
                         subQb
                             .andWhere('va.contact_email', 'Ilike', `%${query.filter}%`)
                             .orWhere('va.nationality', 'Ilike', `%${query.filter}%`)
                             .orWhere('va.residence', 'Ilike', `%${query.filter}%`)
-                            .orWhere('va.contact_number', 'Ilike', `%${query.filter}%`);
+                            .orWhere('va.contact_number', 'Ilike', `%${query.filter}%`)
+                            .orWhere('va.application_ref', 'Ilike', `%${query.filter}%`);
                     });
                 }
             })
                 .limit(query.limit || 100)
-                .offset(query.skip || 0);
+                .offset(query.skip || 0)
+                .orderBy('va.application_date', 'desc');
             const total = yield this.db('visa_application as va')
                 .withSchema(this.SERVICE_SCHEMA)
                 .count('va.id as total')
@@ -85,16 +84,14 @@ class VisaApplicationModel extends schema_1.default {
                 if (query.status) {
                     qb.andWhere('va.status', query.status);
                 }
-                if (query.application_ref) {
-                    qb.andWhere('va.application_ref', query.application_ref);
-                }
                 if (query.filter) {
                     qb.andWhere((subQb) => {
                         subQb
                             .andWhere('va.contact_email', 'Ilike', `%${query.filter}%`)
                             .orWhere('va.nationality', 'Ilike', `%${query.filter}%`)
                             .orWhere('va.residence', 'Ilike', `%${query.filter}%`)
-                            .orWhere('va.contact_number', 'Ilike', `%${query.filter}%`);
+                            .orWhere('va.contact_number', 'Ilike', `%${query.filter}%`)
+                            .orWhere('va.application_ref', 'Ilike', `%${query.filter}%`);
                     });
                 }
             });
@@ -131,6 +128,84 @@ class VisaApplicationModel extends schema_1.default {
                 .where((qb) => {
                 qb.andWhere('vat.application_id', query.application_id);
             });
+        });
+    }
+    //get all agent b2c visa application
+    getAllAgentB2CVisaApplication(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield this.db('visa_application as va')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('va.id', 'va.application_ref', 'v.title', 'vt.name as visa_type', 'vm.name as visa_mode', 'c.nice_name as country_name', 'u.name as applicant_name', 'va.status', 'va.traveler', 'va.application_date')
+                .leftJoin('visa as v', 'va.visa_id', 'v.id')
+                .leftJoin('visa_type as vt', 'v.visa_type_id', 'vt.id')
+                .leftJoin('visa_mode as vm', 'v.visa_mode_id', 'vm.id')
+                .joinRaw(`LEFT JOIN public.country AS c ON v.country_id = c.id`)
+                .joinRaw(`LEFT JOIN agent_b2c.users as u ON va.user_id = u.id`)
+                .where((qb) => {
+                qb.andWhere('va.source_id', query.source_id);
+                qb.andWhere('va.source_type', query.source_type);
+                if (query.from_date && query.to_date) {
+                    qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
+                }
+                if (query.status) {
+                    qb.andWhere('va.status', query.status);
+                }
+                if (query.filter) {
+                    qb.andWhere((subQb) => {
+                        subQb
+                            .andWhere('va.contact_email', 'Ilike', `%${query.filter}%`)
+                            .orWhere('va.nationality', 'Ilike', `%${query.filter}%`)
+                            .orWhere('va.residence', 'Ilike', `%${query.filter}%`)
+                            .orWhere('va.contact_number', 'Ilike', `%${query.filter}%`)
+                            .orWhere('va.application_ref', 'Ilike', `%${query.filter}%`);
+                    });
+                }
+            })
+                .limit(query.limit || 100)
+                .offset(query.skip || 0)
+                .orderBy('va.application_date', 'desc');
+            const total = yield this.db('visa_application as va')
+                .withSchema(this.SERVICE_SCHEMA)
+                .count('va.id as total')
+                .where((qb) => {
+                qb.andWhere('va.source_id', query.source_id);
+                qb.andWhere('va.source_type', query.source_type);
+                if (query.from_date && query.to_date) {
+                    qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
+                }
+                if (query.status) {
+                    qb.andWhere('va.status', query.status);
+                }
+                if (query.filter) {
+                    qb.andWhere((subQb) => {
+                        subQb
+                            .andWhere('va.contact_email', 'Ilike', `%${query.filter}%`)
+                            .orWhere('va.nationality', 'Ilike', `%${query.filter}%`)
+                            .orWhere('va.residence', 'Ilike', `%${query.filter}%`)
+                            .orWhere('va.contact_number', 'Ilike', `%${query.filter}%`)
+                            .orWhere('va.application_ref', 'Ilike', `%${query.filter}%`);
+                    });
+                }
+            });
+            return { data: result, total: Number(total[0].total) };
+        });
+    }
+    // get agent b2c single application
+    getAgentB2CSingleVisaApplicationForAgent(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('visa_application as va')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('va.id', 'v.title', 'vt.name as visa_type', 'vm.name as visa_mode', 'c.nice_name as country_name', 'va.application_ref', 'va.from_date', 'va.to_date', 'va.visa_fee', 'va.processing_fee', 'va.traveler', 'va.payable', 'va.status', 'va.application_date', 'va.contact_email', 'va.contact_number', 'va.whatsapp_number', 'va.nationality', 'va.residence')
+                .leftJoin('visa as v', 'va.visa_id', 'v.id')
+                .leftJoin('visa_type as vt', 'v.visa_type_id', 'vt.id')
+                .leftJoin('visa_mode as vm', 'v.visa_mode_id', 'vm.id')
+                .joinRaw(`LEFT JOIN public.country AS c ON v.country_id = c.id`)
+                .where((qb) => {
+                qb.andWhere('va.source_id', query.source_id);
+                qb.andWhere('va.source_type', query.source_type);
+                qb.andWhere('va.id', query.id);
+            })
+                .first();
         });
     }
 }

@@ -188,7 +188,6 @@ export class AgentB2CVisaService extends AbstractServices {
     const query = req.query as unknown as {
       limit: number;
       skip: number;
-      application_ref: string;
       filter: string;
       from_date: Date;
       to_date: Date;
@@ -203,7 +202,6 @@ export class AgentB2CVisaService extends AbstractServices {
       source_type: SOURCE_AGENT_B2C,
       limit: query.limit,
       skip: query.skip,
-      application_ref: query.application_ref,
       filter: query.filter,
       from_date: query.from_date,
       to_date: query.to_date,

@@ -181,7 +181,6 @@ class AgentB2CVisaService extends abstract_service_1.default {
                 source_type: constants_1.SOURCE_AGENT_B2C,
                 limit: query.limit,
                 skip: query.skip,
-                application_ref: query.application_ref,
                 filter: query.filter,
                 from_date: query.from_date,
                 to_date: query.to_date,

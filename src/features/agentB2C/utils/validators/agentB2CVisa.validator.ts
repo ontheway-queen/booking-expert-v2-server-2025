@@ -21,7 +21,7 @@ export class AgentB2CVisaValidator {
     'C11',
   ];
 
-  private traveler_titles = ['MISS', 'MASTER', 'MS', 'MR', 'MRS'];
+  private traveler_titles = ['Miss', 'Master', 'Ms', 'Mr', 'Mrs'];
 
   private passengerSchema = Joi.array()
     .items(

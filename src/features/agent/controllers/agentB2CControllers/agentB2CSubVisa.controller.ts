@@ -57,4 +57,20 @@ export class AgentB2CSubVisaController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public getAgentB2CApplicationList = this.asyncWrapper.wrap(
+    { querySchema: this.validator.getAgentB2CApplicationListValidatorSchema },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getAgentB2CApplicationList(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public getAgentB2CSingleApplication = this.asyncWrapper.wrap(
+    { paramSchema: this.commonValidator.singleParamNumValidator() },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getAgentB2CSingleVisaApplication(req);
+      res.status(code).json(rest);
+    }
+  );
 }

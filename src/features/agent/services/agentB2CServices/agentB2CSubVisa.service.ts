@@ -1,7 +1,10 @@
 import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
-import { SOURCE_AGENT } from '../../../../utils/miscellaneous/constants';
-import { IGetVisaListQuery } from '../../utils/types/agentB2CSubTypes/agentB2CSubVisa.types';
+import { SOURCE_AGENT, SOURCE_AGENT_B2C } from '../../../../utils/miscellaneous/constants';
+import {
+  IGetAllAgentB2CVisaApplicationQuery,
+  IGetVisaListQuery,
+} from '../../utils/types/agentB2CSubTypes/agentB2CSubVisa.types';
 
 export class AgentB2CSubVisaService extends AbstractServices {
   public async createVisa(req: Request) {
@@ -202,6 +205,68 @@ export class AgentB2CSubVisaService extends AbstractServices {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: 'Visa deleted successfully',
+    };
+  }
+
+  public async getAgentB2CApplicationList(req: Request) {
+    const { agency_id } = req.agencyUser;
+    const { filter, from_date, to_date, status, limit, skip } =
+      req.query as unknown as IGetAllAgentB2CVisaApplicationQuery;
+
+    const visaApplicationModel = this.Model.VisaApplicationModel();
+
+    const { data, total } = await visaApplicationModel.getAllAgentB2CVisaApplication({
+      filter,
+      from_date,
+      to_date,
+      status,
+      limit,
+      skip,
+      source_id: agency_id,
+      source_type: SOURCE_AGENT_B2C,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data,
+      total,
+    };
+  }
+
+  public async getAgentB2CSingleVisaApplication(req: Request) {
+    const { id } = req.params;
+    const { agency_id } = req.agencyUser;
+
+    const visaApplicationModel = this.Model.VisaApplicationModel();
+
+    const data = await visaApplicationModel.getAgentB2CSingleVisaApplicationForAgent({
+      id: Number(id),
+      source_id: agency_id,
+      source_type: SOURCE_AGENT_B2C,
+    });
+
+    if (!data) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_NOT_FOUND,
+        message: this.ResMsg.HTTP_NOT_FOUND,
+      };
+    }
+
+    const passengers = await visaApplicationModel.getAgentB2CSingleVisaApplicationTraveler({
+      application_id: data.id,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: {
+        ...data,
+        passengers,
+      },
     };
   }
 }

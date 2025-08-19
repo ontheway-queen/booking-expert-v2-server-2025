@@ -25,7 +25,7 @@ class AgentB2CVisaValidator {
             'C10',
             'C11',
         ];
-        this.traveler_titles = ['MISS', 'MASTER', 'MS', 'MR', 'MRS'];
+        this.traveler_titles = ['Miss', 'Master', 'Ms', 'Mr', 'Mrs'];
         this.passengerSchema = joi_1.default.array()
             .items(joi_1.default.object({
             key: joi_1.default.number().required(),

@@ -200,5 +200,57 @@ class AgentB2CSubVisaService extends abstract_service_1.default {
             };
         });
     }
+    getAgentB2CApplicationList(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const { filter, from_date, to_date, status, limit, skip } = req.query;
+            const visaApplicationModel = this.Model.VisaApplicationModel();
+            const { data, total } = yield visaApplicationModel.getAllAgentB2CVisaApplication({
+                filter,
+                from_date,
+                to_date,
+                status,
+                limit,
+                skip,
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT_B2C,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data,
+                total,
+            };
+        });
+    }
+    getAgentB2CSingleVisaApplication(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const { agency_id } = req.agencyUser;
+            const visaApplicationModel = this.Model.VisaApplicationModel();
+            const data = yield visaApplicationModel.getAgentB2CSingleVisaApplicationForAgent({
+                id: Number(id),
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT_B2C,
+            });
+            if (!data) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            const passengers = yield visaApplicationModel.getAgentB2CSingleVisaApplicationTraveler({
+                application_id: data.id,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: Object.assign(Object.assign({}, data), { passengers }),
+            };
+        });
+    }
 }
 exports.AgentB2CSubVisaService = AgentB2CSubVisaService;

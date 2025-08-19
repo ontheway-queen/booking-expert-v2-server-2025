@@ -93,6 +93,14 @@ class AgentB2CSubVisaValidator {
             }))
                 .optional(),
         });
+        this.getAgentB2CApplicationListValidatorSchema = joi_1.default.object({
+            from_date: joi_1.default.date().optional(),
+            to_date: joi_1.default.date().optional(),
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
+            status: joi_1.default.string().optional(),
+            filter: joi_1.default.string().max(100).optional(),
+        });
     }
 }
 exports.AgentB2CSubVisaValidator = AgentB2CSubVisaValidator;

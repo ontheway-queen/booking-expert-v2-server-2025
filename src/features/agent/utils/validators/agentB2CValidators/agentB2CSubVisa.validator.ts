@@ -69,7 +69,7 @@ export class AgentB2CSubVisaValidator {
     meta_title: Joi.string().optional(),
     meta_description: Joi.string().optional(),
     visa_for: Joi.string().valid('AGENT', 'B2C', 'BOTH').optional(),
-    status:Joi.boolean().optional(),
+    status: Joi.boolean().optional(),
     required_fields: Joi.alternatives()
       .try(
         Joi.object().optional(),
@@ -98,5 +98,14 @@ export class AgentB2CSubVisaValidator {
         })
       )
       .optional(),
+  });
+
+  public getAgentB2CApplicationListValidatorSchema = Joi.object({
+    from_date: Joi.date().optional(),
+    to_date: Joi.date().optional(),
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+    status: Joi.string().optional(),
+    filter: Joi.string().max(100).optional(),
   });
 }
