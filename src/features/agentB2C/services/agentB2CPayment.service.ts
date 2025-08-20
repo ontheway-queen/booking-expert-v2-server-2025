@@ -84,6 +84,7 @@ export default class AgentB2CPaymentService extends AbstractServices {
       const { user_id } = req.agencyB2CUser;
       const { agency_id } = req.agencyB2CWhiteLabel;
       const invoiceModel = this.Model.InvoiceModel(trx);
+      const agencyB2CPaymentModel = this.Model.AgencyB2CPaymentModel(trx);
       const { id } = req.params;
       const data = await invoiceModel.getSingleInvoice({
         id: Number(id),
@@ -126,10 +127,21 @@ export default class AgentB2CPaymentService extends AbstractServices {
         };
       }
 
+      const mr_no = await Lib.generateNo({ trx, type: 'Money_Receipt' });
+
       const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
       await invoiceModel.updateInvoice({ due: 0 }, Number(id));
+      await agencyB2CPaymentModel.insertLedger({
+        agency_id,
+        amount: data.due,
+        user_id,
+        type: 'Credit',
+        voucher_no: mr_no,
+        details: `Due has been cleared for invoice no ${data.invoice_no}. Balance Transaction`,
+      });
+
       await moneyReceiptModel.createMoneyReceipt({
-        mr_no: await Lib.generateNo({ trx, type: 'Money_Receipt' }),
+        mr_no,
         invoice_id: Number(id),
         amount: data.due,
         user_id,

@@ -179,8 +179,16 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                         airline: option.carrier.carrier_marketing_airline,
                         airline_code: option.carrier.carrier_marketing_code,
                         airline_logo: option.carrier.carrier_marketing_logo,
-                        origin: flightUtils.segmentPlaceInfo(option.departure.airport, option.departure.city, option.departure.city_code),
-                        destination: flightUtils.segmentPlaceInfo(option.arrival.airport, option.arrival.city, option.arrival.city_code),
+                        origin: JSON.stringify({
+                            airport: option.departure.airport,
+                            city: option.departure.city,
+                            code: option.departure.city_code,
+                        }),
+                        destination: JSON.stringify({
+                            airport: option.arrival.airport,
+                            city: option.arrival.city,
+                            code: option.arrival.city_code,
+                        }),
                         class: cabin_info[ind],
                         baggage: baggage_info[ind],
                         departure_date: option.departure.date,
