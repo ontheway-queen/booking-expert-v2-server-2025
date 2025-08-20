@@ -113,7 +113,7 @@ class HotelBookingModel extends schema_1.default {
             };
         });
     }
-    getSingleAgentBooking(_a) {
+    getSingleHotelBooking(_a) {
         return __awaiter(this, arguments, void 0, function* ({ booking_id, source_type, source_id, user_id, }) {
             let tableName = 'agent_hotel_booking_view AS hb';
             if (source_type === 'AGENT B2C') {

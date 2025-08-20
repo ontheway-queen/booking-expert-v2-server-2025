@@ -45,7 +45,7 @@ class AdminAgentHotelService extends abstract_service_1.default {
             const { id } = req.params;
             const booking_id = Number(id);
             const hotelBookingModel = this.Model.HotelBookingModel();
-            const data = yield hotelBookingModel.getSingleAgentBooking({
+            const data = yield hotelBookingModel.getSingleHotelBooking({
                 booking_id,
                 source_type: constants_1.SOURCE_AGENT,
             });
@@ -72,7 +72,7 @@ class AdminAgentHotelService extends abstract_service_1.default {
                 const booking_id = Number(id);
                 const payload = req.body;
                 const hotelBookingModel = this.Model.HotelBookingModel(trx);
-                const checkBooking = yield hotelBookingModel.getSingleAgentBooking({
+                const checkBooking = yield hotelBookingModel.getSingleHotelBooking({
                     booking_id,
                     source_type: constants_1.SOURCE_AGENT,
                 });

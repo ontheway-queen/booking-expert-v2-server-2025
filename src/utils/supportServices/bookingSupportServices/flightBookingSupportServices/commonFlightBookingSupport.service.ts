@@ -243,6 +243,8 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       payload.flight_data.availability
     );
 
+    let invoiceDetails = '';
+
     payload.flight_data.flights.forEach(async (flight) => {
       flight.options.forEach(async (option, ind) => {
         await flightBookingSegmentModel.insertFlightBookingSegment({
@@ -281,6 +283,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       //get visa and passport file
       let visa_file = traveler.visa_file;
       let passport_file = traveler.passport_file;
+
       if (payload.files?.length) {
         for (const file of payload.files) {
           if (
@@ -296,6 +299,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
           }
         }
       }
+
       if (traveler.save_information) {
         save_travelers.push({
           ...traveler,
@@ -306,6 +310,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
           source_type: payload.source_type,
         });
       }
+
       return {
         flight_booking_id: booking_res[0].id,
         type: traveler.type,
@@ -338,7 +343,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
     const tracking_data: IInsertFlightBookingTrackingPayload[] = [];
     tracking_data.push({
       flight_booking_id: booking_res[0].id,
-      description: `Booking - ${booking_ref} has been made by Agent(${payload.user_name}). Booking status - ${payload.status}`,
+      description: `Booking - ${booking_ref} has been made by (${payload.user_name}). Booking status - ${payload.status}`,
     });
 
     if (payload.booking_block) {
@@ -370,6 +375,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
         trx: this.trx,
         type: GENERATE_AUTO_UNIQUE_ID.invoice,
       }),
+
       source_type: payload.source_type,
       source_id: payload.source_id,
       user_id: payload.user_id,
@@ -377,7 +383,11 @@ export class CommonFlightBookingSupportService extends AbstractServices {
       ref_type: payload.invoice_ref_type,
       total_amount: payload.flight_data.fare.payable,
       due: payload.flight_data.fare.payable,
-      details: `Invoice has been created for flight booking ref no. - ${booking_ref}`,
+      details: `Invoice for Flight booking ref no - ${booking_ref}. Route-${flightUtils.getRouteOfFlight(
+        payload.flight_data.leg_description
+      )} (${flightUtils.getJourneyType(
+        payload.flight_data.journey_type
+      )}) with ${payload.traveler_data.length} traveler.`,
       type: INVOICE_TYPES.SALE,
       status: INVOICE_STATUS_TYPES.ISSUED,
     });

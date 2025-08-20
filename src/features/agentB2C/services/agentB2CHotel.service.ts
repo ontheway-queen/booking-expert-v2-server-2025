@@ -315,6 +315,7 @@ export default class AgentB2CHotelService extends AbstractServices {
         },
         markup_set: agent.hotel_markup_set,
         markup_amount,
+        with_vendor_price: true,
       });
 
       if (!recheck) {
@@ -326,19 +327,19 @@ export default class AgentB2CHotelService extends AbstractServices {
       }
 
       // Check Balance availability for book
-      const BalanceAvailability =
-        await balanceLib.AgencyBalanceAvailabilityCheck({
-          agency_id,
-          price: recheck.fee.total_price,
-        });
+      // const BalanceAvailability =
+      //   await balanceLib.AgencyBalanceAvailabilityCheck({
+      //     agency_id,
+      //     price: recheck.fee.total_price,
+      //   });
 
-      if (!BalanceAvailability.availability) {
-        return {
-          success: false,
-          code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: 'Insufficient Agent credit. Please add funds to continue.',
-        };
-      }
+      // if (!BalanceAvailability.availability) {
+      //   return {
+      //     success: false,
+      //     code: this.StatusCode.HTTP_BAD_REQUEST,
+      //     message: 'Insufficient Agent credit. Please add funds to continue.',
+      //   };
+      // }
 
       const payload: ICTHotelBookingPayload = body;
 
@@ -429,7 +430,7 @@ export default class AgentB2CHotelService extends AbstractServices {
         status: 'PENDING',
         free_cancellation_last_date:
           recheck.rates[0].cancellation_policy?.free_cancellation_last_date,
-        rooms: JSON.stringify(recheck),
+        rooms: JSON.stringify(recheck.rates[0].rooms),
       });
 
       if (recheck.rates[0].cancellation_policy?.details.length) {
@@ -487,7 +488,7 @@ export default class AgentB2CHotelService extends AbstractServices {
         ref_type: TYPE_HOTEL,
         total_amount: recheck.fee.total_price,
         due: recheck.fee.total_price,
-        details: `Auto invoice has been created for hotel booking ref no. - ${booking_ref}`,
+        details: `Invoice for Hotel booking ref no. - ${booking_ref}. Hotel: ${recheck.name}, City: ${payload.city_code}, Check-in: ${payload.city_code}, Check-out: ${payload.checkout}, with ${travelerPayload.length} traveler(s).`,
         type: INVOICE_TYPES.SALE,
         status: INVOICE_STATUS_TYPES.ISSUED,
       });
@@ -542,7 +543,7 @@ export default class AgentB2CHotelService extends AbstractServices {
     const { id } = req.params;
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    const data = await hotelBookingModel.getSingleAgentBooking({
+    const data = await hotelBookingModel.getSingleHotelBooking({
       source_type: SOURCE_AGENT_B2C,
       source_id: agency_id,
       user_id,
@@ -557,7 +558,12 @@ export default class AgentB2CHotelService extends AbstractServices {
       };
     }
 
-    const {} = data;
+    const {
+      supplier_ref,
+      supplier_cancellation_data,
+      supplier_price,
+      ...restData
+    } = data;
 
     const traveler = await hotelBookingModel.getHotelBookingTraveler(
       Number(id)
@@ -567,7 +573,7 @@ export default class AgentB2CHotelService extends AbstractServices {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: { ...data, traveler },
+      data: { ...restData, traveler },
     };
   }
 }

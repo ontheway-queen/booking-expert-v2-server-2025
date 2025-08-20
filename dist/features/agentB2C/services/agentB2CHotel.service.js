@@ -283,6 +283,7 @@ class AgentB2CHotelService extends abstract_service_1.default {
                     },
                     markup_set: agent.hotel_markup_set,
                     markup_amount,
+                    with_vendor_price: true,
                 });
                 if (!recheck) {
                     return {
@@ -292,17 +293,18 @@ class AgentB2CHotelService extends abstract_service_1.default {
                     };
                 }
                 // Check Balance availability for book
-                const BalanceAvailability = yield balanceLib.AgencyBalanceAvailabilityCheck({
-                    agency_id,
-                    price: recheck.fee.total_price,
-                });
-                if (!BalanceAvailability.availability) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: 'Insufficient Agent credit. Please add funds to continue.',
-                    };
-                }
+                // const BalanceAvailability =
+                //   await balanceLib.AgencyBalanceAvailabilityCheck({
+                //     agency_id,
+                //     price: recheck.fee.total_price,
+                //   });
+                // if (!BalanceAvailability.availability) {
+                //   return {
+                //     success: false,
+                //     code: this.StatusCode.HTTP_BAD_REQUEST,
+                //     message: 'Insufficient Agent credit. Please add funds to continue.',
+                //   };
+                // }
                 const payload = body;
                 // Handle room wise paxes files
                 if (files.length) {
@@ -367,7 +369,7 @@ class AgentB2CHotelService extends abstract_service_1.default {
                     source_type: constants_1.SOURCE_AGENT_B2C,
                     status: 'PENDING',
                     free_cancellation_last_date: (_b = recheck.rates[0].cancellation_policy) === null || _b === void 0 ? void 0 : _b.free_cancellation_last_date,
-                    rooms: JSON.stringify(recheck),
+                    rooms: JSON.stringify(recheck.rates[0].rooms),
                 });
                 if ((_c = recheck.rates[0].cancellation_policy) === null || _c === void 0 ? void 0 : _c.details.length) {
                     const cancellationPayload = recheck.rates[0].cancellation_policy.details.map((item) => {
@@ -412,7 +414,7 @@ class AgentB2CHotelService extends abstract_service_1.default {
                     ref_type: constants_1.TYPE_HOTEL,
                     total_amount: recheck.fee.total_price,
                     due: recheck.fee.total_price,
-                    details: `Auto invoice has been created for hotel booking ref no. - ${booking_ref}`,
+                    details: `Invoice for Hotel booking ref no. - ${booking_ref}. Hotel: ${recheck.name}, City: ${payload.city_code}, Check-in: ${payload.city_code}, Check-out: ${payload.checkout}, with ${travelerPayload.length} traveler(s).`,
                     type: constants_1.INVOICE_TYPES.SALE,
                     status: constants_1.INVOICE_STATUS_TYPES.ISSUED,
                 });
@@ -459,7 +461,7 @@ class AgentB2CHotelService extends abstract_service_1.default {
             const { user_id } = req.agencyB2CUser;
             const { id } = req.params;
             const hotelBookingModel = this.Model.HotelBookingModel();
-            const data = yield hotelBookingModel.getSingleAgentBooking({
+            const data = yield hotelBookingModel.getSingleHotelBooking({
                 source_type: constants_1.SOURCE_AGENT_B2C,
                 source_id: agency_id,
                 user_id,
@@ -472,13 +474,13 @@ class AgentB2CHotelService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_NOT_FOUND,
                 };
             }
-            const {} = data;
+            const { supplier_ref, supplier_cancellation_data, supplier_price } = data, restData = __rest(data, ["supplier_ref", "supplier_cancellation_data", "supplier_price"]);
             const traveler = yield hotelBookingModel.getHotelBookingTraveler(Number(id));
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: Object.assign(Object.assign({}, data), { traveler }),
+                data: Object.assign(Object.assign({}, restData), { traveler }),
             };
         });
     }

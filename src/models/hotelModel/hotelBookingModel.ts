@@ -156,7 +156,7 @@ export default class HotelBookingModel extends Schema {
     };
   }
 
-  public async getSingleAgentBooking({
+  public async getSingleHotelBooking({
     booking_id,
     source_type,
     source_id,
@@ -165,7 +165,7 @@ export default class HotelBookingModel extends Schema {
     booking_id: number;
     source_id?: number;
     user_id?: number;
-    source_type?: 'AGENT' | 'AGENT B2C';
+    source_type?: 'AGENT' | 'AGENT B2C' | 'B2C';
   }): Promise<IGetSingleBookingModelData | null> {
     let tableName = 'agent_hotel_booking_view AS hb';
     if (source_type === 'AGENT B2C') {

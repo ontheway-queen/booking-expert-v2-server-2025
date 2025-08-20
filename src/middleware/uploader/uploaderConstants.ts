@@ -16,6 +16,12 @@ export const allowAllFileTypes: string[] = [
   'application/vnd.openxmlformats-',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'video/mp4',
+  'video/webm',
+  'video/ogg',
+  'video/mov',
+  'video/avi',
+  'video/wmv',
 ];
 
 // Root file folder name

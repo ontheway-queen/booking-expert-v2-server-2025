@@ -135,7 +135,7 @@ export default class AgentB2CPaymentService extends AbstractServices {
         agency_id,
         amount: data.due,
         user_id,
-        type: 'Credit',
+        type: 'Debit',
         voucher_no: mr_no,
         details: `Due has been cleared for invoice no ${data.invoice_no}. Balance Transaction`,
       });

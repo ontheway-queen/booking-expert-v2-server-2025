@@ -156,7 +156,6 @@ export class CommonFlightSupportService extends AbstractServices {
     return diffInDays < MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET;
   }
 
-  //calculate convenience fee and discount
   public async calculateFlightMarkup({
     airline,
     base_fare,
@@ -367,7 +366,21 @@ export class CommonFlightSupportService extends AbstractServices {
 
         const DobAge = DateTimeLib.calculateAge(found[0].date_of_birth);
 
-        if (DobAge !== childAge) {
+        if (childAge === 11) {
+          // if (DobAge < 12 && DobAge > 4) {
+          //   throw new CustomError(
+          //     `Passenger(${Code}) age and dob is invalid.`,
+          //     this.StatusCode.HTTP_BAD_REQUEST
+          //   );
+          // }
+        } else if (childAge === 4) {
+          // if (DobAge < 5 && DobAge > 3) {
+          //   throw new CustomError(
+          //     `Passenger(${Code}) age and dob is invalid.`,
+          //     this.StatusCode.HTTP_BAD_REQUEST
+          //   );
+          // }
+        } else if (DobAge !== childAge) {
           throw new CustomError(
             `Passenger(${Code}) age and dob is invalid.`,
             this.StatusCode.HTTP_BAD_REQUEST

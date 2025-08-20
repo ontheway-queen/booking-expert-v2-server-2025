@@ -171,6 +171,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             }
             //insert flight booking segment data
             const { baggage_info, cabin_info } = flightUtils.mapFlightAvailability(payload.flight_data.availability);
+            let invoiceDetails = '';
             payload.flight_data.flights.forEach((flight) => __awaiter(this, void 0, void 0, function* () {
                 flight.options.forEach((option, ind) => __awaiter(this, void 0, void 0, function* () {
                     yield flightBookingSegmentModel.insertFlightBookingSegment({
@@ -253,7 +254,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
             const tracking_data = [];
             tracking_data.push({
                 flight_booking_id: booking_res[0].id,
-                description: `Booking - ${booking_ref} has been made by Agent(${payload.user_name}). Booking status - ${payload.status}`,
+                description: `Booking - ${booking_ref} has been made by (${payload.user_name}). Booking status - ${payload.status}`,
             });
             if (payload.booking_block) {
                 tracking_data.push({
@@ -288,7 +289,7 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                 ref_type: payload.invoice_ref_type,
                 total_amount: payload.flight_data.fare.payable,
                 due: payload.flight_data.fare.payable,
-                details: `Invoice has been created for flight booking ref no. - ${booking_ref}`,
+                details: `Invoice for Flight booking ref no - ${booking_ref}. Route-${flightUtils.getRouteOfFlight(payload.flight_data.leg_description)} (${flightUtils.getJourneyType(payload.flight_data.journey_type)}) with ${payload.traveler_data.length} traveler.`,
                 type: constants_1.INVOICE_TYPES.SALE,
                 status: constants_1.INVOICE_STATUS_TYPES.ISSUED,
             });

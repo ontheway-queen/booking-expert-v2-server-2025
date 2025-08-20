@@ -6,7 +6,10 @@ import {
 } from '../../../utils/miscellaneous/holidayConstants';
 import {
   GENERATE_AUTO_UNIQUE_ID,
+  INVOICE_STATUS_TYPES,
+  INVOICE_TYPES,
   SOURCE_AGENT_B2C,
+  TYPE_HOLIDAY,
 } from '../../../utils/miscellaneous/constants';
 import Lib from '../../../utils/lib/lib';
 import CustomError from '../../../utils/lib/customError';
@@ -163,26 +166,41 @@ export class AgentB2CHolidayService extends AbstractServices {
         booking_body
       );
 
-      if (booking_res.length) {
-        return {
-          success: true,
-          code: this.StatusCode.HTTP_SUCCESSFUL,
-          message: 'Holiday package has been booked successfully',
-          data: {
-            id: booking_res[0].id,
-            booking_ref,
-            total_adult_price,
-            total_child_price,
-            total_markup,
-            total_price,
-          },
-        };
-      } else {
-        throw new CustomError(
-          'An error occurred while booking the holiday package',
-          this.StatusCode.HTTP_INTERNAL_SERVER_ERROR
-        );
-      }
+      //create invoice
+      const invoiceModel = this.Model.InvoiceModel(trx);
+
+      const invoice_no = await Lib.generateNo({
+        trx: trx,
+        type: GENERATE_AUTO_UNIQUE_ID.invoice,
+      });
+
+      await invoiceModel.createInvoice({
+        invoice_no,
+        source_type: SOURCE_AGENT_B2C,
+        source_id: agency_id,
+        user_id,
+        ref_id: booking_res[0].id,
+        ref_type: TYPE_HOLIDAY,
+        total_amount: total_price,
+        due: total_price,
+        details: `Invoice for Holiday booking ref no. - ${booking_ref}.`,
+        type: INVOICE_TYPES.SALE,
+        status: INVOICE_STATUS_TYPES.ISSUED,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: 'Holiday package has been booked successfully',
+        data: {
+          id: booking_res[0].id,
+          booking_ref,
+          total_adult_price,
+          total_child_price,
+          total_markup,
+          total_price,
+        },
+      };
     });
   }
 

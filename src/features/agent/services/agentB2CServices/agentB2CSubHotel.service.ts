@@ -1,7 +1,7 @@
-import { Request } from "express";
-import AbstractServices from "../../../../abstract/abstract.service";
-import { IGetAgentB2CHotelBookingQuery } from "../../utils/types/agentB2CSubTypes/agentB2CSubHotel.types";
-import { SOURCE_AGENT_B2C } from "../../../../utils/miscellaneous/constants";
+import { Request } from 'express';
+import AbstractServices from '../../../../abstract/abstract.service';
+import { IGetAgentB2CHotelBookingQuery } from '../../utils/types/agentB2CSubTypes/agentB2CSubHotel.types';
+import { SOURCE_AGENT_B2C } from '../../../../utils/miscellaneous/constants';
 
 export class AgentB2CSubHotelService extends AbstractServices {
   constructor() {
@@ -44,7 +44,7 @@ export class AgentB2CSubHotelService extends AbstractServices {
 
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    const data = await hotelBookingModel.getSingleAgentBooking({
+    const data = await hotelBookingModel.getSingleHotelBooking({
       booking_id,
       source_id: agency_id,
       source_type: SOURCE_AGENT_B2C,
@@ -84,7 +84,7 @@ export class AgentB2CSubHotelService extends AbstractServices {
 
       const hotelBookingModel = this.Model.HotelBookingModel(trx);
 
-      const checkBooking = await hotelBookingModel.getSingleAgentBooking({
+      const checkBooking = await hotelBookingModel.getSingleHotelBooking({
         booking_id,
         source_type: SOURCE_AGENT_B2C,
         source_id: agency_id,
