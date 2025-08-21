@@ -24,6 +24,7 @@ const database_1 = require("./database");
 const redis_1 = require("./redis");
 const router_1 = __importDefault(require("./router"));
 const socket_1 = require("./socket");
+const cors_2 = require("../utils/miscellaneous/cors");
 class App {
     constructor(port) {
         this.app = (0, express_1.default)();
@@ -36,6 +37,7 @@ class App {
         this.notFoundRouter();
         this.errorHandle();
         this.disableXPoweredBy();
+        this.origin = cors_2.origin;
     }
     // Run cron jobs
     runCron() {
@@ -64,7 +66,7 @@ class App {
             this.app.use(express_1.default.json({ limit: '2mb' }));
             this.app.use(express_1.default.urlencoded({ limit: '2mb', extended: true }));
             this.app.use((0, morgan_1.default)('dev'));
-            this.app.use((0, cors_1.default)({ origin: cors_origin, credentials: true }));
+            this.app.use((0, cors_1.default)({ origin: this.origin, credentials: true }));
         });
     }
     // socket connection

@@ -43,4 +43,8 @@ export const origin: string[] = [
   'https://www.travelarchitect.net',
   'https://joyair.co',
   'https://www.joyair.co',
+  'https://bhubanmajhi.com.bd',
+  'https://www.bhubanmajhi.com.bd',
+  'https://a1traveler.xyz',
+  'https://www.a1traveler.xyz',
 ];

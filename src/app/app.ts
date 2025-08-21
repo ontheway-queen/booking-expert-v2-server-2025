@@ -11,11 +11,13 @@ import { setUpCorsOrigin } from './database';
 import { client } from './redis';
 import RootRouter from './router';
 import { SocketServer, io } from './socket';
+import { origin } from '../utils/miscellaneous/cors';
 
 class App {
   public app: Application = express();
   private server: Server;
   private port: number;
+  private origin: string[];
 
   constructor(port: number) {
     this.server = SocketServer(this.app);
@@ -27,6 +29,7 @@ class App {
     this.notFoundRouter();
     this.errorHandle();
     this.disableXPoweredBy();
+    this.origin = origin;
   }
 
   // Run cron jobs
@@ -58,7 +61,7 @@ class App {
     this.app.use(express.json({ limit: '2mb' }));
     this.app.use(express.urlencoded({ limit: '2mb', extended: true }));
     this.app.use(morgan('dev'));
-    this.app.use(cors({ origin: cors_origin, credentials: true }));
+    this.app.use(cors({ origin: this.origin, credentials: true }));
   }
 
   // socket connection
