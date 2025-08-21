@@ -19,9 +19,7 @@ const node_cron_1 = __importDefault(require("node-cron"));
 const publicCommon_service_1 = __importDefault(require("../features/public/services/publicCommon.service"));
 const errorHandler_1 = __importDefault(require("../middleware/errorHandler/errorHandler"));
 const customError_1 = __importDefault(require("../utils/lib/customError"));
-const constants_1 = require("../utils/miscellaneous/constants");
 const database_1 = require("./database");
-const redis_1 = require("./redis");
 const router_1 = __importDefault(require("./router"));
 const socket_1 = require("./socket");
 const cors_2 = require("../utils/miscellaneous/cors");
@@ -62,10 +60,12 @@ class App {
     //init middleware
     initMiddleware() {
         return __awaiter(this, void 0, void 0, function* () {
-            const cors_origin = JSON.parse((yield redis_1.client.get(constants_1.cors_origin_name)));
+            // const cors_origin = JSON.parse(
+            //   (await client.get(cors_origin_name)) as string
+            // );
             this.app.use(express_1.default.json({ limit: '2mb' }));
             this.app.use(express_1.default.urlencoded({ limit: '2mb', extended: true }));
-            this.app.use((0, morgan_1.default)('dev'));
+            this.app.use((0, morgan_1.default)('tiny'));
             this.app.use((0, cors_1.default)({ origin: this.origin, credentials: true }));
         });
     }

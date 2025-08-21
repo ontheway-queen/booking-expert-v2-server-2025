@@ -54,13 +54,13 @@ class App {
 
   //init middleware
   private async initMiddleware() {
-    const cors_origin = JSON.parse(
-      (await client.get(cors_origin_name)) as string
-    );
+    // const cors_origin = JSON.parse(
+    //   (await client.get(cors_origin_name)) as string
+    // );
 
     this.app.use(express.json({ limit: '2mb' }));
     this.app.use(express.urlencoded({ limit: '2mb', extended: true }));
-    this.app.use(morgan('dev'));
+    this.app.use(morgan('tiny'));
     this.app.use(cors({ origin: this.origin, credentials: true }));
   }
 
