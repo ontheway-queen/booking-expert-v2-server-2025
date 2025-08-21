@@ -26,6 +26,7 @@ class App {
     constructor(port) {
         this.app = (0, express_1.default)();
         this.server = (0, socket_1.SocketServer)(this.app);
+        this.origin = cors_2.origin;
         this.port = port;
         this.initMiddleware();
         this.initRouters();
@@ -34,7 +35,6 @@ class App {
         this.notFoundRouter();
         this.errorHandle();
         this.disableXPoweredBy();
-        this.origin = cors_2.origin;
     }
     // Run cron jobs
     runCron() {

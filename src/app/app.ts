@@ -21,6 +21,7 @@ class App {
 
   constructor(port: number) {
     this.server = SocketServer(this.app);
+    this.origin = origin;
     this.port = port;
     this.initMiddleware();
     this.initRouters();
@@ -29,7 +30,6 @@ class App {
     this.notFoundRouter();
     this.errorHandle();
     this.disableXPoweredBy();
-    this.origin = origin;
   }
 
   // Run cron jobs
