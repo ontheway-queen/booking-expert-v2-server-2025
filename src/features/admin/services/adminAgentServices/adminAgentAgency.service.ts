@@ -239,7 +239,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       console.log('restBody White label', restBody.white_label);
 
-      if (restBody.white_label && !white_label_permissions) {
+      if (restBody.white_label) {
         const checkPermission = await AgentModel.getWhiteLabelPermission({
           agency_id,
         });

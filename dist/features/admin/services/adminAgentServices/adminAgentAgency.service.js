@@ -201,7 +201,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     }
                 });
                 console.log('restBody White label', restBody.white_label);
-                if (restBody.white_label && !white_label_permissions) {
+                if (restBody.white_label) {
                     const checkPermission = yield AgentModel.getWhiteLabelPermission({
                         agency_id,
                     });
