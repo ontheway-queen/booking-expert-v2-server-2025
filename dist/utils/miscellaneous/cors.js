@@ -44,4 +44,6 @@ exports.origin = [
     'https://www.fgtoursntravels.com',
     'https://travelarchitect.net',
     'https://www.travelarchitect.net',
+    'https://joyair.co',
+    'https://www.joyair.co',
 ];

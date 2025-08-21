@@ -52,7 +52,7 @@ class App {
     this.app.use(express.json({ limit: '2mb' }));
     this.app.use(express.urlencoded({ limit: '2mb', extended: true }));
     this.app.use(morgan('dev'));
-    this.app.use(cors());
+    this.app.use(cors({ origin: this.origin, credentials: true }));
   }
 
   // socket connection
