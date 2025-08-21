@@ -154,7 +154,7 @@ export default class Models {
     return new HolidayPackageBookingModel(trx || db);
   }
 
-  //Sub agent markup model
+  //SUB AGENT markup model
   public SubAgentMarkupModel(trx?: Knex.Transaction) {
     return new SubAgentMarkupModel(trx || db);
   }

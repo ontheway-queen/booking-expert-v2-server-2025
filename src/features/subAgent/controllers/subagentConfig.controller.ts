@@ -1,0 +1,61 @@
+import { Request, Response } from 'express';
+import AbstractController from '../../../abstract/abstract.controller';
+import { SubAgentConfigService } from '../services/subAgentConfig.service';
+
+export default class SubAgentConfigController extends AbstractController {
+  private service = new SubAgentConfigService();
+  constructor() {
+    super();
+  }
+
+  public GetHomePageData = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.GetHomePageData(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public GetAboutUsPageData = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.GetAboutUsPageData(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public GetContactUsPageData = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.GetContactUsPageData(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public GetPrivacyPolicyPageData = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.GetPrivacyPolicyPageData(
+        req
+      );
+      res.status(code).json(rest);
+    }
+  );
+
+  public GetTermsAndConditionsPageData = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } =
+        await this.service.GetTermsAndConditionsPageData(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public GetAccountsData = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.GetAccountsData(req);
+      res.status(code).json(rest);
+    }
+  );
+}

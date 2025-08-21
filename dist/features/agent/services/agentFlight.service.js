@@ -83,9 +83,9 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'No commission set has been found for the agency',
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Flight',
@@ -215,9 +215,9 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'No commission set has been found for the agency',
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Flight',
@@ -360,9 +360,9 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'No commission set has been found for the agency',
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Flight',
@@ -438,9 +438,9 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'Booking permission is not allowed, please contact with the authority',
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Flight',

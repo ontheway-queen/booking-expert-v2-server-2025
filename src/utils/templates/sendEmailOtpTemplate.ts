@@ -4,7 +4,17 @@ import {
   PROJECT_NAME,
 } from '../miscellaneous/constants';
 
-export const sendEmailOtpTemplate = (otp: string, otpFor: string) => {
+export const sendEmailOtpTemplate = ({
+  otp,
+  otpFor,
+  logo,
+  project,
+}: {
+  otp: string;
+  otpFor: string;
+  project?: string;
+  logo?: string;
+}) => {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -43,8 +53,8 @@ export const sendEmailOtpTemplate = (otp: string, otpFor: string) => {
               <td align="center" style="padding: 20px;">
                 <!-- Logo -->
                 <img
-                  src="${PROJECT_LOGO}"
-                  alt="${PROJECT_NAME}"
+                  src="${logo || PROJECT_LOGO}"
+                  alt="${project || PROJECT_NAME}"
                   style="display: block; width: 80px; margin-bottom: 10px;"
                 />
               </td>

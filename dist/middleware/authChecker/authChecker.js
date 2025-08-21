@@ -272,7 +272,7 @@ class AuthChecker {
                 next();
             }
         });
-        // Agency B2C White label Auth Checker
+        // Agency White label Auth Checker
         this.whiteLabelAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             let { token } = req.headers;
             if (!token) {
@@ -308,7 +308,8 @@ class AuthChecker {
                 }
                 const module = req.originalUrl.split('/')[4] || '';
                 req.agencyB2CWhiteLabel = {
-                    agency_id: Number(check_token === null || check_token === void 0 ? void 0 : check_token.agency_id),
+                    agency_id: check_token.agency_id,
+                    agency_name: check_agency.agency_name,
                     flight: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.flight),
                     hotel: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.hotel),
                     visa: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.visa),

@@ -488,7 +488,7 @@ export default class AgentB2CHotelService extends AbstractServices {
         ref_type: TYPE_HOTEL,
         total_amount: recheck.fee.total_price,
         due: recheck.fee.total_price,
-        details: `Invoice for Hotel booking ref no. - ${booking_ref}. Hotel: ${recheck.name}, City: ${payload.city_code}, Check-in: ${payload.city_code}, Check-out: ${payload.checkout}, with ${travelerPayload.length} traveler(s).`,
+        details: `Invoice for Hotel booking ref no. - ${booking_ref}. Hotel: ${recheck.name}, City: ${payload.city_code}, Check-in: ${payload.checkin}, Check-out: ${payload.checkout}, with ${travelerPayload.length} traveler(s).`,
         type: INVOICE_TYPES.SALE,
         status: INVOICE_STATUS_TYPES.ISSUED,
       });
@@ -575,5 +575,39 @@ export default class AgentB2CHotelService extends AbstractServices {
       message: this.ResMsg.HTTP_OK,
       data: { ...restData, traveler },
     };
+  }
+
+  public async hotelBookingCancel(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyB2CWhiteLabel;
+      const { user_id } = req.agencyB2CUser;
+
+      const { id } = req.params;
+      const hotelBookingModel = this.Model.HotelBookingModel(trx);
+
+      const data = await hotelBookingModel.getSingleHotelBooking({
+        booking_id: Number(id),
+        source_type: SOURCE_AGENT_B2C,
+        source_id: agency_id,
+        user_id,
+      });
+
+      if (!data) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      // if(data.s){}
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: data,
+      };
+    });
   }
 }

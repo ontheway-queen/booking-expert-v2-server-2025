@@ -135,7 +135,7 @@ class Models {
     HolidayPackageBookingModel(trx) {
         return new holidayPackageBookingModel_1.default(trx || database_1.db);
     }
-    //Sub agent markup model
+    //SUB AGENT markup model
     SubAgentMarkupModel(trx) {
         return new subAgentMarkupModel_1.default(trx || database_1.db);
     }

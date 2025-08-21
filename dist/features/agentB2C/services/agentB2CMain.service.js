@@ -60,11 +60,25 @@ class AgentB2CMainService extends abstract_service_1.default {
                 }
                 const otp = lib_1.default.otpGenNumber(6);
                 const hashed_otp = yield lib_1.default.hashValue(otp);
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const siteData = yield configModel.getSiteConfig({ agency_id });
+                if (!siteData) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'Site configuration not found',
+                    };
+                }
                 try {
                     const send_email = yield emailSendLib_1.default.sendEmailAgent(trx, agency_id, {
                         email,
                         emailSub: constants_1.OTP_EMAIL_SUBJECT,
-                        emailBody: (0, sendEmailOtpTemplate_1.sendEmailOtpTemplate)(otp, OTP_FOR),
+                        emailBody: (0, sendEmailOtpTemplate_1.sendEmailOtpTemplate)({
+                            otp,
+                            otpFor: OTP_FOR,
+                            logo: siteData.main_logo,
+                            project: siteData.site_name,
+                        }),
                     });
                     if (send_email) {
                         yield commonModel.insertOTP({

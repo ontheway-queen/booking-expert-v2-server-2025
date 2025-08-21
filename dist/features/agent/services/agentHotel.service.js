@@ -60,9 +60,9 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Hotel',
@@ -148,9 +148,9 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Hotel',
@@ -210,9 +210,9 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Hotel',
@@ -284,9 +284,9 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Hotel',

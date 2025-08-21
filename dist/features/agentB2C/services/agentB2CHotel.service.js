@@ -414,7 +414,7 @@ class AgentB2CHotelService extends abstract_service_1.default {
                     ref_type: constants_1.TYPE_HOTEL,
                     total_amount: recheck.fee.total_price,
                     due: recheck.fee.total_price,
-                    details: `Invoice for Hotel booking ref no. - ${booking_ref}. Hotel: ${recheck.name}, City: ${payload.city_code}, Check-in: ${payload.city_code}, Check-out: ${payload.checkout}, with ${travelerPayload.length} traveler(s).`,
+                    details: `Invoice for Hotel booking ref no. - ${booking_ref}. Hotel: ${recheck.name}, City: ${payload.city_code}, Check-in: ${payload.checkin}, Check-out: ${payload.checkout}, with ${travelerPayload.length} traveler(s).`,
                     type: constants_1.INVOICE_TYPES.SALE,
                     status: constants_1.INVOICE_STATUS_TYPES.ISSUED,
                 });
@@ -482,6 +482,36 @@ class AgentB2CHotelService extends abstract_service_1.default {
                 message: this.ResMsg.HTTP_OK,
                 data: Object.assign(Object.assign({}, restData), { traveler }),
             };
+        });
+    }
+    hotelBookingCancel(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyB2CWhiteLabel;
+                const { user_id } = req.agencyB2CUser;
+                const { id } = req.params;
+                const hotelBookingModel = this.Model.HotelBookingModel(trx);
+                const data = yield hotelBookingModel.getSingleHotelBooking({
+                    booking_id: Number(id),
+                    source_type: constants_1.SOURCE_AGENT_B2C,
+                    source_id: agency_id,
+                    user_id,
+                });
+                if (!data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                // if(data.s){}
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                    data: data,
+                };
+            }));
         });
     }
 }

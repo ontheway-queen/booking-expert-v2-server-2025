@@ -135,7 +135,7 @@ export default class PublicEmailOTPService extends AbstractServices {
             ? EmailSendLib.sendEmail({
                 email,
                 emailSub: OTP_EMAIL_SUBJECT,
-                emailBody: sendEmailOtpTemplate(otp, OTP_FOR),
+                emailBody: sendEmailOtpTemplate({ otp, otpFor: OTP_FOR }),
               })
             : undefined,
         ]);
