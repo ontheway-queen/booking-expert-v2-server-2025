@@ -16,7 +16,7 @@ class AdminAgentAgencyValidator {
         });
         this.updateAgency = joi_1.default.object({
             agency_name: joi_1.default.string().trim().optional(),
-            email: joi_1.default.string().trim().optional(),
+            email: joi_1.default.string().lowercase().trim().optional(),
             phone: joi_1.default.string().trim().optional(),
             address: joi_1.default.string().trim().optional(),
             flight_markup_set: joi_1.default.number().optional(),
@@ -79,7 +79,7 @@ class AdminAgentAgencyValidator {
         });
         this.createAgency = joi_1.default.object({
             agency_name: joi_1.default.string().trim().required(),
-            email: joi_1.default.string().trim().required(),
+            email: joi_1.default.string().lowercase().trim().required(),
             phone: joi_1.default.string().trim().required(),
             address: joi_1.default.string().trim().required(),
             user_name: joi_1.default.string().trim().required(),

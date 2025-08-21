@@ -19,6 +19,11 @@ import {
   IUpdateAgencyB2CPopularPlace,
 } from '../../../../utils/modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types';
 import { SOURCE_AGENT } from '../../../../utils/miscellaneous/constants';
+import {
+  heroBG,
+  popularDestination,
+  popularPlaces,
+} from '../../../../utils/miscellaneous/siteConfig/pagesContent';
 
 export class AgentB2CSubConfigService extends AbstractServices {
   public async getB2CMarkup(req: Request) {
@@ -262,9 +267,9 @@ export class AgentB2CSubConfigService extends AbstractServices {
       await this.insertAgentAudit(trx, {
         agency_id,
         created_by: user_id,
-        details: `New bg content(${body.type}) created for ${body.tab || 'all tab'}(${
-          files[0].filename
-        }).`,
+        details: `New bg content(${body.type}) created for ${
+          body.tab || 'all tab'
+        }(${files[0].filename}).`,
         payload: JSON.stringify({
           ...body,
           content: files[0].filename,
@@ -322,7 +327,15 @@ export class AgentB2CSubConfigService extends AbstractServices {
       await configModel.updateHeroBGContent(payload, { agency_id, id });
 
       if (payload.content && check[0].content) {
-        await this.manageFile.deleteFromCloud([check[0].content]);
+        const heroContent = heroBG(agency_id);
+
+        const found = heroContent.find(
+          (item) => item.content === check[0].content
+        );
+
+        if (!found) {
+          await this.manageFile.deleteFromCloud([check[0].content]);
+        }
       }
 
       await this.insertAgentAudit(trx, {
@@ -362,7 +375,15 @@ export class AgentB2CSubConfigService extends AbstractServices {
       await configModel.deleteHeroBGContent({ agency_id, id });
 
       if (check[0].content) {
-        await this.manageFile.deleteFromCloud([check[0].content]);
+        const heroContent = heroBG(agency_id);
+
+        const found = heroContent.find(
+          (item) => item.content === check[0].content
+        );
+
+        if (!found) {
+          await this.manageFile.deleteFromCloud([check[0].content]);
+        }
       }
 
       await this.insertAgentAudit(trx, {
@@ -538,7 +559,15 @@ export class AgentB2CSubConfigService extends AbstractServices {
       await configModel.updatePopularDestination(payload, { agency_id, id });
 
       if (payload.thumbnail && check.thumbnail) {
-        await this.manageFile.deleteFromCloud([check.thumbnail]);
+        const heroContent = popularDestination(agency_id);
+
+        const found = heroContent.find(
+          (item) => item.thumbnail === check.thumbnail
+        );
+
+        if (!found) {
+          await this.manageFile.deleteFromCloud([check.thumbnail]);
+        }
       }
       await this.insertAgentAudit(trx, {
         agency_id,
@@ -587,7 +616,15 @@ export class AgentB2CSubConfigService extends AbstractServices {
       });
 
       if (check.thumbnail) {
-        await this.manageFile.deleteFromCloud([check.thumbnail]);
+        const heroContent = popularDestination(agency_id);
+
+        const found = heroContent.find(
+          (item) => item.thumbnail === check.thumbnail
+        );
+
+        if (!found) {
+          await this.manageFile.deleteFromCloud([check.thumbnail]);
+        }
       }
 
       return {
@@ -731,7 +768,15 @@ export class AgentB2CSubConfigService extends AbstractServices {
       await configModel.updatePopularPlace(payload, { agency_id, id });
 
       if (payload.thumbnail && check.thumbnail) {
-        await this.manageFile.deleteFromCloud([check.thumbnail]);
+        const heroContent = popularPlaces(agency_id);
+
+        const found = heroContent.find(
+          (item) => item.thumbnail === check.thumbnail
+        );
+
+        if (!found) {
+          await this.manageFile.deleteFromCloud([check.thumbnail]);
+        }
       }
 
       await this.insertAgentAudit(trx, {
@@ -781,7 +826,15 @@ export class AgentB2CSubConfigService extends AbstractServices {
       });
 
       if (check.thumbnail) {
-        await this.manageFile.deleteFromCloud([check.thumbnail]);
+        const heroContent = popularPlaces(agency_id);
+
+        const found = heroContent.find(
+          (item) => item.thumbnail === check.thumbnail
+        );
+
+        if (!found) {
+          await this.manageFile.deleteFromCloud([check.thumbnail]);
+        }
       }
 
       return {
@@ -1034,13 +1087,16 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
       // Check if any visa exists with this visa type
       const visaModel = this.Model.VisaModel(trx);
-      const checkVisa = await visaModel.checkVisaExistsByVisaType({ visa_type_id: Number(id) });
+      const checkVisa = await visaModel.checkVisaExistsByVisaType({
+        visa_type_id: Number(id),
+      });
 
       if (checkVisa.length) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: 'Cannot delete this visa type as it is associated with existing visas.',
+          message:
+            'Cannot delete this visa type as it is associated with existing visas.',
         };
       }
 
@@ -1130,12 +1186,15 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
       // Check if any visa exists with this visa mode
       const visaModel = this.Model.VisaModel(trx);
-      const checkVisa = await visaModel.checkVisaExistsByVisaMode({ visa_mode_id: Number(id) });
+      const checkVisa = await visaModel.checkVisaExistsByVisaMode({
+        visa_mode_id: Number(id),
+      });
       if (checkVisa.length) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: 'Cannot delete this visa mode as it is associated with existing visas.',
+          message:
+            'Cannot delete this visa mode as it is associated with existing visas.',
         };
       }
 

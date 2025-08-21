@@ -200,13 +200,11 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                             throw new customError_1.default('Invalid files. Please provide valid trade license, civil aviation, NID, logo.', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                 });
-                console.log('restBody White label', restBody.white_label);
                 if (restBody.white_label) {
                     const checkPermission = yield AgentModel.getWhiteLabelPermission({
                         agency_id,
                     });
                     const checkConfig = yield SiteConfigModel.getSiteConfig({ agency_id });
-                    console.log('checkConfig', checkConfig);
                     if (!checkConfig) {
                         const siteService = new siteConfigSupport_service_1.SiteConfigSupportService(trx);
                         yield siteService.insertSiteConfigData({

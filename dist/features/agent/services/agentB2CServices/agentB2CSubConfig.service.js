@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentB2CSubConfigService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
 const constants_1 = require("../../../../utils/miscellaneous/constants");
+const pagesContent_1 = require("../../../../utils/miscellaneous/siteConfig/pagesContent");
 class AgentB2CSubConfigService extends abstract_service_1.default {
     getB2CMarkup(req) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -268,7 +269,11 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 }
                 yield configModel.updateHeroBGContent(payload, { agency_id, id });
                 if (payload.content && check[0].content) {
-                    yield this.manageFile.deleteFromCloud([check[0].content]);
+                    const heroContent = (0, pagesContent_1.heroBG)(agency_id);
+                    const found = heroContent.find((item) => item.content === check[0].content);
+                    if (!found) {
+                        yield this.manageFile.deleteFromCloud([check[0].content]);
+                    }
                 }
                 yield this.insertAgentAudit(trx, {
                     agency_id,
@@ -302,7 +307,11 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 }
                 yield configModel.deleteHeroBGContent({ agency_id, id });
                 if (check[0].content) {
-                    yield this.manageFile.deleteFromCloud([check[0].content]);
+                    const heroContent = (0, pagesContent_1.heroBG)(agency_id);
+                    const found = heroContent.find((item) => item.content === check[0].content);
+                    if (!found) {
+                        yield this.manageFile.deleteFromCloud([check[0].content]);
+                    }
                 }
                 yield this.insertAgentAudit(trx, {
                     agency_id,
@@ -445,7 +454,11 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 }
                 yield configModel.updatePopularDestination(payload, { agency_id, id });
                 if (payload.thumbnail && check.thumbnail) {
-                    yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                    const heroContent = (0, pagesContent_1.popularDestination)(agency_id);
+                    const found = heroContent.find((item) => item.thumbnail === check.thumbnail);
+                    if (!found) {
+                        yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                    }
                 }
                 yield this.insertAgentAudit(trx, {
                     agency_id,
@@ -488,7 +501,11 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     type: 'DELETE',
                 });
                 if (check.thumbnail) {
-                    yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                    const heroContent = (0, pagesContent_1.popularDestination)(agency_id);
+                    const found = heroContent.find((item) => item.thumbnail === check.thumbnail);
+                    if (!found) {
+                        yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                    }
                 }
                 return {
                     success: true,
@@ -603,7 +620,11 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 }
                 yield configModel.updatePopularPlace(payload, { agency_id, id });
                 if (payload.thumbnail && check.thumbnail) {
-                    yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                    const heroContent = (0, pagesContent_1.popularPlaces)(agency_id);
+                    const found = heroContent.find((item) => item.thumbnail === check.thumbnail);
+                    if (!found) {
+                        yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                    }
                 }
                 yield this.insertAgentAudit(trx, {
                     agency_id,
@@ -646,7 +667,11 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     type: 'DELETE',
                 });
                 if (check.thumbnail) {
-                    yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                    const heroContent = (0, pagesContent_1.popularPlaces)(agency_id);
+                    const found = heroContent.find((item) => item.thumbnail === check.thumbnail);
+                    if (!found) {
+                        yield this.manageFile.deleteFromCloud([check.thumbnail]);
+                    }
                 }
                 return {
                     success: true,
@@ -856,7 +881,9 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 }
                 // Check if any visa exists with this visa type
                 const visaModel = this.Model.VisaModel(trx);
-                const checkVisa = yield visaModel.checkVisaExistsByVisaType({ visa_type_id: Number(id) });
+                const checkVisa = yield visaModel.checkVisaExistsByVisaType({
+                    visa_type_id: Number(id),
+                });
                 if (checkVisa.length) {
                     return {
                         success: false,
@@ -941,7 +968,9 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 }
                 // Check if any visa exists with this visa mode
                 const visaModel = this.Model.VisaModel(trx);
-                const checkVisa = yield visaModel.checkVisaExistsByVisaMode({ visa_mode_id: Number(id) });
+                const checkVisa = yield visaModel.checkVisaExistsByVisaMode({
+                    visa_mode_id: Number(id),
+                });
                 if (checkVisa.length) {
                     return {
                         success: false,
