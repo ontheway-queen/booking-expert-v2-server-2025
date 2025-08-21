@@ -152,3 +152,5 @@ export const UMRAH_BOOKING_STATUS_PROCESSING = 'PROCESSING';
 export const UMRAH_BOOKING_STATUS_PROCESSED = 'PROCESSED';
 export const UMRAH_BOOKING_STATUS_CONFIRMED = 'CONFIRMED';
 export const UMRAH_BOOKING_STATUS_CANCELLED = 'CANCELLED';
+
+export const cors_origin_name = 'cors_origins';

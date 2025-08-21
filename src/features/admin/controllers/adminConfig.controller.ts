@@ -179,6 +179,7 @@ export default class AdminConfigController extends AbstractController {
       }
     }
   );
+
   public getSocialMedia = this.asyncWrapper.wrap(
     { querySchema: this.validator.getSocialMedia },
     async (req: Request, res: Response) => {
@@ -206,6 +207,47 @@ export default class AdminConfigController extends AbstractController {
     },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.updateSocialMedia(req);
+      if (data.success) {
+        res.status(code).json(data);
+      } else {
+        this.error(data.message, code);
+      }
+    }
+  );
+
+  public insertCorsOrigin = this.asyncWrapper.wrap(
+    {
+      bodySchema: this.validator.insertCorsOrigin,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.insertCorsOrigin(req);
+      if (data.success) {
+        res.status(code).json(data);
+      } else {
+        this.error(data.message, code);
+      }
+    }
+  );
+
+  public updateCorsOrigin = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+      bodySchema: this.validator.updateCorsOrigin,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.updateCorsOrigin(req);
+      if (data.success) {
+        res.status(code).json(data);
+      } else {
+        this.error(data.message, code);
+      }
+    }
+  );
+
+  public getCorsOrigin = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getCorsOrigin(req);
       if (data.success) {
         res.status(code).json(data);
       } else {

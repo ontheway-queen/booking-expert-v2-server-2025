@@ -16,6 +16,7 @@ exports.AdminConfigService = void 0;
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
 const holidayConstants_1 = require("../../../utils/miscellaneous/holidayConstants");
+const database_1 = require("../../../app/database");
 class AdminConfigService extends abstract_service_1.default {
     checkSlug(req) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -502,6 +503,44 @@ class AdminConfigService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_SUCCESSFUL,
                 };
             }));
+        });
+    }
+    insertCorsOrigin(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { origins } = req.body;
+            const model = this.Model.CommonModel();
+            yield model.insertCorsOrigin(origins);
+            (0, database_1.setUpCorsOrigin)();
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_SUCCESSFUL,
+                message: this.ResMsg.HTTP_SUCCESSFUL,
+            };
+        });
+    }
+    updateCorsOrigin(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { name, status } = req.body;
+            const model = this.Model.CommonModel();
+            yield model.updateCorsOrigin(Number(req.params.id), { name, status });
+            (0, database_1.setUpCorsOrigin)();
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_ACCEPTED,
+                message: this.ResMsg.HTTP_ACCEPTED,
+            };
+        });
+    }
+    getCorsOrigin(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.CommonModel();
+            const data = yield model.getCorsOrigin(req.query.filter);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data,
+            };
         });
     }
 }

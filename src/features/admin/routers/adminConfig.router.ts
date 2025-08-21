@@ -82,5 +82,14 @@ export default class AdminConfigRouter extends AbstractRouter {
         this.uploader.cloudUploadRaw(this.fileFolders.SOCIAL_MEDIA, ['logo']),
         this.controller.updateSocialMedia
       );
+
+    this.router
+      .route('/cors-origin')
+      .post(this.controller.insertCorsOrigin)
+      .get(this.controller.getCorsOrigin);
+
+    this.router
+      .route('/cors-origin/:id')
+      .post(this.controller.updateCorsOrigin);
   }
 }

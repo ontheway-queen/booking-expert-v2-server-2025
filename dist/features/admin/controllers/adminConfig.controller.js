@@ -160,6 +160,38 @@ class AdminConfigController extends abstract_controller_1.default {
                 this.error(data.message, code);
             }
         }));
+        this.insertCorsOrigin = this.asyncWrapper.wrap({
+            bodySchema: this.validator.insertCorsOrigin,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.insertCorsOrigin(req), { code } = _a, data = __rest(_a, ["code"]);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
+        }));
+        this.updateCorsOrigin = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+            bodySchema: this.validator.updateCorsOrigin,
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.updateCorsOrigin(req), { code } = _a, data = __rest(_a, ["code"]);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
+        }));
+        this.getCorsOrigin = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getCorsOrigin(req), { code } = _a, data = __rest(_a, ["code"]);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
+        }));
     }
 }
 exports.default = AdminConfigController;

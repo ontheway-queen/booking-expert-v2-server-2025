@@ -118,4 +118,15 @@ export default class AdminConfigValidator {
   public createSocialMedia = Joi.object({
     name: Joi.string().required(),
   });
+
+  insertCorsOrigin = Joi.object({
+    origins: Joi.array()
+      .items(Joi.object({ name: Joi.string().trim().required() }))
+      .required(),
+  });
+
+  updateCorsOrigin = Joi.object({
+    name: Joi.string().trim().required(),
+    status: Joi.boolean().optional(),
+  });
 }
