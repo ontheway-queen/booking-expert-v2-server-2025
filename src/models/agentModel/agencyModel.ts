@@ -75,7 +75,7 @@ export default class AgencyModel extends Schema {
         if (query.filter) {
           qb.where('ag.agency_name', 'ILIKE', `%${query.filter}%`)
             .orWhere('ag.agent_no', query.filter)
-            .orWhere('ag.email', 'like', `%${query.filter}%`);
+            .orWhere('ag.email', 'ILIKE', `%${query.filter}%`);
         }
         if (query.status) {
           qb.andWhere('ag.status', query.status);
@@ -102,9 +102,9 @@ export default class AgencyModel extends Schema {
         .count({ total: 'id' })
         .where((qb) => {
           if (query.filter) {
-            qb.where('ag.agency_name', 'like', `%${query.filter}%`)
+            qb.where('ag.agency_name', 'ILIKE', `%${query.filter}%`)
               .orWhere('ag.agent_no', query.filter)
-              .orWhere('ag.email', 'like', `%${query.filter}%`);
+              .orWhere('ag.email', 'ILIKE', `%${query.filter}%`);
           }
           if (query.status) {
             qb.andWhere('ag.status', query.status);
