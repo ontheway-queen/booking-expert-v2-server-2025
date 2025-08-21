@@ -19,7 +19,6 @@ const node_cron_1 = __importDefault(require("node-cron"));
 const publicCommon_service_1 = __importDefault(require("../features/public/services/publicCommon.service"));
 const errorHandler_1 = __importDefault(require("../middleware/errorHandler/errorHandler"));
 const customError_1 = __importDefault(require("../utils/lib/customError"));
-const database_1 = require("./database");
 const router_1 = __importDefault(require("./router"));
 const socket_1 = require("./socket");
 const cors_2 = require("../utils/miscellaneous/cors");
@@ -49,7 +48,7 @@ class App {
     //start server
     startServer() {
         return __awaiter(this, void 0, void 0, function* () {
-            (0, database_1.setUpCorsOrigin)();
+            // setUpCorsOrigin();
             const services = new publicCommon_service_1.default();
             yield services.getSabreToken();
             this.server.listen(this.port, () => {
@@ -63,10 +62,10 @@ class App {
             // const cors_origin = JSON.parse(
             //   (await client.get(cors_origin_name)) as string
             // );
+            this.app.use((0, cors_1.default)({ origin: this.origin, credentials: true }));
             this.app.use(express_1.default.json({ limit: '2mb' }));
             this.app.use(express_1.default.urlencoded({ limit: '2mb', extended: true }));
             this.app.use((0, morgan_1.default)('tiny'));
-            this.app.use((0, cors_1.default)({ origin: this.origin, credentials: true }));
         });
     }
     // socket connection
