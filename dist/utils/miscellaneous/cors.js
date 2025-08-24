@@ -54,4 +54,6 @@ exports.origin = [
     'https://amarbooking.com',
     'https://www.ota.mtltd.com.bd',
     'https://ota.mtltd.com.bd',
+    'https://www.ota.amartravels.com.bd',
+    'https://ota.amartravels.com.bd',
 ];
