@@ -19,7 +19,10 @@ export default class AgentB2CSubVisaRouter extends AbstractRouter {
 
     this.router.route('/applications').get(this.controller.getAgentB2CApplicationList);
 
-    this.router.route('/application/:id').get(this.controller.getAgentB2CSingleApplication);
+    this.router
+      .route('/application/:id')
+      .get(this.controller.getAgentB2CSingleApplication)
+      .patch(this.controller.updateAgentB2CVisaApplication);
 
     this.router
       .route('/:id')

@@ -270,6 +270,11 @@ export class AgentB2CVisaService extends AbstractServices {
       }
     );
 
+
+    const trackings = await visaApplicationModel.getVisaApplicationTrackingList({
+      application_id: application_data.id,
+    });
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
@@ -277,6 +282,7 @@ export class AgentB2CVisaService extends AbstractServices {
       data: {
         ...application_data,
         travelers: applicationTraveler,
+        trackings,
       },
     };
   }

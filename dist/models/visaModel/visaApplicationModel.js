@@ -195,17 +195,38 @@ class VisaApplicationModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('visa_application as va')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('va.id', 'v.title', 'vt.name as visa_type', 'vm.name as visa_mode', 'c.nice_name as country_name', 'va.application_ref', 'va.from_date', 'va.to_date', 'va.visa_fee', 'va.processing_fee', 'va.traveler', 'va.payable', 'va.status', 'va.application_date', 'va.contact_email', 'va.contact_number', 'va.whatsapp_number', 'va.nationality', 'va.residence')
+                .select('va.id', 'v.title', 'vt.name as visa_type', 'vm.name as visa_mode', 'c.nice_name as country_name', 'va.application_ref', 'u.name as applicant_name', 'va.from_date', 'va.to_date', 'va.visa_fee', 'va.processing_fee', 'va.traveler', 'va.payable', 'va.status', 'va.application_date', 'va.contact_email', 'va.contact_number', 'va.whatsapp_number', 'va.nationality', 'va.residence')
                 .leftJoin('visa as v', 'va.visa_id', 'v.id')
                 .leftJoin('visa_type as vt', 'v.visa_type_id', 'vt.id')
                 .leftJoin('visa_mode as vm', 'v.visa_mode_id', 'vm.id')
                 .joinRaw(`LEFT JOIN public.country AS c ON v.country_id = c.id`)
+                .joinRaw(`LEFT JOIN agent_b2c.users as u ON va.user_id = u.id`)
                 .where((qb) => {
                 qb.andWhere('va.source_id', query.source_id);
                 qb.andWhere('va.source_type', query.source_type);
                 qb.andWhere('va.id', query.id);
             })
                 .first();
+        });
+    }
+    // update visa application
+    updateVisaApplication(payload, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('visa_application')
+                .withSchema(this.SERVICE_SCHEMA)
+                .where({ id })
+                .update({ status: payload.status });
+        });
+    }
+    //get visa application tracking
+    getVisaApplicationTrackingList(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ application_id, }) {
+            return yield this.db('visa_application_tracking')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('id', 'details', 'created_at')
+                .where((qb) => {
+                qb.andWhere('application_id', application_id);
+            });
         });
     }
 }

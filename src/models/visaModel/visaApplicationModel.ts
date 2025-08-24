@@ -10,6 +10,7 @@ import {
   IGetAgentB2CVisaApplicationQuery,
   IGetAllAgentB2CVisaApplicationData,
   IGetAllAgentB2CVisaApplicationQuery,
+  IGetVisaApplicationTrackingData,
 } from '../../utils/modelTypes/visa/visaApplicationModel.types';
 
 export default class VisaApplicationModel extends Schema {
@@ -259,9 +260,10 @@ export default class VisaApplicationModel extends Schema {
     return { data: result, total: Number(total[0].total) };
   }
 
-
-    // get agent b2c single application
-  public async getAgentB2CSingleVisaApplicationForAgent(query: IGetAgentB2CSingleVisaApplicationForAgentQuery) {
+  // get agent b2c single application
+  public async getAgentB2CSingleVisaApplicationForAgent(
+    query: IGetAgentB2CSingleVisaApplicationForAgentQuery
+  ) {
     return await this.db('visa_application as va')
       .withSchema(this.SERVICE_SCHEMA)
       .select(
@@ -271,6 +273,7 @@ export default class VisaApplicationModel extends Schema {
         'vm.name as visa_mode',
         'c.nice_name as country_name',
         'va.application_ref',
+        'u.name as applicant_name',
         'va.from_date',
         'va.to_date',
         'va.visa_fee',
@@ -283,17 +286,40 @@ export default class VisaApplicationModel extends Schema {
         'va.contact_number',
         'va.whatsapp_number',
         'va.nationality',
-        'va.residence',
+        'va.residence'
       )
       .leftJoin('visa as v', 'va.visa_id', 'v.id')
       .leftJoin('visa_type as vt', 'v.visa_type_id', 'vt.id')
       .leftJoin('visa_mode as vm', 'v.visa_mode_id', 'vm.id')
       .joinRaw(`LEFT JOIN public.country AS c ON v.country_id = c.id`)
+      .joinRaw(`LEFT JOIN agent_b2c.users as u ON va.user_id = u.id`)
       .where((qb) => {
         qb.andWhere('va.source_id', query.source_id);
         qb.andWhere('va.source_type', query.source_type);
         qb.andWhere('va.id', query.id);
       })
       .first();
+  }
+
+  // update visa application
+  public async updateVisaApplication(payload: { status: string }, id: number) {
+    return await this.db('visa_application')
+      .withSchema(this.SERVICE_SCHEMA)
+      .where({ id })
+      .update({ status: payload.status });
+  }
+
+  //get visa application tracking
+  public async getVisaApplicationTrackingList({
+    application_id,
+  }: {
+    application_id: number;
+  }): Promise<IGetVisaApplicationTrackingData[]> {
+    return await this.db('visa_application_tracking')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('id', 'details', 'created_at')
+      .where((qb) => {
+        qb.andWhere('application_id', application_id);
+      });
   }
 }

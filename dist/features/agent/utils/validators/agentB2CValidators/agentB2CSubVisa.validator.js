@@ -101,6 +101,12 @@ class AgentB2CSubVisaValidator {
             status: joi_1.default.string().optional(),
             filter: joi_1.default.string().max(100).optional(),
         });
+        this.updateVisaApplicationValidatorSchema = joi_1.default.object({
+            status: joi_1.default.string()
+                .valid('Pending', 'Papers Submitted', 'Application Received', 'In Process', 'Document Verification', 'Approved', 'Rejected', 'Collected')
+                .required(),
+            details: joi_1.default.string().required(),
+        });
     }
 }
 exports.AgentB2CSubVisaValidator = AgentB2CSubVisaValidator;

@@ -244,12 +244,51 @@ class AgentB2CSubVisaService extends abstract_service_1.default {
             const passengers = yield visaApplicationModel.getAgentB2CSingleVisaApplicationTraveler({
                 application_id: data.id,
             });
+            const trackings = yield visaApplicationModel.getVisaApplicationTrackingList({
+                application_id: data.id,
+            });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: Object.assign(Object.assign({}, data), { passengers }),
+                data: Object.assign(Object.assign({}, data), { passengers,
+                    trackings }),
             };
+        });
+    }
+    updateAgentB2CVisaApplication(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { status, details } = req.body;
+                const { agency_id } = req.agencyUser;
+                const { id } = req.params;
+                const numberId = Number(id);
+                const visaApplicationModel = this.Model.VisaApplicationModel(trx);
+                const checkExist = yield visaApplicationModel.getAgentB2CSingleVisaApplicationForAgent({
+                    id: numberId,
+                    source_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT_B2C,
+                });
+                if (!checkExist) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                // update status
+                yield visaApplicationModel.updateVisaApplication({ status }, numberId);
+                //add application tracking
+                yield visaApplicationModel.createVisaApplicationTracking({
+                    details,
+                    application_id: numberId,
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }));
         });
     }
 }

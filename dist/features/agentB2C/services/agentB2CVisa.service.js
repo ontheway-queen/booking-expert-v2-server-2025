@@ -239,11 +239,14 @@ class AgentB2CVisaService extends abstract_service_1.default {
             const applicationTraveler = yield visaApplicationModel.getAgentB2CSingleVisaApplicationTraveler({
                 application_id: application_data.id,
             });
+            const trackings = yield visaApplicationModel.getVisaApplicationTrackingList({
+                application_id: application_data.id,
+            });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: Object.assign(Object.assign({}, application_data), { travelers: applicationTraveler }),
+                data: Object.assign(Object.assign({}, application_data), { travelers: applicationTraveler, trackings }),
             };
         });
     }

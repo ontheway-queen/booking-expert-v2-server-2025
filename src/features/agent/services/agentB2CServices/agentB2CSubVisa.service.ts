@@ -259,6 +259,10 @@ export class AgentB2CSubVisaService extends AbstractServices {
       application_id: data.id,
     });
 
+    const trackings = await visaApplicationModel.getVisaApplicationTrackingList({
+      application_id: data.id,
+    });
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
@@ -266,7 +270,47 @@ export class AgentB2CSubVisaService extends AbstractServices {
       data: {
         ...data,
         passengers,
+        trackings,
       },
     };
+  }
+
+  public async updateAgentB2CVisaApplication(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { status, details } = req.body;
+      const { agency_id } = req.agencyUser;
+      const { id } = req.params;
+      const numberId = Number(id);
+
+      const visaApplicationModel = this.Model.VisaApplicationModel(trx);
+      const checkExist = await visaApplicationModel.getAgentB2CSingleVisaApplicationForAgent({
+        id: numberId,
+        source_id: agency_id,
+        source_type: SOURCE_AGENT_B2C,
+      });
+
+      if (!checkExist) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      // update status
+      await visaApplicationModel.updateVisaApplication({ status }, numberId);
+
+      //add application tracking
+      await visaApplicationModel.createVisaApplicationTracking({
+        details,
+        application_id: numberId,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
+    });
   }
 }
