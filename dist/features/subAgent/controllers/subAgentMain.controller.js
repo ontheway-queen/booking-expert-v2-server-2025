@@ -23,28 +23,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SubAgentMainController = void 0;
 const abstract_controller_1 = __importDefault(require("../../../abstract/abstract.controller"));
-const agentB2CConfig_service_1 = require("../services/agentB2CConfig.service");
-class AgentB2CConfigController extends abstract_controller_1.default {
+const subAgentMain_service_1 = require("../services/subAgentMain.service");
+const subagentMain_validator_1 = __importDefault(require("../utils/validator/subagentMain.validator"));
+class SubAgentMainController extends abstract_controller_1.default {
     constructor() {
-        super();
-        this.service = new agentB2CConfig_service_1.AgentB2CConfigService();
-        this.GetHomePageData = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.GetHomePageData(req), { code } = _a, rest = __rest(_a, ["code"]);
+        super(...arguments);
+        this.validator = new subagentMain_validator_1.default();
+        this.service = new subAgentMain_service_1.SubAgentMainService();
+        this.sendEmailOTP = this.asyncWrapper.wrap({ bodySchema: this.validator.sendOtpInputValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.sendEmailOtp(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
-        this.GetAboutUsPageData = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.GetAboutUsPageData(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
-        }));
-        this.GetContactUsPageData = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.GetContactUsPageData(req), { code } = _a, rest = __rest(_a, ["code"]);
-            res.status(code).json(rest);
-        }));
-        this.GetPrivacyPolicyPageData = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const _a = yield this.service.GetPrivacyPolicyPageData(req), { code } = _a, rest = __rest(_a, ["code"]);
+        this.matchEmailOTP = this.asyncWrapper.wrap({ bodySchema: this.validator.matchEmailOtpInputValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.matchEmailOtpService(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
     }
 }
-exports.default = AgentB2CConfigController;
+exports.SubAgentMainController = SubAgentMainController;

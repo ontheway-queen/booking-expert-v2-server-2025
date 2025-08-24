@@ -12,7 +12,7 @@ export default class AdminAgentAgencyValidator {
 
   public updateAgency = Joi.object({
     agency_name: Joi.string().trim().optional(),
-    email: Joi.string().trim().optional(),
+    email: Joi.string().lowercase().trim().optional(),
     phone: Joi.string().trim().optional(),
     address: Joi.string().trim().optional(),
     flight_markup_set: Joi.number().optional(),
@@ -78,7 +78,7 @@ export default class AdminAgentAgencyValidator {
 
   public createAgency = Joi.object({
     agency_name: Joi.string().trim().required(),
-    email: Joi.string().trim().required(),
+    email: Joi.string().lowercase().trim().required(),
     phone: Joi.string().trim().required(),
     address: Joi.string().trim().required(),
     user_name: Joi.string().trim().required(),

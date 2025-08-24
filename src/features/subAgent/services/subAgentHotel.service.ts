@@ -1,28 +1,28 @@
-import { Request } from "express";
-import AbstractServices from "../../../abstract/abstract.service";
-import { CTHotelSupportService } from "../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service";
+import { Request } from 'express';
+import AbstractServices from '../../../abstract/abstract.service';
+import { CTHotelSupportService } from '../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service';
 import {
   ISubAgencyGetHotelBookingQuery,
   ISubAgencyGetHotelSearchHistoryReqQuery,
   ISubAgentHotelBookingReqBody,
   ISubAgentHotelSearchReqBody,
-} from "../utils/types/subAgentHotel.types";
-import { ICTHotelBookingPayload } from "../../../utils/supportTypes/hotelTypes/ctHotelSupport.types";
-import CustomError from "../../../utils/lib/customError";
-import DateTimeLib from "../../../utils/lib/dateTimeLib";
-import BalanceLib from "../../../utils/lib/balanceLib";
-import Lib from "../../../utils/lib/lib";
+} from '../utils/types/subAgentHotel.types';
+import { ICTHotelBookingPayload } from '../../../utils/supportTypes/hotelTypes/ctHotelSupport.types';
+import CustomError from '../../../utils/lib/customError';
+import DateTimeLib from '../../../utils/lib/dateTimeLib';
+import BalanceLib from '../../../utils/lib/balanceLib';
+import Lib from '../../../utils/lib/lib';
 import {
   GENERATE_AUTO_UNIQUE_ID,
   INVOICE_STATUS_TYPES,
   INVOICE_TYPES,
   SOURCE_AGENT,
   TYPE_FLIGHT,
-} from "../../../utils/miscellaneous/constants";
+} from '../../../utils/miscellaneous/constants';
 import {
   IInsertHotelBookingCancellationPayload,
   IInsertHotelBookingTravelerPayload,
-} from "../../../utils/modelTypes/hotelModelTypes/hotelBookingModelTypes";
+} from '../../../utils/modelTypes/hotelModelTypes/hotelBookingModelTypes';
 
 export class SubAgentHotelService extends AbstractServices {
   constructor() {
@@ -38,7 +38,7 @@ export class SubAgentHotelService extends AbstractServices {
 
       const agent = await agencyModel.checkAgency({
         agency_id: ref_agent_id || agency_id,
-        status: "Active",
+        status: 'Active',
       });
 
       if (!agent) {
@@ -52,17 +52,17 @@ export class SubAgentHotelService extends AbstractServices {
       if (!agent.hotel_markup_set) {
         return {
           success: false,
-          message: "Hotel markup set is not configured for this agency.",
+          message: 'Hotel markup set is not configured for this agency.',
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === "Sub Agent") {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
-          type: "Hotel",
+          type: 'Hotel',
           agency_id,
         });
 
@@ -70,7 +70,7 @@ export class SubAgentHotelService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: "Markup information is empty. Contact with the authority",
+            message: 'Markup information is empty. Contact with the authority',
           };
         }
       }
@@ -84,7 +84,7 @@ export class SubAgentHotelService extends AbstractServices {
         destination_type: payload.destination,
         user_id: user_id,
         nationality: payload.client_nationality,
-        user_type: "Agent",
+        user_type: 'Agent',
         agency_id,
         code: payload.code,
         name: name,
@@ -120,7 +120,7 @@ export class SubAgentHotelService extends AbstractServices {
 
     const data = await OthersModel.getHotelSearchHistory({
       agency_id,
-      user_type: "Agent",
+      user_type: 'Agent',
       ...query,
     });
 
@@ -140,7 +140,7 @@ export class SubAgentHotelService extends AbstractServices {
 
       const agent = await agencyModel.checkAgency({
         agency_id: ref_agent_id || agency_id,
-        status: "Active",
+        status: 'Active',
       });
 
       if (!agent) {
@@ -154,17 +154,17 @@ export class SubAgentHotelService extends AbstractServices {
       if (!agent.hotel_markup_set) {
         return {
           success: false,
-          message: "Hotel markup set is not configured for this agency.",
+          message: 'Hotel markup set is not configured for this agency.',
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === "Sub Agent") {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
-          type: "Hotel",
+          type: 'Hotel',
           agency_id,
         });
 
@@ -172,7 +172,7 @@ export class SubAgentHotelService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: "Markup information is empty. Contact with the authority",
+            message: 'Markup information is empty. Contact with the authority',
           };
         }
       }
@@ -210,7 +210,7 @@ export class SubAgentHotelService extends AbstractServices {
 
       const agent = await agencyModel.checkAgency({
         agency_id: ref_agent_id || agency_id,
-        status: "Active",
+        status: 'Active',
       });
 
       if (!agent) {
@@ -224,17 +224,17 @@ export class SubAgentHotelService extends AbstractServices {
       if (!agent.hotel_markup_set) {
         return {
           success: false,
-          message: "Hotel markup set is not configured for this agency.",
+          message: 'Hotel markup set is not configured for this agency.',
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === "Sub Agent") {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
-          type: "Hotel",
+          type: 'Hotel',
           agency_id,
         });
 
@@ -242,7 +242,7 @@ export class SubAgentHotelService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: "Markup information is empty. Contact with the authority",
+            message: 'Markup information is empty. Contact with the authority',
           };
         }
       }
@@ -289,7 +289,7 @@ export class SubAgentHotelService extends AbstractServices {
       // Check agent and markup set
       const agent = await agencyModel.checkAgency({
         agency_id: ref_agent_id || agency_id,
-        status: "Active",
+        status: 'Active',
       });
 
       if (!agent) {
@@ -305,24 +305,24 @@ export class SubAgentHotelService extends AbstractServices {
           success: false,
           code: this.StatusCode.HTTP_FORBIDDEN,
           message:
-            "Booking permission is not allowed, please contact with the authority",
+            'Booking permission is not allowed, please contact with the authority',
         };
       }
 
       if (!agent.hotel_markup_set) {
         return {
           success: false,
-          message: "Hotel markup set is not configured for this agency.",
+          message: 'Hotel markup set is not configured for this agency.',
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === "Sub Agent") {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
-          type: "Hotel",
+          type: 'Hotel',
           agency_id,
         });
 
@@ -330,7 +330,7 @@ export class SubAgentHotelService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: "Markup information is empty. Contact with the authority",
+            message: 'Markup information is empty. Contact with the authority',
           };
         }
       }
@@ -364,7 +364,7 @@ export class SubAgentHotelService extends AbstractServices {
       if (!recheck) {
         return {
           success: false,
-          message: "Booking failed. Please try again with another room.",
+          message: 'Booking failed. Please try again with another room.',
           code: this.StatusCode.HTTP_BAD_REQUEST,
         };
       }
@@ -380,7 +380,7 @@ export class SubAgentHotelService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "Insufficient credit. Please add funds to continue.",
+          message: 'Insufficient credit. Please add funds to continue.',
         };
       }
 
@@ -414,17 +414,17 @@ export class SubAgentHotelService extends AbstractServices {
           return {
             success: false,
             message:
-              "Number of files does not match the total number of paxes.",
+              'Number of files does not match the total number of paxes.',
             code: this.StatusCode.HTTP_BAD_REQUEST,
           };
         }
 
         files.forEach((file) => {
-          const splitName = file.fieldname.split("_");
+          const splitName = file.fieldname.split('_');
 
           if (splitName.length !== 4) {
             throw new CustomError(
-              "Invalid file field name format.",
+              'Invalid file field name format.',
               this.StatusCode.HTTP_BAD_REQUEST
             );
           }
@@ -458,11 +458,11 @@ export class SubAgentHotelService extends AbstractServices {
         checkout_date: payload.checkout,
         hotel_code: payload.hotel_code,
         city_code: payload.city_code,
-        city_country_name: "City",
+        city_country_name: 'City',
         created_by: user_id,
         refundable: recheck.rates[0].refundable,
         holder: JSON.stringify(payload.holder),
-        supplier: "CT",
+        supplier: 'CT',
         hotel_name: recheck.name,
         source_id: agency_id,
         supplier_price: JSON.stringify(recheck.supplier_fee),
@@ -484,7 +484,7 @@ export class SubAgentHotelService extends AbstractServices {
         free_cancellation:
           recheck.rates[0].cancellation_policy?.free_cancellation || false,
         source_type: SOURCE_AGENT,
-        status: "Pending",
+        status: 'PENDING',
         free_cancellation_last_date:
           recheck.rates[0].cancellation_policy?.free_cancellation_last_date,
         rooms: JSON.stringify(recheck.rates[0].rooms),
@@ -621,7 +621,7 @@ export class SubAgentHotelService extends AbstractServices {
 
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    const data = await hotelBookingModel.getSingleAgentBooking({ booking_id });
+    const data = await hotelBookingModel.getSingleHotelBooking({ booking_id });
 
     if (!data) {
       return {

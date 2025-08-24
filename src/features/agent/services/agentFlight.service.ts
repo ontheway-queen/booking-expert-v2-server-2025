@@ -96,9 +96,9 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === 'Sub Agent') {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Flight',
@@ -246,9 +246,9 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === 'Sub Agent') {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Flight',
@@ -427,9 +427,9 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === 'Sub Agent') {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Flight',
@@ -533,10 +533,10 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
 
-      if (agency_type === 'Sub Agent') {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Flight',

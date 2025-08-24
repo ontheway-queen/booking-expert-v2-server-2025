@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FUNCTION_TYPE_VISA = exports.FUNCTION_TYPE_HOLIDAY = exports.FUNCTION_TYPE_HOTEL = exports.FUNCTION_TYPE_FLIGHT = exports.CONTENT_TYPE_VIDEO = exports.CONTENT_TYPE_PHOTO = exports.WHITE_LABEL_PERMISSIONS_MODULES = exports.DEPOSIT_STATUS_CANCELLED = exports.DEPOSIT_STATUS_REJECTED = exports.DEPOSIT_STATUS_APPROVED = exports.DEPOSIT_STATUS_PENDING = exports.SLUG_TYPE_BLOG = exports.SLUG_TYPE_UMRAH = exports.SLUG_TYPE_HOLIDAY = exports.SOURCE_ADMIN = exports.SOURCE_EXTERNAL = exports.SOURCE_B2C = exports.SOURCE_AGENT_B2C = exports.SOURCE_SUB_AGENT = exports.SOURCE_AGENT = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.TYPE_GROUP_FARE = exports.TYPE_UMRAH = exports.TYPE_HOLIDAY = exports.TYPE_VISA = exports.TYPE_HOTEL = exports.TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.ADMIN_NOTIFY_EMAIL = exports.PROJECT_ADDRESS = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL = exports.B2C_PROJECT_LINK = exports.AGENT_PROJECT_LINK = exports.PROJECT_ICON = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.TYPE_EMAIL_SERVER_OTHER = exports.TYPE_EMAIL_SERVER_CPANEL = exports.TYPE_EMAIL_SERVER_ZOHO = exports.TYPE_EMAIL_SERVER_NAMECHEAP = exports.TYPE_EMAIL_SERVER_HOSTINGER = exports.TYPE_EMAIL_SERVER_GMAIL = exports.OTP_TYPES = void 0;
-exports.UMRAH_BOOKING_STATUS_CANCELLED = exports.UMRAH_BOOKING_STATUS_CONFIRMED = exports.UMRAH_BOOKING_STATUS_PROCESSED = exports.UMRAH_BOOKING_STATUS_PROCESSING = exports.UMRAH_BOOKING_STATUS_PENDING = exports.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = exports.INVOICE_STATUS_TYPES = exports.INVOICE_TYPES = exports.MARKUP_MODE_DECREASE = exports.MARKUP_MODE_INCREASE = exports.MARKUP_TYPE_FLAT = exports.MARKUP_TYPE_PER = exports.PAYMENT_GATEWAYS = exports.GENERATE_AUTO_UNIQUE_ID = exports.FUNCTION_TYPE_BLOG = exports.FUNCTION_TYPE_GROUP = exports.FUNCTION_TYPE_UMRAH = void 0;
+exports.cors_origin_name = exports.UMRAH_BOOKING_STATUS_CANCELLED = exports.UMRAH_BOOKING_STATUS_CONFIRMED = exports.UMRAH_BOOKING_STATUS_PROCESSED = exports.UMRAH_BOOKING_STATUS_PROCESSING = exports.UMRAH_BOOKING_STATUS_PENDING = exports.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = exports.INVOICE_STATUS_TYPES = exports.INVOICE_TYPES = exports.MARKUP_MODE_DECREASE = exports.MARKUP_MODE_INCREASE = exports.MARKUP_TYPE_FLAT = exports.MARKUP_TYPE_PER = exports.PAYMENT_GATEWAYS = exports.GENERATE_AUTO_UNIQUE_ID = exports.FUNCTION_TYPE_BLOG = exports.FUNCTION_TYPE_GROUP = exports.FUNCTION_TYPE_UMRAH = void 0;
 // OTP types constants
 exports.OTP_TYPES = {
     reset_admin: 'reset_admin',
@@ -9,6 +9,9 @@ exports.OTP_TYPES = {
     reset_agent: 'reset_agent',
     verify_agent: 'verify_agent',
     register_agent: 'register_agent',
+    reset_sub_agent: 'reset_sub_agent',
+    verify_sub_agent: 'verify_sub_agent',
+    register_sub_agent: 'register_sub_agent',
     reset_b2c: 'reset_b2c',
     verify_b2c: 'verify_b2c',
     register_b2c: 'register_b2c',
@@ -133,3 +136,4 @@ exports.UMRAH_BOOKING_STATUS_PROCESSING = 'PROCESSING';
 exports.UMRAH_BOOKING_STATUS_PROCESSED = 'PROCESSED';
 exports.UMRAH_BOOKING_STATUS_CONFIRMED = 'CONFIRMED';
 exports.UMRAH_BOOKING_STATUS_CANCELLED = 'CANCELLED';
+exports.cors_origin_name = 'cors_origins';

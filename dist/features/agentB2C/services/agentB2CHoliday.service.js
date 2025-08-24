@@ -133,24 +133,38 @@ class AgentB2CHolidayService extends abstract_service_1.default {
                     total_markup,
                     total_price, status: holidayConstants_1.HOLIDAY_BOOKING_STATUS.PENDING });
                 const booking_res = yield holidayPackageBookingModel.insertHolidayBooking(booking_body);
-                if (booking_res.length) {
-                    return {
-                        success: true,
-                        code: this.StatusCode.HTTP_SUCCESSFUL,
-                        message: 'Holiday package has been booked successfully',
-                        data: {
-                            id: booking_res[0].id,
-                            booking_ref,
-                            total_adult_price,
-                            total_child_price,
-                            total_markup,
-                            total_price,
-                        },
-                    };
-                }
-                else {
-                    throw new customError_1.default('An error occurred while booking the holiday package', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
-                }
+                //create invoice
+                const invoiceModel = this.Model.InvoiceModel(trx);
+                const invoice_no = yield lib_1.default.generateNo({
+                    trx: trx,
+                    type: constants_1.GENERATE_AUTO_UNIQUE_ID.invoice,
+                });
+                yield invoiceModel.createInvoice({
+                    invoice_no,
+                    source_type: constants_1.SOURCE_AGENT_B2C,
+                    source_id: agency_id,
+                    user_id,
+                    ref_id: booking_res[0].id,
+                    ref_type: constants_1.TYPE_HOLIDAY,
+                    total_amount: total_price,
+                    due: total_price,
+                    details: `Invoice for Holiday booking ref no. - ${booking_ref}.`,
+                    type: constants_1.INVOICE_TYPES.SALE,
+                    status: constants_1.INVOICE_STATUS_TYPES.ISSUED,
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: 'Holiday package has been booked successfully',
+                    data: {
+                        id: booking_res[0].id,
+                        booking_ref,
+                        total_adult_price,
+                        total_child_price,
+                        total_markup,
+                        total_price,
+                    },
+                };
             }));
         });
     }

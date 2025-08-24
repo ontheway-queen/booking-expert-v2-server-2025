@@ -60,9 +60,9 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Hotel',
@@ -148,9 +148,9 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Hotel',
@@ -210,9 +210,9 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Hotel',
@@ -284,9 +284,9 @@ class AgentHotelService extends abstract_service_1.default {
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
                         type: 'Hotel',
@@ -414,7 +414,7 @@ class AgentHotelService extends abstract_service_1.default {
                     hotel_extra_charges: JSON.stringify(recheck.hotel_extra_charges),
                     free_cancellation: ((_a = recheck.rates[0].cancellation_policy) === null || _a === void 0 ? void 0 : _a.free_cancellation) || false,
                     source_type: constants_1.SOURCE_AGENT,
-                    status: 'Pending',
+                    status: 'PENDING',
                     free_cancellation_last_date: (_b = recheck.rates[0].cancellation_policy) === null || _b === void 0 ? void 0 : _b.free_cancellation_last_date,
                     rooms: JSON.stringify(recheck.rates[0].rooms),
                 });
@@ -527,7 +527,7 @@ class AgentHotelService extends abstract_service_1.default {
             const { id } = req.params;
             const booking_id = Number(id);
             const hotelBookingModel = this.Model.HotelBookingModel();
-            const data = yield hotelBookingModel.getSingleAgentBooking({ booking_id });
+            const data = yield hotelBookingModel.getSingleHotelBooking({ booking_id });
             if (!data) {
                 return {
                     success: false,

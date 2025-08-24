@@ -23,11 +23,11 @@ export default class AgentSubAgentService extends AbstractServices {
   public async createSubAgency(req: Request) {
     return this.db.transaction(async (trx) => {
       const { user_id, agency_id, agency_type } = req.agencyUser;
-      if (agency_type === 'Sub Agent') {
+      if (agency_type === 'SUB AGENT') {
         return {
           success: false,
           code: this.StatusCode.HTTP_FORBIDDEN,
-          message: 'No authority has been found to create a sub agent',
+          message: 'No authority has been found to create a SUB AGENT',
         };
       }
 
@@ -177,7 +177,7 @@ export default class AgentSubAgentService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: 'Sub Agent has been created',
+        message: 'SUB AGENT has been created',
         data: {
           agency_id: newSubAgency[0].id,
           user_id: newUser[0].id,

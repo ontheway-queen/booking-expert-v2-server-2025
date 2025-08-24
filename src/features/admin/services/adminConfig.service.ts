@@ -18,6 +18,9 @@ import {
   IUpdateBankPayload,
   IUpdateSocialMediaPayload,
 } from '../../../utils/modelTypes/commonModelTypes/commonModelTypes';
+import App from '../../../app/app';
+import app from '../../../server';
+import { setUpCorsOrigin } from '../../../app/database';
 
 export class AdminConfigService extends AbstractServices {
   public async checkSlug(req: Request) {
@@ -597,5 +600,50 @@ export class AdminConfigService extends AbstractServices {
         message: this.ResMsg.HTTP_SUCCESSFUL,
       };
     });
+  }
+
+  public async insertCorsOrigin(req: Request) {
+    const { origins } = req.body as { origins: { name: string }[] };
+
+    const model = this.Model.CommonModel();
+
+    await model.insertCorsOrigin(origins);
+
+    setUpCorsOrigin();
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_SUCCESSFUL,
+      message: this.ResMsg.HTTP_SUCCESSFUL,
+    };
+  }
+
+  public async updateCorsOrigin(req: Request) {
+    const { name, status } = req.body as { name: string; status: boolean };
+
+    const model = this.Model.CommonModel();
+
+    await model.updateCorsOrigin(Number(req.params.id), { name, status });
+
+    setUpCorsOrigin();
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_ACCEPTED,
+      message: this.ResMsg.HTTP_ACCEPTED,
+    };
+  }
+
+  public async getCorsOrigin(req: Request) {
+    const model = this.Model.CommonModel();
+
+    const data = await model.getCorsOrigin(req.query.filter as string);
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data,
+    };
   }
 }

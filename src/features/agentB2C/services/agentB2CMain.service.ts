@@ -59,12 +59,27 @@ export class AgentB2CMainService extends AbstractServices {
 
       const otp = Lib.otpGenNumber(6);
       const hashed_otp = await Lib.hashValue(otp);
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+      const siteData = await configModel.getSiteConfig({ agency_id });
+
+      if (!siteData) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Site configuration not found',
+        };
+      }
 
       try {
         const send_email = await EmailSendLib.sendEmailAgent(trx, agency_id, {
           email,
           emailSub: OTP_EMAIL_SUBJECT,
-          emailBody: sendEmailOtpTemplate(otp, OTP_FOR),
+          emailBody: sendEmailOtpTemplate({
+            otp,
+            otpFor: OTP_FOR,
+            logo: siteData.main_logo,
+            project: siteData.site_name,
+          }),
         });
 
         if (send_email) {

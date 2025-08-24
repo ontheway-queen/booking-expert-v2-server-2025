@@ -20,7 +20,9 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertHeroBGContent(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('hero_bg_content').withSchema(this.AGENT_B2C_SCHEMA).insert(payload, 'id');
+            return yield this.db('hero_bg_content')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .insert(payload, 'id');
         });
     }
     getHeroBGContent(query) {
@@ -80,7 +82,9 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertPopularDestination(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('popular_destination').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
+            return yield this.db('popular_destination')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .insert(payload);
         });
     }
     getPopularDestination(query) {
@@ -144,7 +148,9 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertPopularPlaces(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('popular_places').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
+            return yield this.db('popular_places')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .insert(payload);
         });
     }
     getPopularPlaces(query) {
@@ -202,7 +208,9 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertSiteConfig(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('site_config').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
+            return yield this.db('site_config')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .insert(payload);
         });
     }
     getSiteConfig(query) {
@@ -284,7 +292,9 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertHotDeals(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('hot_deals').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
+            return yield this.db('hot_deals')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .insert(payload);
         });
     }
     getHotDeals(query) {
@@ -341,7 +351,9 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertPopUpBanner(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('pop_up_banner').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
+            return yield this.db('pop_up_banner')
+                .withSchema(this.AGENT_B2C_SCHEMA)
+                .insert(payload);
         });
     }
     getPopUpBanner(query) {
@@ -391,7 +403,9 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     createVisaType(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_type').withSchema(this.SERVICE_SCHEMA).insert(payload);
+            return yield this.db('visa_type')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload);
         });
     }
     getAllVisaType(query) {
@@ -435,7 +449,9 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     createVisaMode(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_mode').withSchema(this.SERVICE_SCHEMA).insert(payload);
+            return yield this.db('visa_mode')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload);
         });
     }
     getAllVisaMode(query) {

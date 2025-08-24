@@ -44,7 +44,7 @@ class SubAgentHotelService extends abstract_service_1.default {
                 const OthersModel = this.Model.OthersModel(trx);
                 const agent = yield agencyModel.checkAgency({
                     agency_id: ref_agent_id || agency_id,
-                    status: "Active",
+                    status: 'Active',
                 });
                 if (!agent) {
                     return {
@@ -56,23 +56,23 @@ class SubAgentHotelService extends abstract_service_1.default {
                 if (!agent.hotel_markup_set) {
                     return {
                         success: false,
-                        message: "Hotel markup set is not configured for this agency.",
+                        message: 'Hotel markup set is not configured for this agency.',
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === "Sub Agent") {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
-                        type: "Hotel",
+                        type: 'Hotel',
                         agency_id,
                     });
                     if (!markup_amount) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Markup information is empty. Contact with the authority",
+                            message: 'Markup information is empty. Contact with the authority',
                         };
                     }
                 }
@@ -84,7 +84,7 @@ class SubAgentHotelService extends abstract_service_1.default {
                     destination_type: payload.destination,
                     user_id: user_id,
                     nationality: payload.client_nationality,
-                    user_type: "Agent",
+                    user_type: 'Agent',
                     agency_id,
                     code: payload.code,
                     name: name,
@@ -115,7 +115,7 @@ class SubAgentHotelService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const query = req.query;
             const OthersModel = this.Model.OthersModel();
-            const data = yield OthersModel.getHotelSearchHistory(Object.assign({ agency_id, user_type: "Agent" }, query));
+            const data = yield OthersModel.getHotelSearchHistory(Object.assign({ agency_id, user_type: 'Agent' }, query));
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -132,7 +132,7 @@ class SubAgentHotelService extends abstract_service_1.default {
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agent = yield agencyModel.checkAgency({
                     agency_id: ref_agent_id || agency_id,
-                    status: "Active",
+                    status: 'Active',
                 });
                 if (!agent) {
                     return {
@@ -144,23 +144,23 @@ class SubAgentHotelService extends abstract_service_1.default {
                 if (!agent.hotel_markup_set) {
                     return {
                         success: false,
-                        message: "Hotel markup set is not configured for this agency.",
+                        message: 'Hotel markup set is not configured for this agency.',
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === "Sub Agent") {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
-                        type: "Hotel",
+                        type: 'Hotel',
                         agency_id,
                     });
                     if (!markup_amount) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Markup information is empty. Contact with the authority",
+                            message: 'Markup information is empty. Contact with the authority',
                         };
                     }
                 }
@@ -194,7 +194,7 @@ class SubAgentHotelService extends abstract_service_1.default {
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agent = yield agencyModel.checkAgency({
                     agency_id: ref_agent_id || agency_id,
-                    status: "Active",
+                    status: 'Active',
                 });
                 if (!agent) {
                     return {
@@ -206,23 +206,23 @@ class SubAgentHotelService extends abstract_service_1.default {
                 if (!agent.hotel_markup_set) {
                     return {
                         success: false,
-                        message: "Hotel markup set is not configured for this agency.",
+                        message: 'Hotel markup set is not configured for this agency.',
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === "Sub Agent") {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
-                        type: "Hotel",
+                        type: 'Hotel',
                         agency_id,
                     });
                     if (!markup_amount) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Markup information is empty. Contact with the authority",
+                            message: 'Markup information is empty. Contact with the authority',
                         };
                     }
                 }
@@ -261,7 +261,7 @@ class SubAgentHotelService extends abstract_service_1.default {
                 // Check agent and markup set
                 const agent = yield agencyModel.checkAgency({
                     agency_id: ref_agent_id || agency_id,
-                    status: "Active",
+                    status: 'Active',
                 });
                 if (!agent) {
                     return {
@@ -274,29 +274,29 @@ class SubAgentHotelService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_FORBIDDEN,
-                        message: "Booking permission is not allowed, please contact with the authority",
+                        message: 'Booking permission is not allowed, please contact with the authority',
                     };
                 }
                 if (!agent.hotel_markup_set) {
                     return {
                         success: false,
-                        message: "Hotel markup set is not configured for this agency.",
+                        message: 'Hotel markup set is not configured for this agency.',
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === "Sub Agent") {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
-                        type: "Hotel",
+                        type: 'Hotel',
                         agency_id,
                     });
                     if (!markup_amount) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Markup information is empty. Contact with the authority",
+                            message: 'Markup information is empty. Contact with the authority',
                         };
                     }
                 }
@@ -324,7 +324,7 @@ class SubAgentHotelService extends abstract_service_1.default {
                 if (!recheck) {
                     return {
                         success: false,
-                        message: "Booking failed. Please try again with another room.",
+                        message: 'Booking failed. Please try again with another room.',
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                     };
                 }
@@ -337,7 +337,7 @@ class SubAgentHotelService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "Insufficient credit. Please add funds to continue.",
+                        message: 'Insufficient credit. Please add funds to continue.',
                     };
                 }
                 // Hotel Book
@@ -364,15 +364,15 @@ class SubAgentHotelService extends abstract_service_1.default {
                     if (totalPax < files.length) {
                         return {
                             success: false,
-                            message: "Number of files does not match the total number of paxes.",
+                            message: 'Number of files does not match the total number of paxes.',
                             code: this.StatusCode.HTTP_BAD_REQUEST,
                         };
                     }
                     files.forEach((file) => {
                         var _a, _b;
-                        const splitName = file.fieldname.split("_");
+                        const splitName = file.fieldname.split('_');
                         if (splitName.length !== 4) {
-                            throw new customError_1.default("Invalid file field name format.", this.StatusCode.HTTP_BAD_REQUEST);
+                            throw new customError_1.default('Invalid file field name format.', this.StatusCode.HTTP_BAD_REQUEST);
                         }
                         if (!((_b = (_a = payload.booking_items[0]) === null || _a === void 0 ? void 0 : _a.rooms[Number(splitName[1]) - 1]) === null || _b === void 0 ? void 0 : _b.paxes[Number(splitName[3]) - 1])) {
                             throw new customError_1.default(`Room no or room pax no(${file.fieldname}) does not match with passport/id filename. Filename example: room_1_pax_1 - room_1(Room Number)_pax_1(Pax number)`, this.StatusCode.HTTP_BAD_REQUEST);
@@ -391,11 +391,11 @@ class SubAgentHotelService extends abstract_service_1.default {
                     checkout_date: payload.checkout,
                     hotel_code: payload.hotel_code,
                     city_code: payload.city_code,
-                    city_country_name: "City",
+                    city_country_name: 'City',
                     created_by: user_id,
                     refundable: recheck.rates[0].refundable,
                     holder: JSON.stringify(payload.holder),
-                    supplier: "CT",
+                    supplier: 'CT',
                     hotel_name: recheck.name,
                     source_id: agency_id,
                     supplier_price: JSON.stringify(recheck.supplier_fee),
@@ -414,7 +414,7 @@ class SubAgentHotelService extends abstract_service_1.default {
                     hotel_extra_charges: JSON.stringify(recheck.hotel_extra_charges),
                     free_cancellation: ((_a = recheck.rates[0].cancellation_policy) === null || _a === void 0 ? void 0 : _a.free_cancellation) || false,
                     source_type: constants_1.SOURCE_AGENT,
-                    status: "Pending",
+                    status: 'PENDING',
                     free_cancellation_last_date: (_b = recheck.rates[0].cancellation_policy) === null || _b === void 0 ? void 0 : _b.free_cancellation_last_date,
                     rooms: JSON.stringify(recheck.rates[0].rooms),
                 });
@@ -527,7 +527,7 @@ class SubAgentHotelService extends abstract_service_1.default {
             const { id } = req.params;
             const booking_id = Number(id);
             const hotelBookingModel = this.Model.HotelBookingModel();
-            const data = yield hotelBookingModel.getSingleAgentBooking({ booking_id });
+            const data = yield hotelBookingModel.getSingleHotelBooking({ booking_id });
             if (!data) {
                 return {
                     success: false,

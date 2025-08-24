@@ -5,6 +5,9 @@ export const OTP_TYPES = {
   reset_agent: 'reset_agent',
   verify_agent: 'verify_agent',
   register_agent: 'register_agent',
+  reset_sub_agent: 'reset_sub_agent',
+  verify_sub_agent: 'verify_sub_agent',
+  register_sub_agent: 'register_sub_agent',
   reset_b2c: 'reset_b2c',
   verify_b2c: 'verify_b2c',
   register_b2c: 'register_b2c',
@@ -149,3 +152,5 @@ export const UMRAH_BOOKING_STATUS_PROCESSING = 'PROCESSING';
 export const UMRAH_BOOKING_STATUS_PROCESSED = 'PROCESSED';
 export const UMRAH_BOOKING_STATUS_CONFIRMED = 'CONFIRMED';
 export const UMRAH_BOOKING_STATUS_CANCELLED = 'CANCELLED';
+
+export const cors_origin_name = 'cors_origins';

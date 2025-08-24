@@ -43,7 +43,7 @@ export default class AdminAgentHotelService extends AbstractServices {
 
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    const data = await hotelBookingModel.getSingleAgentBooking({
+    const data = await hotelBookingModel.getSingleHotelBooking({
       booking_id,
       source_type: SOURCE_AGENT,
     });
@@ -80,7 +80,7 @@ export default class AdminAgentHotelService extends AbstractServices {
 
       const hotelBookingModel = this.Model.HotelBookingModel(trx);
 
-      const checkBooking = await hotelBookingModel.getSingleAgentBooking({
+      const checkBooking = await hotelBookingModel.getSingleHotelBooking({
         booking_id,
         source_type: SOURCE_AGENT,
       });

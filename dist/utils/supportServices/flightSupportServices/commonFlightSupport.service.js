@@ -115,7 +115,6 @@ class CommonFlightSupportService extends abstract_service_1.default {
         const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
         return diffInDays < flightConstant_1.MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET;
     }
-    //calculate convenience fee and discount
     calculateFlightMarkup(_a) {
         return __awaiter(this, arguments, void 0, function* ({ airline, base_fare, flight_class, dynamic_fare_supplier_id, route_type, total_segments, markup_amount, }) {
             const dynamicFareModel = this.Model.DynamicFareModel(this.trx);
@@ -271,7 +270,23 @@ class CommonFlightSupportService extends abstract_service_1.default {
                     throw new customError_1.default(`Passenger data ${Code} is invalid.`, this.StatusCode.HTTP_BAD_REQUEST);
                 }
                 const DobAge = dateTimeLib_1.default.calculateAge(found[0].date_of_birth);
-                if (DobAge !== childAge) {
+                if (childAge === 11) {
+                    // if (DobAge < 12 && DobAge > 4) {
+                    //   throw new CustomError(
+                    //     `Passenger(${Code}) age and dob is invalid.`,
+                    //     this.StatusCode.HTTP_BAD_REQUEST
+                    //   );
+                    // }
+                }
+                else if (childAge === 4) {
+                    // if (DobAge < 5 && DobAge > 3) {
+                    //   throw new CustomError(
+                    //     `Passenger(${Code}) age and dob is invalid.`,
+                    //     this.StatusCode.HTTP_BAD_REQUEST
+                    //   );
+                    // }
+                }
+                else if (DobAge !== childAge) {
                     throw new customError_1.default(`Passenger(${Code}) age and dob is invalid.`, this.StatusCode.HTTP_BAD_REQUEST);
                 }
             }

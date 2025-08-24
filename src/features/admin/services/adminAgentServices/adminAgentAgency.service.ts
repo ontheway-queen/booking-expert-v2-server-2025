@@ -237,13 +237,12 @@ export default class AdminAgentAgencyService extends AbstractServices {
         }
       });
 
-      if (restBody.white_label && !white_label_permissions) {
+      if (restBody.white_label) {
         const checkPermission = await AgentModel.getWhiteLabelPermission({
           agency_id,
         });
 
         const checkConfig = await SiteConfigModel.getSiteConfig({ agency_id });
-
         if (!checkConfig) {
           const siteService = new SiteConfigSupportService(trx);
 

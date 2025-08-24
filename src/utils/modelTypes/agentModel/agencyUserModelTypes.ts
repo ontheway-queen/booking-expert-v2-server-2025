@@ -79,7 +79,7 @@ export interface ICheckAgencyUserData {
   two_fa: boolean;
   role_id: number;
   ref_agent_id: number;
-  agency_type: 'Agent' | 'Sub Agent';
+  agency_type: 'AGENT' | 'SUB AGENT';
   status: boolean;
   agency_status: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
   agent_no: string;

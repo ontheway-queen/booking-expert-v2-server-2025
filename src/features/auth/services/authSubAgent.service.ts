@@ -31,6 +31,8 @@ export default class AuthSubAgentService extends AbstractServices {
     return this.db.transaction(async (trx) => {
       const { email, agency_name, user_name, address, phone } =
         req.body as IRegisterAgentReqBody;
+      const { agency_id, agency_name: main_agent_name } =
+        req.agencyB2CWhiteLabel;
       const AgentModel = this.Model.AgencyModel(trx);
       const AgencyUserModel = this.Model.AgencyUserModel(trx);
       const files = (req.files as Express.Multer.File[]) || [];
@@ -102,6 +104,7 @@ export default class AuthSubAgentService extends AbstractServices {
         trade_license,
         national_id,
         agency_type: SOURCE_SUB_AGENT,
+        ref_agent_id: agency_id,
       });
 
       const newRole = await AgencyUserModel.createRole({
@@ -161,7 +164,7 @@ export default class AuthSubAgentService extends AbstractServices {
 
       await EmailSendLib.sendEmail({
         email,
-        emailSub: `Booking Expert Agency Registration Verification`,
+        emailSub: `${main_agent_name} Agency Registration Verification`,
         emailBody: registrationVerificationTemplate(
           agency_name,
 
@@ -183,6 +186,8 @@ export default class AuthSubAgentService extends AbstractServices {
   public async registerComplete(req: Request) {
     return this.db.transaction(async (trx) => {
       const { token } = req.body as { token: string };
+      const { agency_id: main_agency_id, agency_name: main_agent_name } =
+        req.agencyB2CWhiteLabel;
       const AgentModel = this.Model.AgencyModel(trx);
       const AgencyUserModel = this.Model.AgencyUserModel(trx);
 
@@ -213,9 +218,9 @@ export default class AuthSubAgentService extends AbstractServices {
         { agency_id, id: user_id }
       );
 
-      await EmailSendLib.sendEmail({
+      await EmailSendLib.sendEmailAgent(trx, main_agency_id, {
         email,
-        emailSub: `Booking Expert Agency Registration Verification`,
+        emailSub: `${main_agent_name} Agency Registration Verification`,
         emailBody: registrationVerificationCompletedTemplate(agency_name, {
           email,
           password,
@@ -233,12 +238,14 @@ export default class AuthSubAgentService extends AbstractServices {
   public async login(req: Request) {
     return this.db.transaction(async (trx) => {
       const { password, user_or_email } = req.body as ILoginReqBody;
+      const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
       const AgentUserModel = this.Model.AgencyUserModel(trx);
-      const AgentModel = this.Model.AgencyModel(trx);
 
       const checkUserAgency = await AgentUserModel.checkUser({
         username: user_or_email,
         email: user_or_email,
+        agency_type: SOURCE_SUB_AGENT,
+        agency_id: main_agency_id,
       });
 
       if (!checkUserAgency) {
@@ -263,18 +270,14 @@ export default class AuthSubAgentService extends AbstractServices {
         agency_status,
         hashed_password,
         phone_number,
-        white_label,
         agency_email,
         agency_phone_number,
         agency_logo,
         agency_name,
         is_main_user,
-        ref_id,
         agency_type,
         ref_agent_id,
-        allow_api,
         civil_aviation,
-        kam_id,
         national_id,
         trade_license,
         address,
@@ -335,27 +338,6 @@ export default class AuthSubAgentService extends AbstractServices {
         }
       }
 
-      let whiteLabelPermissions = {
-        flight: false,
-        hotel: false,
-        visa: false,
-        holiday: false,
-        umrah: false,
-        group_fare: false,
-        blog: false,
-      };
-
-      if (white_label) {
-        const wPermissions = await AgentModel.getWhiteLabelPermission({
-          agency_id,
-        });
-
-        if (wPermissions) {
-          const { token, ...rest } = wPermissions;
-          whiteLabelPermissions = rest;
-        }
-      }
-
       const tokenData: ITokenParseAgencyUser = {
         user_id: id,
         username,
@@ -402,17 +384,13 @@ export default class AuthSubAgentService extends AbstractServices {
             agency_status,
             phone_number: agency_phone_number,
             agency_logo,
-            allow_api,
             civil_aviation,
-            kam_id,
             national_id,
             trade_license,
             agency_type,
             ref_agent_id,
           },
           role,
-          white_label,
-          whiteLabelPermissions,
         },
         token,
       };
@@ -422,13 +400,14 @@ export default class AuthSubAgentService extends AbstractServices {
   public async login2FA(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { user_or_email, otp } = req.body as ILogin2FAReqBody;
-
+      const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
       const AgencyUserModel = this.Model.AgencyUserModel(trx);
-      const AgencyModel = this.Model.AgencyModel(trx);
 
       const checkAgencyUser = await AgencyUserModel.checkUser({
         email: user_or_email,
         username: user_or_email,
+        agency_id: main_agency_id,
+        agency_type: SOURCE_SUB_AGENT,
       });
 
       if (!checkAgencyUser) {
@@ -452,19 +431,14 @@ export default class AuthSubAgentService extends AbstractServices {
         agent_no,
         agency_status,
         phone_number,
-        white_label,
         agency_phone_number,
         agency_email,
         agency_logo,
         agency_name,
         is_main_user,
-        agency_type,
-        allow_api,
         civil_aviation,
-        kam_id,
         national_id,
         trade_license,
-        ref_agent_id,
         address,
       } = checkAgencyUser;
 
@@ -494,27 +468,6 @@ export default class AuthSubAgentService extends AbstractServices {
         return data;
       }
 
-      let whiteLabelPermissions = {
-        flight: false,
-        hotel: false,
-        visa: false,
-        holiday: false,
-        umrah: false,
-        group_fare: false,
-        blog: false,
-      };
-
-      if (white_label) {
-        const wPermissions = await AgencyModel.getWhiteLabelPermission({
-          agency_id,
-        });
-
-        if (wPermissions) {
-          const { token, ...rest } = wPermissions;
-          whiteLabelPermissions = rest;
-        }
-      }
-
       const tokenData: ITokenParseAgencyUser = {
         user_id: id,
         username,
@@ -526,10 +479,9 @@ export default class AuthSubAgentService extends AbstractServices {
         phone_number,
         is_main_user,
         photo,
-        agency_type,
-        ref_agent_id,
         address,
         agency_logo,
+        agency_type: SOURCE_SUB_AGENT,
       };
 
       const authToken = Lib.createToken(
@@ -565,17 +517,11 @@ export default class AuthSubAgentService extends AbstractServices {
             agency_status,
             phone_number: agency_phone_number,
             agency_logo,
-            allow_api,
             civil_aviation,
-            kam_id,
             national_id,
             trade_license,
-            agency_type,
-            ref_agent_id,
           },
           role,
-          white_label,
-          whiteLabelPermissions,
         },
         token: authToken,
       };
@@ -584,7 +530,7 @@ export default class AuthSubAgentService extends AbstractServices {
 
   public async resetPassword(req: Request) {
     const { password, token } = req.body as IResetPassReqBody;
-
+    const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
     const data: any = Lib.verifyToken(
       token,
       config.JWT_SECRET_AGENT + OTP_TYPES.reset_agent

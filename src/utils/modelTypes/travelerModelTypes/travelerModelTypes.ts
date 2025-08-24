@@ -1,4 +1,9 @@
-export type SourceType = "AGENT" | "SUB AGENT" | "AGENT B2C" | "B2C" | "EXTERNAL";
+export type SourceType =
+  | 'AGENT'
+  | 'SUB AGENT'
+  | 'AGENT B2C'
+  | 'B2C'
+  | 'EXTERNAL';
 
 export interface ITraveler {
   id: number;
@@ -66,17 +71,17 @@ export interface IUpdateTravelerPayload {
 }
 
 export interface IGetTravelerDataFilterQuery {
-    source_type: SourceType;
-    source_id?: number;
-    created_by?: number;
-    type?: string;
-    limit?: number;
-    skip?: number;
+  source_type: SourceType;
+  source_id?: number;
+  created_by?: number;
+  type?: string;
+  limit?: number;
+  skip?: number;
 }
 
 export interface IGetSingleTravelerParams {
-    source_type: SourceType;
-    source_id?: number;
-    created_by?: number;
-    id: number;
+  source_type: SourceType;
+  source_id?: number;
+  created_by?: number;
+  id: number;
 }

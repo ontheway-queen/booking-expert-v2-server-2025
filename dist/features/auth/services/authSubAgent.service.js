@@ -8,17 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -40,6 +29,7 @@ class AuthSubAgentService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { email, agency_name, user_name, address, phone } = req.body;
+                const { agency_id, agency_name: main_agent_name } = req.agencyB2CWhiteLabel;
                 const AgentModel = this.Model.AgencyModel(trx);
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
                 const files = req.files || [];
@@ -99,6 +89,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                     trade_license,
                     national_id,
                     agency_type: constants_1.SOURCE_SUB_AGENT,
+                    ref_agent_id: agency_id,
                 });
                 const newRole = yield AgencyUserModel.createRole({
                     agency_id: newAgency[0].id,
@@ -142,7 +133,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                 const verificationToken = lib_1.default.createToken({ agency_id: newAgency[0].id, email, user_id: newUser[0].id }, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent, '24h');
                 yield emailSendLib_1.default.sendEmail({
                     email,
-                    emailSub: `Booking Expert Agency Registration Verification`,
+                    emailSub: `${main_agent_name} Agency Registration Verification`,
                     emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, '/sign-up/verification?token=' + verificationToken),
                 });
                 return {
@@ -160,6 +151,7 @@ class AuthSubAgentService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { token } = req.body;
+                const { agency_id: main_agency_id, agency_name: main_agent_name } = req.agencyB2CWhiteLabel;
                 const AgentModel = this.Model.AgencyModel(trx);
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
                 const parsedToken = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent);
@@ -177,9 +169,9 @@ class AuthSubAgentService extends abstract_service_1.default {
                 yield AgencyUserModel.updateUser({
                     hashed_password,
                 }, { agency_id, id: user_id });
-                yield emailSendLib_1.default.sendEmail({
+                yield emailSendLib_1.default.sendEmailAgent(trx, main_agency_id, {
                     email,
-                    emailSub: `Booking Expert Agency Registration Verification`,
+                    emailSub: `${main_agent_name} Agency Registration Verification`,
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(agency_name, {
                         email,
                         password,
@@ -197,11 +189,13 @@ class AuthSubAgentService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { password, user_or_email } = req.body;
+                const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
                 const AgentUserModel = this.Model.AgencyUserModel(trx);
-                const AgentModel = this.Model.AgencyModel(trx);
                 const checkUserAgency = yield AgentUserModel.checkUser({
                     username: user_or_email,
                     email: user_or_email,
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
+                    agency_id: main_agency_id,
                 });
                 if (!checkUserAgency) {
                     return {
@@ -210,7 +204,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, white_label, agency_email, agency_phone_number, agency_logo, agency_name, is_main_user, ref_id, agency_type, ref_agent_id, allow_api, civil_aviation, kam_id, national_id, trade_license, address, } = checkUserAgency;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, agency_email, agency_phone_number, agency_logo, agency_name, is_main_user, agency_type, ref_agent_id, civil_aviation, national_id, trade_license, address, } = checkUserAgency;
                 if (agency_status === 'Inactive' ||
                     agency_status === 'Incomplete' ||
                     agency_status === 'Rejected' ||
@@ -256,24 +250,6 @@ class AuthSubAgentService extends abstract_service_1.default {
                         return data;
                     }
                 }
-                let whiteLabelPermissions = {
-                    flight: false,
-                    hotel: false,
-                    visa: false,
-                    holiday: false,
-                    umrah: false,
-                    group_fare: false,
-                    blog: false,
-                };
-                if (white_label) {
-                    const wPermissions = yield AgentModel.getWhiteLabelPermission({
-                        agency_id,
-                    });
-                    if (wPermissions) {
-                        const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
-                        whiteLabelPermissions = rest;
-                    }
-                }
                 const tokenData = {
                     user_id: id,
                     username,
@@ -314,17 +290,13 @@ class AuthSubAgentService extends abstract_service_1.default {
                             agency_status,
                             phone_number: agency_phone_number,
                             agency_logo,
-                            allow_api,
                             civil_aviation,
-                            kam_id,
                             national_id,
                             trade_license,
                             agency_type,
                             ref_agent_id,
                         },
                         role,
-                        white_label,
-                        whiteLabelPermissions,
                     },
                     token,
                 };
@@ -335,11 +307,13 @@ class AuthSubAgentService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_or_email, otp } = req.body;
+                const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
-                const AgencyModel = this.Model.AgencyModel(trx);
                 const checkAgencyUser = yield AgencyUserModel.checkUser({
                     email: user_or_email,
                     username: user_or_email,
+                    agency_id: main_agency_id,
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
                 });
                 if (!checkAgencyUser) {
                     return {
@@ -348,7 +322,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, phone_number, white_label, agency_phone_number, agency_email, agency_logo, agency_name, is_main_user, agency_type, allow_api, civil_aviation, kam_id, national_id, trade_license, ref_agent_id, address, } = checkAgencyUser;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, phone_number, agency_phone_number, agency_email, agency_logo, agency_name, is_main_user, civil_aviation, national_id, trade_license, address, } = checkAgencyUser;
                 if (!status) {
                     return {
                         success: false,
@@ -371,24 +345,6 @@ class AuthSubAgentService extends abstract_service_1.default {
                 if (!data.success) {
                     return data;
                 }
-                let whiteLabelPermissions = {
-                    flight: false,
-                    hotel: false,
-                    visa: false,
-                    holiday: false,
-                    umrah: false,
-                    group_fare: false,
-                    blog: false,
-                };
-                if (white_label) {
-                    const wPermissions = yield AgencyModel.getWhiteLabelPermission({
-                        agency_id,
-                    });
-                    if (wPermissions) {
-                        const { token } = wPermissions, rest = __rest(wPermissions, ["token"]);
-                        whiteLabelPermissions = rest;
-                    }
-                }
                 const tokenData = {
                     user_id: id,
                     username,
@@ -400,10 +356,9 @@ class AuthSubAgentService extends abstract_service_1.default {
                     phone_number,
                     is_main_user,
                     photo,
-                    agency_type,
-                    ref_agent_id,
                     address,
                     agency_logo,
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
                 };
                 const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
                 const role = yield AgencyUserModel.getSingleRoleWithPermissions(role_id, agency_id);
@@ -429,17 +384,11 @@ class AuthSubAgentService extends abstract_service_1.default {
                             agency_status,
                             phone_number: agency_phone_number,
                             agency_logo,
-                            allow_api,
                             civil_aviation,
-                            kam_id,
                             national_id,
                             trade_license,
-                            agency_type,
-                            ref_agent_id,
                         },
                         role,
-                        white_label,
-                        whiteLabelPermissions,
                     },
                     token: authToken,
                 };
@@ -449,6 +398,7 @@ class AuthSubAgentService extends abstract_service_1.default {
     resetPassword(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const { password, token } = req.body;
+            const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
             const data = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.reset_agent);
             if (!data) {
                 return {

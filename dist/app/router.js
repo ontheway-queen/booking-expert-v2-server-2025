@@ -32,23 +32,23 @@ class RootRouter {
     }
     callV2Router() {
         // Public Routes
-        this.v2Router.use("/public", this.publicRootRouter.Router);
+        this.v2Router.use('/public', this.publicRootRouter.Router);
         // Auth Routes
-        this.v2Router.use("/auth", this.authRootRouter.Router);
+        this.v2Router.use('/auth', this.authRootRouter.Router);
         // Agent Routes
-        this.v2Router.use("/agent", this.authChecker.agencyUserAuthChecker, this.agentRootRouter.Router);
+        this.v2Router.use('/agent', this.authChecker.agencyUserAuthChecker, this.agentRootRouter.Router);
         // B2C Routes
-        this.v2Router.use("/b2c", this.b2cRootRouter.Router);
+        this.v2Router.use('/b2c', this.b2cRootRouter.Router);
         // Admin Routes
-        this.v2Router.use("/admin", this.authChecker.adminAuthChecker, this.adminRootRouter.Router);
+        this.v2Router.use('/admin', this.authChecker.adminAuthChecker, this.adminRootRouter.Router);
         // Agent B2C Routes
-        this.v2Router.use("/agent-b2c", this.authChecker.whiteLabelAuthChecker, this.agentB2CRootRouter.Router);
-        // Sub Agent B2C Routes
-        this.v2Router.use("/sub-agent", this.authChecker.whiteLabelAuthChecker, this.subAgentRootRouter.Router);
+        this.v2Router.use('/agent-b2c', this.authChecker.whiteLabelAuthChecker, this.agentB2CRootRouter.Router);
+        // SUB AGENT B2C Routes
+        this.v2Router.use('/sub-agent', this.authChecker.whiteLabelAuthChecker, this.subAgentRootRouter.Router);
         // External Routes
-        this.v2Router.use("/external", this.externalRootRouter.Router);
+        this.v2Router.use('/external', this.externalRootRouter.Router);
         //Payment Routes
-        this.v2Router.use("/payment", this.paymentRootRouter.router);
+        this.v2Router.use('/payment', this.paymentRootRouter.router);
     }
 }
 exports.default = RootRouter;

@@ -102,6 +102,15 @@ class AdminConfigValidator {
         this.createSocialMedia = joi_1.default.object({
             name: joi_1.default.string().required(),
         });
+        this.insertCorsOrigin = joi_1.default.object({
+            origins: joi_1.default.array()
+                .items(joi_1.default.object({ name: joi_1.default.string().trim().required() }))
+                .required(),
+        });
+        this.updateCorsOrigin = joi_1.default.object({
+            name: joi_1.default.string().trim().required(),
+            status: joi_1.default.boolean().optional(),
+        });
     }
 }
 exports.default = AdminConfigValidator;

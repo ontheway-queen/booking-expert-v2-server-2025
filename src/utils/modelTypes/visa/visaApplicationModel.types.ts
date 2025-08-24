@@ -65,28 +65,25 @@ export interface IGetAgentB2CVisaApplicationData {
   application_date: Date;
 }
 
-
-export interface IGetAgentB2CSingleVisaApplicationQuery{
-  id:number;
-  source_id:number;
-  source_type:string;
-  user_id:number
+export interface IGetAgentB2CSingleVisaApplicationQuery {
+  id: number;
+  source_id: number;
+  source_type: string;
+  user_id: number;
 }
-
 
 export interface IGetAllAgentB2CVisaApplicationQuery {
   source_id: number;
   source_type: string;
   from_date?: Date;
-  to_date?:Date;
+  to_date?: Date;
   status?: string;
   filter?: string;
   limit?: number;
   skip?: number;
 }
 
-
-export interface IGetAllAgentB2CVisaApplicationData{
+export interface IGetAllAgentB2CVisaApplicationData {
   id: number;
   application_ref: string;
   title: string;

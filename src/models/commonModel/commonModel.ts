@@ -654,5 +654,28 @@ class CommonModel extends Schema {
       .where('id', id)
       .first();
   }
+
+  public async insertCorsOrigin(payload: { name: string }[]) {
+    return await this.db('cors_origins')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .insert(payload);
+  }
+
+  public async updateCorsOrigin(
+    id: number,
+    payload: { name: string; status: boolean }
+  ) {
+    return await this.db('cors_origins')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .update(payload)
+      .where('id', id);
+  }
+
+  public async getCorsOrigin(filter: string) {
+    return await this.db('cors_origins')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .select('id', 'name', 'status', 'created_at')
+      .whereRaw(`name ILIKE ?`, [`%${filter}%`]);
+  }
 }
 export default CommonModel;

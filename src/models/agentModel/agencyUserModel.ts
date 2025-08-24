@@ -133,8 +133,10 @@ export default class AgencyUserModel extends Schema {
     agency_id,
     is_main_user,
     agency_type,
+    ref_agent_id,
   }: {
     agency_id?: number;
+    ref_agent_id?: number;
     agency_type?: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
     email?: string;
     username?: string;
@@ -198,6 +200,10 @@ export default class AgencyUserModel extends Schema {
 
         if (agency_id) {
           qb.andWhere('au.agency_id', agency_id);
+        }
+
+        if (ref_agent_id) {
+          qb.andWhere('au.ref_agent_id', ref_agent_id);
         }
       })
       .first();

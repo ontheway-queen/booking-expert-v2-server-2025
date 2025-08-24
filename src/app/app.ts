@@ -1,23 +1,27 @@
-import express, { Application, NextFunction, Request, Response } from 'express';
-import morgan from 'morgan';
 import cors from 'cors';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import { Server } from 'http';
-import { SocketServer, io } from './socket';
+import morgan from 'morgan';
 import cron from 'node-cron';
-import CustomError from '../utils/lib/customError';
-import ErrorHandler from '../middleware/errorHandler/errorHandler';
-import RootRouter from './router';
 import PublicCommonService from '../features/public/services/publicCommon.service';
+import ErrorHandler from '../middleware/errorHandler/errorHandler';
+import CustomError from '../utils/lib/customError';
+import { cors_origin_name } from '../utils/miscellaneous/constants';
+import { setUpCorsOrigin } from './database';
+import { client } from './redis';
+import RootRouter from './router';
+import { SocketServer, io } from './socket';
 import { origin } from '../utils/miscellaneous/cors';
 
 class App {
   public app: Application = express();
   private server: Server;
   private port: number;
-  private origin: string[] = origin;
+  private origin: string[];
 
   constructor(port: number) {
     this.server = SocketServer(this.app);
+    this.origin = origin;
     this.port = port;
     this.initMiddleware();
     this.initRouters();
@@ -38,6 +42,7 @@ class App {
 
   //start server
   public async startServer() {
+    // setUpCorsOrigin();
     const services = new PublicCommonService();
     await services.getSabreToken();
     this.server.listen(this.port, () => {
@@ -48,11 +53,15 @@ class App {
   }
 
   //init middleware
-  private initMiddleware() {
+  private async initMiddleware() {
+    // const cors_origin = JSON.parse(
+    //   (await client.get(cors_origin_name)) as string
+    // );
+
+    this.app.use(cors({ origin: this.origin, credentials: true }));
     this.app.use(express.json({ limit: '2mb' }));
     this.app.use(express.urlencoded({ limit: '2mb', extended: true }));
-    this.app.use(morgan('dev'));
-    this.app.use(cors({ origin: this.origin, credentials: true }));
+    this.app.use(morgan('tiny'));
   }
 
   // socket connection

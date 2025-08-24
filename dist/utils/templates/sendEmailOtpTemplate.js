@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendEmailOtpTemplate = void 0;
 const constants_1 = require("../miscellaneous/constants");
-const sendEmailOtpTemplate = (otp, otpFor) => {
+const sendEmailOtpTemplate = ({ otp, otpFor, logo, project, }) => {
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -41,8 +41,8 @@ const sendEmailOtpTemplate = (otp, otpFor) => {
               <td align="center" style="padding: 20px;">
                 <!-- Logo -->
                 <img
-                  src="${constants_1.PROJECT_LOGO}"
-                  alt="${constants_1.PROJECT_NAME}"
+                  src="${logo || constants_1.PROJECT_LOGO}"
+                  alt="${project || constants_1.PROJECT_NAME}"
                   style="display: block; width: 80px; margin-bottom: 10px;"
                 />
               </td>

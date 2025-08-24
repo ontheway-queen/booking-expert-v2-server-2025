@@ -45,12 +45,12 @@ class SubAgentFlightService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id, agency_type, ref_agent_id } = req.agencyUser;
                 const body = req.body;
-                if (body.JourneyType === "3") {
+                if (body.JourneyType === '3') {
                     if (body.OriginDestinationInformation.length < 2) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Invalid JourneyType/OriginDestinationInformation",
+                            message: 'Invalid JourneyType/OriginDestinationInformation',
                         };
                     }
                 }
@@ -59,7 +59,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Invalid JourneyType/OriginDestinationInformation",
+                            message: 'Invalid JourneyType/OriginDestinationInformation',
                         };
                     }
                 }
@@ -67,7 +67,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agency_details = yield agencyModel.checkAgency({
                     agency_id: ref_agent_id || agency_id,
-                    status: "Active",
+                    status: 'Active',
                 });
                 if (!agency_details) {
                     return {
@@ -80,22 +80,22 @@ class SubAgentFlightService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "No commission set has been found for the agency",
+                        message: 'No commission set has been found for the agency',
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === "Sub Agent") {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
-                        type: "Flight",
+                        type: 'Flight',
                         agency_id,
                     });
                     if (!markup_amount) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Markup information is empty. Contact with the authority",
+                            message: 'Markup information is empty. Contact with the authority',
                         };
                     }
                 }
@@ -179,12 +179,12 @@ class SubAgentFlightService extends abstract_service_1.default {
                     .PassengerTypeQuantity;
                 const airline_code = req.query
                     .airline_code;
-                if (JourneyType === "3") {
+                if (JourneyType === '3') {
                     if (OriginDestinationInformation.length < 2) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Invalid JourneyType/OriginDestinationInformation",
+                            message: 'Invalid JourneyType/OriginDestinationInformation',
                         };
                     }
                 }
@@ -193,7 +193,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Invalid JourneyType/OriginDestinationInformation",
+                            message: 'Invalid JourneyType/OriginDestinationInformation',
                         };
                     }
                 }
@@ -212,22 +212,22 @@ class SubAgentFlightService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "No commission set has been found for the agency",
+                        message: 'No commission set has been found for the agency',
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === "Sub Agent") {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
-                        type: "Flight",
+                        type: 'Flight',
                         agency_id,
                     });
                     if (!markup_amount) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Markup information is empty. Contact with the authority",
+                            message: 'Markup information is empty. Contact with the authority',
                         };
                     }
                 }
@@ -256,7 +256,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                         arrivalLocation: OrDeInfo.DestinationLocation.LocationCode,
                     };
                 });
-                res.write("event: search_info\n");
+                res.write('event: search_info\n');
                 res.write(`data: ${JSON.stringify({
                     search_id,
                     leg_description: leg_descriptions,
@@ -287,7 +287,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                 // Sabre results
                 if (sabre_supplier_id) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
-                    yield sendResults("Sabre", () => __awaiter(this, void 0, void 0, function* () {
+                    yield sendResults('Sabre', () => __awaiter(this, void 0, void 0, function* () {
                         return sabreSubService.FlightSearch({
                             booking_block: false,
                             reqBody: body,
@@ -299,7 +299,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                 //WFTT results
                 if (custom_supplier_id) {
                     const wfttSubService = new wfttFlightSupport_service_1.default(trx);
-                    yield sendResults("WFTT", () => __awaiter(this, void 0, void 0, function* () {
+                    yield sendResults('WFTT', () => __awaiter(this, void 0, void 0, function* () {
                         return wfttSubService.FlightSearch({
                             booking_block: false,
                             reqBody: body,
@@ -357,22 +357,22 @@ class SubAgentFlightService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "No commission set has been found for the agency",
+                        message: 'No commission set has been found for the agency',
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === "Sub Agent") {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
-                        type: "Flight",
+                        type: 'Flight',
                         agency_id,
                     });
                     if (!markup_amount) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Markup information is empty. Contact with the authority",
+                            message: 'Markup information is empty. Contact with the authority',
                         };
                     }
                 }
@@ -391,7 +391,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                     const { vendor_price } = fare, restFare = __rest(fare, ["vendor_price"]);
                     return {
                         success: true,
-                        message: "Flight has been revalidated successfully!",
+                        message: 'Flight has been revalidated successfully!',
                         data: Object.assign(Object.assign({}, restData), { fare: restFare }),
                         code: this.StatusCode.HTTP_OK,
                     };
@@ -428,29 +428,29 @@ class SubAgentFlightService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "No markup set has been found for the agency",
+                        message: 'No markup set has been found for the agency',
                     };
                 }
                 if (!agency_details.book_permission) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_FORBIDDEN,
-                        message: "Booking permission is not allowed, please contact with the authority",
+                        message: 'Booking permission is not allowed, please contact with the authority',
                     };
                 }
-                //get sub agent markup
+                //get SUB AGENT markup
                 let markup_amount = undefined;
-                if (agency_type === "Sub Agent") {
+                if (agency_type === 'SUB AGENT') {
                     markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
                         trx,
-                        type: "Flight",
+                        type: 'Flight',
                         agency_id,
                     });
                     if (!markup_amount) {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: "Markup information is empty. Contact with the authority",
+                            message: 'Markup information is empty. Contact with the authority',
                         };
                     }
                 }
@@ -534,12 +534,12 @@ class SubAgentFlightService extends abstract_service_1.default {
                 }
                 //insert the revalidate data as info log
                 yield this.Model.ErrorLogsModel(trx).insertErrorLogs({
-                    http_method: "POST",
+                    http_method: 'POST',
                     level: constants_1.ERROR_LEVEL_INFO,
-                    message: "Flight booking revalidate data",
-                    url: "/flight/booking",
+                    message: 'Flight booking revalidate data',
+                    url: '/flight/booking',
                     user_id: user_id,
-                    source: "AGENT",
+                    source: 'AGENT',
                     metadata: {
                         api: data.api,
                         request_body: {
@@ -563,7 +563,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                     refundable,
                     flight_data: data,
                     traveler_data: body.passengers,
-                    type: "Agent_Flight",
+                    type: 'Agent_Flight',
                     source_type: constants_1.SOURCE_AGENT,
                     source_id: agency_id,
                     invoice_ref_type: constants_1.TYPE_FLIGHT,
@@ -591,7 +591,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                                     id: user_id,
                                     name,
                                     email: user_email,
-                                    phone: phone_number || "",
+                                    phone: phone_number || '',
                                 },
                                 revalidate_data: data,
                             });
@@ -619,9 +619,9 @@ class SubAgentFlightService extends abstract_service_1.default {
                 catch (err) {
                     console.log({ err });
                     yield this.Model.ErrorLogsModel(trx).insertErrorLogs({
-                        http_method: "POST",
+                        http_method: 'POST',
                         level: err.level || constants_1.ERROR_LEVEL_ERROR,
-                        message: "Error on flight booking." + err,
+                        message: 'Error on flight booking.' + err,
                         url: req.originalUrl,
                         user_id: user_id,
                         source: constants_1.SOURCE_AGENT,
@@ -638,7 +638,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        message: "Flight booking is in process. Please check later.",
+                        message: 'Flight booking is in process. Please check later.',
                         data: {
                             booking_id: new_booking_id,
                             booking_ref: new_booking_ref,
@@ -670,14 +670,14 @@ class SubAgentFlightService extends abstract_service_1.default {
                 catch (err) {
                     console.log({ err });
                     yield this.Model.ErrorLogsModel(trx).insertErrorLogs({
-                        http_method: "POST",
+                        http_method: 'POST',
                         level: constants_1.ERROR_LEVEL_ERROR,
-                        message: "Error update booking or Email send after booking." + err,
-                        url: "/flight/booking",
+                        message: 'Error update booking or Email send after booking.' + err,
+                        url: '/flight/booking',
                         user_id: user_id,
-                        source: "AGENT",
+                        source: 'AGENT',
                         metadata: {
-                            api: "Update Booking or Email send.",
+                            api: 'Update Booking or Email send.',
                             request_body: err,
                             response: data,
                         },
@@ -686,7 +686,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "The flight has been booked successfully!",
+                    message: 'The flight has been booked successfully!',
                     data: {
                         booking_id: new_booking_id,
                         booking_ref: new_booking_ref,
@@ -854,7 +854,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        message: "Ticket has been issued successfully!",
+                        message: 'Ticket has been issued successfully!',
                         data: {
                             status,
                             due: payment_data.due,
@@ -866,7 +866,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_BAD_REQUEST,
-                    message: "Cannot issue ticket for this booking. Contact support team.",
+                    message: 'Cannot issue ticket for this booking. Contact support team.',
                 };
             }));
         });
@@ -897,7 +897,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: "Cancellation is not allowed for this booking. Contact support team.",
+                        message: 'Cancellation is not allowed for this booking. Contact support team.',
                     };
                 }
                 let status = false;
@@ -935,13 +935,13 @@ class SubAgentFlightService extends abstract_service_1.default {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        message: "Booking has been cancelled successfully!",
+                        message: 'Booking has been cancelled successfully!',
                     };
                 }
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_BAD_REQUEST,
-                    message: "Cannot cancel this booking. Contact support team.",
+                    message: 'Cannot cancel this booking. Contact support team.',
                 };
             }));
         });

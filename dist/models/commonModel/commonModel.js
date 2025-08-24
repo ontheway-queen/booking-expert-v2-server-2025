@@ -556,5 +556,28 @@ class CommonModel extends schema_1.default {
                 .first();
         });
     }
+    insertCorsOrigin(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('cors_origins')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .insert(payload);
+        });
+    }
+    updateCorsOrigin(id, payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('cors_origins')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .update(payload)
+                .where('id', id);
+        });
+    }
+    getCorsOrigin(filter) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('cors_origins')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .select('id', 'name', 'status', 'created_at')
+                .whereRaw(`name ILIKE ?`, [`%${filter}%`]);
+        });
+    }
 }
 exports.default = CommonModel;

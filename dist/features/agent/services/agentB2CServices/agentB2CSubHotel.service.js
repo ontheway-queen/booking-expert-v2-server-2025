@@ -48,7 +48,7 @@ class AgentB2CSubHotelService extends abstract_service_1.default {
             const booking_id = Number(id);
             const { agency_id } = req.agencyUser;
             const hotelBookingModel = this.Model.HotelBookingModel();
-            const data = yield hotelBookingModel.getSingleAgentBooking({
+            const data = yield hotelBookingModel.getSingleHotelBooking({
                 booking_id,
                 source_id: agency_id,
                 source_type: constants_1.SOURCE_AGENT_B2C,
@@ -77,7 +77,7 @@ class AgentB2CSubHotelService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const payload = req.body;
                 const hotelBookingModel = this.Model.HotelBookingModel(trx);
-                const checkBooking = yield hotelBookingModel.getSingleAgentBooking({
+                const checkBooking = yield hotelBookingModel.getSingleHotelBooking({
                     booking_id,
                     source_type: constants_1.SOURCE_AGENT_B2C,
                     source_id: agency_id,

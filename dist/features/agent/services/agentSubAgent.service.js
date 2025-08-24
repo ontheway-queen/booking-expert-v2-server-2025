@@ -37,11 +37,11 @@ class AgentSubAgentService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id, agency_id, agency_type } = req.agencyUser;
-                if (agency_type === 'Sub Agent') {
+                if (agency_type === 'SUB AGENT') {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_FORBIDDEN,
-                        message: 'No authority has been found to create a sub agent',
+                        message: 'No authority has been found to create a SUB AGENT',
                     };
                 }
                 const body = req.body;
@@ -156,7 +156,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: 'Sub Agent has been created',
+                    message: 'SUB AGENT has been created',
                     data: {
                         agency_id: newSubAgency[0].id,
                         user_id: newUser[0].id,

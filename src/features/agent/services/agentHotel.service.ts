@@ -57,9 +57,9 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === 'Sub Agent') {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Hotel',
@@ -159,9 +159,9 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === 'Sub Agent') {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Hotel',
@@ -229,9 +229,9 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === 'Sub Agent') {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Hotel',
@@ -317,9 +317,9 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
-      //get sub agent markup
+      //get SUB AGENT markup
       let markup_amount = undefined;
-      if (agency_type === 'Sub Agent') {
+      if (agency_type === 'SUB AGENT') {
         markup_amount = await Lib.getSubAgentTotalMarkup({
           trx,
           type: 'Hotel',
@@ -484,7 +484,7 @@ export class AgentHotelService extends AbstractServices {
         free_cancellation:
           recheck.rates[0].cancellation_policy?.free_cancellation || false,
         source_type: SOURCE_AGENT,
-        status: 'Pending',
+        status: 'PENDING',
         free_cancellation_last_date:
           recheck.rates[0].cancellation_policy?.free_cancellation_last_date,
         rooms: JSON.stringify(recheck.rates[0].rooms),
@@ -621,7 +621,7 @@ export class AgentHotelService extends AbstractServices {
 
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    const data = await hotelBookingModel.getSingleAgentBooking({ booking_id });
+    const data = await hotelBookingModel.getSingleHotelBooking({ booking_id });
 
     if (!data) {
       return {

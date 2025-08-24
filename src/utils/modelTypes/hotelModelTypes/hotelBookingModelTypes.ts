@@ -33,7 +33,7 @@ export interface IInsertHotelBookingPayload {
   free_cancellation?: boolean;
   free_cancellation_last_date?: string;
   hotel_extra_charges?: string;
-  status: string;
+  status: 'PENDING';
   hotel_data: string;
   city_code: number;
   city_country_name: string;
@@ -118,9 +118,22 @@ export interface IGetSingleBookingModelData {
   supplier_ref?: string;
   refundable: boolean;
   free_cancellation?: boolean;
-  agent_sell_price?: {};
+  hotel_extra_charges?: string;
   status: string;
+  hotel_data: any;
+  city_code: number;
+  city_country_name: string;
   finalized: boolean;
+  free_cancellation_last_date?: string;
+  supplier_cancellation_data?: {
+    no_show_fee: number;
+    free_cancellation: boolean;
+    free_cancellation_last_date?: string;
+    free_cancellation_modified_last_date?: string;
+    details: { fee: number; from_date: string }[];
+  };
+  search_id: string;
+  rooms: string;
 }
 
 export interface IInsertHotelBookingCancellationPayload {

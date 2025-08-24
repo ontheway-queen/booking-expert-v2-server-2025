@@ -1,12 +1,12 @@
-import { Knex } from "knex";
+import { Knex } from 'knex';
 
 // Db or Transaction connection types
 export type TDB = Knex | Knex.Transaction;
 
 export interface ITokenParseAgencyUser {
   agency_id: number;
-  agency_type: "Agent" | "Sub Agent";
-  ref_agent_id: number | null;
+  agency_type: 'AGENT' | 'SUB AGENT';
+  ref_agent_id?: number;
   agency_name: string;
   agency_email: string;
   user_id: number;
@@ -56,6 +56,7 @@ export interface ITokenParseAgencyB2CUser {
 
 export interface ITokenParseAgencyB2CWhiteLabel {
   agency_id: number;
+  agency_name: string;
   flight: boolean;
   hotel: boolean;
   visa: boolean;

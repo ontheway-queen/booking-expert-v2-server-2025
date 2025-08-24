@@ -3,7 +3,7 @@ import { Queue, Worker } from 'bullmq';
 
 const redis_url = 'redis://localhost';
 
-const client = createClient({ url: redis_url });
+export const client = createClient({ url: redis_url });
 
 client.on('error', (err) => console.log('Redis Client Error', err));
 
