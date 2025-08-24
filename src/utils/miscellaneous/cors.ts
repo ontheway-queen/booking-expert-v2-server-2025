@@ -47,4 +47,8 @@ export const origin: string[] = [
   'https://www.bhubanmajhi.com.bd',
   'https://a1traveler.xyz',
   'https://www.a1traveler.xyz',
+  'https://www.amarbooking.com',
+  'https://amarbooking.com',
+  'https://www.ota.mtltd.com.bd',
+  'https://ota.mtltd.com.bd',
 ];

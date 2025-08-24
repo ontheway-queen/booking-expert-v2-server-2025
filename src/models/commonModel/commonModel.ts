@@ -172,13 +172,14 @@ class CommonModel extends Schema {
   }
 
   //get all country
-  public async getCountry(payload: { id?: number; name?: string }) {
+  public async getCountry(payload: { id?: number | number[]; name?: string }) {
     return await this.db('country')
       .withSchema(this.PUBLIC_SCHEMA)
       .select('id', 'name', 'iso', 'iso3', 'phone_code')
       .where((qb) => {
         if (payload.id) {
-          qb.where('id', payload.id);
+          if (Array.isArray(payload.id)) qb.whereIn('id', payload.id);
+          else qb.where('id', payload.id);
         }
         if (payload.name) {
           qb.andWhereILike('name', `%${payload.name}%`);

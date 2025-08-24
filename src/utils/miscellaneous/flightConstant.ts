@@ -1,5 +1,6 @@
 export const SABRE_TOKEN_ENV = 'sabre_token';
 export const WFTT_TOKEN_ENV = 'wftt_token';
+export const VERTEIL_TOKEN_ENV = 'verteil_token';
 
 export const SABRE_FLIGHT_ITINS = '200ITINS';
 // Route type
@@ -18,6 +19,8 @@ export const ROUTE_TYPE: {
 // API Name Const
 export const SABRE_API = 'SABRE';
 export const SABRE_API_NAME = 'S1';
+export const VERTEIL_API = 'VERTEIL';
+export const VERTEIL_API_NAME = 'N1';
 export const CUSTOM_API = 'CUSTOM';
 export const CUSTOM_API_NAME = 'LCC';
 export const CT_API = 'CHOLO_TRAVEL';
@@ -96,3 +99,24 @@ export const PRIORITY_AIRPORTS = [
 //flight fare response
 export const FLIGHT_FARE_RESPONSE =
   "Cancellation:<br/>Refund Amount = Paid Amount - Airline Cancellation Fee<br/>Re-issue:<br/>Re-issue Fee = Airline Fee + Fare Difference<br/>Validity:<br/>Re-issue or refund is subject to the original fare rules and route restrictions.<br/>Convenience Fee:<br/>The convenience fee is non-refundable.<br/>*The airline's fee is indicative and per person. Fare rules are subject to airline policies and may vary.";
+
+export const PTC_TYPES_CHILD = [
+  'CHD',
+  'C02',
+  'C03',
+  'C04',
+  'C05',
+  'C06',
+  'C07',
+  'C08',
+  'C09',
+  'C10',
+  'C11',
+];
+
+export const CLASS_NAME = {
+  economy: 'ECONOMY',
+  business: 'BUSINESS',
+  first: 'FIRST',
+  PREMIUM: 'PREMIUM',
+};

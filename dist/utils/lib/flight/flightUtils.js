@@ -218,5 +218,19 @@ class FlightUtils {
             return 'F';
         }
     }
+    utcToLocalDateTime(DateTime) {
+        const TimeLimits = new Date(DateTime);
+        if (!Number.isNaN(TimeLimits.getTime())) {
+            const year = TimeLimits.getFullYear();
+            const month = String(TimeLimits.getMonth() + 1).padStart(2, '0');
+            const day = String(TimeLimits.getDate()).padStart(2, '0');
+            const hours = String(TimeLimits.getHours()).padStart(2, '0');
+            const minutes = String(TimeLimits.getMinutes()).padStart(2, '0');
+            return [`${year}-${month}-${day}`, `${hours}:${minutes}`];
+        }
+        else {
+            return ['', ''];
+        }
+    }
 }
 exports.default = FlightUtils;

@@ -20,6 +20,7 @@ const sabreFlightSupport_service_1 = __importDefault(require("./sabreFlightSuppo
 const wfttFlightSupport_service_1 = __importDefault(require("./wfttFlightSupport.service"));
 const customError_1 = __importDefault(require("../../lib/customError"));
 const dateTimeLib_1 = __importDefault(require("../../lib/dateTimeLib"));
+const staticData_1 = require("../../miscellaneous/staticData");
 class CommonFlightSupportService extends abstract_service_1.default {
     constructor(trx) {
         super();
@@ -291,6 +292,33 @@ class CommonFlightSupportService extends abstract_service_1.default {
                 }
             }
         }
+    }
+    // find route type
+    routeTypeFinder({ airportsPayload, originDest, }) {
+        let route_type = flightConstant_1.ROUTE_TYPE.SOTO;
+        let airports = [];
+        if (originDest) {
+            originDest.forEach((item) => {
+                airports.push(item.OriginLocation.LocationCode);
+                airports.push(item.DestinationLocation.LocationCode);
+            });
+        }
+        else if (airportsPayload) {
+            airports = airportsPayload;
+        }
+        if (airports.every((airport) => staticData_1.BD_AIRPORT.includes(airport))) {
+            route_type = flightConstant_1.ROUTE_TYPE.DOMESTIC;
+        }
+        else if (staticData_1.BD_AIRPORT.includes(airports[0])) {
+            route_type = flightConstant_1.ROUTE_TYPE.FROM_DAC;
+        }
+        else if (airports.some((code) => staticData_1.BD_AIRPORT.includes(code))) {
+            route_type = flightConstant_1.ROUTE_TYPE.TO_DAC;
+        }
+        else {
+            route_type = flightConstant_1.ROUTE_TYPE.SOTO;
+        }
+        return route_type;
     }
 }
 exports.CommonFlightSupportService = CommonFlightSupportService;

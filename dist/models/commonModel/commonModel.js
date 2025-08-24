@@ -165,7 +165,10 @@ class CommonModel extends schema_1.default {
                 .select('id', 'name', 'iso', 'iso3', 'phone_code')
                 .where((qb) => {
                 if (payload.id) {
-                    qb.where('id', payload.id);
+                    if (Array.isArray(payload.id))
+                        qb.whereIn('id', payload.id);
+                    else
+                        qb.where('id', payload.id);
                 }
                 if (payload.name) {
                     qb.andWhereILike('name', `%${payload.name}%`);

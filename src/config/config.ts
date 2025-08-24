@@ -31,6 +31,10 @@ interface ENV {
   SABRE_URL: string | undefined;
   SABRE_USERNAME: string | undefined;
   SABRE_LNIATA_CODE: string | undefined;
+  VERTEIL_URL: string | undefined;
+  VERTEIL_USERNAME: string | undefined;
+  VERTEIL_PASSWORD: string | undefined;
+  VERTEIL_OFFICEID: string | undefined;
   CT_URL: string | undefined;
   CT_API_KEY: string | undefined;
   SERVER_URL: string | undefined;
@@ -64,6 +68,10 @@ interface Config {
   SABRE_URL: string;
   SABRE_USERNAME: string;
   SABRE_LNIATA_CODE: string;
+  VERTEIL_URL: string;
+  VERTEIL_USERNAME: string;
+  VERTEIL_PASSWORD: string;
+  VERTEIL_OFFICEID: string;
   CT_URL: string;
   CT_API_KEY: string;
   SERVER_URL: string;
@@ -98,10 +106,14 @@ const getConfig = (): ENV => {
     SABRE_URL: process.env.SABRE_URL,
     SABRE_USERNAME: process.env.SABRE_USERNAME,
     SABRE_LNIATA_CODE: process.env.SABRE_LNIATA_CODE,
+    VERTEIL_URL: process.env.VERTEIL_URL,
+    VERTEIL_USERNAME: process.env.VERTEIL_USERNAME,
+    VERTEIL_PASSWORD: process.env.VERTEIL_PASSWORD,
+    VERTEIL_OFFICEID: process.env.VERTEIL_OFFICEID,
     CT_URL: process.env.CT_URL,
     CT_API_KEY: process.env.CT_API_KEY,
     SERVER_URL: process.env.SERVER_URL,
-    WFTT_URL: process.env.WFTT_URL
+    WFTT_URL: process.env.WFTT_URL,
   };
 };
 

@@ -278,4 +278,12 @@ Lib.gibberishChecker = (value) => {
         return true;
     return false;
 };
+// minify html
+Lib.minifyHTML = (html) => {
+    return html
+        .replace(/\n/g, '') // Remove newlines
+        .replace(/\s{2,}/g, ' ') // Collapse multiple spaces
+        .replace(/>\s+</g, '><') // Remove spaces between tags
+        .trim();
+};
 exports.default = Lib;

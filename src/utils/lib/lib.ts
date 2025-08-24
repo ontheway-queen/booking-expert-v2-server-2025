@@ -324,6 +324,15 @@ class Lib {
 
     return amount;
   }
+
+  // minify html
+  public static minifyHTML = (html: string) => {
+    return html
+      .replace(/\n/g, '') // Remove newlines
+      .replace(/\s{2,}/g, ' ') // Collapse multiple spaces
+      .replace(/>\s+</g, '><') // Remove spaces between tags
+      .trim();
+  };
 }
 export default Lib;
 
