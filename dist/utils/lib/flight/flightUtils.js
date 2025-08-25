@@ -111,14 +111,10 @@ class FlightUtils {
     }
     //get route of flight
     getRouteOfFlight(leg_description) {
-        let route;
-        route = leg_description.map((item) => {
-            return item.departureLocation;
+        let route = '';
+        leg_description.forEach((item) => {
+            route += item.departureLocation + '-' + item.arrivalLocation;
         });
-        route =
-            route.join('-') +
-                '-' +
-                leg_description[leg_description.length - 1].arrivalLocation;
         return route;
     }
     //get journey type

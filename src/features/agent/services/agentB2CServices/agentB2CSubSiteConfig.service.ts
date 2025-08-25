@@ -412,15 +412,19 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
     const configModel = this.Model.AgencyB2CConfigModel();
     const { agency_id } = req.agencyUser;
 
-    const social_links = await configModel.getSocialLink({
-      agency_id,
-    });
+    const { data, total } = await configModel.getSocialLink(
+      {
+        agency_id,
+      },
+      true
+    );
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: social_links,
+      data,
+      total,
     };
   }
 

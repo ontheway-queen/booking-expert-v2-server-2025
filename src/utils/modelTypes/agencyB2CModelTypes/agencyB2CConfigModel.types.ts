@@ -47,6 +47,8 @@ export interface IGetAgencyB2CHeroBgContentQuery {
   agency_id: number;
   status?: boolean;
   type?: typeof CONTENT_TYPE_PHOTO | typeof CONTENT_TYPE_VIDEO;
+  limit?: string;
+  skip?: string;
 }
 
 export interface IGetAgencyB2CHeroBgContentData {
@@ -75,6 +77,8 @@ export interface IUpdateAgencyB2CPopularDestinationPayload {
 export interface IGetAgencyB2CPopularDestinationQuery {
   agency_id: number;
   status?: boolean;
+  limit?: string;
+  skip?: string;
 }
 
 export interface IGetAgencyB2CPopularDestinationData {
@@ -120,6 +124,8 @@ export interface ICreateAgencyB2CPopularPlace {
 export interface IGetAgencyB2CPopularPlaceQuery {
   agency_id: number;
   status?: boolean;
+  limit?: string;
+  skip?: string;
 }
 
 export interface IGetAgencyB2CPopularPlaceData {
@@ -245,6 +251,8 @@ export interface ICreateAgencyB2CSocialLinkPayload {
 export interface IGetAgencyB2CSocialLinkQuery {
   agency_id: number;
   status?: boolean;
+  limit?: string;
+  skip?: string;
 }
 
 export interface IGetAgencyB2CSocialLinkData {
@@ -275,6 +283,8 @@ export interface ICreateAgencyB2CHotDeals {
 export interface IGetAgencyB2CHotDealsQuery {
   agency_id: number;
   status?: boolean;
+  limit?: string;
+  skip?: string;
 }
 
 export interface IGetAgencyB2CHotDealsData {
@@ -308,6 +318,8 @@ export interface IGetAgencyB2CPopUpBannerQuery {
   agency_id: number;
   status?: boolean;
   pop_up_for?: 'AGENT' | 'B2C';
+  limit?: string;
+  skip?: string;
 }
 
 export interface IGetAgencyB2CPopUpBannerData {

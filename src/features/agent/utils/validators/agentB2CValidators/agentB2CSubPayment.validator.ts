@@ -26,5 +26,24 @@ export class AgentB2CSubPaymentValidator {
     status: Joi.string()
       .valid(DEPOSIT_STATUS_APPROVED, DEPOSIT_STATUS_REJECTED)
       .required(),
+    note: Joi.string().optional(),
+  });
+
+  public getLedger = Joi.object({
+    user_id: Joi.number().required(),
+    from_date: Joi.string().optional(),
+    to_date: Joi.string().optional(),
+    voucher_no: Joi.string().optional(),
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
+  });
+
+  public balanceAdjust = Joi.object({
+    user_id: Joi.number().required(),
+    amount: Joi.number().required(),
+    type: Joi.string().valid('Debit', 'Credit').required(),
+    details: Joi.string().required(),
+    voucher_no: Joi.string().required(),
+    payment_date: Joi.string().required(),
   });
 }

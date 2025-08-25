@@ -203,7 +203,7 @@ export default class AgencyUserModel extends Schema {
         }
 
         if (ref_agent_id) {
-          qb.andWhere('au.ref_agent_id', ref_agent_id);
+          qb.andWhere('a.ref_agent_id', ref_agent_id);
         }
       })
       .first();

@@ -1,5 +1,5 @@
-import { Request } from "express";
-import AbstractServices from "../../../abstract/abstract.service";
+import { Request } from 'express';
+import AbstractServices from '../../../abstract/abstract.service';
 
 export class AgentB2CConfigService extends AbstractServices {
   constructor() {
@@ -60,9 +60,11 @@ export class AgentB2CConfigService extends AbstractServices {
         status: true,
       });
 
+      console.log({ social_links });
+
       const popUpBanner = await configModel.getPopUpBanner({
         agency_id,
-        pop_up_for: "B2C",
+        pop_up_for: 'B2C',
         status: true,
       });
 
@@ -72,11 +74,11 @@ export class AgentB2CConfigService extends AbstractServices {
         message: this.ResMsg.HTTP_OK,
         data: {
           site_data: restData,
-          hero_bg_data,
-          hot_deals,
-          popular_destinations,
-          popular_places,
-          social_links,
+          hero_bg_data: hero_bg_data.data,
+          hot_deals: hot_deals.data,
+          popular_destinations: popular_destinations.data,
+          popular_places: popular_places.data,
+          social_links: social_links.data,
           popup: {
             allow: popUpBanner.length ? true : false,
             pop_up_data: popUpBanner[0],
@@ -204,8 +206,8 @@ export class AgentB2CConfigService extends AbstractServices {
     const { agency_id } = req.agencyB2CWhiteLabel;
 
     const configModel = this.Model.OthersModel();
-    const accounts = await configModel.getAccount({
-      source_type: "AGENT",
+    const { data } = await configModel.getAccount({
+      source_type: 'AGENT',
       source_id: agency_id,
       status: true,
     });
@@ -214,7 +216,7 @@ export class AgentB2CConfigService extends AbstractServices {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: accounts,
+      data,
     };
   }
 }

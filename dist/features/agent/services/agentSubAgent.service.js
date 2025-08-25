@@ -52,6 +52,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                 const checkSubAgentName = yield agencyModel.checkAgency({
                     name: agency_name,
                     agency_type: constants_1.SOURCE_SUB_AGENT,
+                    ref_agent_id: agency_id,
                 });
                 if (checkSubAgentName) {
                     return {
@@ -63,6 +64,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                 const checkAgentUser = yield agencyUserModel.checkUser({
                     email,
                     agency_type: constants_1.SOURCE_SUB_AGENT,
+                    ref_agent_id: agency_id,
                 });
                 if (checkAgentUser) {
                     return {

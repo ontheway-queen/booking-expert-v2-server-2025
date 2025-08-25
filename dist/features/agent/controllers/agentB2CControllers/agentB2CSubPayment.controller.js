@@ -47,6 +47,14 @@ class AgentB2CSubPaymentController extends abstract_controller_1.default {
             const _a = yield this.services.updateDepositRequest(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.getLedger = this.asyncWrapper.wrap({ querySchema: this.validator.getLedger }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.getLedger(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
+        this.balanceAdjust = this.asyncWrapper.wrap({ bodySchema: this.validator.balanceAdjust }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.balanceAdjust(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.AgentB2CSubPaymentController = AgentB2CSubPaymentController;

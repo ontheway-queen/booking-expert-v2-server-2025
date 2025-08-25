@@ -173,14 +173,12 @@ export default class FlightUtils {
   public getRouteOfFlight(
     leg_description: { departureLocation: string; arrivalLocation: string }[]
   ) {
-    let route;
-    route = leg_description.map((item: any) => {
-      return item.departureLocation;
+    let route = '';
+
+    leg_description.forEach((item: any) => {
+      route += item.departureLocation + '-' + item.arrivalLocation;
     });
-    route =
-      route.join('-') +
-      '-' +
-      leg_description[leg_description.length - 1].arrivalLocation;
+
     return route;
   }
 

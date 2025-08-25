@@ -124,7 +124,7 @@ class AgencyUserModel extends schema_1.default {
                     qb.andWhere('au.agency_id', agency_id);
                 }
                 if (ref_agent_id) {
-                    qb.andWhere('au.ref_agent_id', ref_agent_id);
+                    qb.andWhere('a.ref_agent_id', ref_agent_id);
                 }
             })
                 .first();

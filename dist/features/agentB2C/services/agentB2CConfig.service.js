@@ -63,9 +63,10 @@ class AgentB2CConfigService extends abstract_service_1.default {
                     agency_id,
                     status: true,
                 });
+                console.log({ social_links });
                 const popUpBanner = yield configModel.getPopUpBanner({
                     agency_id,
-                    pop_up_for: "B2C",
+                    pop_up_for: 'B2C',
                     status: true,
                 });
                 return {
@@ -74,11 +75,11 @@ class AgentB2CConfigService extends abstract_service_1.default {
                     message: this.ResMsg.HTTP_OK,
                     data: {
                         site_data: restData,
-                        hero_bg_data,
-                        hot_deals,
-                        popular_destinations,
-                        popular_places,
-                        social_links,
+                        hero_bg_data: hero_bg_data.data,
+                        hot_deals: hot_deals.data,
+                        popular_destinations: popular_destinations.data,
+                        popular_places: popular_places.data,
+                        social_links: social_links.data,
                         popup: {
                             allow: popUpBanner.length ? true : false,
                             pop_up_data: popUpBanner[0],
@@ -194,8 +195,8 @@ class AgentB2CConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { agency_id } = req.agencyB2CWhiteLabel;
             const configModel = this.Model.OthersModel();
-            const accounts = yield configModel.getAccount({
-                source_type: "AGENT",
+            const { data } = yield configModel.getAccount({
+                source_type: 'AGENT',
                 source_id: agency_id,
                 status: true,
             });
@@ -203,7 +204,7 @@ class AgentB2CConfigService extends abstract_service_1.default {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: accounts,
+                data,
             };
         });
     }

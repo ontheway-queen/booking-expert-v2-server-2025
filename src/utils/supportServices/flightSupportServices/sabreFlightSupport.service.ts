@@ -1037,7 +1037,7 @@ export default class SabreFlightService extends AbstractServices {
               LCC: 'Disable',
             },
             VerificationItinCallLogic: {
-              Value: 'L',
+              Value: 'M',
               AlwaysCheckAvailability: true,
             },
           },

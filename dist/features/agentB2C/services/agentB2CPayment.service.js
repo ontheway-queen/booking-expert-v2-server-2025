@@ -118,6 +118,7 @@ class AgentB2CPaymentService extends abstract_service_1.default {
                     type: 'Debit',
                     voucher_no: mr_no,
                     details: `Due has been cleared for invoice no ${data.invoice_no}. Balance Transaction`,
+                    ledger_date: new Date(),
                 });
                 yield moneyReceiptModel.createMoneyReceipt({
                     mr_no,
