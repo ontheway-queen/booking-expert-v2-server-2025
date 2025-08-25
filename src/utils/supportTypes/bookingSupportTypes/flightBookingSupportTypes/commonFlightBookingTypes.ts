@@ -42,6 +42,7 @@ export interface IFlightBookingPassengerReqBody {
   key: string;
   type:
     | 'ADT'
+    | 'CHD'
     | 'C02'
     | 'C03'
     | 'C04'

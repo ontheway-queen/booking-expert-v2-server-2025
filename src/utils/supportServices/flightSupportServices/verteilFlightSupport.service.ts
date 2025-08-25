@@ -289,7 +289,7 @@ export default class VerteilFlightService extends AbstractServices {
     booking_block: boolean;
     route_type: 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' | 'SOTO';
   }): Promise<IFormattedFlightItinerary[]> {
-    const commonModel = this.Model.commonModel(this.trx);
+    const commonModel = this.Model.CommonModel(this.trx);
     const AirlinesPreferenceModel = this.Model.AirlinesPreferenceModel(
       this.trx
     );
@@ -343,7 +343,7 @@ export default class VerteilFlightService extends AbstractServices {
           continue;
         }
 
-        const airlineInfo = await commonModel.getAirlines(airlineCode);
+        const airlineInfo = await commonModel.getAirlineByCode(airlineCode);
 
         //=== Flights Construction ===//
         const Associations = Offer.PricedOffer.Associations;
@@ -366,16 +366,17 @@ export default class VerteilFlightService extends AbstractServices {
                     `Fatal: Verteil API FlightSegment with key "${segRef.ref}" not found.`
                   );
 
-                const dAirport = await commonModel.getAirportDetails(
+                const dAirport = await commonModel.getAirportByCode(
                   FlightSegment.Departure.AirportCode.value
                 );
-                const aAirport = await commonModel.getAirportDetails(
+                const aAirport = await commonModel.getAirportByCode(
                   FlightSegment.Arrival.AirportCode.value
                 );
+
                 const marketing_airline = await commonModel.getAirlines(
                   FlightSegment.MarketingCarrier.AirlineID.value
                 );
-                const operating_airline = await commonModel.getAirlines(
+                const operating_airline = await commonModel.getAirlineByCode(
                   FlightSegment.OperatingCarrier?.AirlineID?.value || ''
                 );
                 const aircraft = await commonModel.getAircraft(
@@ -384,10 +385,10 @@ export default class VerteilFlightService extends AbstractServices {
 
                 const departure: IFormattedDeparture = {
                   airport_code: FlightSegment.Departure.AirportCode.value,
-                  airport: dAirport.airport_name,
-                  city: dAirport.city_name,
-                  city_code: dAirport.city_code,
-                  country: dAirport.country,
+                  airport: dAirport?.name || '',
+                  city: dAirport?.city_name || '',
+                  city_code: dAirport?.city_code || '',
+                  country: dAirport?.country || '',
                   terminal: FlightSegment.Departure.Terminal?.Name || '',
                   time:
                     FlightSegment.Departure.Time +

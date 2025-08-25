@@ -53,4 +53,6 @@ export const origin: string[] = [
   'https://ota.mtltd.com.bd',
   'https://www.ota.amartravels.com.bd',
   'https://ota.amartravels.com.bd',
+  'https://fly-grid.com',
+  'https://www.fly-grid.com',
 ];

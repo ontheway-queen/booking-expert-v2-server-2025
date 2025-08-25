@@ -44,7 +44,7 @@ export class SiteConfigSupportService extends AbstractServices {
       about_us_content: aboutUsContent(site_name, address),
       emails: JSON.stringify([{ email }]),
       numbers: JSON.stringify([{ number: phone }]),
-      address: JSON.stringify([{ address }]),
+      address: JSON.stringify([{ title: 'Main Office', address }]),
       contact_us_content: contactUsContent(address, phone, email),
       privacy_policy_content: privacyAndPolicy(site_name),
       terms_and_conditions_content: privacyAndPolicy(site_name),

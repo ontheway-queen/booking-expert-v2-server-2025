@@ -403,6 +403,35 @@ class CommonModel extends Schema {
     return { data, total: count[0]?.total };
   }
 
+  //get all airport by code
+  public async getAirportByCode(code: string): Promise<{
+    id: number;
+    country_id: number;
+    country: string;
+    name: string;
+    iata_code: string;
+    city_id: number;
+    city_code: string;
+    city_name: string;
+  } | null> {
+    return await this.db('airport as air')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .select(
+        'air.id',
+        'air.country_id',
+        'cou.name as country',
+        'air.name',
+        'air.iata_code',
+        'ct.id as city_id',
+        'ct.code as city_code',
+        'ct.name as city_name'
+      )
+      .join('country as cou', 'cou.id', 'air.country_id')
+      .leftJoin('city as ct', 'ct.id', 'air.city')
+      .where('air.iata_code', code)
+      .first();
+  }
+
   //update airport
   public async updateAirport(payload: IUpdateAirportPayload, id: number) {
     return await this.db('airport')

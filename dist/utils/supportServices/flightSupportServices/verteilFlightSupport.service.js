@@ -204,7 +204,7 @@ class VerteilFlightService extends abstract_service_1.default {
     FlightSearchResFormatter(_a) {
         return __awaiter(this, arguments, void 0, function* ({ dynamic_fare_supplier_id, booking_block, data, reqBody, route_type, }) {
             var _b, _c;
-            const commonModel = this.Model.commonModel(this.trx);
+            const commonModel = this.Model.CommonModel(this.trx);
             const AirlinesPreferenceModel = this.Model.AirlinesPreferenceModel(this.trx);
             const api_currency = yield this.Model.CurrencyModel(this.trx).getApiWiseCurrencyByName(flightConstant_1.VERTEIL_API, 'FLIGHT');
             // convert any Child aged value to CHD
@@ -244,7 +244,7 @@ class VerteilFlightService extends abstract_service_1.default {
                     if (blockedAirlines.find((ba) => ba.Code === airlineCode)) {
                         continue;
                     }
-                    const airlineInfo = yield commonModel.getAirlines(airlineCode);
+                    const airlineInfo = yield commonModel.getAirlineByCode(airlineCode);
                     //=== Flights Construction ===//
                     const Associations = Offer.PricedOffer.Associations;
                     const FormattedFlights = yield Promise.all(Associations.map((Association) => __awaiter(this, void 0, void 0, function* () {
@@ -257,17 +257,17 @@ class VerteilFlightService extends abstract_service_1.default {
                             const FlightSegment = data.DataLists.FlightSegmentList.FlightSegment.find((item) => item.SegmentKey === segRef.ref);
                             if (!FlightSegment)
                                 throw new Error(`Fatal: Verteil API FlightSegment with key "${segRef.ref}" not found.`);
-                            const dAirport = yield commonModel.getAirportDetails(FlightSegment.Departure.AirportCode.value);
-                            const aAirport = yield commonModel.getAirportDetails(FlightSegment.Arrival.AirportCode.value);
+                            const dAirport = yield commonModel.getAirportByCode(FlightSegment.Departure.AirportCode.value);
+                            const aAirport = yield commonModel.getAirportByCode(FlightSegment.Arrival.AirportCode.value);
                             const marketing_airline = yield commonModel.getAirlines(FlightSegment.MarketingCarrier.AirlineID.value);
-                            const operating_airline = yield commonModel.getAirlines(((_b = (_a = FlightSegment.OperatingCarrier) === null || _a === void 0 ? void 0 : _a.AirlineID) === null || _b === void 0 ? void 0 : _b.value) || '');
+                            const operating_airline = yield commonModel.getAirlineByCode(((_b = (_a = FlightSegment.OperatingCarrier) === null || _a === void 0 ? void 0 : _a.AirlineID) === null || _b === void 0 ? void 0 : _b.value) || '');
                             const aircraft = yield commonModel.getAircraft(((_d = (_c = FlightSegment.Equipment) === null || _c === void 0 ? void 0 : _c.AircraftCode) === null || _d === void 0 ? void 0 : _d.value) || '');
                             const departure = {
                                 airport_code: FlightSegment.Departure.AirportCode.value,
-                                airport: dAirport.airport_name,
-                                city: dAirport.city_name,
-                                city_code: dAirport.city_code,
-                                country: dAirport.country,
+                                airport: (dAirport === null || dAirport === void 0 ? void 0 : dAirport.name) || '',
+                                city: (dAirport === null || dAirport === void 0 ? void 0 : dAirport.city_name) || '',
+                                city_code: (dAirport === null || dAirport === void 0 ? void 0 : dAirport.city_code) || '',
+                                country: (dAirport === null || dAirport === void 0 ? void 0 : dAirport.country) || '',
                                 terminal: ((_e = FlightSegment.Departure.Terminal) === null || _e === void 0 ? void 0 : _e.Name) || '',
                                 time: FlightSegment.Departure.Time +
                                     ':00' +

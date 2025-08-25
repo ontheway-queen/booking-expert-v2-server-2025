@@ -17,13 +17,11 @@ class AgentPaymentsRouter extends abstract_router_1.default {
             .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_DEPOSIT_FILES, [
             'document',
         ]), this.controller.createDepositRequest)
-            .delete(this.controller.cancelCurrentDepositRequest);
+            .delete(this.controller.cancelCurrentDepositRequest)
+            .get(this.controller.getDepositHistory);
         this.router
             .route('/deposit/:id')
             .get(this.controller.getSingleDepositRequest);
-        this.router
-            .route('/deposit/history')
-            .get(this.controller.getDepositHistory);
         this.router.route('/adm/history').get(this.controller.getADMList);
         this.router.route('/loan/history').get(this.controller.getLoanHistory);
         this.router.route('/ledger').get(this.controller.getLedger);

@@ -94,7 +94,7 @@ class BlogModel extends schema_1.default {
     getAgentB2CBlogList(query) {
         return __awaiter(this, void 0, void 0, function* () {
             const { is_deleted = false } = query;
-            return yield this.db('blog as b')
+            const data = yield this.db('blog as b')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('b.id', 'b.title', 'b.summary', 'b.cover_image', 'b.slug', 'b.created_at as created_date')
                 .where((qb) => {
@@ -105,6 +105,18 @@ class BlogModel extends schema_1.default {
                     qb.andWhere('b.status', query.status);
                 }
             });
+            const total = yield this.db('blog')
+                .withSchema(this.SERVICE_SCHEMA)
+                .count('id as total')
+                .where((qb) => {
+                qb.andWhere('b.source_type', constants_1.SOURCE_AGENT);
+                qb.andWhere('b.source_id', query.source_id);
+                qb.andWhere('b.is_deleted', is_deleted);
+                if (query.status !== undefined) {
+                    qb.andWhere('b.status', query.status);
+                }
+            });
+            return { data, total: Number(total[0].total) || 0 };
         });
     }
     getSingleAgentB2CBlog(query) {

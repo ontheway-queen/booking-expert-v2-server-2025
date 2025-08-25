@@ -108,7 +108,7 @@ export interface IGetLastIdData {
 
 export interface IInsertEmailSubscriberPayload {
   email: string;
-  source: 'B2C' | 'AGENT B2C';
+  source_type: 'B2C' | 'AGENT B2C';
   agency_id?: number;
 }
 export interface IGetEmailSubscriberPayload {

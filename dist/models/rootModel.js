@@ -46,6 +46,8 @@ const blogModel_1 = __importDefault(require("./blogModel/blogModel"));
 const agencyB2CConfigModel_1 = __importDefault(require("./agencyB2CModel/agencyB2CConfigModel"));
 const agencyB2CPaymentModel_1 = __importDefault(require("./agencyB2CModel/agencyB2CPaymentModel"));
 const depositRequestModel_1 = __importDefault(require("./commonModel/depositRequestModel"));
+const dealCodeModel_1 = __importDefault(require("./othersModel/dealCodeModel"));
+const currencyModel_1 = __importDefault(require("./othersModel/currencyModel"));
 class Models {
     //Common model
     CommonModel(trx) {
@@ -214,6 +216,14 @@ class Models {
     //Deposit Request Model
     DepositRequestModel(trx) {
         return new depositRequestModel_1.default(trx || database_1.db);
+    }
+    //Deal code model
+    DealCodeModel(trx) {
+        return new dealCodeModel_1.default(trx || database_1.db);
+    }
+    //Currency Converter model
+    CurrencyModel(trx) {
+        return new currencyModel_1.default(trx || database_1.db);
     }
 }
 exports.default = Models;

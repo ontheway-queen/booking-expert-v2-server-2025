@@ -110,12 +110,12 @@ export class AgentPaymentsService extends AbstractServices {
       let docs = '';
       files.forEach((file) => {
         switch (file.fieldname) {
-          case 'docs':
+          case 'document':
             docs = file.filename;
             break;
           default:
             throw new CustomError(
-              'Invalid files. Please provide valid docs',
+              'Invalid files. Please provide valid document',
               this.StatusCode.HTTP_UNPROCESSABLE_ENTITY
             );
         }

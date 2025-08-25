@@ -40,7 +40,7 @@ class DepositRequestModel extends schema_1.default {
             const data = yield this.db('deposit_request as dr')
                 .withSchema(this.DBO_SCHEMA)
                 .select('dr.id', 'dr.agency_id', 'ad.bank_name', 'ad.bank_logo', 'dr.amount', 'dr.request_no', 'dr.status', 'dr.payment_date', 'dr.created_at', 'a.agency_name', 'a.agency_logo')
-                .joinRaw('agent.agency as a ON a.id = dr.agency_id')
+                .joinRaw('LEFT JOIN agent.agency as a ON a.id = dr.agency_id')
                 .leftJoin('view_account_details AS ad', 'dr.account_id', 'ad.id')
                 .where((qb) => {
                 qb.andWhere('dr.source', constants_1.SOURCE_AGENT);
@@ -69,9 +69,9 @@ class DepositRequestModel extends schema_1.default {
             let total = [];
             if (is_total) {
                 total = yield this.db('deposit_request as dr')
-                    .withSchema(this.AGENT_SCHEMA)
+                    .withSchema(this.DBO_SCHEMA)
                     .count('dr.id as total')
-                    .join('agency as a', 'a.id', 'dr.agency_id')
+                    .joinRaw('LEFT JOIN agent.agency as a ON a.id = dr.agency_id')
                     .where((qb) => {
                     qb.andWhere('dr.source', constants_1.SOURCE_AGENT);
                     if (query.agency_id) {

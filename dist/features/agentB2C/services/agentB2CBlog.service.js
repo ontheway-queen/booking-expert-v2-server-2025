@@ -19,17 +19,15 @@ class AgentB2CBlogService extends abstract_service_1.default {
     getBlogList(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const { agency_id } = req.agencyB2CWhiteLabel;
+            const query = req.query;
             const blogModel = this.Model.BlogModel();
-            const blogPosts = yield blogModel.getAgentB2CBlogList({
-                is_deleted: false,
-                source_id: agency_id,
-                status: true,
-            });
+            const blogPosts = yield blogModel.getAgentB2CBlogList(Object.assign({ is_deleted: false, source_id: agency_id, status: true }, query));
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: blogPosts,
+                data: blogPosts.data,
+                total: blogPosts.total,
             };
         });
     }

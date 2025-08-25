@@ -71,6 +71,8 @@ export interface IUpdateBlogPayload {
 
 export interface IAgentB2CBlogListQuery {
   source_id: number;
+  limit?: string;
+  skip?: string;
   is_deleted?: boolean;
   status?: boolean;
 }

@@ -320,6 +320,18 @@ class CommonModel extends schema_1.default {
             return { data, total: (_a = count[0]) === null || _a === void 0 ? void 0 : _a.total };
         });
     }
+    //get all airport by code
+    getAirportByCode(code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('airport as air')
+                .withSchema(this.PUBLIC_SCHEMA)
+                .select('air.id', 'air.country_id', 'cou.name as country', 'air.name', 'air.iata_code', 'ct.id as city_id', 'ct.code as city_code', 'ct.name as city_name')
+                .join('country as cou', 'cou.id', 'air.country_id')
+                .leftJoin('city as ct', 'ct.id', 'air.city')
+                .where('air.iata_code', code)
+                .first();
+        });
+    }
     //update airport
     updateAirport(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {

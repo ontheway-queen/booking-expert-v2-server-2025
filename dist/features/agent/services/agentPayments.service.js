@@ -86,11 +86,11 @@ class AgentPaymentsService extends abstract_service_1.default {
                 let docs = '';
                 files.forEach((file) => {
                     switch (file.fieldname) {
-                        case 'docs':
+                        case 'document':
                             docs = file.filename;
                             break;
                         default:
-                            throw new customError_1.default('Invalid files. Please provide valid docs', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
+                            throw new customError_1.default('Invalid files. Please provide valid document', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                 });
                 const deposit_body = {

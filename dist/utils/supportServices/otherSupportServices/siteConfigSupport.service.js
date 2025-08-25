@@ -28,7 +28,7 @@ class SiteConfigSupportService extends abstract_service_1.default {
                 about_us_content: (0, pagesContent_1.aboutUsContent)(site_name, address),
                 emails: JSON.stringify([{ email }]),
                 numbers: JSON.stringify([{ number: phone }]),
-                address: JSON.stringify([{ address }]),
+                address: JSON.stringify([{ title: 'Main Office', address }]),
                 contact_us_content: (0, pagesContent_1.contactUsContent)(address, phone, email),
                 privacy_policy_content: (0, pagesContent_1.privacyAndPolicy)(site_name),
                 terms_and_conditions_content: (0, pagesContent_1.privacyAndPolicy)(site_name),

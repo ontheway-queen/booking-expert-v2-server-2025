@@ -42,6 +42,8 @@ import BlogModel from './blogModel/blogModel';
 import AgencyB2CConfigModel from './agencyB2CModel/agencyB2CConfigModel';
 import AgencyB2CPaymentModel from './agencyB2CModel/agencyB2CPaymentModel';
 import DepositRequestModel from './commonModel/depositRequestModel';
+import DealCodeModel from './othersModel/dealCodeModel';
+import CurrencyModel from './othersModel/currencyModel';
 
 export default class Models {
   //Common model
@@ -247,5 +249,15 @@ export default class Models {
   //Deposit Request Model
   public DepositRequestModel(trx?: Knex.Transaction) {
     return new DepositRequestModel(trx || db);
+  }
+
+  //Deal code model
+  public DealCodeModel(trx?: Knex.Transaction) {
+    return new DealCodeModel(trx || db);
+  }
+
+  //Currency Converter model
+  public CurrencyModel(trx?: Knex.Transaction) {
+    return new CurrencyModel(trx || db);
   }
 }
