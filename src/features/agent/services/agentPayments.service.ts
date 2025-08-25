@@ -1,7 +1,7 @@
-import { Request } from 'express';
-import AbstractServices from '../../../abstract/abstract.service';
-import CustomError from '../../../utils/lib/customError';
-import Lib from '../../../utils/lib/lib';
+import { Request } from "express";
+import AbstractServices from "../../../abstract/abstract.service";
+import CustomError from "../../../utils/lib/customError";
+import Lib from "../../../utils/lib/lib";
 import {
   DEPOSIT_STATUS_CANCELLED,
   DEPOSIT_STATUS_PENDING,
@@ -9,15 +9,15 @@ import {
   PAYMENT_GATEWAYS,
   SOURCE_ADMIN,
   SOURCE_AGENT,
-} from '../../../utils/miscellaneous/constants';
-import { PaymentSupportService } from '../../../utils/supportServices/paymentSupportServices/paymentSupport.service';
+} from "../../../utils/miscellaneous/constants";
+import { PaymentSupportService } from "../../../utils/supportServices/paymentSupportServices/paymentSupport.service";
 import {
   ICreateDepositPayload,
   IGetAgentLedgerHistoryQuery,
   IGetAgentLoanHistoryQuery,
   ITopUpUsingPaymentGatewayReqBody,
-} from '../utils/types/agentPayment.types';
-import { ICreateDepositRequestPayload } from '../../../utils/modelTypes/commonModelTypes/depositRequestModel.types';
+} from "../utils/types/agentPayment.types";
+import { ICreateDepositRequestPayload } from "../../../utils/modelTypes/commonModelTypes/depositRequestModel.types";
 
 export class AgentPaymentsService extends AbstractServices {
   public async getLoanHistory(req: Request) {
@@ -82,7 +82,7 @@ export class AgentPaymentsService extends AbstractServices {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
           message:
-            'Your previous deposit request is still in pending. New deposit request cannot be made',
+            "Your previous deposit request is still in pending. New deposit request cannot be made",
         };
       }
 
@@ -97,7 +97,7 @@ export class AgentPaymentsService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
-          message: 'Invalid account id.',
+          message: "Invalid account id.",
         };
       }
 
@@ -107,15 +107,15 @@ export class AgentPaymentsService extends AbstractServices {
       });
 
       const files = (req.files as Express.Multer.File[]) || [];
-      let docs = '';
+      let docs = "";
       files.forEach((file) => {
         switch (file.fieldname) {
-          case 'document':
+          case "document":
             docs = file.filename;
             break;
           default:
             throw new CustomError(
-              'Invalid files. Please provide valid document',
+              "Invalid files. Please provide valid document",
               this.StatusCode.HTTP_UNPROCESSABLE_ENTITY
             );
         }
@@ -138,7 +138,7 @@ export class AgentPaymentsService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: 'Deposit request has been created',
+        message: "Deposit request has been created",
         data: {
           id: res[0].id,
         },
@@ -160,14 +160,14 @@ export class AgentPaymentsService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: 'No Pending deposit request has been found!',
+          message: "No Pending deposit request has been found!",
         };
       }
 
       await paymentModel.updateDepositRequest(
         {
           status: DEPOSIT_STATUS_CANCELLED,
-          update_note: 'Deposit Cancelled by agent.' + `(${name}[${username}])`,
+          update_note: "Deposit Cancelled by agent." + `(${name}[${username}])`,
         },
         getCurrentDepositData.data[0].id
       );
@@ -175,7 +175,7 @@ export class AgentPaymentsService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: 'Deposit request has been cancelled',
+        message: "Deposit request has been cancelled",
       };
     });
   }
@@ -249,7 +249,7 @@ export class AgentPaymentsService extends AbstractServices {
             cus_name: name,
             cus_email: user_email,
             cus_phone: phone_number,
-            product_name: 'credit load',
+            product_name: "credit load",
             success_page,
             failed_page,
             cancelled_page,
@@ -258,7 +258,7 @@ export class AgentPaymentsService extends AbstractServices {
         default:
           return {
             success: false,
-            message: 'Invalid bank',
+            message: "Invalid bank",
             redirectUrl: null,
             code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
           };
@@ -364,7 +364,7 @@ export class AgentPaymentsService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: 'No due has been found with this invoice',
+          message: "No due has been found with this invoice",
         };
       }
 
@@ -384,7 +384,7 @@ export class AgentPaymentsService extends AbstractServices {
           return {
             success: false,
             code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'There is insufficient balance in your account.',
+            message: "There is insufficient balance in your account.",
           };
         }
         loan_trans =
@@ -399,7 +399,7 @@ export class AgentPaymentsService extends AbstractServices {
       const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
       await invoiceModel.updateInvoice({ due: 0 }, Number(id));
       await moneyReceiptModel.createMoneyReceipt({
-        mr_no: await Lib.generateNo({ trx, type: 'Money_Receipt' }),
+        mr_no: await Lib.generateNo({ trx, type: "Money_Receipt" }),
         invoice_id: Number(id),
         amount: data.due,
         user_id,
@@ -409,7 +409,7 @@ export class AgentPaymentsService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: 'Due has been cleared',
+        message: "Due has been cleared",
       };
     });
   }
@@ -455,15 +455,16 @@ export class AgentPaymentsService extends AbstractServices {
 
   public async getAccounts(_req: Request) {
     const configModel = this.Model.OthersModel();
-    const accounts = await configModel.getAccount({
-      source_type: 'ADMIN',
+    const { data, total } = await configModel.getAccount({
+      source_type: SOURCE_ADMIN,
     });
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: accounts,
+      data,
+      total,
     };
   }
 }
