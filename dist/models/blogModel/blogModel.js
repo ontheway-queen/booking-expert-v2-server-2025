@@ -109,11 +109,11 @@ class BlogModel extends schema_1.default {
                 .withSchema(this.SERVICE_SCHEMA)
                 .count('id as total')
                 .where((qb) => {
-                qb.andWhere('b.source_type', constants_1.SOURCE_AGENT);
-                qb.andWhere('b.source_id', query.source_id);
-                qb.andWhere('b.is_deleted', is_deleted);
+                qb.andWhere('source_type', constants_1.SOURCE_AGENT);
+                qb.andWhere('source_id', query.source_id);
+                qb.andWhere('is_deleted', is_deleted);
                 if (query.status !== undefined) {
-                    qb.andWhere('b.status', query.status);
+                    qb.andWhere('status', query.status);
                 }
             });
             return { data, total: Number(total[0].total) || 0 };

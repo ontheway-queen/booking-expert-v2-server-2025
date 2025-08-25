@@ -156,11 +156,11 @@ export default class BlogModel extends Schema {
       .withSchema(this.SERVICE_SCHEMA)
       .count('id as total')
       .where((qb) => {
-        qb.andWhere('b.source_type', SOURCE_AGENT);
-        qb.andWhere('b.source_id', query.source_id);
-        qb.andWhere('b.is_deleted', is_deleted);
+        qb.andWhere('source_type', SOURCE_AGENT);
+        qb.andWhere('source_id', query.source_id);
+        qb.andWhere('is_deleted', is_deleted);
         if (query.status !== undefined) {
-          qb.andWhere('b.status', query.status);
+          qb.andWhere('status', query.status);
         }
       });
 
