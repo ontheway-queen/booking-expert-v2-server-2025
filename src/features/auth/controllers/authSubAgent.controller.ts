@@ -1,10 +1,10 @@
-import { Request, Response } from "express";
-import AbstractController from "../../../abstract/abstract.controller";
-import AuthValidator from "../utils/validators/authValidator";
-import AuthAgentService from "../services/authAgent.service";
+import { Request, Response } from 'express';
+import AbstractController from '../../../abstract/abstract.controller';
+import AuthValidator from '../utils/validators/authValidator';
+import AuthSubAgentService from '../services/authSubAgent.service';
 
 export default class AuthSubAgentController extends AbstractController {
-  private service = new AuthAgentService();
+  private service = new AuthSubAgentService();
   private validator = new AuthValidator();
   constructor() {
     super();

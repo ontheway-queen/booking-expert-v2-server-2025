@@ -36,7 +36,8 @@ export const PROJECT_EMAIL = 'support@bookingexpert.us';
 export const PROJECT_NUMBER = '+880 1958-398347';
 export const PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 export const ADMIN_NOTIFY_EMAIL = 'ota.bookingexpert@gmail.com';
-
+export const LOGO_ROOT_LINK =
+  'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/';
 // Email subject
 export const OTP_EMAIL_SUBJECT = 'Your One Time Password For Verification';
 

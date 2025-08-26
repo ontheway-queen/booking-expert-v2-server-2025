@@ -380,6 +380,7 @@ export default class AuthChecker {
         umrah: Boolean(check_token?.umrah),
         group_fare: Boolean(check_token?.group_fare),
         blog: Boolean(check_token?.blog),
+        agency_logo: check_agency.agency_logo,
       };
 
       // Check permission

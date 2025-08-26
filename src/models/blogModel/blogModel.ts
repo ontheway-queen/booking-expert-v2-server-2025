@@ -3,7 +3,7 @@ import {
   BLOG_FOR_B2C,
   BLOG_FOR_BOTH,
 } from '../../utils/miscellaneous/blogConstants';
-import { SOURCE_AGENT } from '../../utils/miscellaneous/constants';
+import { DATA_LIMIT, SOURCE_AGENT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   GetSingleAgentB2CBlogPayload,
@@ -33,7 +33,7 @@ export default class BlogModel extends Schema {
 
   public async getSingleBlogPost(
     query: ISingleBlogPostQuery
-  ): Promise<IGetSingleBlogPayload> {
+  ): Promise<IGetSingleBlogPayload | null> {
     const { is_deleted = false } = query;
     return await this.db('blog')
       .withSchema(this.SERVICE_SCHEMA)
@@ -41,6 +41,7 @@ export default class BlogModel extends Schema {
         'id',
         'title',
         'content',
+        'summary',
         'slug',
         'meta_title',
         'meta_description',
@@ -150,7 +151,9 @@ export default class BlogModel extends Schema {
         if (query.status !== undefined) {
           qb.andWhere('b.status', query.status);
         }
-      });
+      })
+      .limit(Number(query.limit) || DATA_LIMIT)
+      .offset(Number(query.skip) || 0);
 
     const total = await this.db('blog')
       .withSchema(this.SERVICE_SCHEMA)

@@ -31,7 +31,7 @@ class BlogModel extends schema_1.default {
             const { is_deleted = false } = query;
             return yield this.db('blog')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('id', 'title', 'content', 'slug', 'meta_title', 'meta_description', 'cover_image', 'status')
+                .select('id', 'title', 'content', 'summary', 'slug', 'meta_title', 'meta_description', 'cover_image', 'status')
                 .where((qb) => {
                 qb.andWhere('source_id', query.source_id);
                 qb.andWhere('source_type', query.source_type);
@@ -104,7 +104,9 @@ class BlogModel extends schema_1.default {
                 if (query.status !== undefined) {
                     qb.andWhere('b.status', query.status);
                 }
-            });
+            })
+                .limit(Number(query.limit) || constants_1.DATA_LIMIT)
+                .offset(Number(query.skip) || 0);
             const total = yield this.db('blog')
                 .withSchema(this.SERVICE_SCHEMA)
                 .count('id as total')

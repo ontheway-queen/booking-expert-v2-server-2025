@@ -178,16 +178,19 @@ export default class AgencyUserModel extends Schema {
       )
       .leftJoin('agency AS a', 'au.agency_id', 'a.id')
       .where((qb) => {
-        if (email) {
-          qb.orWhere('au.email', email);
+        if (email || username) {
+          qb.andWhere((qqb) => {
+            if (email) {
+              qqb.orWhere('au.email', email);
+            }
+            if (username) {
+              qqb.orWhere('au.username', username);
+            }
+          });
         }
 
         if (agency_type) {
-          qb.orWhere('a.agency_type', agency_type);
-        }
-
-        if (username) {
-          qb.orWhere('au.username', username);
+          qb.andWhere('a.agency_type', agency_type);
         }
 
         if (is_main_user !== undefined) {

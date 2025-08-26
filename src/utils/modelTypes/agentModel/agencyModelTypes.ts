@@ -2,6 +2,12 @@ import { SOURCE_AGENT, SOURCE_SUB_AGENT } from '../../miscellaneous/constants';
 
 type markup_type = 'PER' | 'FLAT';
 type markup_mode = 'INCREASE' | 'DECREASE';
+type agency_status_type =
+  | 'Pending'
+  | 'Active'
+  | 'Inactive'
+  | 'Rejected'
+  | 'Incomplete';
 export interface ICreateAgencyPayload {
   agency_logo: string;
   agent_no: string;
@@ -21,7 +27,7 @@ export interface ICreateAgencyPayload {
   ref_id?: number;
   white_label?: boolean;
   allow_api?: boolean;
-  status: 'Pending' | 'Active' | 'Incomplete';
+  status: agency_status_type;
 }
 
 export interface IUpdateAgencyPayload {
@@ -35,7 +41,7 @@ export interface IUpdateAgencyPayload {
   address?: string;
   kam_id?: number;
   ref_id?: number;
-  status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
+  status?: agency_status_type;
   flight_markup_set?: number;
   hotel_markup_set?: number;
   white_label?: boolean;
@@ -48,7 +54,7 @@ export interface IGetAgencyListQuery {
   limit?: string;
   skip?: string;
   filter?: string;
-  status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
+  status?: agency_status_type;
   ref_id?: number;
   ref_agent_id?: number;
   agency_type?: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
@@ -58,7 +64,7 @@ export interface IGetAgencyListWithBalanceQuery {
   limit?: string;
   skip?: string;
   search_value?: string;
-  status?: string;
+  status?: agency_status_type;
   ref_id?: number;
   ref_agent_id?: number;
   agency_type?: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
@@ -72,7 +78,7 @@ export interface IGetAgencyListData {
   email: string;
   phone: string;
   address: string;
-  status: string;
+  status: agency_status_type;
   white_label: boolean;
   allow_api: boolean;
   agency_type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
@@ -86,7 +92,7 @@ export interface IGetAgencyListWithBalanceData {
   email: string;
   phone: string;
   address: string;
-  status: string;
+  status: agency_status_type;
   balance: number;
   usable_loan: number;
   white_label: boolean;
@@ -104,7 +110,7 @@ export interface IGetSingleAgencyData {
   email: string;
   phone: string;
   address: string;
-  status: string;
+  status: agency_status_type;
   usable_loan: number;
   balance: number;
   white_label: boolean;
@@ -127,7 +133,7 @@ export interface ICheckAgencyQuery {
   email?: string;
   name?: string;
   agent_no?: string;
-  status?: 'Pending' | 'Active' | 'Inactive' | 'Rejected' | 'Incomplete';
+  status?: agency_status_type;
   ref_id?: number;
   ref_agent_id?: number;
   agency_type?: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
@@ -139,7 +145,7 @@ export interface ICheckAgencyData {
   agency_name: string;
   email: string;
   phone: string;
-  status: string;
+  status: agency_status_type;
   agency_logo: string;
   civil_aviation?: string;
   trade_license?: string;

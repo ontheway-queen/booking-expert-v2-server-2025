@@ -325,9 +325,10 @@ class AdminAgentFlightService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
-                const { name, user_email } = req.admin;
+                const { name, user_email, user_id } = req.admin;
                 const { status, airline_pnr, charge_credit, gds_pnr, ticket_issue_last_time, ticket_numbers, } = req.body;
                 const flightBookingModel = this.Model.FlightBookingModel(trx);
+                const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(trx);
                 const booking_data = yield flightBookingModel.getSingleFlightBooking({
                     id: Number(id),
                     booked_by: constants_1.SOURCE_AGENT,
@@ -369,6 +370,8 @@ class AdminAgentFlightService extends abstract_service_1.default {
                     booking_tracking += ` Ticket numbers: ${JSON.stringify(ticket_numbers)}.`;
                     const flightBookingTravelerModel = this.Model.FlightBookingTravelerModel(trx);
                     const agentBookingSubService = new agentFlightBookingSupport_service_1.AgentFlightBookingSupportService(trx);
+                    payload.issued_by_type = constants_1.SOURCE_ADMIN;
+                    payload.issued_by_user_id = user_id;
                     if (charge_credit) {
                         const payment_data = yield agentBookingSubService.getPaymentInformation({
                             booking_id: Number(id),
@@ -411,6 +414,10 @@ class AdminAgentFlightService extends abstract_service_1.default {
                 yield flightBookingModel.updateFlightBooking(payload, {
                     id: Number(id),
                     source_type: constants_1.SOURCE_AGENT,
+                });
+                yield flightBookingTrackingModel.insertFlightBookingTracking({
+                    description: booking_tracking,
+                    flight_booking_id: Number(id),
                 });
                 return {
                     success: true,

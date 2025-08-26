@@ -3,6 +3,7 @@ import AbstractServices from '../../../abstract/abstract.service';
 import config from '../../../config/config';
 import Lib from '../../../utils/lib/lib';
 import {
+  LOGO_ROOT_LINK,
   OTP_TYPES,
   SOURCE_SUB_AGENT,
   WHITE_LABEL_PERMISSIONS_MODULES,
@@ -13,14 +14,15 @@ import {
   ILogin2FAReqBody,
   ILoginReqBody,
   IRegisterAgentReqBody,
+  IRegisterSubAgentReqBody,
   IResetPassReqBody,
 } from '../utils/types/authTypes';
 import { ITokenParseAgencyUser } from '../../public/utils/types/publicCommon.types';
 import CustomError from '../../../utils/lib/customError';
 import { IInsertAgencyRolePermissionPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
-import { registrationVerificationTemplate } from '../../../utils/templates/registrationVerificationTemplate';
 import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
 import EmailSendLib from '../../../utils/lib/emailSendLib';
+import { sendEmailOtpTemplate } from '../../../utils/templates/sendEmailOtpTemplate';
 
 export default class AuthSubAgentService extends AbstractServices {
   constructor() {
@@ -29,38 +31,51 @@ export default class AuthSubAgentService extends AbstractServices {
 
   public async register(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { email, agency_name, user_name, address, phone } =
-        req.body as IRegisterAgentReqBody;
-      const { agency_id, agency_name: main_agent_name } =
-        req.agencyB2CWhiteLabel;
+      const { email, agency_name, user_name, address, phone, password } =
+        req.body as IRegisterSubAgentReqBody;
+      const {
+        agency_id: main_agent,
+        agency_name: main_agent_name,
+        agency_logo: main_agent_logo,
+      } = req.agencyB2CWhiteLabel;
       const AgentModel = this.Model.AgencyModel(trx);
       const AgencyUserModel = this.Model.AgencyUserModel(trx);
+      const commonModel = this.Model.CommonModel(trx);
+
       const files = (req.files as Express.Multer.File[]) || [];
 
       const checkAgentName = await AgentModel.checkAgency({
         name: agency_name,
+        ref_agent_id: main_agent,
+        agency_type: SOURCE_SUB_AGENT,
       });
+
+      if (checkAgentName) {
+        if (checkAgentName.status !== 'Incomplete') {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_CONFLICT,
+            message:
+              'Duplicate agency name! Already exist an agency with this name.',
+          };
+        }
+      }
 
       const checkAgentUser = await AgencyUserModel.checkUser({
         email,
         agency_type: SOURCE_SUB_AGENT,
+        ref_agent_id: main_agent,
       });
 
       if (checkAgentUser) {
-        return {
-          success: false,
-          code: this.StatusCode.HTTP_CONFLICT,
-          message: 'Email already exist. Please use another email.',
-        };
-      }
-
-      if (checkAgentName) {
-        return {
-          success: false,
-          code: this.StatusCode.HTTP_CONFLICT,
-          message:
-            'Duplicate agency name! Already exist an agency with this name.',
-        };
+        if (checkAgentUser.agency_status !== 'Incomplete') {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_CONFLICT,
+            message:
+              'Duplicate email! Already exist an agency with this email.',
+          };
+        }
       }
 
       let agency_logo = '';
@@ -92,90 +107,141 @@ export default class AuthSubAgentService extends AbstractServices {
 
       const agent_no = await Lib.generateNo({ trx, type: 'Sub_Agent' });
 
-      const newAgency = await AgentModel.createAgency({
-        address,
-        status: 'Incomplete',
-        agent_no,
-        agency_name,
-        email,
-        phone,
-        agency_logo,
-        civil_aviation,
-        trade_license,
-        national_id,
-        agency_type: SOURCE_SUB_AGENT,
-        ref_agent_id: agency_id,
-      });
+      if (checkAgentUser) {
+        const checkOtp = await commonModel.getOTP({
+          email: email,
+          type: 'register_sub_agent',
+        });
 
-      const newRole = await AgencyUserModel.createRole({
-        agency_id: newAgency[0].id,
-        name: 'Super Admin',
-        is_main_role: true,
-      });
-
-      const permissions = await AgencyUserModel.getAllPermissions();
-
-      const permissionPayload: IInsertAgencyRolePermissionPayload[] = [];
-
-      permissions.forEach((item) => {
-        if (!WHITE_LABEL_PERMISSIONS_MODULES.includes(item.name)) {
-          permissionPayload.push({
-            agency_id: newAgency[0].id,
-            role_id: newRole[0].id,
-            permission_id: item.id,
-            delete: true,
-            read: true,
-            update: true,
-            write: true,
-          });
+        if (checkOtp.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_GONE,
+            message: this.ResMsg.THREE_TIMES_EXPIRED,
+          };
         }
-      });
 
-      await AgencyUserModel.insertRolePermission(permissionPayload);
+        const otp = Lib.otpGenNumber(6);
+        const hashed_otp = await Lib.hashValue(otp);
 
-      let username = Lib.generateUsername(user_name);
+        await EmailSendLib.sendEmailAgent(trx, main_agent, {
+          email,
+          emailSub: `${main_agent_name} - Agency Registration Verification`,
+          emailBody: sendEmailOtpTemplate({
+            otpFor: 'Registration',
+            project: main_agent_name,
+            otp: otp,
+            logo: '',
+          }),
+        });
 
-      let suffix = 1;
-
-      while (await AgencyUserModel.checkUser({ username })) {
-        username = `${username}${suffix}`;
-        suffix += 1;
-      }
-      const password = Lib.generateRandomPassword(8);
-
-      const hashed_password = await Lib.hashValue(password);
-
-      const newUser = await AgencyUserModel.createUser({
-        agency_id: newAgency[0].id,
-        email,
-        hashed_password,
-        is_main_user: true,
-        name: user_name,
-        phone_number: phone,
-        role_id: newRole[0].id,
-        username,
-      });
-
-      const verificationToken = Lib.createToken(
-        { agency_id: newAgency[0].id, email, user_id: newUser[0].id },
-        config.JWT_SECRET_AGENT + OTP_TYPES.register_agent,
-        '24h'
-      );
-
-      await EmailSendLib.sendEmail({
-        email,
-        emailSub: `${main_agent_name} Agency Registration Verification`,
-        emailBody: registrationVerificationTemplate(
+        await commonModel.insertOTP({
+          hashed_otp: hashed_otp,
+          email: email,
+          type: 'register_sub_agent',
+        });
+      } else {
+        const newAgency = await AgentModel.createAgency({
+          address,
+          status: 'Incomplete',
+          agent_no,
           agency_name,
+          email,
+          phone,
+          agency_logo,
+          civil_aviation,
+          trade_license,
+          national_id,
+          agency_type: SOURCE_SUB_AGENT,
+          ref_agent_id: main_agent,
+        });
 
-          '/sign-up/verification?token=' + verificationToken
-        ),
-      });
+        const newRole = await AgencyUserModel.createRole({
+          agency_id: newAgency[0].id,
+          name: 'Super Admin',
+          is_main_role: true,
+        });
+
+        const permissions = await AgencyUserModel.getAllPermissions();
+
+        const permissionPayload: IInsertAgencyRolePermissionPayload[] = [];
+
+        permissions.forEach((item) => {
+          if (!WHITE_LABEL_PERMISSIONS_MODULES.includes(item.name)) {
+            permissionPayload.push({
+              agency_id: newAgency[0].id,
+              role_id: newRole[0].id,
+              permission_id: item.id,
+              delete: true,
+              read: true,
+              update: true,
+              write: true,
+            });
+          }
+        });
+
+        await AgencyUserModel.insertRolePermission(permissionPayload);
+
+        let username = Lib.generateUsername(user_name);
+
+        let suffix = 1;
+
+        while (await AgencyUserModel.checkUser({ username })) {
+          username = `${username}${suffix}`;
+          suffix += 1;
+        }
+
+        const hashed_password = await Lib.hashValue(password);
+
+        await AgencyUserModel.createUser({
+          agency_id: newAgency[0].id,
+          email,
+          hashed_password,
+          is_main_user: true,
+          name: user_name,
+          phone_number: phone,
+          role_id: newRole[0].id,
+          username,
+        });
+
+        const checkOtp = await commonModel.getOTP({
+          email: email,
+          type: 'register_sub_agent',
+        });
+
+        if (checkOtp.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_GONE,
+            message: this.ResMsg.THREE_TIMES_EXPIRED,
+          };
+        }
+
+        const otp = Lib.otpGenNumber(6);
+        const hashed_otp = await Lib.hashValue(otp);
+
+        await EmailSendLib.sendEmailAgent(trx, main_agent, {
+          email,
+          emailSub: `${main_agent_name} - Agency Registration Verification`,
+          emailBody: sendEmailOtpTemplate({
+            otpFor: 'Registration',
+            project: main_agent_name,
+            otp: otp,
+            logo: `${LOGO_ROOT_LINK}${main_agent_logo}`,
+          }),
+        });
+
+        await commonModel.insertOTP({
+          hashed_otp: hashed_otp,
+          email: email,
+          type: 'register_sub_agent',
+        });
+      }
 
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: `Your registration has been successfully placed. Agency ID: ${agent_no}. To complete your registration please check your email and complete registration with the link we have sent to your email.`,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
         data: {
           email,
         },
@@ -185,52 +251,87 @@ export default class AuthSubAgentService extends AbstractServices {
 
   public async registerComplete(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { token } = req.body as { token: string };
+      const { email, otp } = req.body as { email: string; otp: string };
       const { agency_id: main_agency_id, agency_name: main_agent_name } =
         req.agencyB2CWhiteLabel;
       const AgentModel = this.Model.AgencyModel(trx);
       const AgencyUserModel = this.Model.AgencyUserModel(trx);
+      const commonModel = this.Model.CommonModel(trx);
 
-      const parsedToken = Lib.verifyToken(
-        token,
-        config.JWT_SECRET_AGENT + OTP_TYPES.register_agent
-      ) as ICompleteAgencyRegisterParsedTokenData | false;
+      const checkAgency = await AgencyUserModel.checkUser({
+        agency_type: SOURCE_SUB_AGENT,
+        ref_agent_id: main_agency_id,
+        email,
+      });
 
-      if (!parsedToken) {
+      if (!checkAgency || checkAgency.agency_status !== 'Incomplete') {
         return {
           success: false,
-          code: this.StatusCode.HTTP_UNAUTHORIZED,
-          message: 'Invalid token or token expired. Please contact us.',
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: 'No Inactive agency found with this email!',
         };
       }
 
-      const { agency_id, email, user_id, agency_name } = parsedToken;
+      const checkOtp = await commonModel.getOTP({
+        email,
+        type: 'register_sub_agent',
+      });
 
-      await AgentModel.updateAgency({ status: 'Pending' }, agency_id);
+      if (!checkOtp.length) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_FORBIDDEN,
+          message: this.ResMsg.OTP_EXPIRED,
+        };
+      }
 
-      const password = Lib.generateRandomPassword(12);
-      const hashed_password = await Lib.hashValue(password);
+      const { id: email_otp_id, otp: hashed_otp, tried } = checkOtp[0];
 
-      await AgencyUserModel.updateUser(
-        {
-          hashed_password,
-        },
-        { agency_id, id: user_id }
+      if (tried > 3) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_GONE,
+          message: this.ResMsg.TOO_MUCH_ATTEMPT,
+        };
+      }
+
+      const otpValidation = await Lib.compareHashValue(
+        otp.toString(),
+        hashed_otp
       );
 
-      await EmailSendLib.sendEmailAgent(trx, main_agency_id, {
-        email,
-        emailSub: `${main_agent_name} Agency Registration Verification`,
-        emailBody: registrationVerificationCompletedTemplate(agency_name, {
-          email,
-          password,
-        }),
-      });
+      if (otpValidation) {
+        await commonModel.updateOTP(
+          {
+            tried: tried + 1,
+            matched: 1,
+          },
+          { id: email_otp_id }
+        );
+
+        await AgentModel.updateAgency(
+          { status: 'Pending' },
+          checkAgency.agency_id
+        );
+      } else {
+        await commonModel.updateOTP(
+          {
+            tried: tried + 1,
+          },
+          { id: email_otp_id }
+        );
+
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_UNAUTHORIZED,
+          message: this.ResMsg.OTP_INVALID,
+        };
+      }
 
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: `Registration successful. Please check you will receive login credentials at the email address ${email}.`,
+        message: `Registration successful. Please wait for admin approval.`,
       };
     });
   }
@@ -245,7 +346,7 @@ export default class AuthSubAgentService extends AbstractServices {
         username: user_or_email,
         email: user_or_email,
         agency_type: SOURCE_SUB_AGENT,
-        agency_id: main_agency_id,
+        ref_agent_id: main_agency_id,
       });
 
       if (!checkUserAgency) {

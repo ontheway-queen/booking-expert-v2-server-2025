@@ -1,8 +1,8 @@
 import AbstractRouter from '../../../abstract/abstract.router';
-import AuthAgentController from '../controllers/authAgent.controller';
+import AuthSubAgentController from '../controllers/authSubAgent.controller';
 
 export default class AuthSubAgentRouter extends AbstractRouter {
-  private controller = new AuthAgentController();
+  private controller = new AuthSubAgentController();
   constructor() {
     super();
     this.callRouter();

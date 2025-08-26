@@ -108,7 +108,9 @@ export class AgentFlightBookingSupportService extends AbstractServices {
     const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(
       this.trx
     );
+
     const tracking_data: IInsertFlightBookingTrackingPayload[] = [];
+
     tracking_data.push({
       flight_booking_id: payload.booking_id,
       description: `Ticket ${
@@ -117,12 +119,14 @@ export class AgentFlightBookingSupportService extends AbstractServices {
           : 'is in process'
       }. Issued by ${payload.issued_by_type}`,
     });
+
     if (payload.issue_block) {
       tracking_data.push({
         flight_booking_id: payload.booking_id,
         description: `Issue block was enabled for this booking`,
       });
     }
+
     if (payload.due > 0) {
       tracking_data.push({
         flight_booking_id: payload.booking_id,
@@ -155,6 +159,7 @@ export class AgentFlightBookingSupportService extends AbstractServices {
         trx: this.trx,
         type: GENERATE_AUTO_UNIQUE_ID.money_receipt,
       });
+
       await moneyReceiptModel.createMoneyReceipt({
         mr_no: money_receipt_number,
         amount: payload.paid_amount,
