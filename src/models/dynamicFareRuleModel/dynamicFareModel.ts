@@ -3,6 +3,8 @@ import {
   ICreateDynamicFareSupplierPayload,
   ICreateDynamicFareTaxPayload,
   ICreateSupplierAirlinesDynamicFarePayload,
+  IGetFareTaxesData,
+  IGetFareTaxesQuery,
   IGetSupplierAirlinesDynamicFareData,
   IGetSupplierAirlinesDynamicFareQuery,
   IUpdateDynamicFareSupplierPayload,
@@ -212,11 +214,7 @@ class DynamicFareModel extends Schema {
       .where({ id });
   }
 
-  public async getFareTaxes(query: {
-    dynamic_fare_supplier_id: number;
-    airline?: string;
-    tax_name?: string;
-  }) {
+  public async getFareTaxes(query: IGetFareTaxesQuery): Promise<IGetFareTaxesData[]> {
     return await this.db('dynamic_fare_tax')
       .withSchema(this.DBO_SCHEMA)
       .select(
@@ -237,6 +235,21 @@ class DynamicFareModel extends Schema {
         }
         if (query.tax_name) {
           qb.andWhere('tax_name', query.tax_name);
+        }
+        if (query.from_dac !== undefined) {
+          qb.andWhere('from_dac', query.from_dac);
+        }
+        if (query.to_dac !== undefined) {
+          qb.andWhere('to_dac', query.to_dac);
+        }
+        if (query.soto !== undefined) {
+          qb.andWhere('soto', query.soto);
+        }
+        if (query.domestic !== undefined) {
+          qb.andWhere('domestic', query.domestic);
+        }
+        if (query.status !== undefined) {
+          qb.andWhere('dynamic_fare_tax.status', query.status);
         }
       })
       .orderBy('dynamic_fare_tax.id', 'desc');

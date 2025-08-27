@@ -1185,8 +1185,8 @@ export interface IVerteilOrderCancelRQ {
 
 // START -- SEARCH RESPONSE TYPES //
 export interface IVerteilFlightSearchRS {
-  DataLists: IDataLists;
-  Metadata: IMetaData;
+  DataLists: IVerteilDataLists;
+  Metadata: IVerteilMetaData;
   OffersGroup: IOffersGroup;
   Errors?: {
     Error: Array<IError>;
@@ -1213,12 +1213,12 @@ interface IOffersGroup {
         value: string;
       };
       TotalOfferQuantity?: number;
-      AirlineOffer: Array<IAirlineOffer>;
+      AirlineOffer: Array<IVerteilAirlineOffer>;
     }
   ];
 }
 
-export interface IAirlineOffer {
+export interface IVerteilAirlineOffer {
   OfferID: {
     Owner: string;
     Channel: string;
@@ -1413,7 +1413,7 @@ export interface IAirlineOffer {
   };
 }
 
-export interface IDataLists {
+export interface IVerteilDataLists {
   CheckedBagAllowanceList?: {
     /** Baggage is considered as not included in the fare for below scenarios
 
@@ -1753,7 +1753,7 @@ export interface IDataListsPenalty {
   RefundableInd?: boolean;
 }
 
-export interface IMetaData {
+export interface IVerteilMetaData {
   Shopping: {
     ShopMetadataGroup: {
       Offer: {

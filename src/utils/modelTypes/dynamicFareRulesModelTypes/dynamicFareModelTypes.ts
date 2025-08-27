@@ -156,3 +156,28 @@ export interface IUpdateDynamicFareTaxPayload {
   markup_type?: 'PER' | 'FLAT';
   status?: boolean;
 }
+
+export interface IGetFareTaxesQuery {
+  dynamic_fare_supplier_id: number;
+  airline?: string;
+  tax_name?: string;
+  from_dac?: boolean;
+  to_dac?: boolean;
+  soto?: boolean;
+  domestic?: boolean;
+  status?: boolean;
+}
+
+export interface IGetFareTaxesData {
+  id: number;
+  dynamic_fare_supplier_id: number;
+  airline: string; //code
+  tax_name: string;
+  commission: number | null;
+  commission_type: 'PER' | 'FLAT' | null;
+  markup: number | null;
+  markup_type: 'PER' | 'FLAT' | null;
+  status: boolean;
+  airline_name: string | null;
+  airline_logo: string | null;
+}

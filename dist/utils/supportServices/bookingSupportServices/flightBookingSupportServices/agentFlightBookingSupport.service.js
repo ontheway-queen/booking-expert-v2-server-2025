@@ -48,18 +48,18 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                     issue_block: false,
                 };
             }
-            const flightMarkupsModel = this.Model.DynamicFareModel(this.trx);
-            const flightMarkupData = yield flightMarkupsModel.getSupplierAirlinesFares({
-                dynamic_fare_supplier_id: set_flight_api[0].id,
-                airline: payload.airline,
-            });
-            if (!flightMarkupData.length) {
-                return {
-                    success: false,
-                    code: this.StatusCode.HTTP_NOT_FOUND,
-                    message: this.ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP,
-                };
-            }
+            // const flightMarkupsModel = this.Model.DynamicFareModel(this.trx);
+            // const flightMarkupData = await flightMarkupsModel.getSupplierAirlinesFares({
+            //   dynamic_fare_supplier_id: set_flight_api[0].id,
+            //   airline: payload.airline,
+            // });
+            // if (!flightMarkupData.length) {
+            //   return {
+            //     success: false,
+            //     code: this.StatusCode.HTTP_NOT_FOUND,
+            //     message: this.ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP,
+            //   };
+            // }
             return {
                 issue_block: false,
             };
@@ -67,8 +67,10 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
     }
     updateDataAfterTicketIssue(payload) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c;
             //update booking
             const flightBookingModel = this.Model.FlightBookingModel(this.trx);
+            const bookingTravelerModel = this.Model.FlightBookingTravelerModel(this.trx);
             const updateFlightPayload = {
                 status: payload.status,
                 issued_at: new Date(),
@@ -83,6 +85,10 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                 id: payload.booking_id,
                 source_type: constants_1.SOURCE_AGENT,
             });
+            //ticket number update
+            if (((_a = payload.ticket_number) === null || _a === void 0 ? void 0 : _a.length) && ((_b = payload === null || payload === void 0 ? void 0 : payload.travelers_info) === null || _b === void 0 ? void 0 : _b.length) === ((_c = payload === null || payload === void 0 ? void 0 : payload.ticket_number) === null || _c === void 0 ? void 0 : _c.length)) {
+                yield Promise.all(payload.ticket_number.map((ticket_num, ind) => bookingTravelerModel.updateFlightBookingTraveler({ ticket_number: ticket_num }, payload.travelers_info ? payload.travelers_info[ind].id : 0)));
+            }
             //add tracking
             const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(this.trx);
             const tracking_data = [];

@@ -5,11 +5,13 @@ import {
   SOURCE_B2C,
 } from '../../../miscellaneous/constants';
 import {
+  FLIGHT_BOOKING_ON_HOLD,
   FLIGHT_TICKET_IN_PROCESS,
   FLIGHT_TICKET_ISSUE,
   PAYMENT_TYPE_FULL,
   PAYMENT_TYPE_PARTIAL,
 } from '../../../miscellaneous/flightConstant';
+import { IGetFlightBookingTravelerData } from '../../../modelTypes/flightModelTypes/flightBookingTravelerModelTypes';
 
 export interface ICheckAgentDirectTicketIssuePermissionPayload {
   agency_id: number;
@@ -28,7 +30,7 @@ export interface IGetPaymentInformationReqBody {
 
 export interface IAgentUpdateDataAfterTicketIssue {
   booking_id: number;
-  status: typeof FLIGHT_TICKET_IN_PROCESS | typeof FLIGHT_TICKET_ISSUE;
+  status: typeof FLIGHT_TICKET_IN_PROCESS | typeof FLIGHT_TICKET_ISSUE | typeof FLIGHT_BOOKING_ON_HOLD;
   due: number;
   agency_id: number;
   booking_ref: string;
@@ -45,4 +47,6 @@ export interface IAgentUpdateDataAfterTicketIssue {
   issued_by_user_id?: number;
   issue_block?: boolean;
   api: string;
+  ticket_number?: string[];
+  travelers_info?: IGetFlightBookingTravelerData[];
 }

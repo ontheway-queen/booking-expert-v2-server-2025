@@ -15,12 +15,14 @@ import {
   CUSTOM_API,
   FLIGHT_BOOKING_CONFIRMED,
   FLIGHT_BOOKING_IN_PROCESS,
+  FLIGHT_BOOKING_ON_HOLD,
   FLIGHT_BOOKING_PENDING,
   FLIGHT_FARE_RESPONSE,
   FLIGHT_REVALIDATE_REDIS_KEY,
   FLIGHT_TICKET_IN_PROCESS,
   FLIGHT_TICKET_ISSUE,
   SABRE_API,
+  VERTEIL_API,
 } from '../../../utils/miscellaneous/flightConstant';
 import { AgentFlightBookingSupportService } from '../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service';
 import { CommonFlightBookingSupportService } from '../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service';
@@ -42,6 +44,7 @@ import {
 import Lib from '../../../utils/lib/lib';
 import { IUpdateFlightBookingPayload } from '../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
 import CustomError from '../../../utils/lib/customError';
+import VerteilFlightService from '../../../utils/supportServices/flightSupportServices/verteilFlightSupport.service';
 
 export class AgentFlightService extends AbstractServices {
   constructor() {
@@ -122,18 +125,26 @@ export class AgentFlightService extends AbstractServices {
 
       //extract API IDs
       let sabre_supplier_id = 0;
+      let verteil_supplier_id = 0;
       let custom_supplier_id = 0;
 
       apiData.forEach((api) => {
         if (api.sup_api === SABRE_API) {
           sabre_supplier_id = api.id;
         }
+        if (api.sup_api === VERTEIL_API) {
+          verteil_supplier_id = api.id;
+        }
         if (api.sup_api === CUSTOM_API) {
           custom_supplier_id = api.id;
         }
       });
 
+      //generate search ID
+      const search_id = uuidv4();
+
       let sabreData: any[] = [];
+      let verteilData: any[] = [];
       let customData: any[] = [];
 
       if (sabre_supplier_id) {
@@ -143,6 +154,17 @@ export class AgentFlightService extends AbstractServices {
           reqBody: body,
           dynamic_fare_supplier_id: sabre_supplier_id,
           markup_amount,
+        });
+      }
+
+      if (verteil_supplier_id) {
+        const verteilSubService = new VerteilFlightService(trx);
+        verteilData = await verteilSubService.FlightSearchService({
+          booking_block: false,
+          reqBody: body,
+          dynamic_fare_supplier_id: verteil_supplier_id,
+          markup_amount,
+          search_id
         });
       }
 
@@ -156,8 +178,7 @@ export class AgentFlightService extends AbstractServices {
         });
       }
 
-      //generate search ID
-      const search_id = uuidv4();
+
       const leg_descriptions = body.OriginDestinationInformation.map(
         (OrDeInfo) => {
           return {
@@ -168,7 +189,7 @@ export class AgentFlightService extends AbstractServices {
         }
       );
 
-      const results: any[] = [...sabreData, ...customData];
+      const results: any[] = [...sabreData, ...customData, ...verteilData];
 
       results.sort((a, b) => a.fare.payable - b.fare.payable);
 
@@ -271,15 +292,24 @@ export class AgentFlightService extends AbstractServices {
 
       //extract API IDs
       let sabre_supplier_id = 0;
+      let verteil_supplier_id = 0;
       let custom_supplier_id = 0;
 
       apiData.forEach((api) => {
         if (api.sup_api === SABRE_API) {
           sabre_supplier_id = api.id;
         }
+        if (api.sup_api === VERTEIL_API) {
+          verteil_supplier_id = api.id;
+        }
         if (api.sup_api === CUSTOM_API) {
           custom_supplier_id = api.id;
         }
+      });
+      console.log({
+        sabre_supplier_id,
+        verteil_supplier_id,
+        custom_supplier_id
       });
 
       //generate search ID
@@ -337,31 +367,56 @@ export class AgentFlightService extends AbstractServices {
         await setRedis(search_id, { reqBody: body, response: responseData });
       };
 
+      const tasks: Promise<void>[] = [];
+
       // Sabre results
       if (sabre_supplier_id) {
         const sabreSubService = new SabreFlightService(trx);
-        await sendResults('Sabre', async () =>
-          sabreSubService.FlightSearch({
-            booking_block: false,
-            reqBody: body,
-            dynamic_fare_supplier_id: sabre_supplier_id,
-            markup_amount,
-          })
+        tasks.push(
+          sendResults('Sabre', async () =>
+            sabreSubService.FlightSearch({
+              booking_block: false,
+              reqBody: body,
+              dynamic_fare_supplier_id: sabre_supplier_id,
+              markup_amount,
+            })
+          )
+        );
+      }
+
+      //Verteil results
+      if (verteil_supplier_id) {
+        const verteilSubService = new VerteilFlightService(trx);
+        tasks.push(
+          sendResults('Verteil', async () =>
+            verteilSubService.FlightSearchService({
+              booking_block: false,
+              reqBody: body,
+              dynamic_fare_supplier_id: verteil_supplier_id,
+              markup_amount,
+              search_id
+            })
+          )
         );
       }
 
       //WFTT results
       if (custom_supplier_id) {
         const wfttSubService = new WfttFlightService(trx);
-        await sendResults('WFTT', async () =>
-          wfttSubService.FlightSearch({
-            booking_block: false,
-            reqBody: body,
-            dynamic_fare_supplier_id: custom_supplier_id,
-            markup_amount,
-          })
+        tasks.push(
+          sendResults('WFTT', async () =>
+            wfttSubService.FlightSearch({
+              booking_block: false,
+              reqBody: body,
+              dynamic_fare_supplier_id: custom_supplier_id,
+              markup_amount,
+            })
+          )
         );
       }
+
+      // Run all tasks in parallel
+      await Promise.all(tasks);
     });
   }
 
@@ -734,6 +789,18 @@ export class AgentFlightService extends AbstractServices {
             if (grnData.airline_pnr) {
               payload.airline_pnr = grnData.airline_pnr;
             }
+          } else if (data.api === VERTEIL_API) {
+            const verteilSubService = new VerteilFlightService(trx);
+            const res = await verteilSubService.FlightBookService({
+              search_id: body.search_id,
+              flight_id: body.flight_id,
+              passengers: body.passengers,
+            });
+            payload.gds_pnr = res.pnr;
+            payload.airline_pnr = res.pnr;
+            payload.ticket_issue_last_time = res.paymentTimeLimit;
+            payload.api_booking_ref = res.apiBookingId;
+            payload.status = FLIGHT_BOOKING_CONFIRMED;
           } else if (data.api === CUSTOM_API) {
             payload.status = FLIGHT_BOOKING_IN_PROCESS;
           }
@@ -912,6 +979,7 @@ export class AgentFlightService extends AbstractServices {
 
       //get flight details
       const flightBookingModel = this.Model.FlightBookingModel(trx);
+      const bookingSegmentModel = this.Model.FlightBookingSegmentModel(trx);
       const bookingTravelerModel = this.Model.FlightBookingTravelerModel(trx);
       const booking_data = await flightBookingModel.getSingleFlightBooking({
         id: Number(id),
@@ -925,6 +993,8 @@ export class AgentFlightService extends AbstractServices {
           message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
+
+      let ticket_number: string[] = [];
 
       //get other information
       const get_travelers = await bookingTravelerModel.getFlightBookingTraveler(
@@ -972,6 +1042,7 @@ export class AgentFlightService extends AbstractServices {
       let status:
         | typeof FLIGHT_TICKET_ISSUE
         | typeof FLIGHT_TICKET_IN_PROCESS
+        | typeof FLIGHT_BOOKING_ON_HOLD
         | null = null;
       if (ticketIssuePermission.issue_block === true) {
         status = FLIGHT_TICKET_IN_PROCESS;
@@ -989,7 +1060,24 @@ export class AgentFlightService extends AbstractServices {
             unique_traveler,
           });
           if (res?.success) {
-            status = FLIGHT_TICKET_ISSUE;
+            status = res.data?.length ? FLIGHT_TICKET_ISSUE : FLIGHT_BOOKING_ON_HOLD;
+            ticket_number = res.data;
+          }
+        } else if (booking_data.api === VERTEIL_API) {
+          const segmentDetails = await bookingSegmentModel.getFlightBookingSegment(Number(id));
+          const verteilSubService = new VerteilFlightService(trx);
+          const res = await verteilSubService.TicketIssueService({
+            airlineCode: segmentDetails[0].airline_code,
+            oldFare: {
+              vendor_total: booking_data.vendor_fare.net_fare,
+            },
+            passengers: get_travelers,
+            pnr: String(booking_data.airline_pnr),
+          });
+
+          if (res?.success) {
+            status = res.data?.length ? FLIGHT_TICKET_ISSUE : FLIGHT_BOOKING_ON_HOLD;
+            if (res?.data?.length) ticket_number = res.data;
           }
         }
       }
@@ -1012,6 +1100,8 @@ export class AgentFlightService extends AbstractServices {
           issued_by_user_id: user_id,
           issue_block: ticketIssuePermission.issue_block,
           api: booking_data.api,
+          ticket_number,
+          travelers_info: get_travelers
         });
 
         //send email
@@ -1055,6 +1145,7 @@ export class AgentFlightService extends AbstractServices {
       const { user_id, agency_id, agency_email, agency_logo } = req.agencyUser;
       const { id } = req.params; //booking id
       const flightBookingModel = this.Model.FlightBookingModel(trx);
+      const bookingSegmentModel = this.Model.FlightBookingSegmentModel(trx);
       const booking_data = await flightBookingModel.getSingleFlightBooking({
         id: Number(id),
         booked_by: SOURCE_AGENT,
@@ -1090,6 +1181,16 @@ export class AgentFlightService extends AbstractServices {
           pnr: String(booking_data.gds_pnr),
         });
         if (res?.success) {
+          status = true;
+        }
+      } else if (booking_data.api === VERTEIL_API) {
+        const segmentDetails = await bookingSegmentModel.getFlightBookingSegment(Number(id));
+        const verteilSubService = new VerteilFlightService(trx);
+        const res = await verteilSubService.OrderCancelService({
+          airlineCode: segmentDetails[0].airline_code,
+          pnr: String(booking_data.airline_pnr),
+        });
+        if (res.success) {
           status = true;
         }
       } else if (booking_data.api === CUSTOM_API) {

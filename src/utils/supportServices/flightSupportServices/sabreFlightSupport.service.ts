@@ -435,7 +435,7 @@ export default class SabreFlightService extends AbstractServices {
         ((Number(fare.totalFare.equivalentAmount) +
           Number(fare.totalFare.totalTaxAmount)) /
           100) *
-          0.3
+        0.3
       );
 
       const new_fare: IFormattedFare = {
@@ -562,15 +562,15 @@ export default class SabreFlightService extends AbstractServices {
             segments,
             baggage: newBaggage?.id
               ? {
-                  id: newBaggage?.id,
-                  unit: newBaggage.unit || 'pieces',
-                  count: newBaggage.weight || newBaggage.pieceCount,
-                }
+                id: newBaggage?.id,
+                unit: newBaggage.unit || 'pieces',
+                count: newBaggage.weight || newBaggage.pieceCount,
+              }
               : {
-                  id: 1,
-                  unit: 'N/A',
-                  count: 'N/A',
-                },
+                id: 1,
+                unit: 'N/A',
+                count: 'N/A',
+              },
           });
           segments = [];
         }
@@ -581,7 +581,7 @@ export default class SabreFlightService extends AbstractServices {
           segmentDetails,
         });
 
-        const per_pax_discount = (commission + agent_discount) / pax_count;
+        const per_pax_discount = Number(passenger_info.passengerTotalFare.equivalentAmount) * ((commission + agent_discount) / Number(fare.totalFare.equivalentAmount));
         const per_pax_markup = (markup + agent_markup) / pax_count;
 
         const total_pax_markup = pax_markup + per_pax_markup;
@@ -816,12 +816,12 @@ export default class SabreFlightService extends AbstractServices {
         availability,
         modifiedFare: with_modified_fare
           ? {
-              agent_discount,
-              agent_markup,
-              commission,
-              markup,
-              pax_markup,
-            }
+            agent_discount,
+            agent_markup,
+            commission,
+            markup,
+            pax_markup,
+          }
           : undefined,
         partial_payment,
         leg_description: [],
@@ -901,26 +901,16 @@ export default class SabreFlightService extends AbstractServices {
     reqBody: IFlightSearchReqBody,
     retrieved_response: IFormattedFlightItinerary
   ) {
-    let cabin = 'Y';
-    switch (
-      reqBody.OriginDestinationInformation[0]?.TPA_Extensions?.CabinPref?.Cabin
-    ) {
-      case '1':
-        cabin = 'Y';
-        break;
-      case '2':
-        cabin = 'W';
-        break;
-      case '3':
-        cabin = 'J';
-        break;
-      case '4':
-        cabin = 'F';
-        break;
+    const booking_code: string[] = [];
+    retrieved_response.availability?.map((av_elm) => {
+      av_elm?.segments?.map((seg_elm) => {
+        if (seg_elm?.passenger?.[0]?.booking_code) {
+          booking_code.push(seg_elm?.passenger?.[0]?.booking_code);
+        }
+      })
+    });
 
-      default:
-        break;
-    }
+    let booking_ind = 0;
 
     const OriginDestinationInformation =
       reqBody.OriginDestinationInformation.map((item, index) => {
@@ -930,8 +920,9 @@ export default class SabreFlightService extends AbstractServices {
 
         const depart_time = flight.options[0].departure.time;
         const depart_air = flight.options[0].departure.airport_code;
+        const depart_city = flight.options[0].departure.city_code;
 
-        if (req_depart_air === depart_air) {
+        if ([depart_air, depart_city].includes(req_depart_air)) {
           for (const option of flight.options) {
             const DepartureDateTime = this.flightUtils.convertDateTime(
               option.departure.date,
@@ -944,7 +935,7 @@ export default class SabreFlightService extends AbstractServices {
 
             const flight_data = {
               Number: Number(option?.carrier.carrier_marketing_flight_number),
-              ClassOfService: cabin,
+              ClassOfService: booking_code?.[booking_ind] || "",
               DepartureDateTime,
               ArrivalDateTime,
               Type: 'A',
@@ -959,6 +950,7 @@ export default class SabreFlightService extends AbstractServices {
                 Operating: option?.carrier.carrier_operating_code,
               },
             };
+            booking_ind++;
 
             flights.push(flight_data);
           }
@@ -1066,7 +1058,7 @@ export default class SabreFlightService extends AbstractServices {
     const monthDiff = (date: string | Date): string => {
       const diff = Math.ceil(
         (new Date().getTime() - new Date(date).getTime()) /
-          (1000 * 60 * 60 * 24 * 30)
+        (1000 * 60 * 60 * 24 * 30)
       );
       return String(diff).padStart(2, '0');
     };
@@ -1138,8 +1130,8 @@ export default class SabreFlightService extends AbstractServices {
               item.type === 'INF' && item.gender === 'Male'
                 ? 'MI'
                 : item.type === 'INF' && item.gender === 'Female'
-                ? 'FI'
-                : item.gender[0],
+                  ? 'FI'
+                  : item.gender[0],
             GivenName: item.first_name,
             Surname: item.last_name,
           },
@@ -1214,8 +1206,8 @@ export default class SabreFlightService extends AbstractServices {
                 item.type === 'INF' && item.gender === 'Male'
                   ? 'MI'
                   : item.type === 'INF' && item.gender === 'Female'
-                  ? 'FI'
-                  : item.gender[0],
+                    ? 'FI'
+                    : item.gender[0],
               GivenName: item.first_name,
               Surname: item.last_name,
               DateOfBirth: String(item.date_of_birth)?.split('T')[0],
@@ -1231,8 +1223,8 @@ export default class SabreFlightService extends AbstractServices {
             item.type === 'INF'
               ? 'I' + monthDiff(item.date_of_birth)
               : item.type === 'ADT'
-              ? ''
-              : item.type,
+                ? ''
+                : item.type,
           GivenName: item.first_name + ' ' + item.reference,
           Surname: item.last_name,
           PassengerType: item.type,

@@ -53,10 +53,11 @@ class AgentFlightController extends abstract_controller_1.default {
                 res.end();
             }
             catch (error) {
-                sendEvent('error', {
+                const errorPayload = {
                     message: 'An error occurred during flight search.',
-                    error,
-                });
+                    error: Object.assign(Object.assign({ message: error.message, stack: error.stack, name: error.name }, (error.code && { code: error.code })), (error.response && { response: error.response })),
+                };
+                sendEvent('error', errorPayload);
                 res.end();
             }
         }));

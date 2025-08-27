@@ -100,7 +100,7 @@ export interface IFormattedFlightItinerary {
 }
 
 export interface IFormattedFlight {
-  id: number;
+  id: number | string;
   elapsed_time?: number;
   stoppage?: number;
   options: IFormattedFlightOption[];
@@ -109,7 +109,7 @@ export interface IFormattedFlight {
 
 export interface IFormattedFlightOption {
   segment_ref?: string;
-  id: number;
+  id: number | string;
   elapsedTime: number;
   total_miles_flown?: number | null;
   departure: IFormattedDeparture;
@@ -126,7 +126,7 @@ export interface IFormattedDeparture {
   terminal: string | undefined;
   time: string;
   date: string | Date;
-  date_adjustment: number | undefined;
+  date_adjustment?: number | undefined;
 }
 
 export interface IFormattedArrival {
