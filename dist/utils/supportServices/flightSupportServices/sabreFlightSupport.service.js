@@ -759,7 +759,7 @@ class SabreFlightService extends abstract_service_1.default {
                                 LCC: 'Disable',
                             },
                             VerificationItinCallLogic: {
-                                Value: 'L',
+                                Value: 'M',
                                 AlwaysCheckAvailability: true,
                             },
                         },

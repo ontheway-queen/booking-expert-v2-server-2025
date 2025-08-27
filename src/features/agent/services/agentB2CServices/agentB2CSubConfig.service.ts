@@ -73,17 +73,25 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async getAccounts(req: Request) {
     const { agency_id } = req.agencyUser;
 
+    const { limit, skip } = req.query as { limit?: string; skip?: string };
+
     const configModel = this.Model.OthersModel();
-    const accounts = await configModel.getAccount({
-      source_type: 'AGENT',
-      source_id: agency_id,
-    });
+    const { data, total } = await configModel.getAccount(
+      {
+        source_type: SOURCE_AGENT,
+        source_id: agency_id,
+        limit,
+        skip,
+      },
+      true
+    );
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: accounts,
+      data,
+      total,
     };
   }
 
@@ -223,16 +231,23 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async getHeroBGContent(req: Request) {
     const configModel = this.Model.AgencyB2CConfigModel();
     const { agency_id } = req.agencyUser;
+    const { limit, skip } = req.query as { limit?: string; skip?: string };
 
-    const hero_bg_data = await configModel.getHeroBGContent({
-      agency_id,
-    });
+    const { data, total } = await configModel.getHeroBGContent(
+      {
+        agency_id,
+        limit,
+        skip,
+      },
+      true
+    );
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: hero_bg_data,
+      data,
+      total,
     };
   }
 
@@ -404,16 +419,23 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async getPopularDestination(req: Request) {
     const configModel = this.Model.AgencyB2CConfigModel();
     const { agency_id } = req.agencyUser;
+    const { limit, skip } = req.query as { limit?: string; skip?: string };
 
-    const popular_destinations = await configModel.getPopularDestination({
-      agency_id,
-    });
+    const { data, total } = await configModel.getPopularDestination(
+      {
+        agency_id,
+        limit,
+        skip,
+      },
+      true
+    );
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: popular_destinations,
+      data,
+      total,
     };
   }
 
@@ -638,16 +660,23 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async getPopularPlace(req: Request) {
     const configModel = this.Model.AgencyB2CConfigModel();
     const { agency_id } = req.agencyUser;
+    const { limit, skip } = req.query as { limit?: string; skip?: string };
 
-    const popular_places = await configModel.getPopularPlaces({
-      agency_id,
-    });
+    const { data, total } = await configModel.getPopularPlaces(
+      {
+        agency_id,
+        limit,
+        skip,
+      },
+      true
+    );
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: popular_places,
+      data,
+      total,
     };
   }
 
@@ -848,16 +877,23 @@ export class AgentB2CSubConfigService extends AbstractServices {
   public async getHotDeals(req: Request) {
     const configModel = this.Model.AgencyB2CConfigModel();
     const { agency_id } = req.agencyUser;
+    const { limit, skip } = req.query as { limit?: string; skip?: string };
 
-    const hotDeals = await configModel.getHotDeals({
-      agency_id,
-    });
+    const { data, total } = await configModel.getHotDeals(
+      {
+        agency_id,
+        limit,
+        skip,
+      },
+      true
+    );
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: hotDeals,
+      data,
+      total,
     };
   }
 

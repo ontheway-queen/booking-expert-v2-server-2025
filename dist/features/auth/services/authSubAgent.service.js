@@ -18,9 +18,8 @@ const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
 const publicEmailOTP_service_1 = __importDefault(require("../../public/services/publicEmailOTP.service"));
 const customError_1 = __importDefault(require("../../../utils/lib/customError"));
-const registrationVerificationTemplate_1 = require("../../../utils/templates/registrationVerificationTemplate");
-const registrationVerificationCompletedTemplate_1 = require("../../../utils/templates/registrationVerificationCompletedTemplate");
 const emailSendLib_1 = __importDefault(require("../../../utils/lib/emailSendLib"));
+const sendEmailOtpTemplate_1 = require("../../../utils/templates/sendEmailOtpTemplate");
 class AuthSubAgentService extends abstract_service_1.default {
     constructor() {
         super();
@@ -28,31 +27,39 @@ class AuthSubAgentService extends abstract_service_1.default {
     register(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { email, agency_name, user_name, address, phone } = req.body;
-                const { agency_id, agency_name: main_agent_name } = req.agencyB2CWhiteLabel;
+                const { email, agency_name, user_name, address, phone, password } = req.body;
+                const { agency_id: main_agent, agency_name: main_agent_name, agency_logo: main_agent_logo, } = req.agencyB2CWhiteLabel;
                 const AgentModel = this.Model.AgencyModel(trx);
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
+                const commonModel = this.Model.CommonModel(trx);
                 const files = req.files || [];
                 const checkAgentName = yield AgentModel.checkAgency({
                     name: agency_name,
+                    ref_agent_id: main_agent,
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
                 });
+                if (checkAgentName) {
+                    if (checkAgentName.status !== 'Incomplete') {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_CONFLICT,
+                            message: 'Duplicate agency name! Already exist an agency with this name.',
+                        };
+                    }
+                }
                 const checkAgentUser = yield AgencyUserModel.checkUser({
                     email,
                     agency_type: constants_1.SOURCE_SUB_AGENT,
+                    ref_agent_id: main_agent,
                 });
                 if (checkAgentUser) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_CONFLICT,
-                        message: 'Email already exist. Please use another email.',
-                    };
-                }
-                if (checkAgentName) {
-                    return {
-                        success: false,
-                        code: this.StatusCode.HTTP_CONFLICT,
-                        message: 'Duplicate agency name! Already exist an agency with this name.',
-                    };
+                    if (checkAgentUser.agency_status !== 'Incomplete') {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_CONFLICT,
+                            message: 'Duplicate email! Already exist an agency with this email.',
+                        };
+                    }
                 }
                 let agency_logo = '';
                 let civil_aviation = '';
@@ -77,69 +84,122 @@ class AuthSubAgentService extends abstract_service_1.default {
                     }
                 });
                 const agent_no = yield lib_1.default.generateNo({ trx, type: 'Sub_Agent' });
-                const newAgency = yield AgentModel.createAgency({
-                    address,
-                    status: 'Incomplete',
-                    agent_no,
-                    agency_name,
-                    email,
-                    phone,
-                    agency_logo,
-                    civil_aviation,
-                    trade_license,
-                    national_id,
-                    agency_type: constants_1.SOURCE_SUB_AGENT,
-                    ref_agent_id: agency_id,
-                });
-                const newRole = yield AgencyUserModel.createRole({
-                    agency_id: newAgency[0].id,
-                    name: 'Super Admin',
-                    is_main_role: true,
-                });
-                const permissions = yield AgencyUserModel.getAllPermissions();
-                const permissionPayload = [];
-                permissions.forEach((item) => {
-                    if (!constants_1.WHITE_LABEL_PERMISSIONS_MODULES.includes(item.name)) {
-                        permissionPayload.push({
-                            agency_id: newAgency[0].id,
-                            role_id: newRole[0].id,
-                            permission_id: item.id,
-                            delete: true,
-                            read: true,
-                            update: true,
-                            write: true,
-                        });
+                if (checkAgentUser) {
+                    const checkOtp = yield commonModel.getOTP({
+                        email: email,
+                        type: 'register_sub_agent',
+                    });
+                    if (checkOtp.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_GONE,
+                            message: this.ResMsg.THREE_TIMES_EXPIRED,
+                        };
                     }
-                });
-                yield AgencyUserModel.insertRolePermission(permissionPayload);
-                let username = lib_1.default.generateUsername(user_name);
-                let suffix = 1;
-                while (yield AgencyUserModel.checkUser({ username })) {
-                    username = `${username}${suffix}`;
-                    suffix += 1;
+                    const otp = lib_1.default.otpGenNumber(6);
+                    const hashed_otp = yield lib_1.default.hashValue(otp);
+                    yield emailSendLib_1.default.sendEmailAgent(trx, main_agent, {
+                        email,
+                        emailSub: `${main_agent_name} - Agency Registration Verification`,
+                        emailBody: (0, sendEmailOtpTemplate_1.sendEmailOtpTemplate)({
+                            otpFor: 'Registration',
+                            project: main_agent_name,
+                            otp: otp,
+                            logo: '',
+                        }),
+                    });
+                    yield commonModel.insertOTP({
+                        hashed_otp: hashed_otp,
+                        email: email,
+                        type: 'register_sub_agent',
+                    });
                 }
-                const password = lib_1.default.generateRandomPassword(8);
-                const hashed_password = yield lib_1.default.hashValue(password);
-                const newUser = yield AgencyUserModel.createUser({
-                    agency_id: newAgency[0].id,
-                    email,
-                    hashed_password,
-                    is_main_user: true,
-                    name: user_name,
-                    phone_number: phone,
-                    role_id: newRole[0].id,
-                    username,
-                });
-                const verificationToken = lib_1.default.createToken({ agency_id: newAgency[0].id, email, user_id: newUser[0].id }, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent, '24h');
-                yield emailSendLib_1.default.sendEmail({
-                    email,
-                    emailSub: `${main_agent_name} Agency Registration Verification`,
-                    emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, '/sign-up/verification?token=' + verificationToken),
-                });
+                else {
+                    const newAgency = yield AgentModel.createAgency({
+                        address,
+                        status: 'Incomplete',
+                        agent_no,
+                        agency_name,
+                        email,
+                        phone,
+                        agency_logo,
+                        civil_aviation,
+                        trade_license,
+                        national_id,
+                        agency_type: constants_1.SOURCE_SUB_AGENT,
+                        ref_agent_id: main_agent,
+                    });
+                    const newRole = yield AgencyUserModel.createRole({
+                        agency_id: newAgency[0].id,
+                        name: 'Super Admin',
+                        is_main_role: true,
+                    });
+                    const permissions = yield AgencyUserModel.getAllPermissions();
+                    const permissionPayload = [];
+                    permissions.forEach((item) => {
+                        if (!constants_1.WHITE_LABEL_PERMISSIONS_MODULES.includes(item.name)) {
+                            permissionPayload.push({
+                                agency_id: newAgency[0].id,
+                                role_id: newRole[0].id,
+                                permission_id: item.id,
+                                delete: true,
+                                read: true,
+                                update: true,
+                                write: true,
+                            });
+                        }
+                    });
+                    yield AgencyUserModel.insertRolePermission(permissionPayload);
+                    let username = lib_1.default.generateUsername(user_name);
+                    let suffix = 1;
+                    while (yield AgencyUserModel.checkUser({ username })) {
+                        username = `${username}${suffix}`;
+                        suffix += 1;
+                    }
+                    const hashed_password = yield lib_1.default.hashValue(password);
+                    yield AgencyUserModel.createUser({
+                        agency_id: newAgency[0].id,
+                        email,
+                        hashed_password,
+                        is_main_user: true,
+                        name: user_name,
+                        phone_number: phone,
+                        role_id: newRole[0].id,
+                        username,
+                    });
+                    const checkOtp = yield commonModel.getOTP({
+                        email: email,
+                        type: 'register_sub_agent',
+                    });
+                    if (checkOtp.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_GONE,
+                            message: this.ResMsg.THREE_TIMES_EXPIRED,
+                        };
+                    }
+                    const otp = lib_1.default.otpGenNumber(6);
+                    const hashed_otp = yield lib_1.default.hashValue(otp);
+                    yield emailSendLib_1.default.sendEmailAgent(trx, main_agent, {
+                        email,
+                        emailSub: `${main_agent_name} - Agency Registration Verification`,
+                        emailBody: (0, sendEmailOtpTemplate_1.sendEmailOtpTemplate)({
+                            otpFor: 'Registration',
+                            project: main_agent_name,
+                            otp: otp,
+                            logo: `${constants_1.LOGO_ROOT_LINK}${main_agent_logo}`,
+                        }),
+                    });
+                    yield commonModel.insertOTP({
+                        hashed_otp: hashed_otp,
+                        email: email,
+                        type: 'register_sub_agent',
+                    });
+                }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: `Your registration has been successfully placed. Agency ID: ${agent_no}. To complete your registration please check your email and complete registration with the link we have sent to your email.`,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
                     data: {
                         email,
                     },
@@ -150,37 +210,64 @@ class AuthSubAgentService extends abstract_service_1.default {
     registerComplete(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { token } = req.body;
+                const { email, otp } = req.body;
                 const { agency_id: main_agency_id, agency_name: main_agent_name } = req.agencyB2CWhiteLabel;
                 const AgentModel = this.Model.AgencyModel(trx);
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
-                const parsedToken = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent);
-                if (!parsedToken) {
+                const commonModel = this.Model.CommonModel(trx);
+                const checkAgency = yield AgencyUserModel.checkUser({
+                    agency_type: constants_1.SOURCE_SUB_AGENT,
+                    ref_agent_id: main_agency_id,
+                    email,
+                });
+                if (!checkAgency || checkAgency.agency_status !== 'Incomplete') {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: 'No Inactive agency found with this email!',
+                    };
+                }
+                const checkOtp = yield commonModel.getOTP({
+                    email,
+                    type: 'register_sub_agent',
+                });
+                if (!checkOtp.length) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_FORBIDDEN,
+                        message: this.ResMsg.OTP_EXPIRED,
+                    };
+                }
+                const { id: email_otp_id, otp: hashed_otp, tried } = checkOtp[0];
+                if (tried > 3) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_GONE,
+                        message: this.ResMsg.TOO_MUCH_ATTEMPT,
+                    };
+                }
+                const otpValidation = yield lib_1.default.compareHashValue(otp.toString(), hashed_otp);
+                if (otpValidation) {
+                    yield commonModel.updateOTP({
+                        tried: tried + 1,
+                        matched: 1,
+                    }, { id: email_otp_id });
+                    yield AgentModel.updateAgency({ status: 'Pending' }, checkAgency.agency_id);
+                }
+                else {
+                    yield commonModel.updateOTP({
+                        tried: tried + 1,
+                    }, { id: email_otp_id });
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_UNAUTHORIZED,
-                        message: 'Invalid token or token expired. Please contact us.',
+                        message: this.ResMsg.OTP_INVALID,
                     };
                 }
-                const { agency_id, email, user_id, agency_name } = parsedToken;
-                yield AgentModel.updateAgency({ status: 'Pending' }, agency_id);
-                const password = lib_1.default.generateRandomPassword(12);
-                const hashed_password = yield lib_1.default.hashValue(password);
-                yield AgencyUserModel.updateUser({
-                    hashed_password,
-                }, { agency_id, id: user_id });
-                yield emailSendLib_1.default.sendEmailAgent(trx, main_agency_id, {
-                    email,
-                    emailSub: `${main_agent_name} Agency Registration Verification`,
-                    emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(agency_name, {
-                        email,
-                        password,
-                    }),
-                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: `Registration successful. Please check you will receive login credentials at the email address ${email}.`,
+                    message: `Registration successful. Please wait for admin approval.`,
                 };
             }));
         });
@@ -195,7 +282,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                     username: user_or_email,
                     email: user_or_email,
                     agency_type: constants_1.SOURCE_SUB_AGENT,
-                    agency_id: main_agency_id,
+                    ref_agent_id: main_agency_id,
                 });
                 if (!checkUserAgency) {
                     return {

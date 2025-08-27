@@ -26,11 +26,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentB2CBlogController = void 0;
 const abstract_controller_1 = __importDefault(require("../../../abstract/abstract.controller"));
 const agentB2CBlog_service_1 = require("../services/agentB2CBlog.service");
+const agentB2CBlog_validator_1 = __importDefault(require("../utils/validators/agentB2CBlog.validator"));
 class AgentB2CBlogController extends abstract_controller_1.default {
     constructor() {
         super(...arguments);
         this.controller = new agentB2CBlog_service_1.AgentB2CBlogService();
-        this.getBlogList = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.validator = new agentB2CBlog_validator_1.default();
+        this.getBlogList = this.asyncWrapper.wrap({ querySchema: this.validator.getBlog }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.controller.getBlogList(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));

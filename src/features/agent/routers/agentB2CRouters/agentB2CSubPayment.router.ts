@@ -15,5 +15,11 @@ export default class AgentB2CSubPaymentRouter extends AbstractRouter {
       .route('/deposit/:id')
       .get(this.controller.getSingleDepositRequest)
       .patch(this.controller.updateDepositRequest);
+
+    this.router.route('/ledger').get(this.controller.getLedger);
+
+    this.router
+      .route('/balance-adjustment')
+      .post(this.controller.balanceAdjust);
   }
 }

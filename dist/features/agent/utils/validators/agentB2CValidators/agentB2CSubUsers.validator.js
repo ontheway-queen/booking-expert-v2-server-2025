@@ -11,12 +11,13 @@ class AgentB2CSubUsersValidator {
             filter: joi_1.default.string().trim(),
             status: joi_1.default.boolean(),
             limit: joi_1.default.number(),
-            skip: joi_1.default.number()
+            skip: joi_1.default.number(),
         });
         this.updateB2CUser = joi_1.default.object({
             name: joi_1.default.string().trim(),
             phone_number: joi_1.default.string().min(11),
-            gender: joi_1.default.string().valid("Male", "Female", "Other")
+            gender: joi_1.default.string().valid('Male', 'Female', 'Other'),
+            status: joi_1.default.boolean().optional(),
         });
     }
 }

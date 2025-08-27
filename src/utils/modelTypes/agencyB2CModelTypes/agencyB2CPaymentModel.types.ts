@@ -5,6 +5,7 @@ export interface IInsertAgencyB2CLedgerPayload {
   amount: number;
   details: string;
   voucher_no: string;
+  ledger_date: string | Date;
 }
 
 export interface IGetAgencyB2CLedgerQuery {

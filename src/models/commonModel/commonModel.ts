@@ -172,13 +172,14 @@ class CommonModel extends Schema {
   }
 
   //get all country
-  public async getCountry(payload: { id?: number; name?: string }) {
+  public async getCountry(payload: { id?: number | number[]; name?: string }) {
     return await this.db('country')
       .withSchema(this.PUBLIC_SCHEMA)
       .select('id', 'name', 'iso', 'iso3', 'phone_code')
       .where((qb) => {
         if (payload.id) {
-          qb.where('id', payload.id);
+          if (Array.isArray(payload.id)) qb.whereIn('id', payload.id);
+          else qb.where('id', payload.id);
         }
         if (payload.name) {
           qb.andWhereILike('name', `%${payload.name}%`);
@@ -400,6 +401,35 @@ class CommonModel extends Schema {
         });
     }
     return { data, total: count[0]?.total };
+  }
+
+  //get all airport by code
+  public async getAirportByCode(code: string): Promise<{
+    id: number;
+    country_id: number;
+    country: string;
+    name: string;
+    iata_code: string;
+    city_id: number;
+    city_code: string;
+    city_name: string;
+  } | null> {
+    return await this.db('airport as air')
+      .withSchema(this.PUBLIC_SCHEMA)
+      .select(
+        'air.id',
+        'air.country_id',
+        'cou.name as country',
+        'air.name',
+        'air.iata_code',
+        'ct.id as city_id',
+        'ct.code as city_code',
+        'ct.name as city_name'
+      )
+      .join('country as cou', 'cou.id', 'air.country_id')
+      .leftJoin('city as ct', 'ct.id', 'air.city')
+      .where('air.iata_code', code)
+      .first();
   }
 
   //update airport

@@ -38,4 +38,20 @@ export class AgentB2CSubPaymentController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public getLedger = this.asyncWrapper.wrap(
+    { querySchema: this.validator.getLedger },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.getLedger(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public balanceAdjust = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.balanceAdjust },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.balanceAdjust(req);
+      res.status(code).json(rest);
+    }
+  );
 }

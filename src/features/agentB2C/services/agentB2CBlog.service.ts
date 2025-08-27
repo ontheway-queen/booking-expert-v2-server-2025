@@ -5,6 +5,10 @@ export class AgentB2CBlogService extends AbstractServices {
   //get blog list
   public async getBlogList(req: Request) {
     const { agency_id } = req.agencyB2CWhiteLabel;
+    const query = req.query as {
+      limit?: string;
+      skip?: string;
+    };
 
     const blogModel = this.Model.BlogModel();
 
@@ -12,13 +16,15 @@ export class AgentB2CBlogService extends AbstractServices {
       is_deleted: false,
       source_id: agency_id,
       status: true,
+      ...query,
     });
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: blogPosts,
+      data: blogPosts.data,
+      total: blogPosts.total,
     };
   }
 

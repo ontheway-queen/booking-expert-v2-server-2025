@@ -5,10 +5,12 @@ import {
   CUSTOM_API,
   FLIGHT_REVALIDATE_REDIS_KEY,
   MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET,
+  ROUTE_TYPE,
   SABRE_API,
 } from '../../miscellaneous/flightConstant';
 import {
   IFormattedFlightItinerary,
+  IOriginDestinationInformationPayload,
   IPassengerTypeQuantityPayload,
 } from '../../supportTypes/flightTypes/commonFlightTypes';
 import SabreFlightService from './sabreFlightSupport.service';
@@ -17,6 +19,7 @@ import CustomError from '../../lib/customError';
 import { IGetSupplierAirlinesDynamicFareQuery } from '../../modelTypes/dynamicFareRulesModelTypes/dynamicFareModelTypes';
 import { IFlightBookingPassengerReqBody } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
 import DateTimeLib from '../../lib/dateTimeLib';
+import { BD_AIRPORT } from '../../miscellaneous/staticData';
 
 export class CommonFlightSupportService extends AbstractServices {
   private trx: Knex.Transaction;
@@ -388,5 +391,40 @@ export class CommonFlightSupportService extends AbstractServices {
         }
       }
     }
+  }
+
+  // find route type
+  public routeTypeFinder({
+    airportsPayload,
+    originDest,
+  }: {
+    originDest?: IOriginDestinationInformationPayload[];
+    airportsPayload?: string[];
+  }) {
+    let route_type: 'SOTO' | 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' =
+      ROUTE_TYPE.SOTO;
+
+    let airports: string[] = [];
+
+    if (originDest) {
+      originDest.forEach((item) => {
+        airports.push(item.OriginLocation.LocationCode);
+        airports.push(item.DestinationLocation.LocationCode);
+      });
+    } else if (airportsPayload) {
+      airports = airportsPayload;
+    }
+
+    if (airports.every((airport) => BD_AIRPORT.includes(airport))) {
+      route_type = ROUTE_TYPE.DOMESTIC;
+    } else if (BD_AIRPORT.includes(airports[0])) {
+      route_type = ROUTE_TYPE.FROM_DAC;
+    } else if (airports.some((code) => BD_AIRPORT.includes(code))) {
+      route_type = ROUTE_TYPE.TO_DAC;
+    } else {
+      route_type = ROUTE_TYPE.SOTO;
+    }
+
+    return route_type;
   }
 }

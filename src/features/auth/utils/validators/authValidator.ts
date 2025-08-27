@@ -25,6 +25,16 @@ export default class AuthValidator {
     phone: Joi.string().min(7).max(20).required().trim(),
   });
 
+  //sub agency register validator
+  public subagencyRegisterValidator = Joi.object({
+    user_name: Joi.string().trim().min(4).max(255).required(),
+    password: Joi.string().trim().min(8).max(50).required(),
+    agency_name: Joi.string().trim().min(4).max(255).required(),
+    email: Joi.string().email().trim().lowercase().max(255).required(),
+    address: Joi.string().min(8).max(100).required().trim(),
+    phone: Joi.string().min(7).max(20).required().trim(),
+  });
+
   //B2C register validator
   public b2cRegisterValidator = Joi.object({
     name: Joi.string().trim().min(4).max(255).required(),

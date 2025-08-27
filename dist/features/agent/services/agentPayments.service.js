@@ -63,7 +63,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: 'Your previous deposit request is still in pending. New deposit request cannot be made',
+                        message: "Your previous deposit request is still in pending. New deposit request cannot be made",
                     };
                 }
                 const body = req.body;
@@ -75,7 +75,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
-                        message: 'Invalid account id.',
+                        message: "Invalid account id.",
                     };
                 }
                 const request_no = yield lib_1.default.generateNo({
@@ -83,14 +83,14 @@ class AgentPaymentsService extends abstract_service_1.default {
                     type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent_deposit_request,
                 });
                 const files = req.files || [];
-                let docs = '';
+                let docs = "";
                 files.forEach((file) => {
                     switch (file.fieldname) {
-                        case 'docs':
+                        case "document":
                             docs = file.filename;
                             break;
                         default:
-                            throw new customError_1.default('Invalid files. Please provide valid docs', this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
+                            throw new customError_1.default("Invalid files. Please provide valid document", this.StatusCode.HTTP_UNPROCESSABLE_ENTITY);
                     }
                 });
                 const deposit_body = {
@@ -108,7 +108,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: 'Deposit request has been created',
+                    message: "Deposit request has been created",
                     data: {
                         id: res[0].id,
                     },
@@ -126,17 +126,17 @@ class AgentPaymentsService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: 'No Pending deposit request has been found!',
+                        message: "No Pending deposit request has been found!",
                     };
                 }
                 yield paymentModel.updateDepositRequest({
                     status: constants_1.DEPOSIT_STATUS_CANCELLED,
-                    update_note: 'Deposit Cancelled by agent.' + `(${name}[${username}])`,
+                    update_note: "Deposit Cancelled by agent." + `(${name}[${username}])`,
                 }, getCurrentDepositData.data[0].id);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: 'Deposit request has been cancelled',
+                    message: "Deposit request has been cancelled",
                 };
             }));
         });
@@ -194,7 +194,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                             cus_name: name,
                             cus_email: user_email,
                             cus_phone: phone_number,
-                            product_name: 'credit load',
+                            product_name: "credit load",
                             success_page,
                             failed_page,
                             cancelled_page,
@@ -202,7 +202,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                     default:
                         return {
                             success: false,
-                            message: 'Invalid bank',
+                            message: "Invalid bank",
                             redirectUrl: null,
                             code: this.StatusCode.HTTP_UNPROCESSABLE_ENTITY,
                         };
@@ -292,7 +292,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: 'No due has been found with this invoice',
+                        message: "No due has been found with this invoice",
                     };
                 }
                 let balance_trans = data.due;
@@ -310,7 +310,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                         return {
                             success: false,
                             code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: 'There is insufficient balance in your account.',
+                            message: "There is insufficient balance in your account.",
                         };
                     }
                     loan_trans =
@@ -324,7 +324,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                 const moneyReceiptModel = this.Model.MoneyReceiptModel(trx);
                 yield invoiceModel.updateInvoice({ due: 0 }, Number(id));
                 yield moneyReceiptModel.createMoneyReceipt({
-                    mr_no: yield lib_1.default.generateNo({ trx, type: 'Money_Receipt' }),
+                    mr_no: yield lib_1.default.generateNo({ trx, type: "Money_Receipt" }),
                     invoice_id: Number(id),
                     amount: data.due,
                     user_id,
@@ -333,7 +333,7 @@ class AgentPaymentsService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: 'Due has been cleared',
+                    message: "Due has been cleared",
                 };
             }));
         });
@@ -373,14 +373,15 @@ class AgentPaymentsService extends abstract_service_1.default {
     getAccounts(_req) {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.OthersModel();
-            const accounts = yield configModel.getAccount({
-                source_type: 'ADMIN',
+            const { data, total } = yield configModel.getAccount({
+                source_type: constants_1.SOURCE_ADMIN,
             });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: accounts,
+                data,
+                total,
             };
         });
     }

@@ -35,10 +35,14 @@ const getConfig = () => {
         SABRE_URL: process.env.SABRE_URL,
         SABRE_USERNAME: process.env.SABRE_USERNAME,
         SABRE_LNIATA_CODE: process.env.SABRE_LNIATA_CODE,
+        VERTEIL_URL: process.env.VERTEIL_URL,
+        VERTEIL_USERNAME: process.env.VERTEIL_USERNAME,
+        VERTEIL_PASSWORD: process.env.VERTEIL_PASSWORD,
+        VERTEIL_OFFICEID: process.env.VERTEIL_OFFICEID,
         CT_URL: process.env.CT_URL,
         CT_API_KEY: process.env.CT_API_KEY,
         SERVER_URL: process.env.SERVER_URL,
-        WFTT_URL: process.env.WFTT_URL
+        WFTT_URL: process.env.WFTT_URL,
     };
 };
 const getSanitzedConfig = (config) => {

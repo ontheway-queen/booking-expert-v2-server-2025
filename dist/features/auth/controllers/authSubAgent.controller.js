@@ -25,11 +25,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_controller_1 = __importDefault(require("../../../abstract/abstract.controller"));
 const authValidator_1 = __importDefault(require("../utils/validators/authValidator"));
-const authAgent_service_1 = __importDefault(require("../services/authAgent.service"));
+const authSubAgent_service_1 = __importDefault(require("../services/authSubAgent.service"));
 class AuthSubAgentController extends abstract_controller_1.default {
     constructor() {
         super();
-        this.service = new authAgent_service_1.default();
+        this.service = new authSubAgent_service_1.default();
         this.validator = new authValidator_1.default();
         this.login = this.asyncWrapper.wrap({ bodySchema: this.validator.loginValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.login(req), { code } = _a, data = __rest(_a, ["code"]);

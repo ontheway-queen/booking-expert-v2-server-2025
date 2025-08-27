@@ -57,6 +57,7 @@ export interface ITokenParseAgencyB2CUser {
 export interface ITokenParseAgencyB2CWhiteLabel {
   agency_id: number;
   agency_name: string;
+  agency_logo: string;
   flight: boolean;
   hotel: boolean;
   visa: boolean;

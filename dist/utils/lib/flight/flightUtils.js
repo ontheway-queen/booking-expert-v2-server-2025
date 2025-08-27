@@ -111,14 +111,10 @@ class FlightUtils {
     }
     //get route of flight
     getRouteOfFlight(leg_description) {
-        let route;
-        route = leg_description.map((item) => {
-            return item.departureLocation;
+        let route = '';
+        leg_description.forEach((item) => {
+            route += item.departureLocation + '-' + item.arrivalLocation;
         });
-        route =
-            route.join('-') +
-                '-' +
-                leg_description[leg_description.length - 1].arrivalLocation;
         return route;
     }
     //get journey type
@@ -216,6 +212,20 @@ class FlightUtils {
         else {
             //first
             return 'F';
+        }
+    }
+    utcToLocalDateTime(DateTime) {
+        const TimeLimits = new Date(DateTime);
+        if (!Number.isNaN(TimeLimits.getTime())) {
+            const year = TimeLimits.getFullYear();
+            const month = String(TimeLimits.getMonth() + 1).padStart(2, '0');
+            const day = String(TimeLimits.getDate()).padStart(2, '0');
+            const hours = String(TimeLimits.getHours()).padStart(2, '0');
+            const minutes = String(TimeLimits.getMinutes()).padStart(2, '0');
+            return [`${year}-${month}-${day}`, `${hours}:${minutes}`];
+        }
+        else {
+            return ['', ''];
         }
     }
 }

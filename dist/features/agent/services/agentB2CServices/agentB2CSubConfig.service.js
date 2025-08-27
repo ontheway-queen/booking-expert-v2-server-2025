@@ -65,16 +65,20 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
     getAccounts(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const { agency_id } = req.agencyUser;
+            const { limit, skip } = req.query;
             const configModel = this.Model.OthersModel();
-            const accounts = yield configModel.getAccount({
-                source_type: 'AGENT',
+            const { data, total } = yield configModel.getAccount({
+                source_type: constants_1.SOURCE_AGENT,
                 source_id: agency_id,
-            });
+                limit,
+                skip,
+            }, true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: accounts,
+                data,
+                total,
             };
         });
     }
@@ -192,14 +196,18 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
             const { agency_id } = req.agencyUser;
-            const hero_bg_data = yield configModel.getHeroBGContent({
+            const { limit, skip } = req.query;
+            const { data, total } = yield configModel.getHeroBGContent({
                 agency_id,
-            });
+                limit,
+                skip,
+            }, true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: hero_bg_data,
+                data,
+                total,
             };
         });
     }
@@ -331,14 +339,18 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
             const { agency_id } = req.agencyUser;
-            const popular_destinations = yield configModel.getPopularDestination({
+            const { limit, skip } = req.query;
+            const { data, total } = yield configModel.getPopularDestination({
                 agency_id,
-            });
+                limit,
+                skip,
+            }, true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: popular_destinations,
+                data,
+                total,
             };
         });
     }
@@ -519,14 +531,18 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
             const { agency_id } = req.agencyUser;
-            const popular_places = yield configModel.getPopularPlaces({
+            const { limit, skip } = req.query;
+            const { data, total } = yield configModel.getPopularPlaces({
                 agency_id,
-            });
+                limit,
+                skip,
+            }, true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: popular_places,
+                data,
+                total,
             };
         });
     }
@@ -685,14 +701,18 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
             const { agency_id } = req.agencyUser;
-            const hotDeals = yield configModel.getHotDeals({
+            const { limit, skip } = req.query;
+            const { data, total } = yield configModel.getHotDeals({
                 agency_id,
-            });
+                limit,
+                skip,
+            }, true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: hotDeals,
+                data,
+                total,
             };
         });
     }

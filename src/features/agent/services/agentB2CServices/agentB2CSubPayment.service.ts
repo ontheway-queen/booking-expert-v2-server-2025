@@ -9,6 +9,10 @@ import {
   deposit_status,
   IGetAgentB2CDepositRequestListFilterQuery,
 } from '../../../../utils/modelTypes/commonModelTypes/depositRequestModel.types';
+import {
+  IAdjustAgentB2CSubLedgerReqBody,
+  IGetAgentB2CSubLedgerHistoryQuery,
+} from '../../utils/types/agentB2CSubTypes/agentB2CSubPayment.types';
 
 export class AgentB2CSubPaymentService extends AbstractServices {
   constructor() {
@@ -91,7 +95,7 @@ export class AgentB2CSubPaymentService extends AbstractServices {
   public async updateDepositRequest(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
-      const { agency_id } = req.agencyUser;
+      const { agency_id, user_id } = req.agencyUser;
 
       const depositModel = this.Model.DepositRequestModel(trx);
       const AgencyPaymentModel = this.Model.AgencyB2CPaymentModel(trx);
@@ -116,12 +120,31 @@ export class AgentB2CSubPaymentService extends AbstractServices {
         };
       }
 
-      const { status } = req.body;
+      const { status, note } = req.body as {
+        status: 'APPROVED' | 'REJECTED';
+        note?: string;
+      };
 
       if (status === DEPOSIT_STATUS_REJECTED) {
-        await depositModel.updateDepositRequest({ status }, Number(id));
+        await depositModel.updateDepositRequest(
+          {
+            status,
+            update_note: note,
+            updated_by: user_id,
+            updated_at: new Date(),
+          },
+          Number(id)
+        );
       } else if (status === DEPOSIT_STATUS_APPROVED) {
-        await depositModel.updateDepositRequest({ status }, Number(id));
+        await depositModel.updateDepositRequest(
+          {
+            status,
+            update_note: note,
+            updated_by: user_id,
+            updated_at: new Date(),
+          },
+          Number(id)
+        );
 
         await AgencyPaymentModel.insertLedger({
           agency_id: agency_id,
@@ -130,6 +153,7 @@ export class AgentB2CSubPaymentService extends AbstractServices {
           voucher_no: data.request_no,
           type: 'Credit',
           details: `Deposit request - ${data.request_no} has been approved.`,
+          ledger_date: new Date(),
         });
       }
 
@@ -137,6 +161,70 @@ export class AgentB2CSubPaymentService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: `Deposit request has been updated`,
+      };
+    });
+  }
+
+  public async getLedger(req: Request) {
+    const { agency_id } = req.agencyUser;
+    const { user_id, ...restQuery } =
+      req.query as IGetAgentB2CSubLedgerHistoryQuery;
+    const AgencyB2CPaymentModel = this.Model.AgencyB2CPaymentModel();
+
+    const data = await AgencyB2CPaymentModel.getLedger(
+      {
+        agency_id,
+        ...restQuery,
+        user_id: Number(user_id),
+      },
+      true
+    );
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: data.data,
+      total: data.total || 0,
+    };
+  }
+
+  public async balanceAdjust(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const { amount, type, details, voucher_no, payment_date, user_id } =
+        req.body as IAdjustAgentB2CSubLedgerReqBody;
+
+      const AgencyB2CPaymentModel = this.Model.AgencyB2CPaymentModel(trx);
+
+      const checkVoucher = await AgencyB2CPaymentModel.getLedger({
+        voucher_no,
+        agency_id,
+        user_id,
+      });
+
+      if (checkVoucher.data.length > 0) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_CONFLICT,
+          message: 'Voucher No already exists',
+        };
+      }
+
+      await AgencyB2CPaymentModel.insertLedger({
+        agency_id,
+        amount,
+        details,
+        type,
+        user_id,
+        voucher_no,
+        ledger_date: payment_date,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: 'Balance adjusted successfully',
       };
     });
   }

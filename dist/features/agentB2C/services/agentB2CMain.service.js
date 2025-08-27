@@ -201,7 +201,7 @@ class AgentB2CMainService extends abstract_service_1.default {
                 if (!check.data.length) {
                     yield commonModel.insertEmailSubscriber({
                         email,
-                        source: 'AGENT B2C',
+                        source_type: 'AGENT B2C',
                         agency_id,
                     });
                 }

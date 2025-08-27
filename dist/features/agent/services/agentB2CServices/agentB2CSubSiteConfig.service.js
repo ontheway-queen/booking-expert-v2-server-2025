@@ -358,14 +358,15 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const configModel = this.Model.AgencyB2CConfigModel();
             const { agency_id } = req.agencyUser;
-            const social_links = yield configModel.getSocialLink({
+            const { data, total } = yield configModel.getSocialLink({
                 agency_id,
-            });
+            }, true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: social_links,
+                data,
+                total,
             };
         });
     }

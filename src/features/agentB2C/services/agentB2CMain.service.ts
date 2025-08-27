@@ -226,7 +226,7 @@ export class AgentB2CMainService extends AbstractServices {
       if (!check.data.length) {
         await commonModel.insertEmailSubscriber({
           email,
-          source: 'AGENT B2C',
+          source_type: 'AGENT B2C',
           agency_id,
         });
       }

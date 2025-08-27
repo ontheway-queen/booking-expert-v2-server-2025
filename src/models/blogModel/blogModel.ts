@@ -1,6 +1,9 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { BLOG_FOR_B2C, BLOG_FOR_BOTH } from '../../utils/miscellaneous/blogConstants';
-import { SOURCE_AGENT } from '../../utils/miscellaneous/constants';
+import {
+  BLOG_FOR_B2C,
+  BLOG_FOR_BOTH,
+} from '../../utils/miscellaneous/blogConstants';
+import { DATA_LIMIT, SOURCE_AGENT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   GetSingleAgentB2CBlogPayload,
@@ -30,7 +33,7 @@ export default class BlogModel extends Schema {
 
   public async getSingleBlogPost(
     query: ISingleBlogPostQuery
-  ): Promise<IGetSingleBlogPayload> {
+  ): Promise<IGetSingleBlogPayload | null> {
     const { is_deleted = false } = query;
     return await this.db('blog')
       .withSchema(this.SERVICE_SCHEMA)
@@ -38,6 +41,7 @@ export default class BlogModel extends Schema {
         'id',
         'title',
         'content',
+        'summary',
         'slug',
         'meta_title',
         'meta_description',
@@ -128,9 +132,9 @@ export default class BlogModel extends Schema {
 
   public async getAgentB2CBlogList(
     query: IAgentB2CBlogListQuery
-  ): Promise<IGetAgentB2CBlogListPayload[]> {
+  ): Promise<{ data: IGetAgentB2CBlogListPayload[]; total: number }> {
     const { is_deleted = false } = query;
-    return await this.db('blog as b')
+    const data = await this.db('blog as b')
       .withSchema(this.SERVICE_SCHEMA)
       .select(
         'b.id',
@@ -144,11 +148,26 @@ export default class BlogModel extends Schema {
         qb.andWhere('b.source_type', SOURCE_AGENT);
         qb.andWhere('b.source_id', query.source_id);
         qb.andWhere('b.is_deleted', is_deleted);
-
         if (query.status !== undefined) {
           qb.andWhere('b.status', query.status);
         }
+      })
+      .limit(Number(query.limit) || DATA_LIMIT)
+      .offset(Number(query.skip) || 0);
+
+    const total = await this.db('blog')
+      .withSchema(this.SERVICE_SCHEMA)
+      .count('id as total')
+      .where((qb) => {
+        qb.andWhere('source_type', SOURCE_AGENT);
+        qb.andWhere('source_id', query.source_id);
+        qb.andWhere('is_deleted', is_deleted);
+        if (query.status !== undefined) {
+          qb.andWhere('status', query.status);
+        }
       });
+
+    return { data, total: Number(total[0].total) || 0 };
   }
 
   public async getSingleAgentB2CBlog(

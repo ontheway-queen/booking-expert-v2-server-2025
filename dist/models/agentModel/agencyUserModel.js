@@ -105,14 +105,18 @@ class AgencyUserModel extends schema_1.default {
                 .select('au.id', 'au.agency_id', 'au.email', 'au.phone_number', 'au.photo', 'au.name', 'au.username', 'au.hashed_password', 'au.two_fa', 'au.role_id', 'au.status', 'au.socket_id', 'au.is_main_user', 'a.status AS agency_status', 'a.agent_no', 'a.email AS agency_email', 'a.phone AS agency_phone_number', 'a.agency_name', 'a.agency_logo', 'a.allow_api', 'a.white_label', 'a.ref_id', 'a.ref_agent_id', 'a.agency_type', 'a.civil_aviation', 'a.trade_license', 'a.national_id', 'a.kam_id', 'a.address')
                 .leftJoin('agency AS a', 'au.agency_id', 'a.id')
                 .where((qb) => {
-                if (email) {
-                    qb.orWhere('au.email', email);
+                if (email || username) {
+                    qb.andWhere((qqb) => {
+                        if (email) {
+                            qqb.orWhere('au.email', email);
+                        }
+                        if (username) {
+                            qqb.orWhere('au.username', username);
+                        }
+                    });
                 }
                 if (agency_type) {
-                    qb.orWhere('a.agency_type', agency_type);
-                }
-                if (username) {
-                    qb.orWhere('au.username', username);
+                    qb.andWhere('a.agency_type', agency_type);
                 }
                 if (is_main_user !== undefined) {
                     qb.andWhere('is_main_user', is_main_user);
@@ -124,7 +128,7 @@ class AgencyUserModel extends schema_1.default {
                     qb.andWhere('au.agency_id', agency_id);
                 }
                 if (ref_agent_id) {
-                    qb.andWhere('au.ref_agent_id', ref_agent_id);
+                    qb.andWhere('a.ref_agent_id', ref_agent_id);
                 }
             })
                 .first();

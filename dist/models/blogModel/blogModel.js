@@ -31,7 +31,7 @@ class BlogModel extends schema_1.default {
             const { is_deleted = false } = query;
             return yield this.db('blog')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('id', 'title', 'content', 'slug', 'meta_title', 'meta_description', 'cover_image', 'status')
+                .select('id', 'title', 'content', 'summary', 'slug', 'meta_title', 'meta_description', 'cover_image', 'status')
                 .where((qb) => {
                 qb.andWhere('source_id', query.source_id);
                 qb.andWhere('source_type', query.source_type);
@@ -94,7 +94,7 @@ class BlogModel extends schema_1.default {
     getAgentB2CBlogList(query) {
         return __awaiter(this, void 0, void 0, function* () {
             const { is_deleted = false } = query;
-            return yield this.db('blog as b')
+            const data = yield this.db('blog as b')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('b.id', 'b.title', 'b.summary', 'b.cover_image', 'b.slug', 'b.created_at as created_date')
                 .where((qb) => {
@@ -104,7 +104,21 @@ class BlogModel extends schema_1.default {
                 if (query.status !== undefined) {
                     qb.andWhere('b.status', query.status);
                 }
+            })
+                .limit(Number(query.limit) || constants_1.DATA_LIMIT)
+                .offset(Number(query.skip) || 0);
+            const total = yield this.db('blog')
+                .withSchema(this.SERVICE_SCHEMA)
+                .count('id as total')
+                .where((qb) => {
+                qb.andWhere('source_type', constants_1.SOURCE_AGENT);
+                qb.andWhere('source_id', query.source_id);
+                qb.andWhere('is_deleted', is_deleted);
+                if (query.status !== undefined) {
+                    qb.andWhere('status', query.status);
+                }
             });
+            return { data, total: Number(total[0].total) || 0 };
         });
     }
     getSingleAgentB2CBlog(query) {

@@ -400,7 +400,7 @@ export class AdminAgentFlightService extends AbstractServices {
   public async updateBooking(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
-      const { name, user_email } = req.admin;
+      const { name, user_email, user_id } = req.admin;
       const {
         status,
         airline_pnr,
@@ -411,6 +411,8 @@ export class AdminAgentFlightService extends AbstractServices {
       } = req.body as IAdminUpdateFlightBookingReqBody;
 
       const flightBookingModel = this.Model.FlightBookingModel(trx);
+      const flightBookingTrackingModel =
+        this.Model.FlightBookingTrackingModel(trx);
 
       const booking_data = await flightBookingModel.getSingleFlightBooking({
         id: Number(id),
@@ -441,6 +443,7 @@ export class AdminAgentFlightService extends AbstractServices {
               'Flight book is not allowed for this booking. Only pending/booking in process booking can be booked.',
           };
         }
+
         payload.gds_pnr = gds_pnr;
         payload.airline_pnr = airline_pnr;
         payload.ticket_issue_last_time = ticket_issue_last_time;
@@ -469,6 +472,9 @@ export class AdminAgentFlightService extends AbstractServices {
         const agentBookingSubService = new AgentFlightBookingSupportService(
           trx
         );
+
+        payload.issued_by_type = SOURCE_ADMIN;
+        payload.issued_by_user_id = user_id;
 
         if (charge_credit) {
           const payment_data =
@@ -527,6 +533,11 @@ export class AdminAgentFlightService extends AbstractServices {
       await flightBookingModel.updateFlightBooking(payload, {
         id: Number(id),
         source_type: SOURCE_AGENT,
+      });
+
+      await flightBookingTrackingModel.insertFlightBookingTracking({
+        description: booking_tracking,
+        flight_booking_id: Number(id),
       });
 
       return {

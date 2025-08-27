@@ -76,6 +76,8 @@ export interface IGetBankAccountQuery {
   source_id?: number;
   status?: boolean;
   filter?: string;
+  limit?: string;
+  skip?: string;
 }
 
 export interface IUpdateBankAccountPayload {

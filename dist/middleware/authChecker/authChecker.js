@@ -317,6 +317,7 @@ class AuthChecker {
                     umrah: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.umrah),
                     group_fare: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.group_fare),
                     blog: Boolean(check_token === null || check_token === void 0 ? void 0 : check_token.blog),
+                    agency_logo: check_agency.agency_logo,
                 };
                 // Check permission
                 const agencyB2CModules = [

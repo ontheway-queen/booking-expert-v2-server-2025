@@ -53,6 +53,7 @@ export default class AgentSubAgentService extends AbstractServices {
       const checkSubAgentName = await agencyModel.checkAgency({
         name: agency_name,
         agency_type: SOURCE_SUB_AGENT,
+        ref_agent_id: agency_id,
       });
 
       if (checkSubAgentName) {
@@ -67,6 +68,7 @@ export default class AgentSubAgentService extends AbstractServices {
       const checkAgentUser = await agencyUserModel.checkUser({
         email,
         agency_type: SOURCE_SUB_AGENT,
+        ref_agent_id: agency_id,
       });
 
       if (checkAgentUser) {

@@ -173,14 +173,12 @@ export default class FlightUtils {
   public getRouteOfFlight(
     leg_description: { departureLocation: string; arrivalLocation: string }[]
   ) {
-    let route;
-    route = leg_description.map((item: any) => {
-      return item.departureLocation;
+    let route = '';
+
+    leg_description.forEach((item: any) => {
+      route += item.departureLocation + '-' + item.arrivalLocation;
     });
-    route =
-      route.join('-') +
-      '-' +
-      leg_description[leg_description.length - 1].arrivalLocation;
+
     return route;
   }
 
@@ -291,6 +289,20 @@ export default class FlightUtils {
     } else {
       //first
       return 'F';
+    }
+  }
+
+  public utcToLocalDateTime(DateTime: string): [string, string] {
+    const TimeLimits = new Date(DateTime);
+    if (!Number.isNaN(TimeLimits.getTime())) {
+      const year = TimeLimits.getFullYear();
+      const month = String(TimeLimits.getMonth() + 1).padStart(2, '0');
+      const day = String(TimeLimits.getDate()).padStart(2, '0');
+      const hours = String(TimeLimits.getHours()).padStart(2, '0');
+      const minutes = String(TimeLimits.getMinutes()).padStart(2, '0');
+      return [`${year}-${month}-${day}`, `${hours}:${minutes}`];
+    } else {
+      return ['', ''];
     }
   }
 }

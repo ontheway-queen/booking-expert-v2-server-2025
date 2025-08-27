@@ -1,4 +1,5 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
+import { DATA_LIMIT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   ICreateAgencyB2CHeroBgContentPayload,
@@ -50,9 +51,10 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async getHeroBGContent(
-    query: IGetAgencyB2CHeroBgContentQuery
-  ): Promise<IGetAgencyB2CHeroBgContentData[]> {
-    return await this.db('hero_bg_content')
+    query: IGetAgencyB2CHeroBgContentQuery,
+    with_total: boolean = false
+  ): Promise<{ data: IGetAgencyB2CHeroBgContentData[]; total?: number }> {
+    const data = await this.db('hero_bg_content')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('*')
       .orderBy('order_number', 'asc')
@@ -64,7 +66,27 @@ export default class AgencyB2CConfigModel extends Schema {
         if (query.type) {
           qb.andWhere('type', query.type);
         }
-      });
+      })
+      .limit(query.limit ? parseInt(query.limit) : DATA_LIMIT)
+      .offset(query.skip ? parseInt(query.skip) : 0);
+
+    let total: any[] = [];
+    if (with_total) {
+      total = await this.db('hero_bg_content')
+        .withSchema(this.AGENT_B2C_SCHEMA)
+        .count('id AS total')
+        .andWhere('agency_id', query.agency_id)
+        .where((qb) => {
+          if (query.status !== undefined) {
+            qb.andWhere('status', query.status);
+          }
+          if (query.type) {
+            qb.andWhere('type', query.type);
+          }
+        });
+    }
+
+    return { data, total: Number(total[0]?.total) || 0 };
   }
 
   public async checkHeroBGContent(query: {
@@ -123,9 +145,10 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async getPopularDestination(
-    query: IGetAgencyB2CPopularDestinationQuery
-  ): Promise<IGetAgencyB2CPopularDestinationData[]> {
-    return await this.db('popular_destination AS pd')
+    query: IGetAgencyB2CPopularDestinationQuery,
+    with_total: boolean = false
+  ): Promise<{ data: IGetAgencyB2CPopularDestinationData[]; total?: number }> {
+    const data = await this.db('popular_destination AS pd')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select(
         'pd.*',
@@ -150,7 +173,25 @@ export default class AgencyB2CConfigModel extends Schema {
         if (query.status !== undefined) {
           qb.andWhere('pd.status', query.status);
         }
-      });
+      })
+      .limit(query.limit ? parseInt(query.limit) : DATA_LIMIT)
+      .offset(query.skip ? parseInt(query.skip) : 0);
+
+    let total: any[] = [];
+
+    if (with_total) {
+      total = await this.db('popular_destination')
+        .withSchema(this.AGENT_B2C_SCHEMA)
+        .count('id AS total')
+        .andWhere('agency_id', query.agency_id)
+        .where((qb) => {
+          if (query.status !== undefined) {
+            qb.andWhere('status', query.status);
+          }
+        });
+    }
+
+    return { data, total: Number(total[0]?.total) || 0 };
   }
 
   public async checkPopularDestination(query: {
@@ -211,9 +252,10 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async getPopularPlaces(
-    query: IGetAgencyB2CPopularPlaceQuery
-  ): Promise<IGetAgencyB2CPopularPlaceData[]> {
-    return await this.db('popular_places AS pp')
+    query: IGetAgencyB2CPopularPlaceQuery,
+    with_total: boolean = false
+  ): Promise<{ data: IGetAgencyB2CPopularPlaceData[]; total?: number }> {
+    const data = await this.db('popular_places AS pp')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('pp.*', 'c.name AS country_name')
       .joinRaw(`LEFT JOIN public.country AS c ON pp.country_id = c.id`)
@@ -223,7 +265,24 @@ export default class AgencyB2CConfigModel extends Schema {
         if (query.status !== undefined) {
           qb.andWhere('pp.status', query.status);
         }
-      });
+      })
+      .limit(query.limit ? parseInt(query.limit) : DATA_LIMIT)
+      .offset(query.skip ? parseInt(query.skip) : 0);
+
+    let total: any[] = [];
+    if (with_total) {
+      total = await this.db('popular_places')
+        .withSchema(this.AGENT_B2C_SCHEMA)
+        .count('id AS total')
+        .andWhere('agency_id', query.agency_id)
+        .where((qb) => {
+          if (query.status !== undefined) {
+            qb.andWhere('status', query.status);
+          }
+        });
+    }
+
+    return { data, total: Number(total[0]?.total) || 0 };
   }
 
   public async checkPopularPlace(query: {
@@ -310,9 +369,10 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async getSocialLink(
-    query: IGetAgencyB2CSocialLinkQuery
-  ): Promise<IGetAgencyB2CSocialLinkData[]> {
-    return await this.db('social_links AS sl')
+    query: IGetAgencyB2CSocialLinkQuery,
+    with_total: boolean = false
+  ): Promise<{ data: IGetAgencyB2CSocialLinkData[]; total?: number }> {
+    const data = await this.db('social_links AS sl')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select(
         'sl.id',
@@ -332,7 +392,25 @@ export default class AgencyB2CConfigModel extends Schema {
         if (query.status !== undefined) {
           qb.andWhere('sl.status', query.status);
         }
-      });
+      })
+      .limit(query.limit ? parseInt(query.limit) : DATA_LIMIT)
+      .offset(query.skip ? parseInt(query.skip) : 0);
+
+    let total: any[] = [];
+
+    if (with_total) {
+      total = await this.db('social_links')
+        .withSchema(this.AGENT_B2C_SCHEMA)
+        .count('id AS total')
+        .andWhere('agency_id', query.agency_id)
+        .where((qb) => {
+          if (query.status !== undefined) {
+            qb.andWhere('status', query.status);
+          }
+        });
+    }
+
+    return { data, total: Number(total[0]?.total) || 0 };
   }
 
   public async checkSocialLink(query: {
@@ -389,9 +467,10 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async getHotDeals(
-    query: IGetAgencyB2CHotDealsQuery
-  ): Promise<IGetAgencyB2CHotDealsData[]> {
-    return await this.db('hot_deals')
+    query: IGetAgencyB2CHotDealsQuery,
+    with_total: boolean = false
+  ): Promise<{ data: IGetAgencyB2CHotDealsData[]; total?: number }> {
+    const data = await this.db('hot_deals')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .select('*')
       .orderBy('order_number', 'asc')
@@ -401,6 +480,21 @@ export default class AgencyB2CConfigModel extends Schema {
           qb.andWhere('status', query.status);
         }
       });
+
+    let total: any[] = [];
+    if (with_total) {
+      total = await this.db('hot_deals')
+        .withSchema(this.AGENT_B2C_SCHEMA)
+        .count('id AS total')
+        .andWhere('agency_id', query.agency_id)
+        .where((qb) => {
+          if (query.status !== undefined) {
+            qb.andWhere('status', query.status);
+          }
+        });
+    }
+
+    return { data, total: Number(total[0]?.total) || 0 };
   }
 
   public async checkHotDeals(query: {
