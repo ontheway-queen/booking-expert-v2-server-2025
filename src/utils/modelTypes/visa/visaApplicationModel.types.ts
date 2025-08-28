@@ -96,8 +96,15 @@ export interface IGetAllAgentB2CVisaApplicationData {
   application_date: Date;
 }
 
-export interface IGetAgentB2CSingleVisaApplicationForAgentQuery {
-  id: number;
-  source_id: number;
-  source_type: string;
+export interface IGetAgentB2CSingleVisaApplicationForAgentQuery{
+  id:number;
+  source_id:number;
+  source_type:string;
+}
+
+
+export interface IGetVisaApplicationTrackingData{
+  id:number;
+  details:string;
+  created_at:Date;
 }

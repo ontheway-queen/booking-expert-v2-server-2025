@@ -108,4 +108,20 @@ export class AgentB2CSubVisaValidator {
     status: Joi.string().optional(),
     filter: Joi.string().max(100).optional(),
   });
+
+  public updateVisaApplicationValidatorSchema = Joi.object({
+    status: Joi.string()
+      .valid(
+        'Pending',
+        'Papers Submitted',
+        'Application Received',
+        'In Process',
+        'Document Verification',
+        'Approved',
+        'Rejected',
+        'Collected'
+      )
+      .required(),
+    details: Joi.string().required(),
+  });
 }
