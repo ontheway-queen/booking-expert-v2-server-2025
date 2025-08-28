@@ -112,7 +112,7 @@ export class AgentB2CFlightService extends AbstractServices {
           reqBody: body,
           dynamic_fare_supplier_id: verteil_supplier_id,
           markup_amount,
-          search_id
+          search_id,
         });
       }
 
@@ -313,7 +313,7 @@ export class AgentB2CFlightService extends AbstractServices {
               reqBody: body,
               dynamic_fare_supplier_id: verteil_supplier_id,
               markup_amount,
-              search_id
+              search_id,
             })
           )
         );
@@ -321,16 +321,19 @@ export class AgentB2CFlightService extends AbstractServices {
       //WFTT results
       if (wftt_set_flight_api_id) {
         const wfttSubService = new WfttFlightService(trx);
-        tasks.push(sendResults('WFTT', async () =>
-          wfttSubService.FlightSearch({
-            booking_block: false,
-            reqBody: body,
-            dynamic_fare_supplier_id: wftt_set_flight_api_id,
-            markup_amount,
-          })
-        )
+        tasks.push(
+          sendResults('WFTT', async () =>
+            wfttSubService.FlightSearch({
+              booking_block: false,
+              reqBody: body,
+              dynamic_fare_supplier_id: wftt_set_flight_api_id,
+              markup_amount,
+            })
+          )
         );
       }
+
+      await Promise.all(tasks);
     });
   }
 

@@ -109,7 +109,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         reqBody: body,
                         dynamic_fare_supplier_id: verteil_supplier_id,
                         markup_amount,
-                        search_id
+                        search_id,
                     });
                 }
                 if (wftt_set_flight_api_id) {
@@ -271,7 +271,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                             reqBody: body,
                             dynamic_fare_supplier_id: verteil_supplier_id,
                             markup_amount,
-                            search_id
+                            search_id,
                         });
                     })));
                 }
@@ -287,6 +287,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         });
                     })));
                 }
+                yield Promise.all(tasks);
             }));
         });
     }
