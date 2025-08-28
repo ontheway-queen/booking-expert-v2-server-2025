@@ -14,6 +14,7 @@ import AdminVisaRouter from './routers/adminVisa.router';
 import { AdminAirlinesPreferenceRouter } from './routers/adminAirlinesPreference.router';
 import { AdminDynamicFareRouter } from './routers/adminDynamicFare.router';
 import { AdminDynamicFareSetRouter } from './routers/adminDynamicFareSet.router';
+import AdminAccountsRouter from './routers/adminAccounts.router';
 
 export default class AdminRootRouter {
   public Router = Router();
@@ -32,6 +33,7 @@ export default class AdminRootRouter {
   private adminAirlinesPreferenceRouter = new AdminAirlinesPreferenceRouter();
   private adminDynamicFareRouter = new AdminDynamicFareRouter();
   private adminDynamicFareSetRouter = new AdminDynamicFareSetRouter();
+  private adminAccountsRouter = new AdminAccountsRouter();
 
   //Admin Agent ,Admin B2C Sub Root Router Class
   private adminB2CRouter = new AdminB2CRouter();
@@ -57,6 +59,7 @@ export default class AdminRootRouter {
     this.Router.use('/hotel-markup-set', this.adminHotelMarkupSetRouter.router);
     this.Router.use('/dynamic-fare-set', this.adminDynamicFareSetRouter.router);
     this.Router.use('/dynamic-fare', this.adminDynamicFareRouter.router);
+    this.Router.use('/accounts', this.adminAccountsRouter.router);
 
     //Admin Agent, Admin B2C Root Routes
     this.Router.use('/agent', this.adminAgentRouter.router);

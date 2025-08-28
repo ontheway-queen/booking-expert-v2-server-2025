@@ -81,6 +81,8 @@ class AdminConfigValidator {
         this.getBanks = joi_1.default.object({
             status: joi_1.default.boolean().optional(),
             filter: joi_1.default.string().optional(),
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
         });
         this.updateBank = joi_1.default.object({
             name: joi_1.default.string().optional(),
@@ -94,6 +96,8 @@ class AdminConfigValidator {
         this.getSocialMedia = joi_1.default.object({
             status: joi_1.default.boolean().optional(),
             filter: joi_1.default.string().optional(),
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
         });
         this.updateSocialMedia = joi_1.default.object({
             name: joi_1.default.string().optional(),

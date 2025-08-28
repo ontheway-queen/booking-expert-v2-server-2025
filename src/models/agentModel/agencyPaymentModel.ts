@@ -133,23 +133,30 @@ export default class AgencyPaymentModel extends Schema {
     }: IGetAgentLoanHistoryQuery,
     need_total: boolean = false
   ): Promise<{ data: IGetAgencyLedgerData[]; total?: number }> {
-    const data = await this.db('loan_history')
+    const data = await this.db('loan_history AS lh')
       .withSchema(this.AGENT_SCHEMA)
-      .select('*')
+      .select(
+        'lh.*',
+        'a.agency_name',
+        'a.agency_logo',
+        'ua.name AS created_by_name'
+      )
+      .leftJoin('agency as a', 'a.id', 'lh.agency_id')
+      .joinRaw('LEFT JOIN admin.user_admin AS ua ON ua.id = lh.created_by')
       .where((qb) => {
         if (agency_id) {
-          qb.andWhere('agency_id', agency_id);
+          qb.andWhere('lh.agency_id', agency_id);
         }
         if (type) {
-          qb.andWhere('type', type);
+          qb.andWhere('lh.type', type);
         }
 
         if (from_date && to_date) {
-          qb.andWhereBetween('created_at', [from_date, to_date]);
+          qb.andWhereBetween('lh.created_at', [from_date, to_date]);
         }
       })
-      .orderBy('created_at', 'asc')
-      .orderBy('id', 'asc')
+      .orderBy('lh.created_at', 'asc')
+      .orderBy('lh.id', 'asc')
       .limit(Number(limit) || DATA_LIMIT)
       .offset(Number(skip) || 0);
 

@@ -132,12 +132,15 @@ class PublicCommonService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const CommonModel = this.Model.CommonModel(trx);
                 const { filter } = req.query;
-                const banks = yield CommonModel.getBanks({ name: filter, status: true });
+                const { data } = yield CommonModel.getBanks({
+                    name: filter,
+                    status: true,
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: banks,
+                    data,
                 };
             }));
         });
@@ -147,7 +150,7 @@ class PublicCommonService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const CommonModel = this.Model.CommonModel(trx);
                 const { filter } = req.query;
-                const banks = yield CommonModel.getSocialMedia({
+                const { data } = yield CommonModel.getSocialMedia({
                     name: filter,
                     status: true,
                 });
@@ -155,7 +158,7 @@ class PublicCommonService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: banks,
+                    data,
                 };
             }));
         });

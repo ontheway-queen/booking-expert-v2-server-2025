@@ -78,7 +78,8 @@ class OthersModel extends schema_1.default {
                 }
             })
                 .limit(query.limit ? parseInt(query.limit) : constants_1.DATA_LIMIT)
-                .offset(query.skip ? parseInt(query.skip) : 0);
+                .offset(query.skip ? parseInt(query.skip) : 0)
+                .orderBy('b.name', 'asc');
             let total = [];
             if (with_total) {
                 total = yield this.db('account_details AS ad')

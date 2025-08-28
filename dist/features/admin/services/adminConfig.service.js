@@ -18,6 +18,9 @@ const constants_1 = require("../../../utils/miscellaneous/constants");
 const holidayConstants_1 = require("../../../utils/miscellaneous/holidayConstants");
 const database_1 = require("../../../app/database");
 class AdminConfigService extends abstract_service_1.default {
+    constructor() {
+        super();
+    }
     checkSlug(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
@@ -356,16 +359,19 @@ class AdminConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const CommonModel = this.Model.CommonModel(trx);
-                const { filter, status } = req.query;
-                const banks = yield CommonModel.getBanks({
+                const { filter, status, limit, skip } = req.query;
+                const { data, total } = yield CommonModel.getBanks({
                     name: filter,
                     status: status,
-                });
+                    limit,
+                    skip,
+                }, true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: banks,
+                    data,
+                    total,
                 };
             }));
         });
@@ -431,16 +437,19 @@ class AdminConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const CommonModel = this.Model.CommonModel(trx);
-                const { filter, status } = req.query;
-                const socialMedia = yield CommonModel.getSocialMedia({
+                const { filter, status, limit, skip } = req.query;
+                const { data, total } = yield CommonModel.getSocialMedia({
                     name: filter,
                     status: status,
-                });
+                    limit,
+                    skip,
+                }, true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: socialMedia,
+                    data,
+                    total,
                 };
             }));
         });

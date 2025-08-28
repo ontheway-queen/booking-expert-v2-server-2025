@@ -122,13 +122,16 @@ export default class PublicCommonService extends AbstractServices {
 
       const { filter } = req.query as { filter: string };
 
-      const banks = await CommonModel.getBanks({ name: filter, status: true });
+      const { data } = await CommonModel.getBanks({
+        name: filter,
+        status: true,
+      });
 
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
-        data: banks,
+        data,
       };
     });
   }
@@ -139,7 +142,7 @@ export default class PublicCommonService extends AbstractServices {
 
       const { filter } = req.query as { filter: string };
 
-      const banks = await CommonModel.getSocialMedia({
+      const { data } = await CommonModel.getSocialMedia({
         name: filter,
         status: true,
       });
@@ -148,7 +151,7 @@ export default class PublicCommonService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
-        data: banks,
+        data,
       };
     });
   }

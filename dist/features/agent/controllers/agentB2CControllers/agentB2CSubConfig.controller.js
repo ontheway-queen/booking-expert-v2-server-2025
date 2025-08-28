@@ -39,7 +39,7 @@ class AgentB2CSubConfigController extends abstract_controller_1.default {
             const _a = yield this.service.upsertB2CMarkup(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
-        this.getAccounts = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.getAccounts = this.asyncWrapper.wrap({ querySchema: this.validator.getAccounts }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.getAccounts(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));

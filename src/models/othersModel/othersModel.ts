@@ -120,7 +120,8 @@ export default class OthersModel extends Schema {
         }
       })
       .limit(query.limit ? parseInt(query.limit) : DATA_LIMIT)
-      .offset(query.skip ? parseInt(query.skip) : 0);
+      .offset(query.skip ? parseInt(query.skip) : 0)
+      .orderBy('b.name', 'asc');
 
     let total: any[] = [];
 

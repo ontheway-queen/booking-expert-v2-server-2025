@@ -18,11 +18,13 @@ import {
   IUpdateBankPayload,
   IUpdateSocialMediaPayload,
 } from '../../../utils/modelTypes/commonModelTypes/commonModelTypes';
-import App from '../../../app/app';
-import app from '../../../server';
 import { setUpCorsOrigin } from '../../../app/database';
 
 export class AdminConfigService extends AbstractServices {
+  constructor() {
+    super();
+  }
+
   public async checkSlug(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { slug, type } = req.query as unknown as ICheckSlug;
@@ -401,21 +403,29 @@ export class AdminConfigService extends AbstractServices {
     return this.db.transaction(async (trx) => {
       const CommonModel = this.Model.CommonModel(trx);
 
-      const { filter, status } = req.query as {
+      const { filter, status, limit, skip } = req.query as {
         filter?: string;
-        status?: 'true' | 'false';
+        status?: boolean;
+        limit?: string;
+        skip?: string;
       };
 
-      const banks = await CommonModel.getBanks({
-        name: filter,
-        status: status,
-      });
+      const { data, total } = await CommonModel.getBanks(
+        {
+          name: filter,
+          status: status,
+          limit,
+          skip,
+        },
+        true
+      );
 
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
-        data: banks,
+        data,
+        total,
       };
     });
   }
@@ -503,21 +513,29 @@ export class AdminConfigService extends AbstractServices {
     return this.db.transaction(async (trx) => {
       const CommonModel = this.Model.CommonModel(trx);
 
-      const { filter, status } = req.query as {
+      const { filter, status, limit, skip } = req.query as {
         filter?: string;
-        status?: 'true' | 'false';
+        status?: boolean;
+        limit?: string;
+        skip?: string;
       };
 
-      const socialMedia = await CommonModel.getSocialMedia({
-        name: filter,
-        status: status,
-      });
+      const { data, total } = await CommonModel.getSocialMedia(
+        {
+          name: filter,
+          status: status,
+          limit,
+          skip,
+        },
+        true
+      );
 
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
-        data: socialMedia,
+        data,
+        total,
       };
     });
   }
