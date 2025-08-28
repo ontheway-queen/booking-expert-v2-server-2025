@@ -635,7 +635,7 @@ const heroBG = (agency_id) => {
         },
         {
             agency_id,
-            content: 'agent/b2c/hero-bg/hero-holiday.jpg',
+            content: 'agent/b2c/hero-bg/hero-visa.jpg',
             order_number: 4,
             type: 'PHOTO',
             quote: 'Visa Services Available for These Countries',

@@ -9,13 +9,10 @@ import {
   TYPE_FLIGHT,
 } from '../../../../utils/miscellaneous/constants';
 import {
-  FLIGHT_BOOKING_CANCELLED,
   FLIGHT_BOOKING_CONFIRMED,
-  FLIGHT_BOOKING_EXPIRED,
   FLIGHT_BOOKING_IN_PROCESS,
   FLIGHT_BOOKING_ON_HOLD,
   FLIGHT_BOOKING_PENDING,
-  FLIGHT_BOOKING_REFUNDED,
   FLIGHT_TICKET_IN_PROCESS,
   FLIGHT_TICKET_ISSUE,
   PAYMENT_TYPE_FULL,
@@ -202,7 +199,8 @@ export class AdminAgentFlightService extends AbstractServices {
         }
       } else if (booking_data.api === VERTEIL_API) {
         const bookingSegmentModel = this.Model.FlightBookingSegmentModel(trx);
-        const segmentDetails = await bookingSegmentModel.getFlightBookingSegment(Number(id));
+        const segmentDetails =
+          await bookingSegmentModel.getFlightBookingSegment(Number(id));
         const verteilSubService = new VerteilFlightService(trx);
         const res = await verteilSubService.OrderCancelService({
           airlineCode: segmentDetails[0].airline_code,
@@ -338,12 +336,15 @@ export class AdminAgentFlightService extends AbstractServices {
             unique_traveler,
           });
           if (res?.success) {
-            status = res.data?.length ? FLIGHT_TICKET_ISSUE : FLIGHT_BOOKING_ON_HOLD;
+            status = res.data?.length
+              ? FLIGHT_TICKET_ISSUE
+              : FLIGHT_BOOKING_ON_HOLD;
             ticket_number = res.data;
           }
         } else if (booking_data.api === VERTEIL_API) {
           const bookingSegmentModel = this.Model.FlightBookingSegmentModel(trx);
-          const segmentDetails = await bookingSegmentModel.getFlightBookingSegment(Number(id));
+          const segmentDetails =
+            await bookingSegmentModel.getFlightBookingSegment(Number(id));
           const verteilSubService = new VerteilFlightService(trx);
           const res = await verteilSubService.TicketIssueService({
             airlineCode: segmentDetails[0].airline_code,
@@ -355,7 +356,9 @@ export class AdminAgentFlightService extends AbstractServices {
           });
 
           if (res?.success) {
-            status = res.data?.length ? FLIGHT_TICKET_ISSUE : FLIGHT_BOOKING_ON_HOLD;
+            status = res.data?.length
+              ? FLIGHT_TICKET_ISSUE
+              : FLIGHT_BOOKING_ON_HOLD;
             if (res?.data?.length) ticket_number = res.data;
           }
         }
@@ -393,7 +396,7 @@ export class AdminAgentFlightService extends AbstractServices {
           issue_block: ticketIssuePermission.issue_block,
           api: booking_data.api,
           ticket_number,
-          travelers_info: get_travelers
+          travelers_info: get_travelers,
         });
 
         //send email

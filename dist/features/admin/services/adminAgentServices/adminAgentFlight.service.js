@@ -268,7 +268,9 @@ class AdminAgentFlightService extends abstract_service_1.default {
                             unique_traveler,
                         });
                         if (res === null || res === void 0 ? void 0 : res.success) {
-                            status = ((_a = res.data) === null || _a === void 0 ? void 0 : _a.length) ? flightConstant_1.FLIGHT_TICKET_ISSUE : flightConstant_1.FLIGHT_BOOKING_ON_HOLD;
+                            status = ((_a = res.data) === null || _a === void 0 ? void 0 : _a.length)
+                                ? flightConstant_1.FLIGHT_TICKET_ISSUE
+                                : flightConstant_1.FLIGHT_BOOKING_ON_HOLD;
                             ticket_number = res.data;
                         }
                     }
@@ -285,7 +287,9 @@ class AdminAgentFlightService extends abstract_service_1.default {
                             pnr: String(booking_data.airline_pnr),
                         });
                         if (res === null || res === void 0 ? void 0 : res.success) {
-                            status = ((_b = res.data) === null || _b === void 0 ? void 0 : _b.length) ? flightConstant_1.FLIGHT_TICKET_ISSUE : flightConstant_1.FLIGHT_BOOKING_ON_HOLD;
+                            status = ((_b = res.data) === null || _b === void 0 ? void 0 : _b.length)
+                                ? flightConstant_1.FLIGHT_TICKET_ISSUE
+                                : flightConstant_1.FLIGHT_BOOKING_ON_HOLD;
                             if ((_c = res === null || res === void 0 ? void 0 : res.data) === null || _c === void 0 ? void 0 : _c.length)
                                 ticket_number = res.data;
                         }
@@ -320,7 +324,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         issue_block: ticketIssuePermission.issue_block,
                         api: booking_data.api,
                         ticket_number,
-                        travelers_info: get_travelers
+                        travelers_info: get_travelers,
                     });
                     //send email
                     yield bookingSubService.sendTicketIssueMail({
