@@ -16,15 +16,20 @@ import {
   IFormattedArrival,
   IFormattedCarrier,
   IFormattedDeparture,
+  IFormattedFare,
   IFormattedFlight,
   IFormattedFlightItinerary,
   IFormattedFlightOption,
 } from '../../supportTypes/flightTypes/commonFlightTypes';
 import {
   IFormattedTicketIssueRes,
+  IVerteilAirlineOffer,
+  IVerteilDataLists,
   IVerteilFlightPriceRQ,
+  IVerteilFlightPriceRS,
   IVerteilFlightSearchRQ,
   IVerteilFlightSearchRS,
+  IVerteilMetaData,
   IVerteilOrderCancelRQ,
   IVerteilOrderChangeRQ,
   IVerteilOrderCreateRQ,
@@ -42,6 +47,7 @@ import { IGetAirlinesPreferenceQuery } from '../../modelTypes/dynamicFareRulesMo
 import VerteilAPIEndpoints from '../../miscellaneous/endpoints/verteilApiEndpoints';
 import { IFlightBookingPassengerReqBody } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
 import { VerteilFlightUtils } from '../../lib/flight/verteilFlightUtils';
+import { IGetFlightBookingTravelerData } from '../../modelTypes/flightModelTypes/flightBookingTravelerModelTypes';
 
 export default class VerteilFlightService extends AbstractServices {
   private request = new VerteilRequests();
@@ -117,8 +123,8 @@ export default class VerteilFlightService extends AbstractServices {
             item.Code === 'ADT'
               ? { AnonymousTraveler: [{ PTC: { value: 'ADT' } }] }
               : item.Code === 'INF'
-              ? { AnonymousTraveler: [{ PTC: { value: 'INF' } }] }
-              : {
+                ? { AnonymousTraveler: [{ PTC: { value: 'INF' } }] }
+                : {
                   AnonymousTraveler: [
                     { PTC: { value: 'CHD' }, Age: { Value: { value: 11 } } },
                   ],
@@ -154,16 +160,25 @@ export default class VerteilFlightService extends AbstractServices {
     reqBody,
     search_id,
     dynamic_fare_supplier_id,
+    markup_amount,
+    with_vendor_fare,
+    with_modified_fare,
   }: {
     reqBody: IFlightSearchReqBody;
     booking_block: boolean;
     search_id: string;
     dynamic_fare_supplier_id: number;
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
+    with_vendor_fare?: boolean;
+    with_modified_fare?: boolean;
   }) {
     const route_type = this.flightSupport.routeTypeFinder({
       originDest: reqBody.OriginDestinationInformation,
     });
-
     const AirlinesPrefModel = this.Model.AirlinesPreferenceModel(this.trx);
 
     const prefAirlinesQuery: IGetAirlinesPreferenceQuery = {
@@ -211,7 +226,6 @@ export default class VerteilFlightService extends AbstractServices {
         finalAirlineCodes = PreferredAirlines;
       }
     }
-
     // Convert to comma-separated string
     const airlineCodesCsv = finalAirlineCodes.join(',');
     //deal code
@@ -252,13 +266,15 @@ export default class VerteilFlightService extends AbstractServices {
     if (!hasAtLeastOneOffer) {
       return [];
     }
-
     const result = await this.FlightSearchResFormatter({
       data: AirShoppingRS,
       reqBody: reqBody,
       booking_block,
       dynamic_fare_supplier_id,
       route_type,
+      markup_amount,
+      with_vendor_fare,
+      with_modified_fare,
     });
 
     {
@@ -282,20 +298,31 @@ export default class VerteilFlightService extends AbstractServices {
     data,
     reqBody,
     route_type,
+    markup_amount,
+    with_vendor_fare,
+    with_modified_fare,
   }: {
     data: IVerteilFlightSearchRS;
     reqBody: IFlightSearchReqBody;
     dynamic_fare_supplier_id: number;
     booking_block: boolean;
     route_type: 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' | 'SOTO';
+    with_vendor_fare?: boolean;
+    with_modified_fare?: boolean;
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
   }): Promise<IFormattedFlightItinerary[]> {
     const commonModel = this.Model.CommonModel(this.trx);
     const AirlinesPreferenceModel = this.Model.AirlinesPreferenceModel(
       this.trx
     );
-    const api_currency = await this.Model.CurrencyModel(
-      this.trx
-    ).getApiWiseCurrencyByName(VERTEIL_API, 'FLIGHT');
+    // const api_currency = await this.Model.CurrencyModel(
+    //   this.trx
+    // ).getApiWiseCurrencyByName(VERTEIL_API, 'FLIGHT');
+    const api_currency = 1;
 
     // convert any Child aged value to CHD
     reqBody.PassengerTypeQuantity.forEach((PTQ) => {
@@ -363,7 +390,7 @@ export default class VerteilFlightService extends AbstractServices {
                   );
                 if (!FlightSegment)
                   throw new Error(
-                    `Fatal: Verteil API FlightSegment with key "${segRef.ref}" not found.`
+                    `Fatal: FlightSegment with key "${segRef.ref}" not found.`
                   );
 
                 const dAirport = await commonModel.getAirportByCode(
@@ -374,7 +401,7 @@ export default class VerteilFlightService extends AbstractServices {
                 );
 
                 const marketing_airline = await commonModel.getAirlines(
-                  FlightSegment.MarketingCarrier.AirlineID.value
+                  { code: FlightSegment.MarketingCarrier.AirlineID.value }, false
                 );
                 const operating_airline = await commonModel.getAirlineByCode(
                   FlightSegment.OperatingCarrier?.AirlineID?.value || ''
@@ -392,43 +419,29 @@ export default class VerteilFlightService extends AbstractServices {
                   terminal: FlightSegment.Departure.Terminal?.Name || '',
                   time:
                     FlightSegment.Departure.Time +
-                    ':00' +
-                    `${
-                      dAirport.time_zone
-                        ? DateTime.now()
-                            .setZone(dAirport.time_zone)
-                            .toFormat('ZZ')
-                        : ''
-                    }`, // HH:MM -> HH:MM:00
+                    ':00', // HH:MM -> HH:MM:00
                   date: FlightSegment.Departure.Date.slice(0, 10), // YYYY-MM-DDT00-00-00.000 -> YYYY-MM-DD
                 };
 
                 const arrival: IFormattedArrival = {
                   date_adjustment: FlightSegment.Arrival.ChangeOfDay,
                   airport_code: FlightSegment.Arrival.AirportCode.value,
-                  airport: aAirport.airport_name,
-                  city: aAirport.city_name,
-                  city_code: aAirport.city_code,
-                  country: aAirport.country,
+                  airport: aAirport?.name || "Unknown",
+                  city: aAirport?.city_name || "Unknown",
+                  city_code: aAirport?.city_code || "Unknown",
+                  country: aAirport?.country || "Unknown",
                   terminal: FlightSegment.Arrival.Terminal?.Name || '',
                   time:
                     FlightSegment.Arrival.Time +
-                    ':00' +
-                    `${
-                      aAirport.time_zone
-                        ? DateTime.now()
-                            .setZone(aAirport.time_zone)
-                            .toFormat('ZZ')
-                        : ''
-                    }`, // HH:MM -> HH:MM:00
+                    ':00', // HH:MM -> HH:MM:00
                   date: FlightSegment.Arrival.Date.slice(0, 10), // YYYY-MM-DDT00-00-00.000 -> YYYY-MM-DD
                 };
 
                 const carrier: IFormattedCarrier = {
                   carrier_marketing_code:
                     FlightSegment.MarketingCarrier.AirlineID.value,
-                  carrier_marketing_airline: marketing_airline.name,
-                  carrier_marketing_logo: marketing_airline.logo,
+                  carrier_marketing_airline: marketing_airline.data?.[0]?.name,
+                  carrier_marketing_logo: marketing_airline.data?.[0]?.logo,
                   carrier_marketing_flight_number:
                     FlightSegment.MarketingCarrier.FlightNumber.value,
                   carrier_operating_code:
@@ -489,7 +502,7 @@ export default class VerteilFlightService extends AbstractServices {
 
             if (!FLightInfo)
               throw new Error(
-                `Fatal: Verteil API FLightInfo with key "${Association.ApplicableFlight.FlightReferences.value[0]}" not found.`
+                `Fatal: FLightInfo with key "${Association.ApplicableFlight.FlightReferences.value[0]}" not found.`
               );
 
             let flightElapsedTime: number | undefined = undefined;
@@ -508,9 +521,7 @@ export default class VerteilFlightService extends AbstractServices {
               id: FLightInfo?.FlightKey,
               elapsed_time: flightElapsedTime,
               stoppage: FormattedFlightOptions.length - 1,
-              // price_class_code: PriceClassInfo?.Code,
-              // price_class_name: PriceClassInfo?.Name,
-              layover_time: new FlightUtils().getNewLayoverTime(
+              layover_time: new FlightUtils().getLayoverTime(
                 FormattedFlightOptions
               ),
               options: FormattedFlightOptions,
@@ -533,7 +544,7 @@ export default class VerteilFlightService extends AbstractServices {
 
             if (!OriginDestination)
               throw new Error(
-                `Fatal: Verteil API OriginDestination with key "${originDestRef}" not found.`
+                `Fatal: OriginDestination with key "${originDestRef}" not found.`
               );
 
             const from_airport = OriginDestination.DepartureCode.value;
@@ -559,7 +570,7 @@ export default class VerteilFlightService extends AbstractServices {
 
                     if (!TravelerInfo)
                       throw new Error(
-                        `Fatal: Verteil API TravelerInfo with key "${travelerRef}" not found.`
+                        `Fatal: TravelerInfo with key "${travelerRef}" not found.`
                       );
 
                     let baggage_count: number | null = null;
@@ -626,23 +637,24 @@ export default class VerteilFlightService extends AbstractServices {
                     }
 
                     const FormattedPassenger: IFlightDataAvailabilityPassenger =
-                      {
-                        type: TravelerInfo.PTC.value,
-                        count:
-                          reqBody.PassengerTypeQuantity.find(
-                            (PTQ) => PTQ.Code === TravelerInfo.PTC.value
-                          )?.Quantity || 0,
-                        cabin_code:
-                          Segment.ClassOfService.MarketingName.CabinDesignator,
-                        cabin_type: Segment.ClassOfService.MarketingName.value,
-                        booking_code: Segment.ClassOfService.Code?.value,
-                        available_seat: Segment.ClassOfService.Code?.SeatsLeft,
-                        meal_code: undefined,
-                        meal_type: undefined,
-                        available_break: undefined,
-                        available_fare_break: undefined,
-                        baggage_info: `${baggage_count} ${baggage_unit}`,
-                      };
+                    {
+                      type: TravelerInfo.PTC.value,
+                      count:
+                        reqBody.PassengerTypeQuantity.find(
+                          (PTQ) => PTQ.Code === TravelerInfo.PTC.value
+                        )?.Quantity || 0,
+                      cabin_code:
+                        Segment.ClassOfService.MarketingName.CabinDesignator,
+                      cabin_type: Segment.ClassOfService.MarketingName.value,
+                      booking_code: Segment.ClassOfService.Code?.value,
+                      available_seat: Segment.ClassOfService.Code?.SeatsLeft,
+                      meal_code: undefined,
+                      meal_type: undefined,
+                      available_break: undefined,
+                      available_fare_break: undefined,
+                      baggage_count: String(baggage_count),
+                      baggage_unit
+                    };
 
                     return FormattedPassenger;
                   }
@@ -693,7 +705,7 @@ export default class VerteilFlightService extends AbstractServices {
 
             if (!TravelerInfo)
               throw new Error(
-                `Fatal: Verteil API TravelerInfo with key "${travelerRef}" not found.`
+                `Fatal: TravelerInfo with key "${travelerRef}" not found.`
               );
 
             const paxCount = reqBody.PassengerTypeQuantity.filter(
@@ -749,21 +761,27 @@ export default class VerteilFlightService extends AbstractServices {
           ((Number(totalBaseFare) + Number(totalTax)) / 100) * 0.3
         );
 
-        const new_fare = {
+        const new_fare: IFormattedFare = {
           base_fare: totalBaseFare,
           total_tax: totalTax,
           ait: ait,
           discount: totalDiscount,
           payable: 0,
-          vendor_price: {
+
+        };
+
+        if (with_vendor_fare) {
+          new_fare.vendor_price = {
             base_fare: totalBaseFare,
             tax: totalTax,
+            ait: 0,
             charge: totalConFee,
             discount: totalDiscount,
             gross_fare: total_amount + totalDiscount,
             net_fare: total_amount,
-          },
-        };
+          }
+        }
+
         let total_segments = 0;
         FormattedFlights.map((elm) => {
           elm.options.map((elm2) => {
@@ -772,17 +790,18 @@ export default class VerteilFlightService extends AbstractServices {
         });
 
         //calculate tax fare
-        let { tax_markup, tax_commission } =
+        let { tax_markup, tax_commission, agent_tax_discount, agent_tax_markup } =
           await this.flightSupport.calculateFlightTaxMarkup({
             dynamic_fare_supplier_id,
             tax: tax_fare,
             route_type,
             airline: airlineCode,
+            markup_amount
           });
         tax_commission = tax_commission * api_currency;
         tax_markup = tax_markup * api_currency;
 
-        const { markup, commission, pax_markup } =
+        let { markup, commission, pax_markup, agent_discount, agent_markup } =
           await this.flightSupport.calculateFlightMarkup({
             dynamic_fare_supplier_id,
             airline: airlineCode,
@@ -790,17 +809,19 @@ export default class VerteilFlightService extends AbstractServices {
               reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
                 .Cabin
             ),
-            base_fare: new_fare.base_fare,
+            base_fare: Number(new_fare.base_fare),
             total_segments,
             route_type,
+            markup_amount
           });
+
+        agent_discount += agent_tax_discount;
+        agent_markup += agent_tax_markup;
 
         const total_pax_markup = pax_count * pax_markup;
 
-        new_fare.base_fare += markup + total_pax_markup;
-        new_fare.base_fare += tax_markup;
-        new_fare.discount += commission;
-        new_fare.discount += tax_commission;
+        new_fare.base_fare = Number(new_fare.base_fare) + markup + agent_markup + total_pax_markup + tax_markup;
+        new_fare.discount = Number(new_fare.discount) + commission + agent_discount + tax_commission;
         new_fare.payable = Number(
           (
             Number(new_fare.base_fare) +
@@ -812,21 +833,21 @@ export default class VerteilFlightService extends AbstractServices {
 
         const newFormattedPax = FormattedPassengers.map((newPax) => {
           const per_pax_markup =
-            ((markup + tax_markup) / pax_count) * newPax.number +
+            ((markup + agent_markup + tax_markup) / pax_count) * newPax.number +
             pax_markup * newPax.number;
           return {
             type: newPax.type,
             number: newPax.number,
-            fare: {
-              base_fare: newPax.fare.base_fare + per_pax_markup,
-              tax: newPax.fare.tax,
-              total_fare: newPax.fare.total_fare + per_pax_markup,
+            per_pax_fare: {
+              base_fare: String(newPax.fare.base_fare + per_pax_markup),
+              tax: String(newPax.fare.tax),
+              total_fare: String(newPax.fare.total_fare + per_pax_markup),
               ait:
-                Number(Number(newPax.fare.base_fare) + newPax.fare.tax) * 0.003,
-              discount: Number(
+                String(Number(Number(newPax.fare.base_fare) + newPax.fare.tax) * 0.003),
+              discount: String(Number(
                 Number(newPax.fare.base_fare) *
-                  (commission / Number(totalBaseFare))
-              ),
+                ((commission + agent_discount) / Number(totalBaseFare))
+              )),
             },
           };
         });
@@ -953,14 +974,23 @@ export default class VerteilFlightService extends AbstractServices {
           flights: FormattedFlights,
           passengers: newFormattedPax,
           availability: FormattedAvailability,
+          modifiedFare: with_modified_fare
+            ? {
+              agent_discount,
+              agent_markup,
+              commission,
+              markup,
+              pax_markup,
+            }
+            : undefined,
           // dynamic_fare_rules: fare_rules,
         };
 
         FormattedResponseList.push(FormattedResponse);
       } catch (error: any) {
         console.warn(
-          'An error occurred while formatting a Verteil Offer. This offer will be omitted from final response. ErrorMessage: ' +
-            error.message
+          'An error occurred while formatting an Offer. This offer will be omitted from final response. ErrorMessage: ' +
+          error.message
         );
         continue;
       }
@@ -974,9 +1004,9 @@ export default class VerteilFlightService extends AbstractServices {
     DataLists,
     MetaData,
   }: {
-    Offer: IAirlineOffer;
-    DataLists: IDataLists;
-    MetaData: IMetaData;
+    Offer: IVerteilAirlineOffer;
+    DataLists: IVerteilDataLists;
+    MetaData: IVerteilMetaData;
   }) {
     const policyObject = Offer.PricedOffer.OfferPrice.map((OfferPrice) => {
       const paxRef =
@@ -1201,11 +1231,21 @@ export default class VerteilFlightService extends AbstractServices {
     reqBody,
     oldData,
     dynamic_fare_supplier_id,
+    markup_amount,
+    with_vendor_fare,
+    with_modified_fare,
   }: {
     search_id: string;
     reqBody: IFlightSearchReqBody;
     oldData: Readonly<IFormattedFlightItinerary>;
     dynamic_fare_supplier_id: number;
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
+    with_vendor_fare?: boolean;
+    with_modified_fare?: boolean;
   }) {
     let FlightPriceRQ: IVerteilFlightPriceRQ | null;
     FlightPriceRQ = await getRedis(
@@ -1249,6 +1289,9 @@ export default class VerteilFlightService extends AbstractServices {
       response: FlightPriceRS,
       dynamic_fare_supplier_id,
       route_type,
+      markup_amount,
+      with_vendor_fare: true,
+      with_modified_fare: true,
     });
 
     // Post Revalidate Works
@@ -1293,16 +1336,27 @@ export default class VerteilFlightService extends AbstractServices {
     dynamic_fare_supplier_id,
     response,
     route_type,
+    markup_amount,
+    with_vendor_fare,
+    with_modified_fare
   }: {
     reqBody: IFlightSearchReqBody;
     oldData: Readonly<IFormattedFlightItinerary>;
     dynamic_fare_supplier_id: number;
     response: IVerteilFlightPriceRS;
     route_type: 'FROM_DAC' | 'TO_DAC' | 'DOMESTIC' | 'SOTO';
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
+    with_vendor_fare?: boolean;
+    with_modified_fare?: boolean;
   }) {
-    const api_currency = await this.Model.CurrencyModel(
-      this.trx
-    ).getApiWiseCurrencyByName(VERTEIL_API, 'FLIGHT');
+    // const api_currency = await this.Model.CurrencyModel(
+    //   this.trx
+    // ).getApiWiseCurrencyByName(VERTEIL_API, 'FLIGHT');
+    const api_currency = 1;
 
     const newData = JSON.parse(
       JSON.stringify(oldData)
@@ -1327,7 +1381,7 @@ export default class VerteilFlightService extends AbstractServices {
 
           if (!OriginDestination)
             throw new Error(
-              `Fatal: Verteil API OriginDestination with key "${originDestRef}" not found.`
+              `Fatal: OriginDestination with key "${originDestRef}" not found.`
             );
 
           const from_airport = OriginDestination.DepartureCode.value;
@@ -1338,7 +1392,7 @@ export default class VerteilFlightService extends AbstractServices {
 
           if (!SegmentRefs)
             throw new Error(
-              `Fatal: Verteil API SegmentRefs Segment not found.`
+              `Fatal: SegmentRefs Segment not found.`
             );
 
           const FormattedSegments = SegmentRefs.map(
@@ -1358,7 +1412,7 @@ export default class VerteilFlightService extends AbstractServices {
 
                   if (!TravelerInfo)
                     throw new Error(
-                      `Fatal: Verteil API TravelerInfo with key "${travelerRef}" not found.`
+                      `Fatal: TravelerInfo with key "${travelerRef}" not found.`
                     );
 
                   let baggage_count: number | null = null;
@@ -1435,7 +1489,8 @@ export default class VerteilFlightService extends AbstractServices {
                     meal_type: undefined,
                     available_break: undefined,
                     available_fare_break: undefined,
-                    baggage_info: `${baggage_count} ${baggage_unit}`,
+                    baggage_count: String(baggage_count),
+                    baggage_unit
                   };
 
                   return FormattedPassenger;
@@ -1492,7 +1547,7 @@ export default class VerteilFlightService extends AbstractServices {
 
           if (!TravelerInfo)
             throw new Error(
-              `Fatal: Verteil API TravelerInfo with key "${travelerRef}" not found.`
+              `Fatal: TravelerInfo with key "${travelerRef}" not found.`
             );
 
           const paxCount =
@@ -1546,6 +1601,7 @@ export default class VerteilFlightService extends AbstractServices {
       const vendor_price = {
         base_fare: totalBaseFare,
         tax: totalTax,
+        ait: 0,
         charge: totalConFee,
         discount: totalDiscount,
         gross_fare: total_amount + totalDiscount,
@@ -1556,15 +1612,16 @@ export default class VerteilFlightService extends AbstractServices {
         ((Number(totalBaseFare) + Number(totalTax)) / 100) * 0.3
       );
 
-      const new_fare = {
+      const new_fare: IFormattedFare = {
         base_fare: totalBaseFare,
         total_tax: totalTax,
         ait,
         discount: totalDiscount,
-        payable: totalBaseFare + totalTax + ait - totalDiscount,
-        vendor_price: vendor_price,
-        tax_fare,
+        payable: totalBaseFare + totalTax + ait - totalDiscount
       };
+      if (with_vendor_fare) {
+        new_fare.vendor_price = vendor_price;
+      }
 
       let total_segments = 0;
       newData.flights.map((elm) => {
@@ -1573,38 +1630,40 @@ export default class VerteilFlightService extends AbstractServices {
         });
       });
 
-      new_fare.tax_fare = tax_fare;
 
       //calculate tax fare
-      let { tax_markup, tax_commission } =
+      let { tax_markup, tax_commission, agent_tax_discount, agent_tax_markup } =
         await this.flightSupport.calculateFlightTaxMarkup({
           dynamic_fare_supplier_id,
           tax: tax_fare,
           route_type,
           airline: newData.carrier_code,
+          markup_amount
         });
       tax_commission = tax_commission * api_currency;
       tax_markup = tax_markup * api_currency;
 
-      const { markup, commission, pax_markup } = await new CommonFlightSupport(
+      let { markup, commission, pax_markup, agent_discount, agent_markup } = await new CommonFlightSupportService(
         this.trx
       ).calculateFlightMarkup({
         dynamic_fare_supplier_id,
         airline: newData.carrier_code,
-        flight_class: new CommonFlightUtils().getClassFromId(
+        flight_class: new FlightUtils().getClassFromId(
           reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref.Cabin
         ),
-        base_fare: new_fare.base_fare,
+        base_fare: Number(new_fare.base_fare),
         total_segments,
         route_type,
+        markup_amount
       });
+
+      agent_discount += agent_tax_discount;
+      agent_markup += agent_tax_markup;
 
       const total_pax_markup = pax_count * pax_markup;
 
-      new_fare.base_fare += markup + total_pax_markup;
-      new_fare.base_fare += tax_markup;
-      new_fare.discount += commission;
-      new_fare.discount += tax_commission;
+      new_fare.base_fare = Number(new_fare.base_fare) + markup + agent_markup + total_pax_markup + tax_markup;
+      new_fare.discount = Number(new_fare.discount) + agent_discount + commission + tax_commission;
 
       new_fare.payable = Number(
         (
@@ -1618,28 +1677,38 @@ export default class VerteilFlightService extends AbstractServices {
 
       newData.passengers = FormattedPassengers.map((newPax) => {
         const per_pax_markup =
-          ((markup + tax_markup) / pax_count) * newPax.number +
+          ((markup + agent_markup + tax_markup) / pax_count) * newPax.number +
           pax_markup * newPax.number;
         return {
           type: newPax.type,
           number: newPax.number,
-          fare: {
-            base_fare: Number(
+          per_pax_fare: {
+            base_fare: String(Number(
               (newPax.fare.base_fare + per_pax_markup).toFixed(2)
-            ),
-            tax: newPax.fare.tax,
-            total_fare: Number(
+            )),
+            tax: String(newPax.fare.tax),
+            total_fare: String(Number(
               (newPax.fare.total_fare + per_pax_markup).toFixed(2)
-            ),
+            )),
             ait:
-              Number(Number(newPax.fare.base_fare) + newPax.fare.tax) * 0.003,
-            discount: Number(
+              String(Number(Number(newPax.fare.base_fare) + newPax.fare.tax) * 0.003),
+            discount: String(Number(
               Number(newPax.fare.base_fare) *
-                (commission / Number(totalBaseFare))
-            ),
+              ((commission + agent_discount) / Number(totalBaseFare))
+            )),
           },
         };
       });
+
+      newData.modifiedFare = with_modified_fare
+        ? {
+          agent_discount,
+          agent_markup,
+          commission,
+          markup,
+          pax_markup,
+        }
+        : undefined;
     }
 
     //=== Last Time Check ==//
@@ -1747,243 +1816,9 @@ export default class VerteilFlightService extends AbstractServices {
     }
 
     newData.partial_payment = partial_payment;
-    // console.log({old: oldData.fare.payable});
     newData.price_changed = !(oldData.fare.payable === newData.fare.payable);
 
-    // Policies
-    {
-      const policyObject = PricedFlightOffer[0].OfferPrice.map((OfferPrice) => {
-        const paxRef =
-          OfferPrice.RequestedDate.Associations[0].AssociatedTraveler
-            .TravelerReferences[0];
-        const PaxTypeCode =
-          DataLists.AnonymousTravelerList?.AnonymousTraveler.find(
-            (AT) => AT.ObjectKey === paxRef
-          )?.PTC.value;
 
-        const OD = OfferPrice.RequestedDate.Associations.map((Association) => {
-          let route = '';
-          const ODRef =
-            Association.ApplicableFlight.OriginDestinationReferences?.[0];
-
-          const ODInfo = DataLists.OriginDestinationList.OriginDestination.find(
-            (od) => od.OriginDestinationKey === ODRef
-          );
-
-          if (ODInfo)
-            route = ODInfo.DepartureCode.value + '-' + ODInfo.ArrivalCode.value;
-
-          const ODSegmentsRef =
-            Association.ApplicableFlight.FlightSegmentReference?.map(
-              (Seg) => Seg.ref
-            )?.filter((item) => item !== undefined) || [];
-
-          const ODPenaltyRefs = OfferPrice.FareDetail?.FareComponent?.filter(
-            (FC) => FC.refs.some((ref) => ODSegmentsRef.includes(ref))
-            // (FC) => ODSegmentsRef.includes(FC.refs[0])
-          )
-            .map((FC) => FC.FareRules?.Penalty.refs)
-            ?.filter((value) => value !== undefined)
-            .flat(2);
-
-          const ODPenalties =
-            DataLists.PenaltyList?.Penalty?.filter((P) =>
-              ODPenaltyRefs?.includes(P.ObjectKey)
-            ) || [];
-
-          const ChangeFeePenalties = ODPenalties?.filter(
-            (ODP) => ODP.ChangeFeeInd !== undefined
-          );
-
-          const CancelFeePenalties = ODPenalties?.filter(
-            (ODP) => ODP.CancelFeeInd !== undefined
-          );
-
-          let changeAllowed = true;
-          let noChangeFee = true;
-          let changeFeeCurrencyCode: string = '';
-          const changeFeeMinValueList: number[] = [];
-          const changeFeeMaxValueList: number[] = [];
-
-          let noCancelFee = true;
-          let cancelFeeCurrencyCode: string = '';
-          const cancelFeeMinValueList: number[] = [];
-          const cancelFeeMaxValueList: number[] = [];
-
-          ChangeFeePenalties.forEach((CFP) => {
-            if (CFP.ChangeAllowedInd !== true) changeAllowed = false;
-            if (CFP.ChangeFeeInd !== false) noChangeFee = false;
-            const ChangeDetails = CFP.Details.Detail?.filter(
-              (Detail) => Detail.Type === 'Change'
-            );
-            for (const detail of ChangeDetails) {
-              const Amounts = detail.Amounts?.Amount;
-              if (Amounts) {
-                for (const Amount of Amounts) {
-                  if (Amount.CurrencyAmountValue == undefined) continue;
-                  changeFeeCurrencyCode = Amount.CurrencyAmountValue.Code;
-                  const decimalKey =
-                    // PricedFlightOffer[0].OfferID.Owner +
-                    // "-" +
-                    changeFeeCurrencyCode;
-
-                  const decimal =
-                    response.Metadata?.Other?.OtherMetadata?.[0]?.CurrencyMetadatas?.CurrencyMetadata.find(
-                      (CM) => CM.MetadataKey === decimalKey
-                    )?.Decimals;
-
-                  if (Amount.AmountApplication === 'MIN')
-                    changeFeeMinValueList.push(
-                      this.applyDecimal(
-                        Amount.CurrencyAmountValue.value,
-                        decimal
-                      )
-                    );
-                  else if (Amount.AmountApplication === 'MAX')
-                    changeFeeMaxValueList.push(
-                      this.applyDecimal(
-                        Amount.CurrencyAmountValue.value,
-                        decimal
-                      )
-                    );
-                }
-              }
-            }
-          });
-
-          CancelFeePenalties.forEach((CFP) => {
-            if (CFP.CancelFeeInd !== false) noCancelFee = false;
-            const ChangeDetails = CFP.Details.Detail?.filter(
-              (Detail) => Detail.Type === 'Cancel'
-            );
-            for (const detail of ChangeDetails) {
-              const Amounts = detail.Amounts?.Amount;
-              if (Amounts) {
-                for (const Amount of Amounts) {
-                  if (Amount.CurrencyAmountValue == undefined) continue;
-                  cancelFeeCurrencyCode = Amount.CurrencyAmountValue.Code;
-                  const decimalKey =
-                    // PricedFlightOffer[0].OfferID.Owner +
-                    // "-" +
-                    cancelFeeCurrencyCode;
-
-                  const decimal =
-                    response.Metadata?.Other?.OtherMetadata?.[0]?.CurrencyMetadatas?.CurrencyMetadata.find(
-                      (CM) => CM.MetadataKey === decimalKey
-                    )?.Decimals;
-
-                  if (Amount.AmountApplication === 'MIN')
-                    cancelFeeMinValueList.push(
-                      this.applyDecimal(
-                        Amount.CurrencyAmountValue.value,
-                        decimal
-                      )
-                    );
-                  else if (Amount.AmountApplication === 'MAX')
-                    cancelFeeMaxValueList.push(
-                      this.applyDecimal(
-                        Amount.CurrencyAmountValue.value,
-                        decimal
-                      )
-                    );
-                }
-              }
-            }
-          });
-
-          const minimumChangePenalty = Math.min(...changeFeeMinValueList);
-          const maximumChangePenalty = Math.max(...changeFeeMaxValueList);
-
-          const minimumCancelPenalty = Math.min(...cancelFeeMinValueList);
-          const maximumCancelPenalty = Math.max(...cancelFeeMaxValueList);
-
-          return {
-            route,
-            changeAllowed,
-            noChangeFee,
-            noCancelFee,
-            changeFeeCurrencyCode,
-            minimumChangePenalty,
-            maximumChangePenalty,
-            cancelFeeCurrencyCode,
-            minimumCancelPenalty,
-            maximumCancelPenalty,
-          };
-        });
-
-        return {
-          PTC: PaxTypeCode,
-          OD,
-        };
-      });
-
-      const safeValue = (val: any) => {
-        if (val === null || val === undefined || !isFinite(val)) return '-';
-        return val;
-      };
-
-      let html = `
-    <style>
-      table.compact-table {
-        font-size: 12px;
-        border-collapse: collapse;
-        width: 100%;
-      }
-      table.compact-table th, table.compact-table td {
-        border: 1px solid #ccc;
-        padding: 4px 6px;
-        text-align: center;
-      }
-      table.compact-table th {
-        background-color: #f2f2f2;
-        white-space: nowrap;
-      }
-    </style>
-
-    <table class="compact-table">
-      <caption>Fare Rules (Change/Cancel Fees)</caption>
-      <thead>
-        <tr>
-          <th>PTC</th>
-          <th>Route</th>
-          <th title="Change Allowed Or Not?">Change Allowed</th>
-          <th title="Change Fee Currency">Change Cur</th>
-          <th title="Minimum Change Penalty">Min CP</th>
-          <th title="Maximum Change Penalty">Max CP</th>
-          <th title="Change Allowed Or Not?">Refund Allowed</th>
-          <th title="Cancel Fee Currency">Cancel Cur</th>
-          <th title="Minimum Cancel Penalty">Min XP</th>
-          <th title="Maximum Cancel Penalty">Max XP</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-      for (const ptc of policyObject) {
-        for (const od of ptc.OD) {
-          html += `
-        <tr>
-          <td>${ptc.PTC}</td>
-          <td>${od.route}</td>
-          <td>${od.changeAllowed ? 'Yes' : 'No'}</td>
-          <td>${od.changeFeeCurrencyCode || '-'}</td>
-          <td>${safeValue(od.minimumChangePenalty)}</td>
-          <td>${safeValue(od.maximumChangePenalty)}</td>
-          <td>${od.noCancelFee ? 'Full' : 'None/Partial'}</td>
-          <td>${od.cancelFeeCurrencyCode || '-'}</td>
-          <td>${safeValue(od.minimumCancelPenalty)}</td>
-          <td>${safeValue(od.maximumCancelPenalty)}</td>
-        </tr>
-      `;
-        }
-      }
-
-      html += `
-        </tbody>
-        </table>
-      `;
-      newData.fare_rules = Lib.minifyHTML(html);
-    }
 
     return newData;
   }
@@ -1996,15 +1831,15 @@ export default class VerteilFlightService extends AbstractServices {
     passengers,
     countries,
   }: // primeFlow,
-  {
-    OrderCreateRQ: IVerteilOrderCreateRQ;
-    passengers: Array<IFlightBookingPassengerReqBody>;
-    countries: Array<{ id: number; iso: string }>;
-    // primeFlow?: {
-    //   Amount: { Code: string; value: number };
-    //   Method: { Cash: { CashInd: boolean } };
-    // };
-  }): IVerteilOrderCreateRQ {
+    {
+      OrderCreateRQ: IVerteilOrderCreateRQ;
+      passengers: Array<IFlightBookingPassengerReqBody>;
+      countries: Array<{ id: number; iso: string }>;
+      // primeFlow?: {
+      //   Amount: { Code: string; value: number };
+      //   Method: { Cash: { CashInd: boolean } };
+      // };
+    }): IVerteilOrderCreateRQ {
     let infAssociationAdtIndex = 0;
     const priority: Record<string, number> = { ADT: 1, CHD: 2, INF: 3 };
 
@@ -2136,28 +1971,6 @@ export default class VerteilFlightService extends AbstractServices {
     // @ts-ignore
     OrderCreateRQ.Query.Passengers.Passenger = completedPax;
 
-    // Append Payment Method for instant purchase
-    // if (primeFlow !== undefined) {
-    //   OrderCreateRQ.Query.Payments = {
-    //     Payment: [
-    //       {
-    //         Amount: primeFlow.Amount,
-    //         Method: primeFlow.Method,
-    //       },
-    //     ],
-    //   };
-    // }
-    // {
-    //   OrderCreateRQ.Query.Payments = {
-    //     Payment: [
-    //       {
-    //         Amount: { Code: "INR", value: 259614 },
-    //         Method: { Cash: { CashInd: true } },
-    //       },
-    //     ],
-    //   };
-    // }
-
     return OrderCreateRQ;
   }
 
@@ -2226,8 +2039,8 @@ export default class VerteilFlightService extends AbstractServices {
 
     let paymentTimeLimit = Order?.TimeLimits
       ? new Date(Order.TimeLimits.PaymentTimeLimit.DateTime)
-          .toLocaleString('sv-SE', { hour12: false })
-          .replace('T', ' ')
+        .toLocaleString('sv-SE', { hour12: false })
+        .replace('T', ' ')
       : '';
 
     if (paymentTimeLimit === '' && Order?.OrderItems?.OrderItem[0].TimeLimits) {
@@ -2303,9 +2116,9 @@ export default class VerteilFlightService extends AbstractServices {
       if (OrderRetrieveRS.Errors)
         throw new Error(
           'No information has been found' +
-            OrderRetrieveRS?.Errors?.Error.map(
-              (Er: { value: string }) => Er.value + ' '
-            )
+          OrderRetrieveRS?.Errors?.Error.map(
+            (Er: { value: string }) => Er.value + ' '
+          )
         );
 
       if (OrderRetrieveRS.Response === undefined)
@@ -2316,8 +2129,8 @@ export default class VerteilFlightService extends AbstractServices {
 
       let paymentTimeLimit = Order?.TimeLimits
         ? new Date(Order.TimeLimits.PaymentTimeLimit.DateTime)
-            .toLocaleString('sv-SE', { hour12: false })
-            .replace('T', ' ')
+          .toLocaleString('sv-SE', { hour12: false })
+          .replace('T', ' ')
         : '';
 
       if (
@@ -2447,11 +2260,9 @@ export default class VerteilFlightService extends AbstractServices {
 
           return {
             PTC: PTC.PTC.value,
-            baggageDesc: `Checked: ${
-              CheckedBagDescription.length ? CheckedBagDescription : 'N/A'
-            } \nHand: ${
-              CarryBagDescription.length ? CarryBagDescription : 'N/A'
-            }`,
+            baggageDesc: `Checked: ${CheckedBagDescription.length ? CheckedBagDescription : 'N/A'
+              } \nHand: ${CarryBagDescription.length ? CarryBagDescription : 'N/A'
+              }`,
           };
         });
       }
@@ -2483,7 +2294,7 @@ export default class VerteilFlightService extends AbstractServices {
     pnr: string;
     airlineCode: string;
     oldFare: { vendor_total: number };
-    passengers: Array<IFlightBookingPassengerReqBody>;
+    passengers: Array<IGetFlightBookingTravelerData>;
   }): Promise<IFormattedTicketIssueRes> {
     let errorCode: number | undefined;
     try {
@@ -2600,7 +2411,7 @@ export default class VerteilFlightService extends AbstractServices {
         ticket_status: FLIGHT_TICKET_ISSUE,
       };
     } catch (error) {
-      console.warn(`Verteil TicketIssue Error: ` + (error as any).message);
+      console.warn(`TicketIssue Error: ` + (error as any).message);
       return {
         success: false,
         message: (error as any).message,

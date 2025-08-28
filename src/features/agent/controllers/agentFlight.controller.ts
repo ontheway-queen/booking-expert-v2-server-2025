@@ -39,11 +39,18 @@ export default class AgentFlightController extends AbstractController {
         //SSE connection closed
         sendEvent('end', { message: 'Flight search completed successfully.' });
         res.end();
-      } catch (error) {
-        sendEvent('error', {
+      } catch (error: any) {
+        const errorPayload = {
           message: 'An error occurred during flight search.',
-          error,
-        });
+          error: {
+            message: error.message,
+            stack: error.stack,
+            name: error.name,
+            ...(error.code && { code: error.code }),
+            ...(error.response && { response: error.response }),
+          },
+        };
+        sendEvent('error', errorPayload);
         res.end();
       }
     }

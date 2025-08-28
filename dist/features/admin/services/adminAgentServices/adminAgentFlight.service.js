@@ -19,6 +19,7 @@ const flightConstant_1 = require("../../../../utils/miscellaneous/flightConstant
 const sabreFlightSupport_service_1 = __importDefault(require("../../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service"));
 const commonFlightBookingSupport_service_1 = require("../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service");
 const agentFlightBookingSupport_service_1 = require("../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service");
+const verteilFlightSupport_service_1 = __importDefault(require("../../../../utils/supportServices/flightSupportServices/verteilFlightSupport.service"));
 class AdminAgentFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -151,6 +152,18 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         status = true;
                     }
                 }
+                else if (booking_data.api === flightConstant_1.VERTEIL_API) {
+                    const bookingSegmentModel = this.Model.FlightBookingSegmentModel(trx);
+                    const segmentDetails = yield bookingSegmentModel.getFlightBookingSegment(Number(id));
+                    const verteilSubService = new verteilFlightSupport_service_1.default(trx);
+                    const res = yield verteilSubService.OrderCancelService({
+                        airlineCode: segmentDetails[0].airline_code,
+                        pnr: String(booking_data.airline_pnr),
+                    });
+                    if (res.success) {
+                        status = true;
+                    }
+                }
                 if (status) {
                     const flightBookingSupportService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
                     //update booking data
@@ -188,6 +201,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
     issueTicket(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                var _a, _b, _c;
                 const { id } = req.params; //booking id
                 const { user_id } = req.admin;
                 //get flight details
@@ -211,6 +225,7 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         message: 'Issue is not allowed for this booking. Only confirmed booking can be issued.',
                     };
                 }
+                let ticket_number = [];
                 //get other information
                 const get_travelers = yield bookingTravelerModel.getFlightBookingTraveler(Number(id));
                 //get payment details
@@ -253,7 +268,26 @@ class AdminAgentFlightService extends abstract_service_1.default {
                             unique_traveler,
                         });
                         if (res === null || res === void 0 ? void 0 : res.success) {
-                            status = flightConstant_1.FLIGHT_TICKET_ISSUE;
+                            status = ((_a = res.data) === null || _a === void 0 ? void 0 : _a.length) ? flightConstant_1.FLIGHT_TICKET_ISSUE : flightConstant_1.FLIGHT_BOOKING_ON_HOLD;
+                            ticket_number = res.data;
+                        }
+                    }
+                    else if (booking_data.api === flightConstant_1.VERTEIL_API) {
+                        const bookingSegmentModel = this.Model.FlightBookingSegmentModel(trx);
+                        const segmentDetails = yield bookingSegmentModel.getFlightBookingSegment(Number(id));
+                        const verteilSubService = new verteilFlightSupport_service_1.default(trx);
+                        const res = yield verteilSubService.TicketIssueService({
+                            airlineCode: segmentDetails[0].airline_code,
+                            oldFare: {
+                                vendor_total: booking_data.vendor_fare.net_fare,
+                            },
+                            passengers: get_travelers,
+                            pnr: String(booking_data.airline_pnr),
+                        });
+                        if (res === null || res === void 0 ? void 0 : res.success) {
+                            status = ((_b = res.data) === null || _b === void 0 ? void 0 : _b.length) ? flightConstant_1.FLIGHT_TICKET_ISSUE : flightConstant_1.FLIGHT_BOOKING_ON_HOLD;
+                            if ((_c = res === null || res === void 0 ? void 0 : res.data) === null || _c === void 0 ? void 0 : _c.length)
+                                ticket_number = res.data;
                         }
                     }
                 }
@@ -285,6 +319,8 @@ class AdminAgentFlightService extends abstract_service_1.default {
                         issued_by_user_id: user_id,
                         issue_block: ticketIssuePermission.issue_block,
                         api: booking_data.api,
+                        ticket_number,
+                        travelers_info: get_travelers
                     });
                     //send email
                     yield bookingSubService.sendTicketIssueMail({

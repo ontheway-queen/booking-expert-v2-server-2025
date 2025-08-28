@@ -13,6 +13,7 @@ import {
   FLIGHT_FARE_RESPONSE,
   FLIGHT_REVALIDATE_REDIS_KEY,
   SABRE_API,
+  VERTEIL_API,
 } from '../../../utils/miscellaneous/flightConstant';
 import SabreFlightService from '../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service';
 import WfttFlightService from '../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service';
@@ -28,6 +29,7 @@ import {
   SOURCE_AGENT_B2C,
   TYPE_FLIGHT,
 } from '../../../utils/miscellaneous/constants';
+import VerteilFlightService from '../../../utils/supportServices/flightSupportServices/verteilFlightSupport.service';
 
 export class AgentB2CFlightService extends AbstractServices {
   constructor() {
@@ -72,18 +74,26 @@ export class AgentB2CFlightService extends AbstractServices {
 
       //extract API IDs
       let sabre_set_flight_api_id = 0;
+      let verteil_supplier_id = 0;
       let wftt_set_flight_api_id = 0;
 
       apiData.forEach((api) => {
         if (api.sup_api === SABRE_API) {
           sabre_set_flight_api_id = api.id;
         }
+        if (api.sup_api === VERTEIL_API) {
+          verteil_supplier_id = api.id;
+        }
         if (api.sup_api === CUSTOM_API) {
           wftt_set_flight_api_id = api.id;
         }
       });
 
+      //generate search ID
+      const search_id = uuidv4();
+
       let sabreData: any[] = [];
+      let verteilData: any[] = [];
       let wfttData: any[] = [];
 
       if (sabre_set_flight_api_id) {
@@ -93,6 +103,16 @@ export class AgentB2CFlightService extends AbstractServices {
           reqBody: body,
           dynamic_fare_supplier_id: sabre_set_flight_api_id,
           markup_amount,
+        });
+      }
+      if (verteil_supplier_id) {
+        const verteilSubService = new VerteilFlightService(trx);
+        verteilData = await verteilSubService.FlightSearchService({
+          booking_block: false,
+          reqBody: body,
+          dynamic_fare_supplier_id: verteil_supplier_id,
+          markup_amount,
+          search_id
         });
       }
 
@@ -106,8 +126,6 @@ export class AgentB2CFlightService extends AbstractServices {
         });
       }
 
-      //generate search ID
-      const search_id = uuidv4();
       const leg_descriptions = body.OriginDestinationInformation.map(
         (OrDeInfo) => {
           return {
@@ -118,7 +136,7 @@ export class AgentB2CFlightService extends AbstractServices {
         }
       );
 
-      const results: any[] = [...sabreData, ...wfttData];
+      const results: any[] = [...sabreData, ...wfttData, ...verteilData];
 
       results.sort((a, b) => a.fare.payable - b.fare.payable);
 
@@ -199,11 +217,15 @@ export class AgentB2CFlightService extends AbstractServices {
 
       //extract API IDs
       let sabre_set_flight_api_id = 0;
+      let verteil_supplier_id = 0;
       let wftt_set_flight_api_id = 0;
 
       apiData.forEach((api) => {
         if (api.sup_api === SABRE_API) {
           sabre_set_flight_api_id = api.id;
+        }
+        if (api.sup_api === VERTEIL_API) {
+          verteil_supplier_id = api.id;
         }
         if (api.sup_api === CUSTOM_API) {
           wftt_set_flight_api_id = api.id;
@@ -265,28 +287,48 @@ export class AgentB2CFlightService extends AbstractServices {
         await setRedis(search_id, { reqBody: body, response: responseData });
       };
 
+      const tasks: Promise<void>[] = [];
+
       // Sabre results
       if (sabre_set_flight_api_id) {
         const sabreSubService = new SabreFlightService(trx);
-        await sendResults('Sabre', async () =>
-          sabreSubService.FlightSearch({
-            booking_block: false,
-            reqBody: body,
-            dynamic_fare_supplier_id: sabre_set_flight_api_id,
-            markup_amount,
-          })
+        tasks.push(
+          sendResults('Sabre', async () =>
+            sabreSubService.FlightSearch({
+              booking_block: false,
+              reqBody: body,
+              dynamic_fare_supplier_id: sabre_set_flight_api_id,
+              markup_amount,
+            })
+          )
+        );
+      }
+      //Verteil results
+      if (verteil_supplier_id) {
+        const verteilSubService = new VerteilFlightService(trx);
+        tasks.push(
+          sendResults('Verteil', async () =>
+            verteilSubService.FlightSearchService({
+              booking_block: false,
+              reqBody: body,
+              dynamic_fare_supplier_id: verteil_supplier_id,
+              markup_amount,
+              search_id
+            })
+          )
         );
       }
       //WFTT results
       if (wftt_set_flight_api_id) {
         const wfttSubService = new WfttFlightService(trx);
-        await sendResults('WFTT', async () =>
+        tasks.push(sendResults('WFTT', async () =>
           wfttSubService.FlightSearch({
             booking_block: false,
             reqBody: body,
             dynamic_fare_supplier_id: wftt_set_flight_api_id,
             markup_amount,
           })
+        )
         );
       }
     });

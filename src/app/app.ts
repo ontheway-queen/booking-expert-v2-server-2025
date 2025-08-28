@@ -34,9 +34,16 @@ class App {
 
   // Run cron jobs
   private async runCron() {
+    const services = new PublicCommonService();
+
     // Run every 3 days at 12:00 AM
-    cron.schedule('0 0 */5 * *', async () => {
-      // await services.getSabreToken();
+    cron.schedule("0 0 */3 * *", async () => {
+      await services.getSabreToken();
+    });
+
+    //Run after every 12 hours
+    cron.schedule("0 */12 * * *", async () => {
+      await services.getVerteilToken();
     });
   }
 
@@ -44,7 +51,8 @@ class App {
   public async startServer() {
     // setUpCorsOrigin();
     const services = new PublicCommonService();
-    await services.getSabreToken();
+    // await services.getSabreToken();
+    // await services.getVerteilToken();
     this.server.listen(this.port, () => {
       console.log(
         `Booking Expert V2 OTA server has started successfully at port: ${this.port}...🚀`

@@ -409,7 +409,7 @@ class SabreFlightService extends abstract_service_1.default {
                         passenger_count: passenger.passengerInfo.passengerNumber,
                         segmentDetails,
                     });
-                    const per_pax_discount = (commission + agent_discount) / pax_count;
+                    const per_pax_discount = Number(passenger_info.passengerTotalFare.equivalentAmount) * ((commission + agent_discount) / Number(fare.totalFare.equivalentAmount));
                     const per_pax_markup = (markup + agent_markup) / pax_count;
                     const total_pax_markup = pax_markup + per_pax_markup;
                     const per_pax_ait = ait / pax_count;
@@ -645,37 +645,32 @@ class SabreFlightService extends abstract_service_1.default {
     // Revalidate Flight Request Formatter
     RevalidateFlightReqFormatter(reqBody, retrieved_response) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c;
-            let cabin = 'Y';
-            switch ((_c = (_b = (_a = reqBody.OriginDestinationInformation[0]) === null || _a === void 0 ? void 0 : _a.TPA_Extensions) === null || _b === void 0 ? void 0 : _b.CabinPref) === null || _c === void 0 ? void 0 : _c.Cabin) {
-                case '1':
-                    cabin = 'Y';
-                    break;
-                case '2':
-                    cabin = 'W';
-                    break;
-                case '3':
-                    cabin = 'J';
-                    break;
-                case '4':
-                    cabin = 'F';
-                    break;
-                default:
-                    break;
-            }
+            var _a;
+            const booking_code = [];
+            (_a = retrieved_response.availability) === null || _a === void 0 ? void 0 : _a.map((av_elm) => {
+                var _a;
+                (_a = av_elm === null || av_elm === void 0 ? void 0 : av_elm.segments) === null || _a === void 0 ? void 0 : _a.map((seg_elm) => {
+                    var _a, _b, _c, _d;
+                    if ((_b = (_a = seg_elm === null || seg_elm === void 0 ? void 0 : seg_elm.passenger) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.booking_code) {
+                        booking_code.push((_d = (_c = seg_elm === null || seg_elm === void 0 ? void 0 : seg_elm.passenger) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.booking_code);
+                    }
+                });
+            });
+            let booking_ind = 0;
             const OriginDestinationInformation = reqBody.OriginDestinationInformation.map((item, index) => {
                 const req_depart_air = item.OriginLocation.LocationCode;
                 const flights = [];
                 const flight = retrieved_response.flights[index];
                 const depart_time = flight.options[0].departure.time;
                 const depart_air = flight.options[0].departure.airport_code;
-                if (req_depart_air === depart_air) {
+                const depart_city = flight.options[0].departure.city_code;
+                if ([depart_air, depart_city].includes(req_depart_air)) {
                     for (const option of flight.options) {
                         const DepartureDateTime = this.flightUtils.convertDateTime(option.departure.date, option.departure.time);
                         const ArrivalDateTime = this.flightUtils.convertDateTime(option.arrival.date, option.arrival.time);
                         const flight_data = {
                             Number: Number(option === null || option === void 0 ? void 0 : option.carrier.carrier_marketing_flight_number),
-                            ClassOfService: cabin,
+                            ClassOfService: (booking_code === null || booking_code === void 0 ? void 0 : booking_code[booking_ind]) || "",
                             DepartureDateTime,
                             ArrivalDateTime,
                             Type: 'A',
@@ -690,6 +685,7 @@ class SabreFlightService extends abstract_service_1.default {
                                 Operating: option === null || option === void 0 ? void 0 : option.carrier.carrier_operating_code,
                             },
                         };
+                        booking_ind++;
                         flights.push(flight_data);
                     }
                     const origin_destination_info = {

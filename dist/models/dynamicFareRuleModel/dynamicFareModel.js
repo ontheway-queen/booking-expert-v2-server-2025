@@ -183,6 +183,21 @@ class DynamicFareModel extends schema_1.default {
                 if (query.tax_name) {
                     qb.andWhere('tax_name', query.tax_name);
                 }
+                if (query.from_dac !== undefined) {
+                    qb.andWhere('from_dac', query.from_dac);
+                }
+                if (query.to_dac !== undefined) {
+                    qb.andWhere('to_dac', query.to_dac);
+                }
+                if (query.soto !== undefined) {
+                    qb.andWhere('soto', query.soto);
+                }
+                if (query.domestic !== undefined) {
+                    qb.andWhere('domestic', query.domestic);
+                }
+                if (query.status !== undefined) {
+                    qb.andWhere('dynamic_fare_tax.status', query.status);
+                }
             })
                 .orderBy('dynamic_fare_tax.id', 'desc');
         });
