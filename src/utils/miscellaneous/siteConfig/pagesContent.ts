@@ -2,7 +2,7 @@ import {
   ICreateAgencyB2CHeroBgContentPayload,
   ICreateAgencyB2CPopularDestinationPayload,
   ICreateAgencyB2CPopularPlace,
-} from '../../modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types';
+} from "../../modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types";
 
 export const aboutUsContent = (site_name: string, site_address: string) => {
   return `<div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #333; line-height: 1.6;">
@@ -349,7 +349,6 @@ export const privacyAndPolicy = (site_name: string) => {
         <li style="margin:8px 0;">Your usernames, passwords, email addresses and other security-related information used by the User in relation to ${site_name} Services.</li>
         <li style="margin:8px 0;">Data either created by the User or by a third party and which the User wishes to store on ${site_name} servers such as image files, documents etc.</li>
         <li style="margin:8px 0;">Data available in public domain or received from any third party including social media channels, including but not limited to personal or non-personal information from the User’s linked social media channels (like name, email address, profile pictures or any other information that is permitted to be received as per the User’s account settings) as a part of the User’s account information.</li>
-        <li style="margin:8px 0;">Information pertaining to any other traveler(s) for whom the User makes a booking through the User’s registered ${site_name} account. In such a case, the User must confirm and represent that each of the other traveler(s) for whom a booking has been made, has agreed to have the information shared by the User disclosed to ${site_name} and further be shared by <strong>www.flyfarint.com</strong> with the concerned service provider(s).</li>
         <li style="margin:8px 0;">If the User requests ${site_name} to provide visa-related services, then copies of the User’s passport, bank statements, originals of the filled-in application forms, photographs, and any other information which may be required by the respective embassy to process the User’s visa application.</li>
         <li style="margin:8px 0;">For international bookings, User, in compliance with the Bangladesh Bank or any other law may be required to provide details such as their TIN information or passport details number or any such information required by the Service Provider. Such information shall be strictly used as per the aforesaid requirements only. In case a User does not wish to provide this information, ${site_name} may not be able to process the booking. ${site_name} will never share User’s TIN details without their prior consent unless otherwise such action is required by any law enforcement authority for investigation, by court order or in reference to any legal process.</li>
         <li style="margin:8px 0;">In case the User opts for contactless check-in at Hotels, then copies of the User’s government identification like NID, driving license, election card etc. Self-declaration and any other information like date of birth, destination/origin of travel and place of residence that may be required by the concerned Hotel to honor the User’s hotel booking.</li>
@@ -379,8 +378,6 @@ export const privacyAndPolicy = (site_name: string) => {
       </ul>
 
       <h4 style="font-size:18px; margin:16px 0 8px;">IV) Surveys</h4>
-      <p style="margin-top:0;">${site_name} identifies the importance of its valuable customers’ opinion. ${site_name} often conducts surveys and uses personal identification information to invite its regular customers to take part in the surveys. Customers can take part in these surveys completely on their own choice. Typically, ${site_name} conducts surveys to know about the customer’s experiences with flyfarint.com and to make the Website, mobile site and mobile app more user-friendly for its members. Identity of the survey participants is anonymous unless otherwise stated in the survey.</p>
-
       <h4 style="font-size:18px; margin:16px 0 8px;">V) Safeguard Sensitive Information</h4>
       <p style="margin-top:0;">Sensitive information like Credit/Debit Card and Net Banking Details are mainly collected by the payment gateways and banks and not by ${site_name}. However, if still this information is stored on the Website, it remains completely safe, excluding that if it has been shared with any third party inadvertently by the User while browsing the Website. Sometimes, such information is shared with certain third parties to process the cashback offers &amp; discounts, if applicable.</p>
 
@@ -394,7 +391,6 @@ export const privacyAndPolicy = (site_name: string) => {
       <ol style="margin:0 0 0 20px; padding:0;">
         <li style="margin:8px 0;">${site_name} uses cookies to personalize the User’s experience on the Website and the advertisements that may be displayed. ${site_name} use of cookies is similar to that of any other Travel/ecommerce companies.</li>
         <li style="margin:8px 0;">Cookies are small pieces of information that are stored by the User’s browser on User’s devices hard drive. Cookies allow ${site_name} to deliver better services in an efficient manner. Cookies also allow ease of access, by logging the User in without having to type the User’s login name each time (only the password is needed); ${site_name} may also use such cookies to display any advertisement(s) to the Users while they are on the Website or to send the Users offers (or similar emails – provided the Users have not opted out of receiving such emails) focusing on destinations which may be of the User’s interest.</li>
-        <li style="margin:8px 0;">A cookie may also be placed by ${site_name}’s advertising servers, or third party advertising companies. Such cookies are used for purposes of tracking the effectiveness of advertising served by flyfarint.com on any website, and also to use aggregated statistics about the User’s visits to the Website in order to provide advertisements in the Website or any other website about services that may be of potential interest to the User. The third party advertising companies or advertisement providers may also employ technology that is used to measure the effectiveness of the advertisements. All such information is anonymous. This anonymous information is collected through the use of a pixel tag, which is an industry standard technology and is used by all major websites. They may use this anonymous information about the User’s visits to the Website in order to provide advertisements about goods and services of potential interest to the User. No Personal Information is collected during this process. The information so collected during this process, is anonymous, and does not link online actions to a User.</li>
         <li style="margin:8px 0;">Most web browsers automatically accept cookies. Of course, by changing the options on the User’s web browser or using certain software programs, the User can control how and whether cookies will be accepted by the browser. ${site_name} supports the User’s right to block any unwanted Internet activity, especially that of unscrupulous websites. However, blocking ${site_name} cookies may disable certain features on the Website, and may hinder an otherwise seamless experience to purchase or use certain services available on the Website. Please note that it is possible to block cookie activity from certain websites while permitting cookies from websites you trust.</li>
         <li style="margin:8px 0;">Automatic Logging of Session Data: ${site_name} records session data of the Users, which includes IP address, Operating System, browser software and the activities of the user on his device. We collect session data to evaluate the User behavior. Such session data helps ${site_name} in identifying the problems with its servers and lets ${site_name} improve its systems. This information does not identify any visitor personally and only examines the User’s geographic location.</li>
       </ol>
@@ -460,7 +456,6 @@ export const privacyAndPolicy = (site_name: string) => {
       <p style="margin-top:0;">The libraries in the app use these permissions to allow map data to be saved to the user’s phone’s external storage, like SD cards. By saving map data locally, the user’s smartphone does not need to re-download the same map data every time the user uses the app. This provides users a seamless Map based Hotel selection experience, even on low bandwidth networks.</p>
 
       <h4 style="font-size:18px; margin:16px 0 8px;">F) Wi‑Fi connection information</h4>
-      <p style="margin-top:0;">When you allow flyfarint.com the permission to detect a user’s Wi‑Fi connection, we optimize the user’s experience such as more detailing on maps, better image loading, more hotel / flights / package options to choose from, etc.</p>
 
       <h4 style="font-size:18px; margin:16px 0 8px;">G) SMS</h4>
       <p style="margin-top:0;">If the User allows ${site_name} to access its SMS, ${site_name} reads SMS and fills the One Time Password (OTP) automatically while making transactions. This offers the User a hassle-free booking experience and the User does not have to move out of the app for checking the OTP and then filling it manually.</p>
@@ -505,42 +500,42 @@ export const popularDestination = (
   return [
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/jeddah.jpg',
+      thumbnail: "agent/b2c/others/jeddah.jpg",
       order_number: 1,
       from_airport: 210,
       to_airport: 1139,
     },
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/dubai.jpg',
+      thumbnail: "agent/b2c/others/dubai.jpg",
       order_number: 2,
       from_airport: 210,
       to_airport: 1349,
     },
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/newyork.jpg',
+      thumbnail: "agent/b2c/others/newyork.jpg",
       order_number: 3,
       from_airport: 210,
       to_airport: 1754,
     },
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/sydney.jpg',
+      thumbnail: "agent/b2c/others/sydney.jpg",
       order_number: 4,
       from_airport: 210,
       to_airport: 171,
     },
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/paris.jpg',
+      thumbnail: "agent/b2c/others/paris.jpg",
       order_number: 5,
       from_airport: 210,
       to_airport: 1386,
     },
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/india.jpg',
+      thumbnail: "agent/b2c/others/india.jpg",
       order_number: 6,
       from_airport: 210,
       to_airport: 698,
@@ -554,69 +549,69 @@ export const popularPlaces = (
   return [
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/dubai.jpg',
+      thumbnail: "agent/b2c/others/dubai.jpg",
       order_number: 1,
       country_id: 224,
       location_id: 121449,
-      location_name: 'Dubai',
-      location_type: 'City',
+      location_name: "Dubai",
+      location_type: "City",
       short_description:
-        'Discover the modern marvels and luxurious experiences of Dubai.',
+        "Discover the modern marvels and luxurious experiences of Dubai.",
     },
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/kuala-lampur.avif',
+      thumbnail: "agent/b2c/others/kuala-lampur.avif",
       order_number: 2,
       country_id: 129,
       location_id: 124046,
-      location_name: 'Kuala Lumpur',
-      location_type: 'City',
+      location_name: "Kuala Lumpur",
+      location_type: "City",
       short_description:
-        'Explore the vibrant cityscape of Kuala Lumpur, known for its iconic Petronas Towers.',
+        "Explore the vibrant cityscape of Kuala Lumpur, known for its iconic Petronas Towers.",
     },
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/bangkok.avif',
+      thumbnail: "agent/b2c/others/bangkok.avif",
       order_number: 3,
       country_id: 211,
       location_id: 122861,
-      location_name: 'Bangkok',
-      location_type: 'City',
+      location_name: "Bangkok",
+      location_type: "City",
       short_description:
         "Experience the bustling life of Bangkok, Thailand's vibrant capital city.",
     },
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/singapore.avif',
+      thumbnail: "agent/b2c/others/singapore.avif",
       order_number: 4,
       country_id: 192,
       location_id: 121673,
-      location_name: 'Singapore',
-      location_type: 'City',
+      location_name: "Singapore",
+      location_type: "City",
       short_description:
-        'Discover the beautiful and ultra-modern city of Singapore.',
+        "Discover the beautiful and ultra-modern city of Singapore.",
     },
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/bali.jpg',
+      thumbnail: "agent/b2c/others/bali.jpg",
       order_number: 5,
       country_id: 100,
       location_id: 124781,
-      location_name: 'Bali',
-      location_type: 'City',
+      location_name: "Bali",
+      location_type: "City",
       short_description:
-        'Enjoy the serene beaches and tropical vibes of Bali, Indonesia.',
+        "Enjoy the serene beaches and tropical vibes of Bali, Indonesia.",
     },
     {
       agency_id,
-      thumbnail: 'agent/b2c/others/colombo.webp',
+      thumbnail: "agent/b2c/others/colombo.webp",
       order_number: 6,
       country_id: 224,
       location_id: 139467,
-      location_name: 'Colombo',
-      location_type: 'City',
+      location_name: "Colombo",
+      location_type: "City",
       short_description:
-        'Experience the cultural heritage and lush landscapes of Sri Lanka.',
+        "Experience the cultural heritage and lush landscapes of Sri Lanka.",
     },
   ];
 };
@@ -627,39 +622,39 @@ export const heroBG = (
   return [
     {
       agency_id,
-      content: 'agent/b2c/hero-bg/hero-flight.jpg',
+      content: "agent/b2c/hero-bg/hero-flight.jpg",
       order_number: 1,
-      type: 'PHOTO',
-      quote: 'Explore the Best Flight Options',
-      sub_quote: 'Uncover unbeatable offers on global travel destinations',
-      tab: 'FLIGHT',
+      type: "PHOTO",
+      quote: "Explore the Best Flight Options",
+      sub_quote: "Uncover unbeatable offers on global travel destinations",
+      tab: "FLIGHT",
     },
     {
       agency_id,
-      content: 'agent/b2c/hero-bg/hero-hotel.jpg',
+      content: "agent/b2c/hero-bg/hero-hotel.jpg",
       order_number: 2,
-      type: 'PHOTO',
-      quote: 'Discover Your Perfect Vacation Stay',
-      sub_quote: 'Discover amazing deals to destinations worldwide',
-      tab: 'HOTEL',
+      type: "PHOTO",
+      quote: "Discover Your Perfect Vacation Stay",
+      sub_quote: "Discover amazing deals to destinations worldwide",
+      tab: "HOTEL",
     },
     {
       agency_id,
-      content: 'agent/b2c/hero-bg/hero-holiday.jpg',
+      content: "agent/b2c/hero-bg/hero-holiday.jpg",
       order_number: 3,
-      type: 'PHOTO',
-      quote: 'Discover Your Next Tour',
-      sub_quote: 'Discover amazing deals to destinations worldwide',
-      tab: 'HOLIDAY',
+      type: "PHOTO",
+      quote: "Discover Your Next Tour",
+      sub_quote: "Discover amazing deals to destinations worldwide",
+      tab: "HOLIDAY",
     },
     {
       agency_id,
-      content: 'agent/b2c/hero-bg/hero-visa.jpg',
+      content: "agent/b2c/hero-bg/hero-visa.jpg",
       order_number: 4,
-      type: 'PHOTO',
-      quote: 'Visa Services Available for These Countries',
-      sub_quote: 'Visa Services Available for These Countries',
-      tab: 'VISA',
+      type: "PHOTO",
+      quote: "Visa Services Available for These Countries",
+      sub_quote: "Visa Services Available for These Countries",
+      tab: "VISA",
     },
   ];
 };
