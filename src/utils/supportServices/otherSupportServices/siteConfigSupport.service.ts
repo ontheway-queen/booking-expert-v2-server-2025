@@ -13,6 +13,7 @@ import {
   popularDestination,
   popularPlaces,
   privacyAndPolicy,
+  termsAndConditions,
 } from '../../miscellaneous/siteConfig/pagesContent';
 
 export class SiteConfigSupportService extends AbstractServices {
@@ -47,7 +48,7 @@ export class SiteConfigSupportService extends AbstractServices {
       address: JSON.stringify([{ title: 'Main Office', address }]),
       contact_us_content: contactUsContent(address, phone, email),
       privacy_policy_content: privacyAndPolicy(site_name),
-      terms_and_conditions_content: privacyAndPolicy(site_name),
+      terms_and_conditions_content: termsAndConditions(site_name),
       site_name,
       hero_quote: `Welcome to ${site_name}!`,
       hero_sub_quote: 'Find Flights, Hotels, Visa & Holidays',

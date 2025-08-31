@@ -133,14 +133,17 @@ class AuthChecker {
             if (!authorization)
                 authorization = req.query.token;
             if (!authorization) {
-                res
-                    .status(statusCode_1.default.HTTP_UNAUTHORIZED)
-                    .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                    statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
+                    success: false,
+                    message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                });
                 return;
             }
             const authSplit = authorization.split(' ');
             if (authSplit.length !== 2) {
                 res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                    statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
                     success: false,
                     message: responseMessage_1.default.HTTP_UNAUTHORIZED,
                 });
@@ -149,9 +152,11 @@ class AuthChecker {
             const verify = lib_1.default.verifyToken(authSplit[1], config_1.default.JWT_SECRET_AGENT);
             console.log(verify);
             if (!verify) {
-                res
-                    .status(statusCode_1.default.HTTP_UNAUTHORIZED)
-                    .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                    statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
+                    success: false,
+                    message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                });
                 return;
             }
             else {
@@ -166,15 +171,18 @@ class AuthChecker {
                         agency_name: checkAgencyUser.agency_name,
                     });
                     if (!checkAgencyUser.status) {
-                        res
-                            .status(statusCode_1.default.HTTP_UNAUTHORIZED)
-                            .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                        res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                            statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
+                            success: false,
+                            message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                        });
                         return;
                     }
                     if (checkAgencyUser.agency_status === 'Inactive' ||
                         checkAgencyUser.agency_status === 'Incomplete' ||
                         checkAgencyUser.agency_status === 'Rejected') {
                         res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                            statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
                             success: false,
                             message: responseMessage_1.default.HTTP_UNAUTHORIZED,
                         });
@@ -201,9 +209,11 @@ class AuthChecker {
                     }
                 }
                 else {
-                    res
-                        .status(statusCode_1.default.HTTP_UNAUTHORIZED)
-                        .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
+                    res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                        statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
+                        success: false,
+                        message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                    });
                     return;
                 }
             }
@@ -298,9 +308,7 @@ class AuthChecker {
                 const check_agency = yield agencyModel.checkAgency({
                     agency_id: check_token === null || check_token === void 0 ? void 0 : check_token.agency_id,
                 });
-                if (!check_agency ||
-                    check_agency.status !== 'Active' ||
-                    !check_agency.white_label) {
+                if (!check_agency || check_agency.status !== 'Active' || !check_agency.white_label) {
                     res
                         .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                         .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });
