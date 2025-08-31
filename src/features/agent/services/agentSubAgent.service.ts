@@ -167,7 +167,7 @@ export default class AgentSubAgentService extends AbstractServices {
         hotel_markup,
       });
 
-      await EmailSendLib.sendEmail({
+      await EmailSendLib.sendEmailAgent(trx, agency_id, {
         email,
         emailSub: `Booking Expert Agency Credentials`,
         emailBody: registrationVerificationCompletedTemplate(agency_name, {

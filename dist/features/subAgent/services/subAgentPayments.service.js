@@ -52,6 +52,7 @@ class SubAgentPaymentsService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id, agency_id } = req.agencyUser;
+                const { agency_id: ref_agent_id } = req.agencyB2CWhiteLabel;
                 const paymentModel = this.Model.DepositRequestModel(trx);
                 const othersModel = this.Model.OthersModel(trx);
                 const check_duplicate = yield paymentModel.getSubAgentDepositRequestList({
@@ -69,7 +70,7 @@ class SubAgentPaymentsService extends abstract_service_1.default {
                 const checkAccount = yield othersModel.checkAccount({
                     id: body.account_id,
                     source_type: constants_1.SOURCE_AGENT,
-                    source_id: agency_id,
+                    source_id: ref_agent_id,
                 });
                 if (!checkAccount) {
                     return {
@@ -158,12 +159,12 @@ class SubAgentPaymentsService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const paymentModel = this.Model.DepositRequestModel(trx);
                 const query = req.query;
-                const depositData = yield paymentModel.getSubAgentDepositRequestList(Object.assign(Object.assign({}, query), { agency_id }), true);
+                const { data, total } = yield paymentModel.getSubAgentDepositRequestList(Object.assign(Object.assign({}, query), { agency_id }), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    total: depositData.total,
-                    data: depositData.data,
+                    data,
+                    total,
                 };
             }));
         });
@@ -310,6 +311,23 @@ class SubAgentPaymentsService extends abstract_service_1.default {
                     },
                 };
             }));
+        });
+    }
+    getAccounts(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyB2CWhiteLabel;
+            const configModel = this.Model.OthersModel();
+            const { data, total } = yield configModel.getAccount({
+                source_type: constants_1.SOURCE_AGENT,
+                source_id: agency_id,
+            }, true);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data,
+                total,
+            };
         });
     }
 }

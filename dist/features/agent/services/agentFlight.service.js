@@ -35,7 +35,6 @@ const commonFlightBookingSupport_service_1 = require("../../../utils/supportServ
 const commonFlightSupport_service_1 = require("../../../utils/supportServices/flightSupportServices/commonFlightSupport.service");
 const sabreFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service"));
 const wfttFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/wfttFlightSupport.service"));
-const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 const verteilFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/verteilFlightSupport.service"));
 class AgentFlightService extends abstract_service_1.default {
     constructor() {
@@ -84,22 +83,6 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'No commission set has been found for the agency',
                     };
                 }
-                //get SUB AGENT markup
-                let markup_amount = undefined;
-                if (agency_type === 'SUB AGENT') {
-                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
-                        trx,
-                        type: 'Flight',
-                        agency_id,
-                    });
-                    if (!markup_amount) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: 'Markup information is empty. Contact with the authority',
-                        };
-                    }
-                }
                 const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
                 const apiData = yield markupSetFlightApiModel.getDynamicFareSuppliers({
                     status: true,
@@ -131,7 +114,6 @@ class AgentFlightService extends abstract_service_1.default {
                         booking_block: false,
                         reqBody: body,
                         dynamic_fare_supplier_id: sabre_supplier_id,
-                        markup_amount,
                     });
                 }
                 if (verteil_supplier_id) {
@@ -140,8 +122,7 @@ class AgentFlightService extends abstract_service_1.default {
                         booking_block: false,
                         reqBody: body,
                         dynamic_fare_supplier_id: verteil_supplier_id,
-                        markup_amount,
-                        search_id
+                        search_id,
                     });
                 }
                 if (custom_supplier_id) {
@@ -150,7 +131,6 @@ class AgentFlightService extends abstract_service_1.default {
                         booking_block: false,
                         reqBody: body,
                         dynamic_fare_supplier_id: custom_supplier_id,
-                        markup_amount,
                     });
                 }
                 const leg_descriptions = body.OriginDestinationInformation.map((OrDeInfo) => {
@@ -231,22 +211,6 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'No commission set has been found for the agency',
                     };
                 }
-                //get SUB AGENT markup
-                let markup_amount = undefined;
-                if (agency_type === 'SUB AGENT') {
-                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
-                        trx,
-                        type: 'Flight',
-                        agency_id,
-                    });
-                    if (!markup_amount) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: 'Markup information is empty. Contact with the authority',
-                        };
-                    }
-                }
                 const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
                 const apiData = yield markupSetFlightApiModel.getDynamicFareSuppliers({
                     status: true,
@@ -270,7 +234,7 @@ class AgentFlightService extends abstract_service_1.default {
                 console.log({
                     sabre_supplier_id,
                     verteil_supplier_id,
-                    custom_supplier_id
+                    custom_supplier_id,
                 });
                 //generate search ID
                 const search_id = (0, uuid_1.v4)();
@@ -318,7 +282,6 @@ class AgentFlightService extends abstract_service_1.default {
                             booking_block: false,
                             reqBody: body,
                             dynamic_fare_supplier_id: sabre_supplier_id,
-                            markup_amount,
                         });
                     })));
                 }
@@ -330,8 +293,7 @@ class AgentFlightService extends abstract_service_1.default {
                             booking_block: false,
                             reqBody: body,
                             dynamic_fare_supplier_id: verteil_supplier_id,
-                            markup_amount,
-                            search_id
+                            search_id,
                         });
                     })));
                 }
@@ -343,7 +305,6 @@ class AgentFlightService extends abstract_service_1.default {
                             booking_block: false,
                             reqBody: body,
                             dynamic_fare_supplier_id: custom_supplier_id,
-                            markup_amount,
                         });
                     })));
                 }
@@ -387,7 +348,7 @@ class AgentFlightService extends abstract_service_1.default {
     flightRevalidate(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id, ref_agent_id, agency_type } = req.agencyUser;
+                const { agency_id, ref_agent_id } = req.agencyUser;
                 const { flight_id, search_id } = req.query;
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
@@ -401,30 +362,12 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'No commission set has been found for the agency',
                     };
                 }
-                //get SUB AGENT markup
-                let markup_amount = undefined;
-                if (agency_type === 'SUB AGENT') {
-                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
-                        trx,
-                        type: 'Flight',
-                        agency_id,
-                    });
-                    if (!markup_amount) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: 'Markup information is empty. Contact with the authority',
-                        };
-                    }
-                }
                 //revalidate using the flight support service
                 const flightSupportService = new commonFlightSupport_service_1.CommonFlightSupportService(trx);
-                console.log({ set: agency_details.flight_markup_set, markup_amount });
                 const data = yield flightSupportService.FlightRevalidate({
                     search_id,
                     flight_id,
                     dynamic_fare_set_id: agency_details.flight_markup_set,
-                    markup_amount,
                 });
                 if (data) {
                     yield (0, redis_1.setRedis)(`${flightConstant_1.FLIGHT_REVALIDATE_REDIS_KEY}${flight_id}`, data);
@@ -447,7 +390,7 @@ class AgentFlightService extends abstract_service_1.default {
     }
     flightBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id, ref_agent_id, agency_type, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
+            const { agency_id, ref_agent_id, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
             const body = req.body;
             let booking_block = false;
             let refundable = false;
@@ -479,22 +422,6 @@ class AgentFlightService extends abstract_service_1.default {
                         message: 'Booking permission is not allowed, please contact with the authority',
                     };
                 }
-                //get SUB AGENT markup
-                let markup_amount = undefined;
-                if (agency_type === 'SUB AGENT') {
-                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
-                        trx,
-                        type: 'Flight',
-                        agency_id,
-                    });
-                    if (!markup_amount) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: 'Markup information is empty. Contact with the authority',
-                        };
-                    }
-                }
                 //get data from redis using the search id
                 const retrievedData = yield (0, redis_1.getRedis)(body.search_id);
                 if (!retrievedData) {
@@ -517,7 +444,6 @@ class AgentFlightService extends abstract_service_1.default {
                     search_id: body.search_id,
                     flight_id: body.flight_id,
                     dynamic_fare_set_id: agency_details.flight_markup_set,
-                    markup_amount,
                 });
                 if (!rev_data) {
                     return {
@@ -712,6 +638,7 @@ class AgentFlightService extends abstract_service_1.default {
                         email: agency_email,
                         booked_by: constants_1.SOURCE_AGENT,
                         agency: {
+                            agency_id,
                             email: agency_email,
                             name: agency_name,
                             phone: String(phone_number),
@@ -872,7 +799,9 @@ class AgentFlightService extends abstract_service_1.default {
                             unique_traveler,
                         });
                         if (res === null || res === void 0 ? void 0 : res.success) {
-                            status = ((_a = res.data) === null || _a === void 0 ? void 0 : _a.length) ? flightConstant_1.FLIGHT_TICKET_ISSUE : flightConstant_1.FLIGHT_BOOKING_ON_HOLD;
+                            status = ((_a = res.data) === null || _a === void 0 ? void 0 : _a.length)
+                                ? flightConstant_1.FLIGHT_TICKET_ISSUE
+                                : flightConstant_1.FLIGHT_BOOKING_ON_HOLD;
                             ticket_number = res.data;
                         }
                     }
@@ -888,7 +817,9 @@ class AgentFlightService extends abstract_service_1.default {
                             pnr: String(booking_data.airline_pnr),
                         });
                         if (res === null || res === void 0 ? void 0 : res.success) {
-                            status = ((_b = res.data) === null || _b === void 0 ? void 0 : _b.length) ? flightConstant_1.FLIGHT_TICKET_ISSUE : flightConstant_1.FLIGHT_BOOKING_ON_HOLD;
+                            status = ((_b = res.data) === null || _b === void 0 ? void 0 : _b.length)
+                                ? flightConstant_1.FLIGHT_TICKET_ISSUE
+                                : flightConstant_1.FLIGHT_BOOKING_ON_HOLD;
                             if ((_c = res === null || res === void 0 ? void 0 : res.data) === null || _c === void 0 ? void 0 : _c.length)
                                 ticket_number = res.data;
                         }
@@ -911,7 +842,7 @@ class AgentFlightService extends abstract_service_1.default {
                         issue_block: ticketIssuePermission.issue_block,
                         api: booking_data.api,
                         ticket_number,
-                        travelers_info: get_travelers
+                        travelers_info: get_travelers,
                     });
                     //send email
                     yield bookingSubService.sendTicketIssueMail({

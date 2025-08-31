@@ -9,6 +9,7 @@ import {
   SOURCE_AGENT_B2C,
   SOURCE_B2C,
   SOURCE_EXTERNAL,
+  SOURCE_SUB_AGENT,
 } from '../../miscellaneous/constants';
 
 export interface IInsertErrorLogsPayload {
@@ -25,7 +26,8 @@ export interface IInsertErrorLogsPayload {
     | typeof SOURCE_AGENT_B2C
     | typeof SOURCE_B2C
     | typeof SOURCE_EXTERNAL
-    | typeof SOURCE_ADMIN;
+    | typeof SOURCE_ADMIN
+    | typeof SOURCE_SUB_AGENT;
   user_id?: number;
   url: string;
   http_method: string;

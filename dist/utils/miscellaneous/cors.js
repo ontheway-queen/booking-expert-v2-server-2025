@@ -17,6 +17,7 @@ exports.origin = [
     'http://10.10.220.42:5000',
     'http://10.10.220.42:5001',
     'http://10.10.220.42:3001',
+    'http://10.10.220.31:3001',
     'http://localhost:5001',
     'https://sohiaviation.com',
     'https://www.sohiaviation.com',

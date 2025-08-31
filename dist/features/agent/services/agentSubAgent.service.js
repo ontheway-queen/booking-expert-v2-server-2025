@@ -147,7 +147,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                     flight_markup,
                     hotel_markup,
                 });
-                yield emailSendLib_1.default.sendEmail({
+                yield emailSendLib_1.default.sendEmailAgent(trx, agency_id, {
                     email,
                     emailSub: `Booking Expert Agency Credentials`,
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(agency_name, {

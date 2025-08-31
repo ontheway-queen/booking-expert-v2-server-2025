@@ -26,6 +26,16 @@ export default class AuthValidator {
   });
 
   //sub agency register validator
+  public subAgencyRegisterValidator = Joi.object({
+    user_name: Joi.string().trim().min(4).max(255).required(),
+    agency_name: Joi.string().trim().min(4).max(255).required(),
+    email: Joi.string().email().trim().lowercase().max(255).required(),
+    address: Joi.string().min(8).max(100).required().trim(),
+    password: Joi.string().min(8).max(100).required().trim(),
+    phone: Joi.string().min(7).max(20).required().trim(),
+  });
+
+  //sub agency register validator
   public subagencyRegisterValidator = Joi.object({
     user_name: Joi.string().trim().min(4).max(255).required(),
     password: Joi.string().trim().min(8).max(50).required(),
@@ -55,6 +65,12 @@ export default class AuthValidator {
   //Complete Registration Validator
   public agencyRegisterCompleteValidator = Joi.object({
     token: Joi.string().required().trim(),
+  });
+
+  //Complete Registration Validator
+  public subagencyRegisterCompleteValidator = Joi.object({
+    email: Joi.string().email().lowercase().required().trim(),
+    otp: Joi.string().required(),
   });
 
   //login with google validator

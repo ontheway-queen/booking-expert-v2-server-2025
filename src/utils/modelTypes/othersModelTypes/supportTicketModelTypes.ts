@@ -1,6 +1,6 @@
 export interface IInsertSupportTicketPayload {
   support_no: string;
-  source_type: 'AGENT' | 'AGENT B2C' | 'B2C';
+  source_type: 'AGENT' | 'AGENT B2C' | 'B2C' | 'SUB AGENT';
   source_id: number;
   created_by_user_id: number;
   created_by: 'Admin' | 'Customer';

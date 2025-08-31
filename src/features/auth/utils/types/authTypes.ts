@@ -22,6 +22,7 @@ export interface IRegisterAgentReqBody {
   phone: string;
   email: string;
 }
+
 export interface IRegisterSubAgentReqBody {
   user_name: string;
   agency_name: string;

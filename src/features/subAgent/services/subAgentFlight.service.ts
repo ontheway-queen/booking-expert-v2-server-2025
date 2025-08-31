@@ -9,6 +9,7 @@ import {
   ERROR_LEVEL_INFO,
   FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT,
   SOURCE_AGENT,
+  SOURCE_SUB_AGENT,
   TYPE_FLIGHT,
 } from '../../../utils/miscellaneous/constants';
 import {
@@ -49,7 +50,8 @@ export class SubAgentFlightService extends AbstractServices {
 
   public async flightSearch(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, agency_type, ref_agent_id } = req.agencyUser;
+      const { agency_id: ref_agent_id } = req.agencyB2CWhiteLabel;
+      const { agency_id } = req.agencyUser;
       const body = req.body as IFlightSearchReqBody;
 
       if (body.JourneyType === '3') {
@@ -75,7 +77,7 @@ export class SubAgentFlightService extends AbstractServices {
       const agencyModel = this.Model.AgencyModel(trx);
 
       const agency_details = await agencyModel.checkAgency({
-        agency_id: ref_agent_id || agency_id,
+        agency_id: ref_agent_id,
         status: 'Active',
       });
 
@@ -96,21 +98,18 @@ export class SubAgentFlightService extends AbstractServices {
       }
 
       //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Flight',
-          agency_id,
-        });
+      const markup_amount = await Lib.getSubAgentTotalMarkup({
+        trx,
+        type: 'Flight',
+        agency_id,
+      });
 
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
+      if (!markup_amount) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Markup information is empty. Contact with the authority',
+        };
       }
 
       const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
@@ -198,7 +197,8 @@ export class SubAgentFlightService extends AbstractServices {
 
   public async flightSearchSSE(req: Request, res: Response) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, agency_type, ref_agent_id } = req.agencyUser;
+      const { agency_id } = req.agencyUser;
+      const { agency_id: ref_agent_id } = req.agencyB2CWhiteLabel;
       const JourneyType = req.query.JourneyType as string;
       const OriginDestinationInformation = req.query
         .OriginDestinationInformation as unknown as IOriginDestinationInformationPayload[];
@@ -235,7 +235,7 @@ export class SubAgentFlightService extends AbstractServices {
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
       const agency_details = await agencyModel.checkAgency({
-        agency_id: ref_agent_id || agency_id,
+        agency_id: ref_agent_id,
       });
       if (!agency_details?.flight_markup_set) {
         return {
@@ -246,20 +246,18 @@ export class SubAgentFlightService extends AbstractServices {
       }
 
       //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Flight',
-          agency_id,
-        });
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
+      let markup_amount = await Lib.getSubAgentTotalMarkup({
+        trx,
+        type: 'Flight',
+        agency_id,
+      });
+
+      if (!markup_amount) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Markup information is empty. Contact with the authority',
+        };
       }
 
       const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
@@ -407,7 +405,8 @@ export class SubAgentFlightService extends AbstractServices {
 
   public async flightRevalidate(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, ref_agent_id, agency_type } = req.agencyUser;
+      const { agency_id } = req.agencyUser;
+      const { agency_id: ref_agent_id } = req.agencyB2CWhiteLabel;
       const { flight_id, search_id } = req.query as {
         flight_id: string;
         search_id: string;
@@ -415,7 +414,7 @@ export class SubAgentFlightService extends AbstractServices {
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
       const agency_details = await agencyModel.checkAgency({
-        agency_id: ref_agent_id || agency_id,
+        agency_id: ref_agent_id,
       });
 
       if (!agency_details?.flight_markup_set) {
@@ -427,26 +426,23 @@ export class SubAgentFlightService extends AbstractServices {
       }
 
       //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Flight',
-          agency_id,
-        });
+      let markup_amount = await Lib.getSubAgentTotalMarkup({
+        trx,
+        type: 'Flight',
+        agency_id,
+      });
 
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
+      if (!markup_amount) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Markup information is empty. Contact with the authority',
+        };
       }
 
       //revalidate using the flight support service
       const flightSupportService = new CommonFlightSupportService(trx);
-      console.log({ set: agency_details.flight_markup_set, markup_amount });
+
       const data: IFormattedFlightItinerary | null =
         await flightSupportService.FlightRevalidate({
           search_id,
@@ -481,7 +477,6 @@ export class SubAgentFlightService extends AbstractServices {
     const {
       agency_id,
       ref_agent_id,
-      agency_type,
       user_id,
       user_email,
       name,
@@ -512,7 +507,7 @@ export class SubAgentFlightService extends AbstractServices {
       const agencyModel = this.Model.AgencyModel(trx);
 
       const agency_details = await agencyModel.checkAgency({
-        agency_id: ref_agent_id || agency_id,
+        agency_id: ref_agent_id,
       });
 
       if (!agency_details?.flight_markup_set) {
@@ -533,22 +528,18 @@ export class SubAgentFlightService extends AbstractServices {
       }
 
       //get SUB AGENT markup
-      let markup_amount = undefined;
+      let markup_amount = await Lib.getSubAgentTotalMarkup({
+        trx,
+        type: 'Flight',
+        agency_id,
+      });
 
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Flight',
-          agency_id,
-        });
-
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
+      if (!markup_amount) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Markup information is empty. Contact with the authority',
+        };
       }
 
       //get data from redis using the search id
@@ -655,7 +646,7 @@ export class SubAgentFlightService extends AbstractServices {
         message: 'Flight booking revalidate data',
         url: '/flight/booking',
         user_id: user_id,
-        source: 'AGENT',
+        source: 'SUB AGENT',
         metadata: {
           api: data.api,
           request_body: {
@@ -682,7 +673,7 @@ export class SubAgentFlightService extends AbstractServices {
           flight_data: data,
           traveler_data: body.passengers,
           type: 'Agent_Flight',
-          source_type: SOURCE_AGENT,
+          source_type: SOURCE_SUB_AGENT,
           source_id: agency_id,
           invoice_ref_type: TYPE_FLIGHT,
           booking_block: directBookingPermission.booking_block,
@@ -740,14 +731,13 @@ export class SubAgentFlightService extends AbstractServices {
           payload.status = FLIGHT_BOOKING_IN_PROCESS;
         }
       } catch (err: any) {
-        console.log({ err });
         await this.Model.ErrorLogsModel(trx).insertErrorLogs({
           http_method: 'POST',
           level: err.level || ERROR_LEVEL_ERROR,
           message: 'Error on flight booking.' + err,
           url: req.originalUrl,
           user_id: user_id,
-          source: SOURCE_AGENT,
+          source: SOURCE_SUB_AGENT,
           metadata: err.metadata || {
             api: data.api,
             request_body: {
@@ -775,7 +765,7 @@ export class SubAgentFlightService extends AbstractServices {
 
         await flightBookingModel.updateFlightBooking(payload, {
           id: new_booking_id,
-          source_type: SOURCE_AGENT,
+          source_type: SOURCE_SUB_AGENT,
         });
 
         //send email
@@ -786,13 +776,14 @@ export class SubAgentFlightService extends AbstractServices {
           email: agency_email,
           booked_by: SOURCE_AGENT,
           agency: {
+            agency_id,
             email: agency_email,
             name: agency_name,
             phone: String(phone_number),
             address: address,
             photo: agency_logo,
           },
-          panel_link: `${AGENT_PROJECT_LINK}${FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${new_booking_id}`,
+          panel_link: new_booking_ref,
         });
       } catch (err) {
         console.log({ err });
@@ -832,7 +823,7 @@ export class SubAgentFlightService extends AbstractServices {
       const query = req.query as ISubAgentGetFlightBookingReqQuery;
 
       const data = await flightBookingModel.getFlightBookingList(
-        { ...query, source_id: agency_id, booked_by: SOURCE_AGENT },
+        { ...query, source_id: agency_id, booked_by: SOURCE_SUB_AGENT },
         true
       );
 
@@ -953,6 +944,7 @@ export class SubAgentFlightService extends AbstractServices {
       const flightSegment = await flightSegmentsModel.getFlightBookingSegment(
         Number(id)
       );
+
       const agentFlightBookingSupportService =
         new AgentFlightBookingSupportService(trx);
       const ticketIssuePermission =

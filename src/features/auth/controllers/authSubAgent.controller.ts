@@ -19,7 +19,7 @@ export default class AuthSubAgentController extends AbstractController {
   );
 
   public register = this.asyncWrapper.wrap(
-    { bodySchema: this.validator.agencyRegisterValidator },
+    { bodySchema: this.validator.subAgencyRegisterValidator },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.register(req);
       if (data.success) {
@@ -31,7 +31,7 @@ export default class AuthSubAgentController extends AbstractController {
   );
 
   public registerComplete = this.asyncWrapper.wrap(
-    { bodySchema: this.validator.agencyRegisterCompleteValidator },
+    { bodySchema: this.validator.subagencyRegisterCompleteValidator },
     async (req: Request, res: Response) => {
       const { code, ...data } = await this.service.registerComplete(req);
       res.status(code).json(data);

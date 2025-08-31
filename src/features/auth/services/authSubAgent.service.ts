@@ -241,7 +241,7 @@ export default class AuthSubAgentService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: this.ResMsg.HTTP_SUCCESSFUL,
+        message: 'OTP has been sent to your email.',
         data: {
           email,
         },
@@ -294,6 +294,8 @@ export default class AuthSubAgentService extends AbstractServices {
           message: this.ResMsg.TOO_MUCH_ATTEMPT,
         };
       }
+
+      console.log({ otp, hashed_otp });
 
       const otpValidation = await Lib.compareHashValue(
         otp.toString(),
@@ -384,16 +386,25 @@ export default class AuthSubAgentService extends AbstractServices {
         address,
       } = checkUserAgency;
 
+      console.log({ agency_status });
+
       if (
         agency_status === 'Inactive' ||
         agency_status === 'Incomplete' ||
-        agency_status === 'Rejected' ||
-        agency_status === 'Pending'
+        agency_status === 'Rejected'
       ) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
           message: 'Unauthorized agency! Please contact with us.',
+        };
+      }
+
+      if (agency_status === 'Pending') {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Agency Request is in process. Please wait for approval.',
         };
       }
 
@@ -507,7 +518,7 @@ export default class AuthSubAgentService extends AbstractServices {
       const checkAgencyUser = await AgencyUserModel.checkUser({
         email: user_or_email,
         username: user_or_email,
-        agency_id: main_agency_id,
+        ref_agent_id: main_agency_id,
         agency_type: SOURCE_SUB_AGENT,
       });
 
@@ -515,7 +526,7 @@ export default class AuthSubAgentService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_UNAUTHORIZED,
-          message: this.ResMsg.WRONG_CREDENTIALS,
+          message: this.ResMsg.HTTP_NOT_FOUND,
         };
       }
 

@@ -25,6 +25,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SubAgentConfigService = void 0;
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
+const constants_1 = require("../../../utils/miscellaneous/constants");
 class SubAgentConfigService extends abstract_service_1.default {
     constructor() {
         super();
@@ -174,8 +175,8 @@ class SubAgentConfigService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { agency_id } = req.agencyB2CWhiteLabel;
             const configModel = this.Model.OthersModel();
-            const accounts = yield configModel.getAccount({
-                source_type: 'AGENT',
+            const { data } = yield configModel.getAccount({
+                source_type: constants_1.SOURCE_AGENT,
                 source_id: agency_id,
                 status: true,
             });
@@ -183,7 +184,7 @@ class SubAgentConfigService extends abstract_service_1.default {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: accounts,
+                data,
             };
         });
     }

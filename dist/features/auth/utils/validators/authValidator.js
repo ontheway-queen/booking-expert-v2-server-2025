@@ -28,6 +28,15 @@ class AuthValidator {
             phone: joi_1.default.string().min(7).max(20).required().trim(),
         });
         //sub agency register validator
+        this.subAgencyRegisterValidator = joi_1.default.object({
+            user_name: joi_1.default.string().trim().min(4).max(255).required(),
+            agency_name: joi_1.default.string().trim().min(4).max(255).required(),
+            email: joi_1.default.string().email().trim().lowercase().max(255).required(),
+            address: joi_1.default.string().min(8).max(100).required().trim(),
+            password: joi_1.default.string().min(8).max(100).required().trim(),
+            phone: joi_1.default.string().min(7).max(20).required().trim(),
+        });
+        //sub agency register validator
         this.subagencyRegisterValidator = joi_1.default.object({
             user_name: joi_1.default.string().trim().min(4).max(255).required(),
             password: joi_1.default.string().trim().min(8).max(50).required(),
@@ -54,6 +63,11 @@ class AuthValidator {
         //Complete Registration Validator
         this.agencyRegisterCompleteValidator = joi_1.default.object({
             token: joi_1.default.string().required().trim(),
+        });
+        //Complete Registration Validator
+        this.subagencyRegisterCompleteValidator = joi_1.default.object({
+            email: joi_1.default.string().email().lowercase().required().trim(),
+            otp: joi_1.default.string().required(),
         });
         //login with google validator
         this.loginWithGoogleValidator = joi_1.default.object({

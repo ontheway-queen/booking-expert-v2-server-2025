@@ -26,11 +26,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SubAgentMainController = void 0;
 const abstract_controller_1 = __importDefault(require("../../../abstract/abstract.controller"));
 const subAgentMain_service_1 = require("../services/subAgentMain.service");
-const subagentMain_validator_1 = __importDefault(require("../utils/validator/subagentMain.validator"));
+const subAgentMain_validator_1 = __importDefault(require("../utils/validator/subAgentMain.validator"));
 class SubAgentMainController extends abstract_controller_1.default {
     constructor() {
         super(...arguments);
-        this.validator = new subagentMain_validator_1.default();
+        this.validator = new subAgentMain_validator_1.default();
         this.service = new subAgentMain_service_1.SubAgentMainService();
         this.sendEmailOTP = this.asyncWrapper.wrap({ bodySchema: this.validator.sendOtpInputValidator }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.sendEmailOtp(req), { code } = _a, rest = __rest(_a, ["code"]);

@@ -199,7 +199,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                    message: 'OTP has been sent to your email.',
                     data: {
                         email,
                     },
@@ -246,6 +246,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                         message: this.ResMsg.TOO_MUCH_ATTEMPT,
                     };
                 }
+                console.log({ otp, hashed_otp });
                 const otpValidation = yield lib_1.default.compareHashValue(otp.toString(), hashed_otp);
                 if (otpValidation) {
                     yield commonModel.updateOTP({
@@ -292,14 +293,21 @@ class AuthSubAgentService extends abstract_service_1.default {
                     };
                 }
                 const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, agency_email, agency_phone_number, agency_logo, agency_name, is_main_user, agency_type, ref_agent_id, civil_aviation, national_id, trade_license, address, } = checkUserAgency;
+                console.log({ agency_status });
                 if (agency_status === 'Inactive' ||
                     agency_status === 'Incomplete' ||
-                    agency_status === 'Rejected' ||
-                    agency_status === 'Pending') {
+                    agency_status === 'Rejected') {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                         message: 'Unauthorized agency! Please contact with us.',
+                    };
+                }
+                if (agency_status === 'Pending') {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'Agency Request is in process. Please wait for approval.',
                     };
                 }
                 if (!status) {
@@ -399,14 +407,14 @@ class AuthSubAgentService extends abstract_service_1.default {
                 const checkAgencyUser = yield AgencyUserModel.checkUser({
                     email: user_or_email,
                     username: user_or_email,
-                    agency_id: main_agency_id,
+                    ref_agent_id: main_agency_id,
                     agency_type: constants_1.SOURCE_SUB_AGENT,
                 });
                 if (!checkAgencyUser) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_UNAUTHORIZED,
-                        message: this.ResMsg.WRONG_CREDENTIALS,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, phone_number, agency_phone_number, agency_email, agency_logo, agency_name, is_main_user, civil_aviation, national_id, trade_license, address, } = checkAgencyUser;

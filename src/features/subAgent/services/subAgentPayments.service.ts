@@ -6,11 +6,9 @@ import {
   DEPOSIT_STATUS_CANCELLED,
   DEPOSIT_STATUS_PENDING,
   GENERATE_AUTO_UNIQUE_ID,
-  PAYMENT_GATEWAYS,
   SOURCE_AGENT,
   SOURCE_SUB_AGENT,
 } from '../../../utils/miscellaneous/constants';
-import { PaymentSupportService } from '../../../utils/supportServices/paymentSupportServices/paymentSupport.service';
 import {
   ISubAgentCreateDepositPayload,
   IGetSubAgentLedgerHistoryQuery,
@@ -66,6 +64,7 @@ export class SubAgentPaymentsService extends AbstractServices {
   public async createDepositRequest(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { user_id, agency_id } = req.agencyUser;
+      const { agency_id: ref_agent_id } = req.agencyB2CWhiteLabel;
 
       const paymentModel = this.Model.DepositRequestModel(trx);
       const othersModel = this.Model.OthersModel(trx);
@@ -89,7 +88,7 @@ export class SubAgentPaymentsService extends AbstractServices {
       const checkAccount = await othersModel.checkAccount({
         id: body.account_id,
         source_type: SOURCE_AGENT,
-        source_id: agency_id,
+        source_id: ref_agent_id,
       });
 
       if (!checkAccount) {
@@ -202,7 +201,7 @@ export class SubAgentPaymentsService extends AbstractServices {
       const { agency_id } = req.agencyUser;
       const paymentModel = this.Model.DepositRequestModel(trx);
       const query = req.query;
-      const depositData = await paymentModel.getSubAgentDepositRequestList(
+      const { data, total } = await paymentModel.getSubAgentDepositRequestList(
         { ...query, agency_id },
         true
       );
@@ -210,8 +209,8 @@ export class SubAgentPaymentsService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        total: depositData.total,
-        data: depositData.data,
+        data,
+        total,
       };
     });
   }
@@ -382,5 +381,26 @@ export class SubAgentPaymentsService extends AbstractServices {
         },
       };
     });
+  }
+
+  public async getAccounts(req: Request) {
+    const { agency_id } = req.agencyB2CWhiteLabel;
+    const configModel = this.Model.OthersModel();
+
+    const { data, total } = await configModel.getAccount(
+      {
+        source_type: SOURCE_AGENT,
+        source_id: agency_id,
+      },
+      true
+    );
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data,
+      total,
+    };
   }
 }

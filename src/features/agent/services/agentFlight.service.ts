@@ -43,7 +43,6 @@ import {
 } from '../utils/types/agentFlight.types';
 import Lib from '../../../utils/lib/lib';
 import { IUpdateFlightBookingPayload } from '../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
-import CustomError from '../../../utils/lib/customError';
 import VerteilFlightService from '../../../utils/supportServices/flightSupportServices/verteilFlightSupport.service';
 
 export class AgentFlightService extends AbstractServices {
@@ -99,24 +98,6 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
-      //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Flight',
-          agency_id,
-        });
-
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
-      }
-
       const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
       const apiData = await markupSetFlightApiModel.getDynamicFareSuppliers({
         status: true,
@@ -153,7 +134,6 @@ export class AgentFlightService extends AbstractServices {
           booking_block: false,
           reqBody: body,
           dynamic_fare_supplier_id: sabre_supplier_id,
-          markup_amount,
         });
       }
 
@@ -163,8 +143,7 @@ export class AgentFlightService extends AbstractServices {
           booking_block: false,
           reqBody: body,
           dynamic_fare_supplier_id: verteil_supplier_id,
-          markup_amount,
-          search_id
+          search_id,
         });
       }
 
@@ -174,10 +153,8 @@ export class AgentFlightService extends AbstractServices {
           booking_block: false,
           reqBody: body,
           dynamic_fare_supplier_id: custom_supplier_id,
-          markup_amount,
         });
       }
-
 
       const leg_descriptions = body.OriginDestinationInformation.map(
         (OrDeInfo) => {
@@ -267,23 +244,6 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
-      //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Flight',
-          agency_id,
-        });
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
-      }
-
       const markupSetFlightApiModel = this.Model.DynamicFareModel(trx);
       const apiData = await markupSetFlightApiModel.getDynamicFareSuppliers({
         status: true,
@@ -309,7 +269,7 @@ export class AgentFlightService extends AbstractServices {
       console.log({
         sabre_supplier_id,
         verteil_supplier_id,
-        custom_supplier_id
+        custom_supplier_id,
       });
 
       //generate search ID
@@ -378,7 +338,6 @@ export class AgentFlightService extends AbstractServices {
               booking_block: false,
               reqBody: body,
               dynamic_fare_supplier_id: sabre_supplier_id,
-              markup_amount,
             })
           )
         );
@@ -393,8 +352,7 @@ export class AgentFlightService extends AbstractServices {
               booking_block: false,
               reqBody: body,
               dynamic_fare_supplier_id: verteil_supplier_id,
-              markup_amount,
-              search_id
+              search_id,
             })
           )
         );
@@ -409,7 +367,6 @@ export class AgentFlightService extends AbstractServices {
               booking_block: false,
               reqBody: body,
               dynamic_fare_supplier_id: custom_supplier_id,
-              markup_amount,
             })
           )
         );
@@ -463,7 +420,7 @@ export class AgentFlightService extends AbstractServices {
 
   public async flightRevalidate(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, ref_agent_id, agency_type } = req.agencyUser;
+      const { agency_id, ref_agent_id } = req.agencyUser;
       const { flight_id, search_id } = req.query as {
         flight_id: string;
         search_id: string;
@@ -482,33 +439,14 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
-      //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Flight',
-          agency_id,
-        });
-
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
-      }
-
       //revalidate using the flight support service
       const flightSupportService = new CommonFlightSupportService(trx);
-      console.log({ set: agency_details.flight_markup_set, markup_amount });
+
       const data: IFormattedFlightItinerary | null =
         await flightSupportService.FlightRevalidate({
           search_id,
           flight_id,
           dynamic_fare_set_id: agency_details.flight_markup_set,
-          markup_amount,
         });
 
       if (data) {
@@ -537,7 +475,6 @@ export class AgentFlightService extends AbstractServices {
     const {
       agency_id,
       ref_agent_id,
-      agency_type,
       user_id,
       user_email,
       name,
@@ -588,25 +525,6 @@ export class AgentFlightService extends AbstractServices {
         };
       }
 
-      //get SUB AGENT markup
-      let markup_amount = undefined;
-
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Flight',
-          agency_id,
-        });
-
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
-      }
-
       //get data from redis using the search id
       const retrievedData = await getRedis(body.search_id);
 
@@ -636,7 +554,6 @@ export class AgentFlightService extends AbstractServices {
           search_id: body.search_id,
           flight_id: body.flight_id,
           dynamic_fare_set_id: agency_details.flight_markup_set,
-          markup_amount,
         });
 
       if (!rev_data) {
@@ -854,6 +771,7 @@ export class AgentFlightService extends AbstractServices {
           email: agency_email,
           booked_by: SOURCE_AGENT,
           agency: {
+            agency_id,
             email: agency_email,
             name: agency_name,
             phone: String(phone_number),
@@ -1060,11 +978,14 @@ export class AgentFlightService extends AbstractServices {
             unique_traveler,
           });
           if (res?.success) {
-            status = res.data?.length ? FLIGHT_TICKET_ISSUE : FLIGHT_BOOKING_ON_HOLD;
+            status = res.data?.length
+              ? FLIGHT_TICKET_ISSUE
+              : FLIGHT_BOOKING_ON_HOLD;
             ticket_number = res.data;
           }
         } else if (booking_data.api === VERTEIL_API) {
-          const segmentDetails = await bookingSegmentModel.getFlightBookingSegment(Number(id));
+          const segmentDetails =
+            await bookingSegmentModel.getFlightBookingSegment(Number(id));
           const verteilSubService = new VerteilFlightService(trx);
           const res = await verteilSubService.TicketIssueService({
             airlineCode: segmentDetails[0].airline_code,
@@ -1076,7 +997,9 @@ export class AgentFlightService extends AbstractServices {
           });
 
           if (res?.success) {
-            status = res.data?.length ? FLIGHT_TICKET_ISSUE : FLIGHT_BOOKING_ON_HOLD;
+            status = res.data?.length
+              ? FLIGHT_TICKET_ISSUE
+              : FLIGHT_BOOKING_ON_HOLD;
             if (res?.data?.length) ticket_number = res.data;
           }
         }
@@ -1101,7 +1024,7 @@ export class AgentFlightService extends AbstractServices {
           issue_block: ticketIssuePermission.issue_block,
           api: booking_data.api,
           ticket_number,
-          travelers_info: get_travelers
+          travelers_info: get_travelers,
         });
 
         //send email
@@ -1184,7 +1107,8 @@ export class AgentFlightService extends AbstractServices {
           status = true;
         }
       } else if (booking_data.api === VERTEIL_API) {
-        const segmentDetails = await bookingSegmentModel.getFlightBookingSegment(Number(id));
+        const segmentDetails =
+          await bookingSegmentModel.getFlightBookingSegment(Number(id));
         const verteilSubService = new VerteilFlightService(trx);
         const res = await verteilSubService.OrderCancelService({
           airlineCode: segmentDetails[0].airline_code,

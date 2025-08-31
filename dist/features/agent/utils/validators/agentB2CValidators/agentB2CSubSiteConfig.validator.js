@@ -24,7 +24,7 @@ class AgentB2CSubSiteConfigValidator {
             meta_title: joi_1.default.string().trim().optional(),
             meta_description: joi_1.default.string().trim().optional(),
             meta_tags: joi_1.default.string().trim().optional(),
-            notice: joi_1.default.string().trim().optional(),
+            notice: joi_1.default.string().trim().allow('').optional(),
             android_app_link: joi_1.default.string().trim().optional(),
             ios_app_link: joi_1.default.string().trim().optional(),
             show_developer: joi_1.default.boolean().optional(),

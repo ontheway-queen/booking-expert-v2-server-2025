@@ -527,24 +527,45 @@ export class CommonFlightBookingSupportService extends AbstractServices {
         })
       );
 
-      //send email
-      await EmailSendLib.sendEmail({
-        email: payload.email,
-        emailSub: `Flight Booking Confirmation - ${booking_data.booking_ref}`,
-        emailBody: flightBookingBodyTemplate({
-          booking: booking_data,
-          travelers: get_travelers,
-          panel_link: payload.panel_link,
-          logo: source_logo,
-        }),
-        attachments: [
-          {
-            filename: 'flight-booking.pdf',
-            content: pdfBuffer,
-            contentType: 'application/pdf',
-          },
-        ],
-      });
+      if (payload.booked_by === 'AGENT') {
+        //send email
+        await EmailSendLib.sendEmail({
+          email: payload.email,
+          emailSub: `Flight Booking Confirmation - ${booking_data.booking_ref}`,
+          emailBody: flightBookingBodyTemplate({
+            booking: booking_data,
+            travelers: get_travelers,
+            panel_link: payload.panel_link,
+            logo: source_logo,
+          }),
+          attachments: [
+            {
+              filename: 'flight-booking.pdf',
+              content: pdfBuffer,
+              contentType: 'application/pdf',
+            },
+          ],
+        });
+      } else {
+        //send email
+        await EmailSendLib.sendEmailAgent(this.trx, payload.agency.agency_id, {
+          email: payload.email,
+          emailSub: `Flight Booking Confirmation - ${booking_data.booking_ref}`,
+          emailBody: flightBookingBodyTemplate({
+            booking: booking_data,
+            travelers: get_travelers,
+            panel_link: payload.panel_link,
+            logo: source_logo,
+          }),
+          attachments: [
+            {
+              filename: 'flight-booking.pdf',
+              content: pdfBuffer,
+              contentType: 'application/pdf',
+            },
+          ],
+        });
+      }
     }
   }
 

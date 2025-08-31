@@ -183,7 +183,7 @@ export default class DepositRequestModel extends Schema {
         'a.agency_name',
         'a.agency_logo'
       )
-      .joinRaw('agent.agency as a ON a.id = dr.agency_id')
+      .joinRaw('LEFT JOIN agent.agency as a ON a.id = dr.agency_id')
       .leftJoin('view_account_details AS ad', 'dr.account_id', 'ad.id')
       .where((qb) => {
         qb.andWhere('dr.source', SOURCE_SUB_AGENT);
@@ -214,11 +214,11 @@ export default class DepositRequestModel extends Schema {
 
     if (is_total) {
       total = await this.db('deposit_request as dr')
-        .withSchema(this.AGENT_SCHEMA)
+        .withSchema(this.DBO_SCHEMA)
         .count('dr.id as total')
-        .join('agency as a', 'a.id', 'dr.agency_id')
+        .joinRaw('LEFT JOIN agent.agency as a ON a.id = dr.agency_id')
         .where((qb) => {
-          qb.andWhere('dr.source', SOURCE_AGENT);
+          qb.andWhere('dr.source', SOURCE_SUB_AGENT);
           if (query.agency_id) {
             qb.andWhere('dr.agency_id', query.agency_id);
           }

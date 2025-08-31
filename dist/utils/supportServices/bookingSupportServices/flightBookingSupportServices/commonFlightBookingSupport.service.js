@@ -377,24 +377,46 @@ class CommonFlightBookingSupportService extends abstract_service_1.default {
                     segments: segments,
                     agency: payload.agency,
                 }));
-                //send email
-                yield emailSendLib_1.default.sendEmail({
-                    email: payload.email,
-                    emailSub: `Flight Booking Confirmation - ${booking_data.booking_ref}`,
-                    emailBody: (0, flightBookingTemplate_1.flightBookingBodyTemplate)({
-                        booking: booking_data,
-                        travelers: get_travelers,
-                        panel_link: payload.panel_link,
-                        logo: source_logo,
-                    }),
-                    attachments: [
-                        {
-                            filename: 'flight-booking.pdf',
-                            content: pdfBuffer,
-                            contentType: 'application/pdf',
-                        },
-                    ],
-                });
+                if (payload.booked_by === 'AGENT') {
+                    //send email
+                    yield emailSendLib_1.default.sendEmail({
+                        email: payload.email,
+                        emailSub: `Flight Booking Confirmation - ${booking_data.booking_ref}`,
+                        emailBody: (0, flightBookingTemplate_1.flightBookingBodyTemplate)({
+                            booking: booking_data,
+                            travelers: get_travelers,
+                            panel_link: payload.panel_link,
+                            logo: source_logo,
+                        }),
+                        attachments: [
+                            {
+                                filename: 'flight-booking.pdf',
+                                content: pdfBuffer,
+                                contentType: 'application/pdf',
+                            },
+                        ],
+                    });
+                }
+                else {
+                    //send email
+                    yield emailSendLib_1.default.sendEmailAgent(this.trx, payload.agency.agency_id, {
+                        email: payload.email,
+                        emailSub: `Flight Booking Confirmation - ${booking_data.booking_ref}`,
+                        emailBody: (0, flightBookingTemplate_1.flightBookingBodyTemplate)({
+                            booking: booking_data,
+                            travelers: get_travelers,
+                            panel_link: payload.panel_link,
+                            logo: source_logo,
+                        }),
+                        attachments: [
+                            {
+                                filename: 'flight-booking.pdf',
+                                content: pdfBuffer,
+                                contentType: 'application/pdf',
+                            },
+                        ],
+                    });
+                }
             }
         });
     }

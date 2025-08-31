@@ -57,24 +57,6 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
-      //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Hotel',
-          agency_id,
-        });
-
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
-      }
-
       const { name, ...payload } = req.body as IAgentHotelSearchReqBody;
 
       await OthersModel.insertHotelSearchHistory({
@@ -93,7 +75,6 @@ export class AgentHotelService extends AbstractServices {
       const result = await ctHotelSupport.HotelSearch({
         payload,
         markup_set: agent.hotel_markup_set,
-        markup_amount,
       });
 
       if (result) {
@@ -159,30 +140,11 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
-      //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Hotel',
-          agency_id,
-        });
-
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
-      }
-
       const payload = req.body as { hcode: number; search_id: string };
 
       const result = await ctHotelSupport.HotelRooms({
         payload,
         markup_set: agent.hotel_markup_set,
-        markup_amount,
       });
 
       if (result) {
@@ -229,24 +191,6 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
-      //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Hotel',
-          agency_id,
-        });
-
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
-      }
-
       const payload = req.body as {
         search_id: string;
         nights: number;
@@ -256,7 +200,6 @@ export class AgentHotelService extends AbstractServices {
       const data = await ctHotelSupport.HotelRecheck({
         payload,
         markup_set: agent.hotel_markup_set,
-        markup_amount,
       });
 
       if (!data) {
@@ -317,24 +260,6 @@ export class AgentHotelService extends AbstractServices {
         };
       }
 
-      //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Hotel',
-          agency_id,
-        });
-
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
-      }
-
       const files = (req.files as Express.Multer.File[]) || [];
 
       const body = req.body as IAgentHotelBookingReqBody;
@@ -356,7 +281,6 @@ export class AgentHotelService extends AbstractServices {
           nights: nights,
         },
         markup_set: agent.hotel_markup_set,
-        markup_amount,
         with_agent_markup: true,
         with_vendor_price: true,
       });

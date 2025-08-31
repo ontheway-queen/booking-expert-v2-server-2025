@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
+import { SOURCE_AGENT } from '../../../utils/miscellaneous/constants';
 
 export class SubAgentConfigService extends AbstractServices {
   constructor() {
@@ -180,8 +181,8 @@ export class SubAgentConfigService extends AbstractServices {
     const { agency_id } = req.agencyB2CWhiteLabel;
 
     const configModel = this.Model.OthersModel();
-    const accounts = await configModel.getAccount({
-      source_type: 'AGENT',
+    const { data } = await configModel.getAccount({
+      source_type: SOURCE_AGENT,
       source_id: agency_id,
       status: true,
     });
@@ -190,7 +191,7 @@ export class SubAgentConfigService extends AbstractServices {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: accounts,
+      data,
     };
   }
 }

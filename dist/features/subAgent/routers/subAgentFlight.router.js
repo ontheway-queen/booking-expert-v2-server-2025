@@ -1,0 +1,32 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const abstract_router_1 = __importDefault(require("../../../abstract/abstract.router"));
+const subAgentFlight_controller_1 = __importDefault(require("../controllers/subAgentFlight.controller"));
+class SubAgentFlightRouter extends abstract_router_1.default {
+    constructor() {
+        super();
+        this.controller = new subAgentFlight_controller_1.default();
+        this.callRouter();
+    }
+    callRouter() {
+        this.router.route('/search').post(this.controller.flightSearch);
+        this.router.route('/search/sse').get(this.controller.FlightSearchSSE);
+        this.router
+            .route('/search/fare-rules')
+            .get(this.controller.getFlightFareRule);
+        this.router.route('/revalidate').get(this.controller.flightRevalidate);
+        this.router
+            .route('/booking')
+            .post(this.uploader.cloudUploadRaw(this.fileFolders.AGENT_FLIGHT_BOOKING_FILES), this.controller.flightBooking)
+            .get(this.controller.getAllBookingList);
+        this.router.route('/booking/:id').get(this.controller.getSingleBooking);
+        this.router.route('/booking/:id/issue').post(this.controller.issueTicket);
+        this.router
+            .route('/booking/:id/cancel')
+            .post(this.controller.cancelBooking);
+    }
+}
+exports.default = SubAgentFlightRouter;

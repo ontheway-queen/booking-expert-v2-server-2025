@@ -35,7 +35,7 @@ export default class SupportTicketModel extends Schema {
   public async updateSupportTicket(
     payload: IUpdateSupportTicketPayload,
     id: number,
-    source_type: 'AGENT' | 'AGENT B2C' | 'B2C'
+    source_type: 'AGENT' | 'AGENT B2C' | 'B2C' | 'SUB AGENT'
   ) {
     return await this.db('support_tickets')
       .withSchema(this.DBO_SCHEMA)
