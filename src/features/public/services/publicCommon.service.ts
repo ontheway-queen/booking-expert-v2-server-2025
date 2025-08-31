@@ -3,9 +3,11 @@ import qs from 'qs';
 import AbstractServices from '../../../abstract/abstract.service';
 import config from '../../../config/config';
 import SabreAPIEndpoints from '../../../utils/miscellaneous/endpoints/sabreApiEndpoints';
-import { SABRE_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstant';
+import { SABRE_TOKEN_ENV, VERTEIL_API, VERTEIL_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstant';
 import { Request } from 'express';
 import { CTHotelSupportService } from '../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service';
+import VerteilAPIEndpoints from '../../../utils/miscellaneous/endpoints/verteilApiEndpoints';
+import { ERROR_LEVEL_CRITICAL } from '../../../utils/miscellaneous/constants';
 
 export default class PublicCommonService extends AbstractServices {
   constructor() {
@@ -45,6 +47,51 @@ export default class PublicCommonService extends AbstractServices {
         });
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  //get verteil token
+  public async getVerteilToken() {
+    try {
+      return await this.db.transaction(async (trx) => {
+        const axiosConfig = {
+          method: 'post',
+          url: `${config.VERTEIL_URL}${VerteilAPIEndpoints.GET_TOKEN_ENDPOINT}`,
+          headers: {
+            Authorization: `Basic ${Buffer.from(
+              `${config.VERTEIL_USERNAME}:${config.VERTEIL_PASSWORD}`
+            ).toString("base64")}`,
+          },
+          maxBodyLength: Infinity,
+          validateStatus: () => true,
+        };
+
+        const response = await axios.request(axiosConfig);
+
+        console.log({ response });
+        if (response.status !== 200) {
+          await this.Model.ErrorLogsModel(trx).insertErrorLogs({
+            level: ERROR_LEVEL_CRITICAL,
+            message: `Error from Verteil authentication`,
+            url: axiosConfig.url,
+            http_method: 'POST',
+            metadata: {
+              api: VERTEIL_API,
+              endpoint: axiosConfig.url,
+              payload: {
+                username: config.VERTEIL_USERNAME,
+                password: config.VERTEIL_PASSWORD,
+              },
+              response: response.data,
+            }
+          });
+        } else {
+          const authModel = this.Model.CommonModel(trx);
+          await authModel.updateEnv(VERTEIL_TOKEN_ENV, response.data.access_token);
+        }
+      });
+    } catch (err) {
+      console.error("Verteil Token Error:", err);
     }
   }
 
@@ -122,13 +169,16 @@ export default class PublicCommonService extends AbstractServices {
 
       const { filter } = req.query as { filter: string };
 
-      const banks = await CommonModel.getBanks({ name: filter, status: true });
+      const { data } = await CommonModel.getBanks({
+        name: filter,
+        status: true,
+      });
 
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
-        data: banks,
+        data,
       };
     });
   }
@@ -139,7 +189,7 @@ export default class PublicCommonService extends AbstractServices {
 
       const { filter } = req.query as { filter: string };
 
-      const banks = await CommonModel.getSocialMedia({
+      const { data } = await CommonModel.getSocialMedia({
         name: filter,
         status: true,
       });
@@ -148,7 +198,7 @@ export default class PublicCommonService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
-        data: banks,
+        data,
       };
     });
   }

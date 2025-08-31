@@ -9,10 +9,18 @@ const constants_1 = require("../../../../../utils/miscellaneous/constants");
 class AgentB2CSubConfigValidator {
     constructor() {
         this.upsertB2CMarkup = joi_1.default.object({
-            flight_markup_type: joi_1.default.string().valid(constants_1.MARKUP_TYPE_PER, constants_1.MARKUP_TYPE_FLAT).required(),
-            hotel_markup_type: joi_1.default.string().valid(constants_1.MARKUP_TYPE_PER, constants_1.MARKUP_TYPE_FLAT).required(),
-            flight_markup_mode: joi_1.default.string().valid(constants_1.MARKUP_MODE_INCREASE, constants_1.MARKUP_MODE_DECREASE).required(),
-            hotel_markup_mode: joi_1.default.string().valid(constants_1.MARKUP_MODE_INCREASE, constants_1.MARKUP_MODE_DECREASE).required(),
+            flight_markup_type: joi_1.default.string()
+                .valid(constants_1.MARKUP_TYPE_PER, constants_1.MARKUP_TYPE_FLAT)
+                .required(),
+            hotel_markup_type: joi_1.default.string()
+                .valid(constants_1.MARKUP_TYPE_PER, constants_1.MARKUP_TYPE_FLAT)
+                .required(),
+            flight_markup_mode: joi_1.default.string()
+                .valid(constants_1.MARKUP_MODE_INCREASE, constants_1.MARKUP_MODE_DECREASE)
+                .required(),
+            hotel_markup_mode: joi_1.default.string()
+                .valid(constants_1.MARKUP_MODE_INCREASE, constants_1.MARKUP_MODE_DECREASE)
+                .required(),
             flight_markup: joi_1.default.number().required(),
             hotel_markup: joi_1.default.number().required(),
         });
@@ -31,6 +39,11 @@ class AgentB2CSubConfigValidator {
             branch: joi_1.default.string().optional().trim(),
             routing_no: joi_1.default.string().optional().trim(),
             swift_code: joi_1.default.string().optional().trim(),
+        });
+        this.getAccounts = joi_1.default.object({
+            limit: joi_1.default.number().optional(),
+            skip: joi_1.default.number().optional(),
+            status: joi_1.default.boolean().optional(),
         });
         this.createHeroBGContent = joi_1.default.object({
             type: joi_1.default.string().valid(constants_1.CONTENT_TYPE_PHOTO, constants_1.CONTENT_TYPE_VIDEO).required(),

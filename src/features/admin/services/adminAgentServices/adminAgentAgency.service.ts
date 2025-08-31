@@ -131,6 +131,21 @@ export default class AdminAgentAgencyService extends AbstractServices {
         payload.photo = files[0].filename;
       }
 
+      if (payload.email) {
+        const checkEmail = await AgencyUserModel.checkUser({
+          email: body.email,
+          agency_id: Number(agency_id),
+        });
+
+        if (checkEmail) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_CONFLICT,
+            message: 'Email already exists. Please use another email',
+          };
+        }
+      }
+
       await AgencyUserModel.updateUser(payload, {
         agency_id: Number(agency_id),
         id: Number(user_id),
@@ -180,12 +195,27 @@ export default class AdminAgentAgencyService extends AbstractServices {
       }
 
       const { user_id } = req.admin;
-      const { white_label_permissions, kam_id, ref_id, ...restBody } =
+      const { white_label_permissions, kam_id, ref_id, email, ...restBody } =
         req.body as IAdminAgentUpdateAgencyReqBody;
 
       const files = (req.files as Express.Multer.File[]) || [];
-
       const payload: IUpdateAgencyPayload = { ...restBody };
+
+      if (email) {
+        const checkEmail = await AgentModel.checkAgency({
+          email,
+          agency_type: SOURCE_AGENT,
+        });
+        if (checkEmail) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_CONFLICT,
+            message: 'Email already exists. Please use another email',
+          };
+        }
+
+        payload.email = email;
+      }
 
       if (kam_id) {
         const adminModel = this.Model.AdminModel(trx);

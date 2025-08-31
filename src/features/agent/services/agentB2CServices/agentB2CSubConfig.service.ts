@@ -153,7 +153,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         status: true,
       });
 
-      if (!checkBank.length) {
+      if (!checkBank.data.length) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
@@ -171,7 +171,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         agency_id,
         created_by: user_id,
         details: 'New Account created.',
-        payload: JSON.stringify({ ...body, bank: checkBank[0].name }),
+        payload: JSON.stringify({ ...body, bank: checkBank.data[0].name }),
         type: 'CREATE',
       });
 

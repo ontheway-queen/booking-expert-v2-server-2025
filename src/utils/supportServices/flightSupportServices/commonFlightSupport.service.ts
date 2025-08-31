@@ -7,6 +7,7 @@ import {
   MIN_DAYS_BEFORE_DEPARTURE_FOR_DIRECT_TICKET,
   ROUTE_TYPE,
   SABRE_API,
+  VERTEIL_API,
 } from '../../miscellaneous/flightConstant';
 import {
   IFormattedFlightItinerary,
@@ -20,6 +21,7 @@ import { IGetSupplierAirlinesDynamicFareQuery } from '../../modelTypes/dynamicFa
 import { IFlightBookingPassengerReqBody } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
 import DateTimeLib from '../../lib/dateTimeLib';
 import { BD_AIRPORT } from '../../miscellaneous/staticData';
+import VerteilFlightService from './verteilFlightSupport.service';
 
 export class CommonFlightSupportService extends AbstractServices {
   private trx: Knex.Transaction;
@@ -93,6 +95,25 @@ export class CommonFlightSupportService extends AbstractServices {
         retrievedData.response.leg_descriptions;
 
       return formattedResBody;
+    } else if (foundItem.api === VERTEIL_API) {
+      const verteilSubService = new VerteilFlightService(this.trx);
+      const formattedResBody = await verteilSubService.FlightRevalidateService({
+        search_id,
+        reqBody: retrievedData.reqBody,
+        oldData: foundItem,
+        dynamic_fare_supplier_id: apiData[0].id,
+        markup_amount
+      });
+
+      formattedResBody[0].price_changed = this.checkRevalidatePriceChange({
+        flight_revalidate_price: formattedResBody[0].fare.payable,
+        flight_search_price: foundItem.fare.payable,
+      });
+
+      formattedResBody[0].leg_description =
+        retrievedData.response.leg_descriptions;
+
+      return formattedResBody[0];
     } else if (foundItem.api === CUSTOM_API) {
       const customFlightService = new WfttFlightService(this.trx);
       const formattedResBody = await customFlightService.FlightRevalidate({
@@ -328,6 +349,87 @@ export class CommonFlightSupportService extends AbstractServices {
       pax_markup: Number(Number(pax_markup).toFixed(2)),
       agent_discount: Number(Number(agent_discount).toFixed(2)),
       agent_markup: Number(Number(agent_markup).toFixed(2)),
+    };
+  }
+
+  public async calculateFlightTaxMarkup({
+    dynamic_fare_supplier_id,
+    tax,
+    route_type,
+    airline,
+    markup_amount,
+  }: {
+    dynamic_fare_supplier_id: number;
+    tax: { code: string; amount: number }[][];
+    route_type: "SOTO" | "FROM_DAC" | "TO_DAC" | "DOMESTIC";
+    airline: string;
+    markup_amount?: {
+      markup: number;
+      markup_type: 'PER' | 'FLAT';
+      markup_mode: 'INCREASE' | 'DECREASE';
+    };
+  }) {
+    const getFareMarkupQuery: IGetSupplierAirlinesDynamicFareQuery = {
+      dynamic_fare_supplier_id
+    };
+    const dynamicFareModel = this.Model.DynamicFareModel(this.trx);
+    if (route_type === "DOMESTIC") {
+      getFareMarkupQuery.domestic = true;
+    } else if (route_type === "FROM_DAC") {
+      getFareMarkupQuery.from_dac = true;
+    } else if (route_type === "TO_DAC") {
+      getFareMarkupQuery.to_dac = true;
+    } else {
+      getFareMarkupQuery.soto = true;
+    }
+    let markup = 0;
+    let commission = 0;
+
+    for (const taxItem of tax) {
+      for (const tax_elm of taxItem) {
+        const supplier_data = await dynamicFareModel.getFareTaxes({
+          ...getFareMarkupQuery,
+          tax_name: tax_elm.code.substring(0, 2),
+          airline,
+          status: true
+        });
+
+        if (supplier_data.length) {
+          if (supplier_data[0].markup_type === "FLAT") {
+            markup += Number(supplier_data[0].markup);
+          } else if (supplier_data[0].markup_type === "PER") {
+            markup +=
+              Number(tax_elm.amount) * (Number(supplier_data[0].markup) / 100);
+          }
+
+          if (supplier_data[0].commission_type === "FLAT") {
+            commission += Number(supplier_data[0].commission);
+          } else if (supplier_data[0].commission_type === "PER") {
+            commission +=
+              Number(tax_elm.amount) * (Number(supplier_data[0].commission) / 100);
+          }
+        }
+      }
+    }
+
+    let agent_markup = 0.0;
+    let agent_discount = 0.0;
+    if (markup_amount) {
+      if (markup_amount.markup_type === 'PER') {
+        if (markup_amount.markup_mode === 'INCREASE') {
+          agent_markup = Number(markup) * (Number(markup_amount.markup) / 100);
+        }
+        if (markup_amount.markup_mode === 'DECREASE') {
+          agent_discount = Number(commission) * (Number(markup_amount.markup) / 100);
+        }
+      }
+    }
+
+    return {
+      tax_markup: Number(markup),
+      tax_commission: Number(commission),
+      agent_tax_markup: agent_markup,
+      agent_tax_discount: agent_discount
     };
   }
 

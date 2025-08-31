@@ -9,17 +9,15 @@ import {
   TYPE_FLIGHT,
 } from '../../../../utils/miscellaneous/constants';
 import {
-  FLIGHT_BOOKING_CANCELLED,
   FLIGHT_BOOKING_CONFIRMED,
-  FLIGHT_BOOKING_EXPIRED,
   FLIGHT_BOOKING_IN_PROCESS,
   FLIGHT_BOOKING_ON_HOLD,
   FLIGHT_BOOKING_PENDING,
-  FLIGHT_BOOKING_REFUNDED,
   FLIGHT_TICKET_IN_PROCESS,
   FLIGHT_TICKET_ISSUE,
   PAYMENT_TYPE_FULL,
   SABRE_API,
+  VERTEIL_API,
 } from '../../../../utils/miscellaneous/flightConstant';
 import SabreFlightService from '../../../../utils/supportServices/flightSupportServices/sabreFlightSupport.service';
 import { CommonFlightBookingSupportService } from '../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service';
@@ -28,6 +26,7 @@ import { IAdminUpdateFlightBookingReqBody } from '../../utils/types/adminAgentTy
 import Lib from '../../../../utils/lib/lib';
 import { IUpdateFlightBookingPayload } from '../../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
 import { IAgentUpdateDataAfterTicketIssue } from '../../../../utils/supportTypes/bookingSupportTypes/flightBookingSupportTypes/agentFlightBookingTypes';
+import VerteilFlightService from '../../../../utils/supportServices/flightSupportServices/verteilFlightSupport.service';
 
 export class AdminAgentFlightService extends AbstractServices {
   constructor() {
@@ -198,6 +197,18 @@ export class AdminAgentFlightService extends AbstractServices {
         if (res?.success) {
           status = true;
         }
+      } else if (booking_data.api === VERTEIL_API) {
+        const bookingSegmentModel = this.Model.FlightBookingSegmentModel(trx);
+        const segmentDetails =
+          await bookingSegmentModel.getFlightBookingSegment(Number(id));
+        const verteilSubService = new VerteilFlightService(trx);
+        const res = await verteilSubService.OrderCancelService({
+          airlineCode: segmentDetails[0].airline_code,
+          pnr: String(booking_data.airline_pnr),
+        });
+        if (res.success) {
+          status = true;
+        }
       }
 
       if (status) {
@@ -267,6 +278,8 @@ export class AdminAgentFlightService extends AbstractServices {
         };
       }
 
+      let ticket_number: string[] = [];
+
       //get other information
       const get_travelers = await bookingTravelerModel.getFlightBookingTraveler(
         Number(id)
@@ -307,6 +320,7 @@ export class AdminAgentFlightService extends AbstractServices {
       let status:
         | typeof FLIGHT_TICKET_ISSUE
         | typeof FLIGHT_TICKET_IN_PROCESS
+        | typeof FLIGHT_BOOKING_ON_HOLD
         | null = null;
       if (ticketIssuePermission.issue_block === true) {
         status = FLIGHT_TICKET_IN_PROCESS;
@@ -322,7 +336,30 @@ export class AdminAgentFlightService extends AbstractServices {
             unique_traveler,
           });
           if (res?.success) {
-            status = FLIGHT_TICKET_ISSUE;
+            status = res.data?.length
+              ? FLIGHT_TICKET_ISSUE
+              : FLIGHT_BOOKING_ON_HOLD;
+            ticket_number = res.data;
+          }
+        } else if (booking_data.api === VERTEIL_API) {
+          const bookingSegmentModel = this.Model.FlightBookingSegmentModel(trx);
+          const segmentDetails =
+            await bookingSegmentModel.getFlightBookingSegment(Number(id));
+          const verteilSubService = new VerteilFlightService(trx);
+          const res = await verteilSubService.TicketIssueService({
+            airlineCode: segmentDetails[0].airline_code,
+            oldFare: {
+              vendor_total: booking_data.vendor_fare.net_fare,
+            },
+            passengers: get_travelers,
+            pnr: String(booking_data.airline_pnr),
+          });
+
+          if (res?.success) {
+            status = res.data?.length
+              ? FLIGHT_TICKET_ISSUE
+              : FLIGHT_BOOKING_ON_HOLD;
+            if (res?.data?.length) ticket_number = res.data;
           }
         }
       }
@@ -358,6 +395,8 @@ export class AdminAgentFlightService extends AbstractServices {
           issued_by_user_id: user_id,
           issue_block: ticketIssuePermission.issue_block,
           api: booking_data.api,
+          ticket_number,
+          travelers_info: get_travelers,
         });
 
         //send email

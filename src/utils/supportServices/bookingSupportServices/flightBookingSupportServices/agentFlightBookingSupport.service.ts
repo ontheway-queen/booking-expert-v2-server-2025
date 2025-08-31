@@ -61,19 +61,19 @@ export class AgentFlightBookingSupportService extends AbstractServices {
       };
     }
 
-    const flightMarkupsModel = this.Model.DynamicFareModel(this.trx);
-    const flightMarkupData = await flightMarkupsModel.getSupplierAirlinesFares({
-      dynamic_fare_supplier_id: set_flight_api[0].id,
-      airline: payload.airline,
-    });
+    // const flightMarkupsModel = this.Model.DynamicFareModel(this.trx);
+    // const flightMarkupData = await flightMarkupsModel.getSupplierAirlinesFares({
+    //   dynamic_fare_supplier_id: set_flight_api[0].id,
+    //   airline: payload.airline,
+    // });
 
-    if (!flightMarkupData.length) {
-      return {
-        success: false,
-        code: this.StatusCode.HTTP_NOT_FOUND,
-        message: this.ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP,
-      };
-    }
+    // if (!flightMarkupData.length) {
+    //   return {
+    //     success: false,
+    //     code: this.StatusCode.HTTP_NOT_FOUND,
+    //     message: this.ResMsg.AIRLINE_DATA_NOT_PRESENT_FOR_MARKUP,
+    //   };
+    // }
 
     return {
       issue_block: false,
@@ -85,6 +85,7 @@ export class AgentFlightBookingSupportService extends AbstractServices {
   ) {
     //update booking
     const flightBookingModel = this.Model.FlightBookingModel(this.trx);
+    const bookingTravelerModel = this.Model.FlightBookingTravelerModel(this.trx);
 
     const updateFlightPayload: IUpdateFlightBookingPayload = {
       status: payload.status,
@@ -104,6 +105,18 @@ export class AgentFlightBookingSupportService extends AbstractServices {
       source_type: SOURCE_AGENT,
     });
 
+    //ticket number update
+    if (payload.ticket_number?.length && payload?.travelers_info?.length === payload?.ticket_number?.length) {
+      await Promise.all(
+        payload.ticket_number.map((ticket_num: string, ind: number) =>
+          bookingTravelerModel.updateFlightBookingTraveler(
+            { ticket_number: ticket_num },
+            payload.travelers_info ? payload.travelers_info[ind].id : 0
+          )
+        )
+      );
+    }
+
     //add tracking
     const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(
       this.trx
@@ -113,11 +126,10 @@ export class AgentFlightBookingSupportService extends AbstractServices {
 
     tracking_data.push({
       flight_booking_id: payload.booking_id,
-      description: `Ticket ${
-        payload.status === FLIGHT_TICKET_IN_PROCESS
-          ? 'has been issued'
-          : 'is in process'
-      }. Issued by ${payload.issued_by_type}`,
+      description: `Ticket ${payload.status === FLIGHT_TICKET_IN_PROCESS
+        ? 'has been issued'
+        : 'is in process'
+        }. Issued by ${payload.issued_by_type}`,
     });
 
     if (payload.issue_block) {
@@ -130,13 +142,10 @@ export class AgentFlightBookingSupportService extends AbstractServices {
     if (payload.due > 0) {
       tracking_data.push({
         flight_booking_id: payload.booking_id,
-        description: `${
-          payload.paid_amount
-        } amount has been paid for the booking (loan amount - ${
-          payload.loan_amount
-        }, balance amount - ${
-          payload.paid_amount - payload.loan_amount
-        }). Due amount is ${payload.due}`,
+        description: `${payload.paid_amount
+          } amount has been paid for the booking (loan amount - ${payload.loan_amount
+          }, balance amount - ${payload.paid_amount - payload.loan_amount
+          }). Due amount is ${payload.due}`,
       });
     }
 

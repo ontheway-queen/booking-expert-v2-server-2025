@@ -134,6 +134,7 @@ export interface IUpdateFlightBookingPayload {
   gds_pnr?: string;
   ticket_issue_last_time?: string;
   airline_pnr?: string;
+  api_booking_ref?: string;
 }
 
 interface IBookingCheckPassenger {

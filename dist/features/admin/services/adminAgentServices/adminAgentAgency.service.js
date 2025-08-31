@@ -114,6 +114,19 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 if (files.length) {
                     payload.photo = files[0].filename;
                 }
+                if (payload.email) {
+                    const checkEmail = yield AgencyUserModel.checkUser({
+                        email: body.email,
+                        agency_id: Number(agency_id),
+                    });
+                    if (checkEmail) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_CONFLICT,
+                            message: 'Email already exists. Please use another email',
+                        };
+                    }
+                }
                 yield AgencyUserModel.updateUser(payload, {
                     agency_id: Number(agency_id),
                     id: Number(user_id),
@@ -151,9 +164,23 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
                 }
                 const { user_id } = req.admin;
-                const _a = req.body, { white_label_permissions, kam_id, ref_id } = _a, restBody = __rest(_a, ["white_label_permissions", "kam_id", "ref_id"]);
+                const _a = req.body, { white_label_permissions, kam_id, ref_id, email } = _a, restBody = __rest(_a, ["white_label_permissions", "kam_id", "ref_id", "email"]);
                 const files = req.files || [];
                 const payload = Object.assign({}, restBody);
+                if (email) {
+                    const checkEmail = yield AgentModel.checkAgency({
+                        email,
+                        agency_type: constants_1.SOURCE_AGENT,
+                    });
+                    if (checkEmail) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_CONFLICT,
+                            message: 'Email already exists. Please use another email',
+                        };
+                    }
+                    payload.email = email;
+                }
                 if (kam_id) {
                     const adminModel = this.Model.AdminModel(trx);
                     const checkKam = yield adminModel.checkUserAdmin({ id: kam_id });

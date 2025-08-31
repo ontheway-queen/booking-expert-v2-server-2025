@@ -128,11 +128,12 @@ export default class DepositRequestModel extends Schema {
     agency_id?: number
   ): Promise<IGetSingleAgentDepositRequestData | null> {
     return await this.db('deposit_request as dr')
-      .withSchema(this.AGENT_SCHEMA)
+      .withSchema(this.DBO_SCHEMA)
       .select(
         'dr.id',
         'dr.agency_id',
-        'dr.bank_name',
+        'ad.bank_name',
+        'ad.bank_logo',
         'dr.amount',
         'dr.remarks',
         'dr.request_no',
@@ -142,15 +143,16 @@ export default class DepositRequestModel extends Schema {
         'dr.docs',
         'dr.created_by',
         'dr.updated_by',
-        'dr.updated_by_name',
+        'ua.name AS updated_by_name',
         'dr.updated_at',
         'dr.update_note',
         'au.name AS created_by_name',
         'a.agency_name',
         'a.agency_logo'
       )
-      .joinRaw('agent.agency as a ON dr.agency_id = a.id')
-      .joinRaw('agent.agency_user AS au ON dr.created_by = au.id')
+      .joinRaw('LEFT JOIN agent.agency as a ON dr.agency_id = a.id')
+      .joinRaw('LEFT JOIN agent.agency_user AS au ON dr.created_by = au.id')
+      .joinRaw('LEFT JOIN admin.user_admin AS ua ON dr.updated_by = ua.id')
       .leftJoin('view_account_details AS ad', 'dr.account_id', 'ad.id')
       .where((qb) => {
         qb.andWhere('dr.id', id);

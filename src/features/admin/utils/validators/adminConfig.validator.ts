@@ -92,6 +92,8 @@ export default class AdminConfigValidator {
   public getBanks = Joi.object({
     status: Joi.boolean().optional(),
     filter: Joi.string().optional(),
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
   });
 
   public updateBank = Joi.object({
@@ -108,6 +110,8 @@ export default class AdminConfigValidator {
   public getSocialMedia = Joi.object({
     status: Joi.boolean().optional(),
     filter: Joi.string().optional(),
+    limit: Joi.number().optional(),
+    skip: Joi.number().optional(),
   });
 
   public updateSocialMedia = Joi.object({

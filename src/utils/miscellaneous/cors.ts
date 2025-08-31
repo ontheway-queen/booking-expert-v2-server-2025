@@ -69,4 +69,10 @@ export const origin: string[] = [
   'https://www.globalairtravelexpress.com',
   'https://travelmirror.com.bd',
   'https://www.travelmirror.com.bd',
+  'https://sammonitravels.com',
+  'https://www.sammonitravels.com',
+  'https://theflightpoint.com',
+  'https://www.theflightpoint.com',
+  'https://safinatourandtravels.com',
+  'https://www.safinatourandtravels.com',
 ];

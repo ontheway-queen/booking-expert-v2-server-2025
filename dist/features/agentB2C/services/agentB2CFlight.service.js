@@ -35,6 +35,7 @@ const commonFlightSupport_service_1 = require("../../../utils/supportServices/fl
 const commonFlightBookingSupport_service_1 = require("../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service");
 const flightUtils_1 = __importDefault(require("../../../utils/lib/flight/flightUtils"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
+const verteilFlightSupport_service_1 = __importDefault(require("../../../utils/supportServices/flightSupportServices/verteilFlightSupport.service"));
 class AgentB2CFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -74,16 +75,23 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 });
                 //extract API IDs
                 let sabre_set_flight_api_id = 0;
+                let verteil_supplier_id = 0;
                 let wftt_set_flight_api_id = 0;
                 apiData.forEach((api) => {
                     if (api.sup_api === flightConstant_1.SABRE_API) {
                         sabre_set_flight_api_id = api.id;
                     }
+                    if (api.sup_api === flightConstant_1.VERTEIL_API) {
+                        verteil_supplier_id = api.id;
+                    }
                     if (api.sup_api === flightConstant_1.CUSTOM_API) {
                         wftt_set_flight_api_id = api.id;
                     }
                 });
+                //generate search ID
+                const search_id = (0, uuid_1.v4)();
                 let sabreData = [];
+                let verteilData = [];
                 let wfttData = [];
                 if (sabre_set_flight_api_id) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
@@ -92,6 +100,16 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         reqBody: body,
                         dynamic_fare_supplier_id: sabre_set_flight_api_id,
                         markup_amount,
+                    });
+                }
+                if (verteil_supplier_id) {
+                    const verteilSubService = new verteilFlightSupport_service_1.default(trx);
+                    verteilData = yield verteilSubService.FlightSearchService({
+                        booking_block: false,
+                        reqBody: body,
+                        dynamic_fare_supplier_id: verteil_supplier_id,
+                        markup_amount,
+                        search_id,
                     });
                 }
                 if (wftt_set_flight_api_id) {
@@ -103,8 +121,6 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         markup_amount,
                     });
                 }
-                //generate search ID
-                const search_id = (0, uuid_1.v4)();
                 const leg_descriptions = body.OriginDestinationInformation.map((OrDeInfo) => {
                     return {
                         departureDate: OrDeInfo.DepartureDateTime,
@@ -112,7 +128,7 @@ class AgentB2CFlightService extends abstract_service_1.default {
                         arrivalLocation: OrDeInfo.DestinationLocation.LocationCode,
                     };
                 });
-                const results = [...sabreData, ...wfttData];
+                const results = [...sabreData, ...wfttData, ...verteilData];
                 results.sort((a, b) => a.fare.payable - b.fare.payable);
                 const responseData = {
                     search_id,
@@ -183,10 +199,14 @@ class AgentB2CFlightService extends abstract_service_1.default {
                 }
                 //extract API IDs
                 let sabre_set_flight_api_id = 0;
+                let verteil_supplier_id = 0;
                 let wftt_set_flight_api_id = 0;
                 apiData.forEach((api) => {
                     if (api.sup_api === flightConstant_1.SABRE_API) {
                         sabre_set_flight_api_id = api.id;
+                    }
+                    if (api.sup_api === flightConstant_1.VERTEIL_API) {
+                        verteil_supplier_id = api.id;
                     }
                     if (api.sup_api === flightConstant_1.CUSTOM_API) {
                         wftt_set_flight_api_id = api.id;
@@ -229,30 +249,45 @@ class AgentB2CFlightService extends abstract_service_1.default {
                     // Update Redis after receiving results
                     yield (0, redis_1.setRedis)(search_id, { reqBody: body, response: responseData });
                 });
+                const tasks = [];
                 // Sabre results
                 if (sabre_set_flight_api_id) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
-                    yield sendResults('Sabre', () => __awaiter(this, void 0, void 0, function* () {
+                    tasks.push(sendResults('Sabre', () => __awaiter(this, void 0, void 0, function* () {
                         return sabreSubService.FlightSearch({
                             booking_block: false,
                             reqBody: body,
                             dynamic_fare_supplier_id: sabre_set_flight_api_id,
                             markup_amount,
                         });
-                    }));
+                    })));
+                }
+                //Verteil results
+                if (verteil_supplier_id) {
+                    const verteilSubService = new verteilFlightSupport_service_1.default(trx);
+                    tasks.push(sendResults('Verteil', () => __awaiter(this, void 0, void 0, function* () {
+                        return verteilSubService.FlightSearchService({
+                            booking_block: false,
+                            reqBody: body,
+                            dynamic_fare_supplier_id: verteil_supplier_id,
+                            markup_amount,
+                            search_id,
+                        });
+                    })));
                 }
                 //WFTT results
                 if (wftt_set_flight_api_id) {
                     const wfttSubService = new wfttFlightSupport_service_1.default(trx);
-                    yield sendResults('WFTT', () => __awaiter(this, void 0, void 0, function* () {
+                    tasks.push(sendResults('WFTT', () => __awaiter(this, void 0, void 0, function* () {
                         return wfttSubService.FlightSearch({
                             booking_block: false,
                             reqBody: body,
                             dynamic_fare_supplier_id: wftt_set_flight_api_id,
                             markup_amount,
                         });
-                    }));
+                    })));
                 }
+                yield Promise.all(tasks);
             }));
         });
     }

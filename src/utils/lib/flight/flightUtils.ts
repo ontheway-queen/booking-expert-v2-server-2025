@@ -136,7 +136,7 @@ export default class FlightUtils {
   }
 
   // Get layover time
-  private getLayoverTime = (options: any[]) => {
+  public getLayoverTime = (options: any[]) => {
     const layoverTime = options.map((item, index) => {
       let firstArrival = options[index].arrival.time;
       let secondDeparture = options[index + 1]?.departure?.time;

@@ -114,7 +114,7 @@ class VerteilFlightService extends abstract_service_1.default {
     }
     // Flight search service
     FlightSearchService(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ booking_block, reqBody, search_id, dynamic_fare_supplier_id, }) {
+        return __awaiter(this, arguments, void 0, function* ({ booking_block, reqBody, search_id, dynamic_fare_supplier_id, markup_amount, with_vendor_fare, with_modified_fare, }) {
             var _b, _c, _d, _e;
             const route_type = this.flightSupport.routeTypeFinder({
                 originDest: reqBody.OriginDestinationInformation,
@@ -193,6 +193,9 @@ class VerteilFlightService extends abstract_service_1.default {
                 booking_block,
                 dynamic_fare_supplier_id,
                 route_type,
+                markup_amount,
+                with_vendor_fare,
+                with_modified_fare,
             });
             {
                 const flightPriceRQs = yield new verteilFlightUtils_1.VerteilFlightUtils().PrepareMetaDataForFlightPrice(reqBody, result, AirShoppingRS, AirShoppingRQ);
@@ -202,11 +205,14 @@ class VerteilFlightService extends abstract_service_1.default {
         });
     }
     FlightSearchResFormatter(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ dynamic_fare_supplier_id, booking_block, data, reqBody, route_type, }) {
+        return __awaiter(this, arguments, void 0, function* ({ dynamic_fare_supplier_id, booking_block, data, reqBody, route_type, markup_amount, with_vendor_fare, with_modified_fare, }) {
             var _b, _c;
             const commonModel = this.Model.CommonModel(this.trx);
             const AirlinesPreferenceModel = this.Model.AirlinesPreferenceModel(this.trx);
-            const api_currency = yield this.Model.CurrencyModel(this.trx).getApiWiseCurrencyByName(flightConstant_1.VERTEIL_API, 'FLIGHT');
+            // const api_currency = await this.Model.CurrencyModel(
+            //   this.trx
+            // ).getApiWiseCurrencyByName(VERTEIL_API, 'FLIGHT');
+            const api_currency = 1;
             // convert any Child aged value to CHD
             reqBody.PassengerTypeQuantity.forEach((PTQ) => {
                 if (PTQ.Code.startsWith('C'))
@@ -253,13 +259,13 @@ class VerteilFlightService extends abstract_service_1.default {
                         const SegmentRefs = Association.ApplicableFlight.FlightSegmentReference;
                         //=== Options array construction ===//
                         const FormattedFlightOptions = yield Promise.all(SegmentRefs.map((segRef) => __awaiter(this, void 0, void 0, function* () {
-                            var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
                             const FlightSegment = data.DataLists.FlightSegmentList.FlightSegment.find((item) => item.SegmentKey === segRef.ref);
                             if (!FlightSegment)
-                                throw new Error(`Fatal: Verteil API FlightSegment with key "${segRef.ref}" not found.`);
+                                throw new Error(`Fatal: FlightSegment with key "${segRef.ref}" not found.`);
                             const dAirport = yield commonModel.getAirportByCode(FlightSegment.Departure.AirportCode.value);
                             const aAirport = yield commonModel.getAirportByCode(FlightSegment.Arrival.AirportCode.value);
-                            const marketing_airline = yield commonModel.getAirlines(FlightSegment.MarketingCarrier.AirlineID.value);
+                            const marketing_airline = yield commonModel.getAirlines({ code: FlightSegment.MarketingCarrier.AirlineID.value }, false);
                             const operating_airline = yield commonModel.getAirlineByCode(((_b = (_a = FlightSegment.OperatingCarrier) === null || _a === void 0 ? void 0 : _a.AirlineID) === null || _b === void 0 ? void 0 : _b.value) || '');
                             const aircraft = yield commonModel.getAircraft(((_d = (_c = FlightSegment.Equipment) === null || _c === void 0 ? void 0 : _c.AircraftCode) === null || _d === void 0 ? void 0 : _d.value) || '');
                             const departure = {
@@ -270,37 +276,27 @@ class VerteilFlightService extends abstract_service_1.default {
                                 country: (dAirport === null || dAirport === void 0 ? void 0 : dAirport.country) || '',
                                 terminal: ((_e = FlightSegment.Departure.Terminal) === null || _e === void 0 ? void 0 : _e.Name) || '',
                                 time: FlightSegment.Departure.Time +
-                                    ':00' +
-                                    `${dAirport.time_zone
-                                        ? luxon_1.DateTime.now()
-                                            .setZone(dAirport.time_zone)
-                                            .toFormat('ZZ')
-                                        : ''}`, // HH:MM -> HH:MM:00
+                                    ':00', // HH:MM -> HH:MM:00
                                 date: FlightSegment.Departure.Date.slice(0, 10), // YYYY-MM-DDT00-00-00.000 -> YYYY-MM-DD
                             };
                             const arrival = {
                                 date_adjustment: FlightSegment.Arrival.ChangeOfDay,
                                 airport_code: FlightSegment.Arrival.AirportCode.value,
-                                airport: aAirport.airport_name,
-                                city: aAirport.city_name,
-                                city_code: aAirport.city_code,
-                                country: aAirport.country,
+                                airport: (aAirport === null || aAirport === void 0 ? void 0 : aAirport.name) || "Unknown",
+                                city: (aAirport === null || aAirport === void 0 ? void 0 : aAirport.city_name) || "Unknown",
+                                city_code: (aAirport === null || aAirport === void 0 ? void 0 : aAirport.city_code) || "Unknown",
+                                country: (aAirport === null || aAirport === void 0 ? void 0 : aAirport.country) || "Unknown",
                                 terminal: ((_f = FlightSegment.Arrival.Terminal) === null || _f === void 0 ? void 0 : _f.Name) || '',
                                 time: FlightSegment.Arrival.Time +
-                                    ':00' +
-                                    `${aAirport.time_zone
-                                        ? luxon_1.DateTime.now()
-                                            .setZone(aAirport.time_zone)
-                                            .toFormat('ZZ')
-                                        : ''}`, // HH:MM -> HH:MM:00
+                                    ':00', // HH:MM -> HH:MM:00
                                 date: FlightSegment.Arrival.Date.slice(0, 10), // YYYY-MM-DDT00-00-00.000 -> YYYY-MM-DD
                             };
                             const carrier = {
                                 carrier_marketing_code: FlightSegment.MarketingCarrier.AirlineID.value,
-                                carrier_marketing_airline: marketing_airline.name,
-                                carrier_marketing_logo: marketing_airline.logo,
+                                carrier_marketing_airline: (_h = (_g = marketing_airline.data) === null || _g === void 0 ? void 0 : _g[0]) === null || _h === void 0 ? void 0 : _h.name,
+                                carrier_marketing_logo: (_k = (_j = marketing_airline.data) === null || _j === void 0 ? void 0 : _j[0]) === null || _k === void 0 ? void 0 : _k.logo,
                                 carrier_marketing_flight_number: FlightSegment.MarketingCarrier.FlightNumber.value,
-                                carrier_operating_code: ((_h = (_g = FlightSegment.OperatingCarrier) === null || _g === void 0 ? void 0 : _g.AirlineID) === null || _h === void 0 ? void 0 : _h.value) || '',
+                                carrier_operating_code: ((_m = (_l = FlightSegment.OperatingCarrier) === null || _l === void 0 ? void 0 : _l.AirlineID) === null || _m === void 0 ? void 0 : _m.value) || '',
                                 carrier_operating_airline: operating_airline.name,
                                 carrier_operating_logo: operating_airline.logo,
                                 carrier_operating_flight_number: '',
@@ -309,7 +305,7 @@ class VerteilFlightService extends abstract_service_1.default {
                             };
                             let elapsed_time;
                             {
-                                const SegmentDuration = (_j = FlightSegment.FlightDetail) === null || _j === void 0 ? void 0 : _j.FlightDuration.Value;
+                                const SegmentDuration = (_o = FlightSegment.FlightDetail) === null || _o === void 0 ? void 0 : _o.FlightDuration.Value;
                                 if (SegmentDuration) {
                                     elapsed_time =
                                         luxon_1.Duration.fromISO(SegmentDuration).as('minutes');
@@ -342,7 +338,7 @@ class VerteilFlightService extends abstract_service_1.default {
                             return flightKeyMatch && segmentMatch;
                         });
                         if (!FLightInfo)
-                            throw new Error(`Fatal: Verteil API FLightInfo with key "${Association.ApplicableFlight.FlightReferences.value[0]}" not found.`);
+                            throw new Error(`Fatal: FLightInfo with key "${Association.ApplicableFlight.FlightReferences.value[0]}" not found.`);
                         let flightElapsedTime = undefined;
                         if (FLightInfo === null || FLightInfo === void 0 ? void 0 : FLightInfo.Journey) {
                             const FlightDuration = FLightInfo.Journey.Time;
@@ -357,9 +353,7 @@ class VerteilFlightService extends abstract_service_1.default {
                             id: FLightInfo === null || FLightInfo === void 0 ? void 0 : FLightInfo.FlightKey,
                             elapsed_time: flightElapsedTime,
                             stoppage: FormattedFlightOptions.length - 1,
-                            // price_class_code: PriceClassInfo?.Code,
-                            // price_class_name: PriceClassInfo?.Name,
-                            layover_time: new flightUtils_1.default().getNewLayoverTime(FormattedFlightOptions),
+                            layover_time: new flightUtils_1.default().getLayoverTime(FormattedFlightOptions),
                             options: FormattedFlightOptions,
                         };
                         return FormattedFlight;
@@ -371,7 +365,7 @@ class VerteilFlightService extends abstract_service_1.default {
                         const originDestRef = Association.ApplicableFlight.OriginDestinationReferences[0];
                         const OriginDestination = data.DataLists.OriginDestinationList.OriginDestination.find((od) => od.OriginDestinationKey === originDestRef);
                         if (!OriginDestination)
-                            throw new Error(`Fatal: Verteil API OriginDestination with key "${originDestRef}" not found.`);
+                            throw new Error(`Fatal: OriginDestination with key "${originDestRef}" not found.`);
                         const from_airport = OriginDestination.DepartureCode.value;
                         const to_airport = OriginDestination.ArrivalCode.value;
                         const SegmentRefs = Association.ApplicableFlight.FlightSegmentReference; // Segments for this LEG
@@ -387,7 +381,7 @@ class VerteilFlightService extends abstract_service_1.default {
                                     .AssociatedTraveler.TravelerReferences[0];
                                 const TravelerInfo = (_a = data.DataLists.AnonymousTravelerList) === null || _a === void 0 ? void 0 : _a.AnonymousTraveler.find((tr) => tr.ObjectKey === travelerRef);
                                 if (!TravelerInfo)
-                                    throw new Error(`Fatal: Verteil API TravelerInfo with key "${travelerRef}" not found.`);
+                                    throw new Error(`Fatal: TravelerInfo with key "${travelerRef}" not found.`);
                                 let baggage_count = null;
                                 let baggage_unit = null;
                                 const OfferPriceSegment = (_b = OfferPrice.RequestedDate.Associations[AssociationIndex]) === null || _b === void 0 ? void 0 : _b.ApplicableFlight.FlightSegmentReference[SegmentIndex];
@@ -447,7 +441,8 @@ class VerteilFlightService extends abstract_service_1.default {
                                     meal_type: undefined,
                                     available_break: undefined,
                                     available_fare_break: undefined,
-                                    baggage_info: `${baggage_count} ${baggage_unit}`,
+                                    baggage_count: String(baggage_count),
+                                    baggage_unit
                                 };
                                 return FormattedPassenger;
                             });
@@ -481,7 +476,7 @@ class VerteilFlightService extends abstract_service_1.default {
                             .TravelerReferences[0];
                         const TravelerInfo = (_a = data.DataLists.AnonymousTravelerList) === null || _a === void 0 ? void 0 : _a.AnonymousTraveler.find((tr) => tr.ObjectKey === travelerRef);
                         if (!TravelerInfo)
-                            throw new Error(`Fatal: Verteil API TravelerInfo with key "${travelerRef}" not found.`);
+                            throw new Error(`Fatal: TravelerInfo with key "${travelerRef}" not found.`);
                         const paxCount = reqBody.PassengerTypeQuantity.filter((PTQ) => PTQ.Code[0] === TravelerInfo.PTC.value[0]).reduce((sum, PTQ) => sum + PTQ.Quantity, 0);
                         const PriceDetail = OfferPrice.RequestedDate.PriceDetail;
                         const baseFare = PriceDetail.BaseAmount.value;
@@ -531,15 +526,18 @@ class VerteilFlightService extends abstract_service_1.default {
                         ait: ait,
                         discount: totalDiscount,
                         payable: 0,
-                        vendor_price: {
+                    };
+                    if (with_vendor_fare) {
+                        new_fare.vendor_price = {
                             base_fare: totalBaseFare,
                             tax: totalTax,
+                            ait: 0,
                             charge: totalConFee,
                             discount: totalDiscount,
                             gross_fare: total_amount + totalDiscount,
                             net_fare: total_amount,
-                        },
-                    };
+                        };
+                    }
                     let total_segments = 0;
                     FormattedFlights.map((elm) => {
                         elm.options.map((elm2) => {
@@ -547,45 +545,47 @@ class VerteilFlightService extends abstract_service_1.default {
                         });
                     });
                     //calculate tax fare
-                    let { tax_markup, tax_commission } = yield this.flightSupport.calculateFlightTaxMarkup({
+                    let { tax_markup, tax_commission, agent_tax_discount, agent_tax_markup } = yield this.flightSupport.calculateFlightTaxMarkup({
                         dynamic_fare_supplier_id,
                         tax: tax_fare,
                         route_type,
                         airline: airlineCode,
+                        markup_amount
                     });
                     tax_commission = tax_commission * api_currency;
                     tax_markup = tax_markup * api_currency;
-                    const { markup, commission, pax_markup } = yield this.flightSupport.calculateFlightMarkup({
+                    let { markup, commission, pax_markup, agent_discount, agent_markup } = yield this.flightSupport.calculateFlightMarkup({
                         dynamic_fare_supplier_id,
                         airline: airlineCode,
                         flight_class: this.flightUtils.getClassFromId(reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref
                             .Cabin),
-                        base_fare: new_fare.base_fare,
+                        base_fare: Number(new_fare.base_fare),
                         total_segments,
                         route_type,
+                        markup_amount
                     });
+                    agent_discount += agent_tax_discount;
+                    agent_markup += agent_tax_markup;
                     const total_pax_markup = pax_count * pax_markup;
-                    new_fare.base_fare += markup + total_pax_markup;
-                    new_fare.base_fare += tax_markup;
-                    new_fare.discount += commission;
-                    new_fare.discount += tax_commission;
+                    new_fare.base_fare = Number(new_fare.base_fare) + markup + agent_markup + total_pax_markup + tax_markup;
+                    new_fare.discount = Number(new_fare.discount) + commission + agent_discount + tax_commission;
                     new_fare.payable = Number((Number(new_fare.base_fare) +
                         Number(new_fare.total_tax) +
                         Number(new_fare.ait) -
                         Number(new_fare.discount)).toFixed(2));
                     const newFormattedPax = FormattedPassengers.map((newPax) => {
-                        const per_pax_markup = ((markup + tax_markup) / pax_count) * newPax.number +
+                        const per_pax_markup = ((markup + agent_markup + tax_markup) / pax_count) * newPax.number +
                             pax_markup * newPax.number;
                         return {
                             type: newPax.type,
                             number: newPax.number,
-                            fare: {
-                                base_fare: newPax.fare.base_fare + per_pax_markup,
-                                tax: newPax.fare.tax,
-                                total_fare: newPax.fare.total_fare + per_pax_markup,
-                                ait: Number(Number(newPax.fare.base_fare) + newPax.fare.tax) * 0.003,
-                                discount: Number(Number(newPax.fare.base_fare) *
-                                    (commission / Number(totalBaseFare))),
+                            per_pax_fare: {
+                                base_fare: String(newPax.fare.base_fare + per_pax_markup),
+                                tax: String(newPax.fare.tax),
+                                total_fare: String(newPax.fare.total_fare + per_pax_markup),
+                                ait: String(Number(Number(newPax.fare.base_fare) + newPax.fare.tax) * 0.003),
+                                discount: String(Number(Number(newPax.fare.base_fare) *
+                                    ((commission + agent_discount) / Number(totalBaseFare)))),
                             },
                         };
                     });
@@ -681,12 +681,21 @@ class VerteilFlightService extends abstract_service_1.default {
                         flights: FormattedFlights,
                         passengers: newFormattedPax,
                         availability: FormattedAvailability,
+                        modifiedFare: with_modified_fare
+                            ? {
+                                agent_discount,
+                                agent_markup,
+                                commission,
+                                markup,
+                                pax_markup,
+                            }
+                            : undefined,
                         // dynamic_fare_rules: fare_rules,
                     };
                     FormattedResponseList.push(FormattedResponse);
                 }
                 catch (error) {
-                    console.warn('An error occurred while formatting a Verteil Offer. This offer will be omitted from final response. ErrorMessage: ' +
+                    console.warn('An error occurred while formatting an Offer. This offer will be omitted from final response. ErrorMessage: ' +
                         error.message);
                     continue;
                 }
@@ -860,7 +869,7 @@ class VerteilFlightService extends abstract_service_1.default {
     // Flight Search (end)//
     // Flight Revalidate (start)//
     FlightRevalidateService(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ search_id, reqBody, oldData, dynamic_fare_supplier_id, }) {
+        return __awaiter(this, arguments, void 0, function* ({ search_id, reqBody, oldData, dynamic_fare_supplier_id, markup_amount, with_vendor_fare, with_modified_fare, }) {
             var _b;
             let FlightPriceRQ;
             FlightPriceRQ = yield (0, redis_1.getRedis)(`VerteilFlightPriceRQ-${search_id}-${oldData.flight_id}`);
@@ -886,6 +895,9 @@ class VerteilFlightService extends abstract_service_1.default {
                 response: FlightPriceRS,
                 dynamic_fare_supplier_id,
                 route_type,
+                markup_amount,
+                with_vendor_fare: true,
+                with_modified_fare: true,
             });
             // Post Revalidate Works
             {
@@ -901,9 +913,12 @@ class VerteilFlightService extends abstract_service_1.default {
         });
     }
     FlightRevalidateResFormatter(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ reqBody, oldData, dynamic_fare_supplier_id, response, route_type, }) {
+        return __awaiter(this, arguments, void 0, function* ({ reqBody, oldData, dynamic_fare_supplier_id, response, route_type, markup_amount, with_vendor_fare, with_modified_fare }) {
             var _b, _c;
-            const api_currency = yield this.Model.CurrencyModel(this.trx).getApiWiseCurrencyByName(flightConstant_1.VERTEIL_API, 'FLIGHT');
+            // const api_currency = await this.Model.CurrencyModel(
+            //   this.trx
+            // ).getApiWiseCurrencyByName(VERTEIL_API, 'FLIGHT');
+            const api_currency = 1;
             const newData = JSON.parse(JSON.stringify(oldData));
             const PricedFlightOffer = response.PricedFlightOffers.PricedFlightOffer;
             const DataLists = response.DataLists;
@@ -917,12 +932,12 @@ class VerteilFlightService extends abstract_service_1.default {
                     const originDestRef = (_a = Association.ApplicableFlight.OriginDestinationReferences) === null || _a === void 0 ? void 0 : _a[0];
                     const OriginDestination = response.DataLists.OriginDestinationList.OriginDestination.find((od) => od.OriginDestinationKey === originDestRef);
                     if (!OriginDestination)
-                        throw new Error(`Fatal: Verteil API OriginDestination with key "${originDestRef}" not found.`);
+                        throw new Error(`Fatal: OriginDestination with key "${originDestRef}" not found.`);
                     const from_airport = OriginDestination.DepartureCode.value;
                     const to_airport = OriginDestination.ArrivalCode.value;
                     const SegmentRefs = Association.ApplicableFlight.FlightSegmentReference; // Segments for this LEG
                     if (!SegmentRefs)
-                        throw new Error(`Fatal: Verteil API SegmentRefs Segment not found.`);
+                        throw new Error(`Fatal: SegmentRefs Segment not found.`);
                     const FormattedSegments = SegmentRefs.map(
                     // Single Segment
                     (Segment, SegmentIndex) => {
@@ -935,7 +950,7 @@ class VerteilFlightService extends abstract_service_1.default {
                                 .TravelerReferences[0];
                             const TravelerInfo = (_a = DataLists.AnonymousTravelerList) === null || _a === void 0 ? void 0 : _a.AnonymousTraveler.find((tr) => tr.ObjectKey === travelerRef);
                             if (!TravelerInfo)
-                                throw new Error(`Fatal: Verteil API TravelerInfo with key "${travelerRef}" not found.`);
+                                throw new Error(`Fatal: TravelerInfo with key "${travelerRef}" not found.`);
                             let baggage_count = null;
                             let baggage_unit = null;
                             const OfferPriceSegment = (_b = OfferPrice.RequestedDate.Associations[AssociationIndex]) === null || _b === void 0 ? void 0 : _b.ApplicableFlight.FlightSegmentReference[SegmentIndex];
@@ -990,7 +1005,8 @@ class VerteilFlightService extends abstract_service_1.default {
                                 meal_type: undefined,
                                 available_break: undefined,
                                 available_fare_break: undefined,
-                                baggage_info: `${baggage_count} ${baggage_unit}`,
+                                baggage_count: String(baggage_count),
+                                baggage_unit
                             };
                             return FormattedPassenger;
                         });
@@ -1028,7 +1044,7 @@ class VerteilFlightService extends abstract_service_1.default {
                         .TravelerReferences[0];
                     const TravelerInfo = (_a = response.DataLists.AnonymousTravelerList) === null || _a === void 0 ? void 0 : _a.AnonymousTraveler.find((tr) => tr.ObjectKey === travelerRef);
                     if (!TravelerInfo)
-                        throw new Error(`Fatal: Verteil API TravelerInfo with key "${travelerRef}" not found.`);
+                        throw new Error(`Fatal: TravelerInfo with key "${travelerRef}" not found.`);
                     const paxCount = OfferPrice.RequestedDate.Associations[0].AssociatedTraveler
                         .TravelerReferences.length;
                     const PriceDetail = OfferPrice.RequestedDate.PriceDetail;
@@ -1073,6 +1089,7 @@ class VerteilFlightService extends abstract_service_1.default {
                 const vendor_price = {
                     base_fare: totalBaseFare,
                     tax: totalTax,
+                    ait: 0,
                     charge: totalConFee,
                     discount: totalDiscount,
                     gross_fare: total_amount + totalDiscount,
@@ -1084,60 +1101,71 @@ class VerteilFlightService extends abstract_service_1.default {
                     total_tax: totalTax,
                     ait,
                     discount: totalDiscount,
-                    payable: totalBaseFare + totalTax + ait - totalDiscount,
-                    vendor_price: vendor_price,
-                    tax_fare,
+                    payable: totalBaseFare + totalTax + ait - totalDiscount
                 };
+                if (with_vendor_fare) {
+                    new_fare.vendor_price = vendor_price;
+                }
                 let total_segments = 0;
                 newData.flights.map((elm) => {
                     elm.options.map((elm2) => {
                         total_segments++;
                     });
                 });
-                new_fare.tax_fare = tax_fare;
                 //calculate tax fare
-                let { tax_markup, tax_commission } = yield this.flightSupport.calculateFlightTaxMarkup({
+                let { tax_markup, tax_commission, agent_tax_discount, agent_tax_markup } = yield this.flightSupport.calculateFlightTaxMarkup({
                     dynamic_fare_supplier_id,
                     tax: tax_fare,
                     route_type,
                     airline: newData.carrier_code,
+                    markup_amount
                 });
                 tax_commission = tax_commission * api_currency;
                 tax_markup = tax_markup * api_currency;
-                const { markup, commission, pax_markup } = yield new CommonFlightSupport(this.trx).calculateFlightMarkup({
+                let { markup, commission, pax_markup, agent_discount, agent_markup } = yield new commonFlightSupport_service_1.CommonFlightSupportService(this.trx).calculateFlightMarkup({
                     dynamic_fare_supplier_id,
                     airline: newData.carrier_code,
-                    flight_class: new CommonFlightUtils().getClassFromId(reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref.Cabin),
-                    base_fare: new_fare.base_fare,
+                    flight_class: new flightUtils_1.default().getClassFromId(reqBody.OriginDestinationInformation[0].TPA_Extensions.CabinPref.Cabin),
+                    base_fare: Number(new_fare.base_fare),
                     total_segments,
                     route_type,
+                    markup_amount
                 });
+                agent_discount += agent_tax_discount;
+                agent_markup += agent_tax_markup;
                 const total_pax_markup = pax_count * pax_markup;
-                new_fare.base_fare += markup + total_pax_markup;
-                new_fare.base_fare += tax_markup;
-                new_fare.discount += commission;
-                new_fare.discount += tax_commission;
+                new_fare.base_fare = Number(new_fare.base_fare) + markup + agent_markup + total_pax_markup + tax_markup;
+                new_fare.discount = Number(new_fare.discount) + agent_discount + commission + tax_commission;
                 new_fare.payable = Number((Number(new_fare.base_fare) +
                     Number(new_fare.total_tax) +
                     Number(new_fare.ait) -
                     Number(new_fare.discount)).toFixed(2));
                 newData.fare = new_fare;
                 newData.passengers = FormattedPassengers.map((newPax) => {
-                    const per_pax_markup = ((markup + tax_markup) / pax_count) * newPax.number +
+                    const per_pax_markup = ((markup + agent_markup + tax_markup) / pax_count) * newPax.number +
                         pax_markup * newPax.number;
                     return {
                         type: newPax.type,
                         number: newPax.number,
-                        fare: {
-                            base_fare: Number((newPax.fare.base_fare + per_pax_markup).toFixed(2)),
-                            tax: newPax.fare.tax,
-                            total_fare: Number((newPax.fare.total_fare + per_pax_markup).toFixed(2)),
-                            ait: Number(Number(newPax.fare.base_fare) + newPax.fare.tax) * 0.003,
-                            discount: Number(Number(newPax.fare.base_fare) *
-                                (commission / Number(totalBaseFare))),
+                        per_pax_fare: {
+                            base_fare: String(Number((newPax.fare.base_fare + per_pax_markup).toFixed(2))),
+                            tax: String(newPax.fare.tax),
+                            total_fare: String(Number((newPax.fare.total_fare + per_pax_markup).toFixed(2))),
+                            ait: String(Number(Number(newPax.fare.base_fare) + newPax.fare.tax) * 0.003),
+                            discount: String(Number(Number(newPax.fare.base_fare) *
+                                ((commission + agent_discount) / Number(totalBaseFare)))),
                         },
                     };
                 });
+                newData.modifiedFare = with_modified_fare
+                    ? {
+                        agent_discount,
+                        agent_markup,
+                        commission,
+                        markup,
+                        pax_markup,
+                    }
+                    : undefined;
             }
             //=== Last Time Check ==//
             {
@@ -1217,177 +1245,7 @@ class VerteilFlightService extends abstract_service_1.default {
                 });
             }
             newData.partial_payment = partial_payment;
-            // console.log({old: oldData.fare.payable});
             newData.price_changed = !(oldData.fare.payable === newData.fare.payable);
-            // Policies
-            {
-                const policyObject = PricedFlightOffer[0].OfferPrice.map((OfferPrice) => {
-                    var _a, _b;
-                    const paxRef = OfferPrice.RequestedDate.Associations[0].AssociatedTraveler
-                        .TravelerReferences[0];
-                    const PaxTypeCode = (_b = (_a = DataLists.AnonymousTravelerList) === null || _a === void 0 ? void 0 : _a.AnonymousTraveler.find((AT) => AT.ObjectKey === paxRef)) === null || _b === void 0 ? void 0 : _b.PTC.value;
-                    const OD = OfferPrice.RequestedDate.Associations.map((Association) => {
-                        var _a, _b, _c, _d, _e, _f, _g, _h;
-                        let route = '';
-                        const ODRef = (_a = Association.ApplicableFlight.OriginDestinationReferences) === null || _a === void 0 ? void 0 : _a[0];
-                        const ODInfo = DataLists.OriginDestinationList.OriginDestination.find((od) => od.OriginDestinationKey === ODRef);
-                        if (ODInfo)
-                            route = ODInfo.DepartureCode.value + '-' + ODInfo.ArrivalCode.value;
-                        const ODSegmentsRef = ((_c = (_b = Association.ApplicableFlight.FlightSegmentReference) === null || _b === void 0 ? void 0 : _b.map((Seg) => Seg.ref)) === null || _c === void 0 ? void 0 : _c.filter((item) => item !== undefined)) || [];
-                        const ODPenaltyRefs = (_f = (_e = (_d = OfferPrice.FareDetail) === null || _d === void 0 ? void 0 : _d.FareComponent) === null || _e === void 0 ? void 0 : _e.filter((FC) => FC.refs.some((ref) => ODSegmentsRef.includes(ref))
-                        // (FC) => ODSegmentsRef.includes(FC.refs[0])
-                        ).map((FC) => { var _a; return (_a = FC.FareRules) === null || _a === void 0 ? void 0 : _a.Penalty.refs; })) === null || _f === void 0 ? void 0 : _f.filter((value) => value !== undefined).flat(2);
-                        const ODPenalties = ((_h = (_g = DataLists.PenaltyList) === null || _g === void 0 ? void 0 : _g.Penalty) === null || _h === void 0 ? void 0 : _h.filter((P) => ODPenaltyRefs === null || ODPenaltyRefs === void 0 ? void 0 : ODPenaltyRefs.includes(P.ObjectKey))) || [];
-                        const ChangeFeePenalties = ODPenalties === null || ODPenalties === void 0 ? void 0 : ODPenalties.filter((ODP) => ODP.ChangeFeeInd !== undefined);
-                        const CancelFeePenalties = ODPenalties === null || ODPenalties === void 0 ? void 0 : ODPenalties.filter((ODP) => ODP.CancelFeeInd !== undefined);
-                        let changeAllowed = true;
-                        let noChangeFee = true;
-                        let changeFeeCurrencyCode = '';
-                        const changeFeeMinValueList = [];
-                        const changeFeeMaxValueList = [];
-                        let noCancelFee = true;
-                        let cancelFeeCurrencyCode = '';
-                        const cancelFeeMinValueList = [];
-                        const cancelFeeMaxValueList = [];
-                        ChangeFeePenalties.forEach((CFP) => {
-                            var _a, _b, _c, _d, _e, _f, _g, _h;
-                            if (CFP.ChangeAllowedInd !== true)
-                                changeAllowed = false;
-                            if (CFP.ChangeFeeInd !== false)
-                                noChangeFee = false;
-                            const ChangeDetails = (_a = CFP.Details.Detail) === null || _a === void 0 ? void 0 : _a.filter((Detail) => Detail.Type === 'Change');
-                            for (const detail of ChangeDetails) {
-                                const Amounts = (_b = detail.Amounts) === null || _b === void 0 ? void 0 : _b.Amount;
-                                if (Amounts) {
-                                    for (const Amount of Amounts) {
-                                        if (Amount.CurrencyAmountValue == undefined)
-                                            continue;
-                                        changeFeeCurrencyCode = Amount.CurrencyAmountValue.Code;
-                                        const decimalKey = 
-                                        // PricedFlightOffer[0].OfferID.Owner +
-                                        // "-" +
-                                        changeFeeCurrencyCode;
-                                        const decimal = (_h = (_g = (_f = (_e = (_d = (_c = response.Metadata) === null || _c === void 0 ? void 0 : _c.Other) === null || _d === void 0 ? void 0 : _d.OtherMetadata) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.CurrencyMetadatas) === null || _g === void 0 ? void 0 : _g.CurrencyMetadata.find((CM) => CM.MetadataKey === decimalKey)) === null || _h === void 0 ? void 0 : _h.Decimals;
-                                        if (Amount.AmountApplication === 'MIN')
-                                            changeFeeMinValueList.push(this.applyDecimal(Amount.CurrencyAmountValue.value, decimal));
-                                        else if (Amount.AmountApplication === 'MAX')
-                                            changeFeeMaxValueList.push(this.applyDecimal(Amount.CurrencyAmountValue.value, decimal));
-                                    }
-                                }
-                            }
-                        });
-                        CancelFeePenalties.forEach((CFP) => {
-                            var _a, _b, _c, _d, _e, _f, _g, _h;
-                            if (CFP.CancelFeeInd !== false)
-                                noCancelFee = false;
-                            const ChangeDetails = (_a = CFP.Details.Detail) === null || _a === void 0 ? void 0 : _a.filter((Detail) => Detail.Type === 'Cancel');
-                            for (const detail of ChangeDetails) {
-                                const Amounts = (_b = detail.Amounts) === null || _b === void 0 ? void 0 : _b.Amount;
-                                if (Amounts) {
-                                    for (const Amount of Amounts) {
-                                        if (Amount.CurrencyAmountValue == undefined)
-                                            continue;
-                                        cancelFeeCurrencyCode = Amount.CurrencyAmountValue.Code;
-                                        const decimalKey = 
-                                        // PricedFlightOffer[0].OfferID.Owner +
-                                        // "-" +
-                                        cancelFeeCurrencyCode;
-                                        const decimal = (_h = (_g = (_f = (_e = (_d = (_c = response.Metadata) === null || _c === void 0 ? void 0 : _c.Other) === null || _d === void 0 ? void 0 : _d.OtherMetadata) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.CurrencyMetadatas) === null || _g === void 0 ? void 0 : _g.CurrencyMetadata.find((CM) => CM.MetadataKey === decimalKey)) === null || _h === void 0 ? void 0 : _h.Decimals;
-                                        if (Amount.AmountApplication === 'MIN')
-                                            cancelFeeMinValueList.push(this.applyDecimal(Amount.CurrencyAmountValue.value, decimal));
-                                        else if (Amount.AmountApplication === 'MAX')
-                                            cancelFeeMaxValueList.push(this.applyDecimal(Amount.CurrencyAmountValue.value, decimal));
-                                    }
-                                }
-                            }
-                        });
-                        const minimumChangePenalty = Math.min(...changeFeeMinValueList);
-                        const maximumChangePenalty = Math.max(...changeFeeMaxValueList);
-                        const minimumCancelPenalty = Math.min(...cancelFeeMinValueList);
-                        const maximumCancelPenalty = Math.max(...cancelFeeMaxValueList);
-                        return {
-                            route,
-                            changeAllowed,
-                            noChangeFee,
-                            noCancelFee,
-                            changeFeeCurrencyCode,
-                            minimumChangePenalty,
-                            maximumChangePenalty,
-                            cancelFeeCurrencyCode,
-                            minimumCancelPenalty,
-                            maximumCancelPenalty,
-                        };
-                    });
-                    return {
-                        PTC: PaxTypeCode,
-                        OD,
-                    };
-                });
-                const safeValue = (val) => {
-                    if (val === null || val === undefined || !isFinite(val))
-                        return '-';
-                    return val;
-                };
-                let html = `
-    <style>
-      table.compact-table {
-        font-size: 12px;
-        border-collapse: collapse;
-        width: 100%;
-      }
-      table.compact-table th, table.compact-table td {
-        border: 1px solid #ccc;
-        padding: 4px 6px;
-        text-align: center;
-      }
-      table.compact-table th {
-        background-color: #f2f2f2;
-        white-space: nowrap;
-      }
-    </style>
-
-    <table class="compact-table">
-      <caption>Fare Rules (Change/Cancel Fees)</caption>
-      <thead>
-        <tr>
-          <th>PTC</th>
-          <th>Route</th>
-          <th title="Change Allowed Or Not?">Change Allowed</th>
-          <th title="Change Fee Currency">Change Cur</th>
-          <th title="Minimum Change Penalty">Min CP</th>
-          <th title="Maximum Change Penalty">Max CP</th>
-          <th title="Change Allowed Or Not?">Refund Allowed</th>
-          <th title="Cancel Fee Currency">Cancel Cur</th>
-          <th title="Minimum Cancel Penalty">Min XP</th>
-          <th title="Maximum Cancel Penalty">Max XP</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-                for (const ptc of policyObject) {
-                    for (const od of ptc.OD) {
-                        html += `
-        <tr>
-          <td>${ptc.PTC}</td>
-          <td>${od.route}</td>
-          <td>${od.changeAllowed ? 'Yes' : 'No'}</td>
-          <td>${od.changeFeeCurrencyCode || '-'}</td>
-          <td>${safeValue(od.minimumChangePenalty)}</td>
-          <td>${safeValue(od.maximumChangePenalty)}</td>
-          <td>${od.noCancelFee ? 'Full' : 'None/Partial'}</td>
-          <td>${od.cancelFeeCurrencyCode || '-'}</td>
-          <td>${safeValue(od.minimumCancelPenalty)}</td>
-          <td>${safeValue(od.maximumCancelPenalty)}</td>
-        </tr>
-      `;
-                    }
-                }
-                html += `
-        </tbody>
-        </table>
-      `;
-                newData.fare_rules = lib_1.default.minifyHTML(html);
-            }
             return newData;
         });
     }
@@ -1502,27 +1360,6 @@ class VerteilFlightService extends abstract_service_1.default {
         });
         // @ts-ignore
         OrderCreateRQ.Query.Passengers.Passenger = completedPax;
-        // Append Payment Method for instant purchase
-        // if (primeFlow !== undefined) {
-        //   OrderCreateRQ.Query.Payments = {
-        //     Payment: [
-        //       {
-        //         Amount: primeFlow.Amount,
-        //         Method: primeFlow.Method,
-        //       },
-        //     ],
-        //   };
-        // }
-        // {
-        //   OrderCreateRQ.Query.Payments = {
-        //     Payment: [
-        //       {
-        //         Amount: { Code: "INR", value: 259614 },
-        //         Method: { Cash: { CashInd: true } },
-        //       },
-        //     ],
-        //   };
-        // }
         return OrderCreateRQ;
     }
     // Flight book
@@ -1818,7 +1655,7 @@ class VerteilFlightService extends abstract_service_1.default {
                 };
             }
             catch (error) {
-                console.warn(`Verteil TicketIssue Error: ` + error.message);
+                console.warn(`TicketIssue Error: ` + error.message);
                 return {
                     success: false,
                     message: error.message,

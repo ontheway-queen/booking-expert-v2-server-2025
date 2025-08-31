@@ -599,13 +599,17 @@ class CommonModel extends Schema {
       .where('id', id);
   }
 
-  public async getBanks(query: {
-    name?: string;
-    id?: number;
-    status?: boolean | 'true' | 'false';
-  }): Promise<IGetBanksData[]> {
-    console.log({ query });
-    return await this.db('banks')
+  public async getBanks(
+    query: {
+      name?: string;
+      id?: number;
+      status?: boolean;
+      limit?: string;
+      skip?: string;
+    },
+    with_total: boolean = false
+  ): Promise<{ data: IGetBanksData[]; total?: number }> {
+    const data = await this.db('banks')
       .withSchema(this.PUBLIC_SCHEMA)
       .select('*')
       .where((qb) => {
@@ -620,7 +624,33 @@ class CommonModel extends Schema {
         if (query.status !== undefined) {
           qb.andWhere('status', query.status);
         }
-      });
+      })
+      .limit(Number(query.limit) || DATA_LIMIT)
+      .offset(Number(query.skip) || 0)
+      .orderBy('name', 'asc');
+
+    let total: any[] = [];
+
+    if (with_total) {
+      total = await this.db('banks')
+        .withSchema(this.PUBLIC_SCHEMA)
+        .count('id AS total')
+        .where((qb) => {
+          if (query.name) {
+            qb.andWhereILike('name', `%${query.name}%`);
+          }
+
+          if (query.id) {
+            qb.andWhere('id', query.id);
+          }
+
+          if (query.status !== undefined) {
+            qb.andWhere('status', query.status);
+          }
+        });
+    }
+
+    return { data, total: total[0]?.total };
   }
 
   public async checkBank(id: number): Promise<IGetBanksData> {
@@ -653,13 +683,17 @@ class CommonModel extends Schema {
       .where('id', id);
   }
 
-  public async getSocialMedia(query: {
-    name?: string;
-    id?: number;
-    status?: boolean | 'true' | 'false';
-  }): Promise<IGetSocialMediaData[]> {
-    console.log({ query });
-    return await this.db('social_media')
+  public async getSocialMedia(
+    query: {
+      name?: string;
+      id?: number;
+      status?: boolean;
+      limit?: string;
+      skip?: string;
+    },
+    with_total: boolean = false
+  ): Promise<{ data: IGetSocialMediaData[]; total?: number }> {
+    const data = await this.db('social_media')
       .withSchema(this.PUBLIC_SCHEMA)
       .select('*')
       .where((qb) => {
@@ -674,7 +708,32 @@ class CommonModel extends Schema {
         if (query.status !== undefined) {
           qb.andWhere('status', query.status);
         }
-      });
+      })
+      .limit(Number(query.limit) || DATA_LIMIT)
+      .offset(Number(query.skip) || 0)
+      .orderBy('name', 'asc');
+
+    let total: any[] = [];
+    if (with_total) {
+      total = await this.db('social_media')
+        .withSchema(this.PUBLIC_SCHEMA)
+        .count('id AS total')
+        .where((qb) => {
+          if (query.name) {
+            qb.andWhereILike('name', `%${query.name}%`);
+          }
+
+          if (query.id) {
+            qb.andWhere('id', query.id);
+          }
+
+          if (query.status !== undefined) {
+            qb.andWhere('status', query.status);
+          }
+        });
+    }
+
+    return { data, total: total[0]?.total };
   }
 
   public async checkSocialMedia(id: number): Promise<IGetSocialMediaData> {

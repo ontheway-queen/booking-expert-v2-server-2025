@@ -493,10 +493,10 @@ class CommonModel extends schema_1.default {
                 .where('id', id);
         });
     }
-    getBanks(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log({ query });
-            return yield this.db('banks')
+    getBanks(query_1) {
+        return __awaiter(this, arguments, void 0, function* (query, with_total = false) {
+            var _a;
+            const data = yield this.db('banks')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .select('*')
                 .where((qb) => {
@@ -509,7 +509,28 @@ class CommonModel extends schema_1.default {
                 if (query.status !== undefined) {
                     qb.andWhere('status', query.status);
                 }
-            });
+            })
+                .limit(Number(query.limit) || constants_1.DATA_LIMIT)
+                .offset(Number(query.skip) || 0)
+                .orderBy('name', 'asc');
+            let total = [];
+            if (with_total) {
+                total = yield this.db('banks')
+                    .withSchema(this.PUBLIC_SCHEMA)
+                    .count('id AS total')
+                    .where((qb) => {
+                    if (query.name) {
+                        qb.andWhereILike('name', `%${query.name}%`);
+                    }
+                    if (query.id) {
+                        qb.andWhere('id', query.id);
+                    }
+                    if (query.status !== undefined) {
+                        qb.andWhere('status', query.status);
+                    }
+                });
+            }
+            return { data, total: (_a = total[0]) === null || _a === void 0 ? void 0 : _a.total };
         });
     }
     checkBank(id) {
@@ -543,10 +564,10 @@ class CommonModel extends schema_1.default {
                 .where('id', id);
         });
     }
-    getSocialMedia(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log({ query });
-            return yield this.db('social_media')
+    getSocialMedia(query_1) {
+        return __awaiter(this, arguments, void 0, function* (query, with_total = false) {
+            var _a;
+            const data = yield this.db('social_media')
                 .withSchema(this.PUBLIC_SCHEMA)
                 .select('*')
                 .where((qb) => {
@@ -559,7 +580,28 @@ class CommonModel extends schema_1.default {
                 if (query.status !== undefined) {
                     qb.andWhere('status', query.status);
                 }
-            });
+            })
+                .limit(Number(query.limit) || constants_1.DATA_LIMIT)
+                .offset(Number(query.skip) || 0)
+                .orderBy('name', 'asc');
+            let total = [];
+            if (with_total) {
+                total = yield this.db('social_media')
+                    .withSchema(this.PUBLIC_SCHEMA)
+                    .count('id AS total')
+                    .where((qb) => {
+                    if (query.name) {
+                        qb.andWhereILike('name', `%${query.name}%`);
+                    }
+                    if (query.id) {
+                        qb.andWhere('id', query.id);
+                    }
+                    if (query.status !== undefined) {
+                        qb.andWhere('status', query.status);
+                    }
+                });
+            }
+            return { data, total: (_a = total[0]) === null || _a === void 0 ? void 0 : _a.total };
         });
     }
     checkSocialMedia(id) {

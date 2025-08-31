@@ -19,6 +19,7 @@ const adminVisa_router_1 = __importDefault(require("./routers/adminVisa.router")
 const adminAirlinesPreference_router_1 = require("./routers/adminAirlinesPreference.router");
 const adminDynamicFare_router_1 = require("./routers/adminDynamicFare.router");
 const adminDynamicFareSet_router_1 = require("./routers/adminDynamicFareSet.router");
+const adminAccounts_router_1 = __importDefault(require("./routers/adminAccounts.router"));
 class AdminRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
@@ -36,6 +37,7 @@ class AdminRootRouter {
         this.adminAirlinesPreferenceRouter = new adminAirlinesPreference_router_1.AdminAirlinesPreferenceRouter();
         this.adminDynamicFareRouter = new adminDynamicFare_router_1.AdminDynamicFareRouter();
         this.adminDynamicFareSetRouter = new adminDynamicFareSet_router_1.AdminDynamicFareSetRouter();
+        this.adminAccountsRouter = new adminAccounts_router_1.default();
         //Admin Agent ,Admin B2C Sub Root Router Class
         this.adminB2CRouter = new adminB2C_router_1.default();
         this.adminAgentRouter = new adminAgent_router_1.default();
@@ -55,6 +57,7 @@ class AdminRootRouter {
         this.Router.use('/hotel-markup-set', this.adminHotelMarkupSetRouter.router);
         this.Router.use('/dynamic-fare-set', this.adminDynamicFareSetRouter.router);
         this.Router.use('/dynamic-fare', this.adminDynamicFareRouter.router);
+        this.Router.use('/accounts', this.adminAccountsRouter.router);
         //Admin Agent, Admin B2C Root Routes
         this.Router.use('/agent', this.adminAgentRouter.router);
         this.Router.use('/b2c', this.adminB2CRouter.router);

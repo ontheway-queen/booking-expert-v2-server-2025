@@ -10,10 +10,13 @@ export default class AgentB2CSubConfigController extends AbstractController {
     super();
   }
 
-  public getB2CMarkup = this.asyncWrapper.wrap(null, async (req: Request, res: Response) => {
-    const { code, ...data } = await this.service.getB2CMarkup(req);
-    res.status(code).json(data);
-  });
+  public getB2CMarkup = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getB2CMarkup(req);
+      res.status(code).json(data);
+    }
+  );
 
   public upsertB2CMarkup = this.asyncWrapper.wrap(
     { bodySchema: this.validator.upsertB2CMarkup },
@@ -23,10 +26,13 @@ export default class AgentB2CSubConfigController extends AbstractController {
     }
   );
 
-  public getAccounts = this.asyncWrapper.wrap(null, async (req: Request, res: Response) => {
-    const { code, ...data } = await this.service.getAccounts(req);
-    res.status(code).json(data);
-  });
+  public getAccounts = this.asyncWrapper.wrap(
+    { querySchema: this.validator.getAccounts },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getAccounts(req);
+      res.status(code).json(data);
+    }
+  );
 
   public updateAccounts = this.asyncWrapper.wrap(
     {
@@ -59,10 +65,13 @@ export default class AgentB2CSubConfigController extends AbstractController {
     }
   );
 
-  public getHeroBGContent = this.asyncWrapper.wrap(null, async (req: Request, res: Response) => {
-    const { code, ...data } = await this.service.getHeroBGContent(req);
-    res.status(code).json(data);
-  });
+  public getHeroBGContent = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getHeroBGContent(req);
+      res.status(code).json(data);
+    }
+  );
 
   public createHeroBGContent = this.asyncWrapper.wrap(
     { bodySchema: this.validator.createHeroBGContent },
@@ -112,7 +121,9 @@ export default class AgentB2CSubConfigController extends AbstractController {
   public createPopularDestination = this.asyncWrapper.wrap(
     { bodySchema: this.validator.createPopularDestination },
     async (req: Request, res: Response) => {
-      const { code, ...data } = await this.service.createPopularDestination(req);
+      const { code, ...data } = await this.service.createPopularDestination(
+        req
+      );
       if (data.success) {
         res.status(code).json(data);
       } else {
@@ -127,7 +138,9 @@ export default class AgentB2CSubConfigController extends AbstractController {
       bodySchema: this.validator.updatePopularDestination,
     },
     async (req: Request, res: Response) => {
-      const { code, ...data } = await this.service.updatePopularDestination(req);
+      const { code, ...data } = await this.service.updatePopularDestination(
+        req
+      );
       if (data.success) {
         res.status(code).json(data);
       } else {
@@ -141,15 +154,20 @@ export default class AgentB2CSubConfigController extends AbstractController {
       paramSchema: this.commonValidator.singleParamNumValidator(),
     },
     async (req: Request, res: Response) => {
-      const { code, ...data } = await this.service.deletePopularDestination(req);
+      const { code, ...data } = await this.service.deletePopularDestination(
+        req
+      );
       res.status(code).json(data);
     }
   );
 
-  public getPopularPlace = this.asyncWrapper.wrap(null, async (req: Request, res: Response) => {
-    const { code, ...data } = await this.service.getPopularPlace(req);
-    res.status(code).json(data);
-  });
+  public getPopularPlace = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getPopularPlace(req);
+      res.status(code).json(data);
+    }
+  );
 
   public createPopularPlace = this.asyncWrapper.wrap(
     { bodySchema: this.validator.createPopularPlace },
@@ -188,10 +206,13 @@ export default class AgentB2CSubConfigController extends AbstractController {
     }
   );
 
-  public getHotDeals = this.asyncWrapper.wrap(null, async (req: Request, res: Response) => {
-    const { code, ...data } = await this.service.getHotDeals(req);
-    res.status(code).json(data);
-  });
+  public getHotDeals = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getHotDeals(req);
+      res.status(code).json(data);
+    }
+  );
 
   public createHotDeals = this.asyncWrapper.wrap(
     { bodySchema: this.validator.createHotDeals },
@@ -242,10 +263,13 @@ export default class AgentB2CSubConfigController extends AbstractController {
     }
   );
 
-  public getAllVisaType = this.asyncWrapper.wrap(null, async (req: Request, res: Response) => {
-    const { code, ...data } = await this.service.getAllVisaType(req);
-    res.status(code).json(data);
-  });
+  public getAllVisaType = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getAllVisaType(req);
+      res.status(code).json(data);
+    }
+  );
 
   public deleteVisaType = this.asyncWrapper.wrap(
     {
@@ -269,10 +293,13 @@ export default class AgentB2CSubConfigController extends AbstractController {
     }
   );
 
-  public getAllVisaMode = this.asyncWrapper.wrap(null, async (req: Request, res: Response) => {
-    const { code, ...data } = await this.service.getAllVisaMode(req);
-    res.status(code).json(data);
-  });
+  public getAllVisaMode = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getAllVisaMode(req);
+      res.status(code).json(data);
+    }
+  );
 
   public deleteVisaMode = this.asyncWrapper.wrap(
     {

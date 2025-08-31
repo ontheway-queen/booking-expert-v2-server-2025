@@ -19,6 +19,8 @@ const config_1 = __importDefault(require("../../../config/config"));
 const sabreApiEndpoints_1 = __importDefault(require("../../../utils/miscellaneous/endpoints/sabreApiEndpoints"));
 const flightConstant_1 = require("../../../utils/miscellaneous/flightConstant");
 const ctHotelSupport_service_1 = require("../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service");
+const verteilApiEndpoints_1 = __importDefault(require("../../../utils/miscellaneous/endpoints/verteilApiEndpoints"));
+const constants_1 = require("../../../utils/miscellaneous/constants");
 class PublicCommonService extends abstract_service_1.default {
     constructor() {
         super();
@@ -55,6 +57,50 @@ class PublicCommonService extends abstract_service_1.default {
             }
             catch (err) {
                 console.log(err);
+            }
+        });
+    }
+    //get verteil token
+    getVerteilToken() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                    const axiosConfig = {
+                        method: 'post',
+                        url: `${config_1.default.VERTEIL_URL}${verteilApiEndpoints_1.default.GET_TOKEN_ENDPOINT}`,
+                        headers: {
+                            Authorization: `Basic ${Buffer.from(`${config_1.default.VERTEIL_USERNAME}:${config_1.default.VERTEIL_PASSWORD}`).toString("base64")}`,
+                        },
+                        maxBodyLength: Infinity,
+                        validateStatus: () => true,
+                    };
+                    const response = yield axios_1.default.request(axiosConfig);
+                    console.log({ response });
+                    if (response.status !== 200) {
+                        yield this.Model.ErrorLogsModel(trx).insertErrorLogs({
+                            level: constants_1.ERROR_LEVEL_CRITICAL,
+                            message: `Error from Verteil authentication`,
+                            url: axiosConfig.url,
+                            http_method: 'POST',
+                            metadata: {
+                                api: flightConstant_1.VERTEIL_API,
+                                endpoint: axiosConfig.url,
+                                payload: {
+                                    username: config_1.default.VERTEIL_USERNAME,
+                                    password: config_1.default.VERTEIL_PASSWORD,
+                                },
+                                response: response.data,
+                            }
+                        });
+                    }
+                    else {
+                        const authModel = this.Model.CommonModel(trx);
+                        yield authModel.updateEnv(flightConstant_1.VERTEIL_TOKEN_ENV, response.data.access_token);
+                    }
+                }));
+            }
+            catch (err) {
+                console.error("Verteil Token Error:", err);
             }
         });
     }
@@ -132,12 +178,15 @@ class PublicCommonService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const CommonModel = this.Model.CommonModel(trx);
                 const { filter } = req.query;
-                const banks = yield CommonModel.getBanks({ name: filter, status: true });
+                const { data } = yield CommonModel.getBanks({
+                    name: filter,
+                    status: true,
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: banks,
+                    data,
                 };
             }));
         });
@@ -147,7 +196,7 @@ class PublicCommonService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const CommonModel = this.Model.CommonModel(trx);
                 const { filter } = req.query;
-                const banks = yield CommonModel.getSocialMedia({
+                const { data } = yield CommonModel.getSocialMedia({
                     name: filter,
                     status: true,
                 });
@@ -155,7 +204,7 @@ class PublicCommonService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: banks,
+                    data,
                 };
             }));
         });
