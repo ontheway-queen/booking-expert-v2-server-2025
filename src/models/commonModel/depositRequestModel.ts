@@ -289,6 +289,7 @@ export default class DepositRequestModel extends Schema {
     query: IGetAgentB2CDepositRequestListFilterQuery,
     is_total: boolean = false
   ): Promise<{ data: IGetAgentDepositRequestData[]; total?: number }> {
+    console.log({ query });
     const data = await this.db('deposit_request as dr')
       .withSchema(this.DBO_SCHEMA)
       .select(
@@ -307,10 +308,6 @@ export default class DepositRequestModel extends Schema {
         if (query.agency_id) {
           qb.andWhere('dr.agency_id', query.agency_id);
         }
-        if (query.created_by) {
-          qb.andWhere('dr.created_by', query.created_by);
-        }
-
         if (query.from_date && query.to_date) {
           qb.andWhereBetween('dr.payment_date', [
             query.from_date,
@@ -335,7 +332,7 @@ export default class DepositRequestModel extends Schema {
         .withSchema(this.DBO_SCHEMA)
         .count('dr.id as total')
         .where((qb) => {
-          qb.andWhere('dr.source', SOURCE_AGENT);
+          qb.andWhere('dr.source', SOURCE_AGENT_B2C);
           if (query.agency_id) {
             qb.andWhere('dr.agency_id', query.agency_id);
           }

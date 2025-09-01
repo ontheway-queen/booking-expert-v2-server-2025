@@ -352,6 +352,7 @@ export default class AgencyB2CConfigModel extends Schema {
       agency_id: number;
     }
   ) {
+    console.log({ payload });
     return await this.db('site_config')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .update(payload)

@@ -276,6 +276,7 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     updateConfig(payload, where) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log({ payload });
             return yield this.db('site_config')
                 .withSchema(this.AGENT_B2C_SCHEMA)
                 .update(payload)

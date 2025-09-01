@@ -2,7 +2,7 @@ import {
   ICreateAgencyB2CHeroBgContentPayload,
   ICreateAgencyB2CPopularDestinationPayload,
   ICreateAgencyB2CPopularPlace,
-} from "../../modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types";
+} from '../../modelTypes/agencyB2CModelTypes/agencyB2CConfigModel.types';
 
 export const aboutUsContent = (site_name: string, site_address: string) => {
   return `<div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #333; line-height: 1.6;">
@@ -319,7 +319,6 @@ export const termsAndConditions = (site_name: string) => {
 
 export const privacyAndPolicy = (site_name: string) => {
   return `
-
 <div style="margin:0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; color:#0f172a; background:#ffffff; line-height:1.6;">
   <header style="background:#0ea5e9; color:#ffffff; padding:40px 16px;">
     <div style="max-width:1000px; margin:0 auto;">
@@ -500,42 +499,42 @@ export const popularDestination = (
   return [
     {
       agency_id,
-      thumbnail: "agent/b2c/others/jeddah.jpg",
+      thumbnail: 'agent/b2c/others/jeddah.jpg',
       order_number: 1,
       from_airport: 210,
       to_airport: 1139,
     },
     {
       agency_id,
-      thumbnail: "agent/b2c/others/dubai.jpg",
+      thumbnail: 'agent/b2c/others/dubai.jpg',
       order_number: 2,
       from_airport: 210,
       to_airport: 1349,
     },
     {
       agency_id,
-      thumbnail: "agent/b2c/others/newyork.jpg",
+      thumbnail: 'agent/b2c/others/newyork.jpg',
       order_number: 3,
       from_airport: 210,
       to_airport: 1754,
     },
     {
       agency_id,
-      thumbnail: "agent/b2c/others/sydney.jpg",
+      thumbnail: 'agent/b2c/others/sydney.jpg',
       order_number: 4,
       from_airport: 210,
       to_airport: 171,
     },
     {
       agency_id,
-      thumbnail: "agent/b2c/others/paris.jpg",
+      thumbnail: 'agent/b2c/others/paris.jpg',
       order_number: 5,
       from_airport: 210,
       to_airport: 1386,
     },
     {
       agency_id,
-      thumbnail: "agent/b2c/others/india.jpg",
+      thumbnail: 'agent/b2c/others/india.jpg',
       order_number: 6,
       from_airport: 210,
       to_airport: 698,
@@ -549,69 +548,69 @@ export const popularPlaces = (
   return [
     {
       agency_id,
-      thumbnail: "agent/b2c/others/dubai.jpg",
+      thumbnail: 'agent/b2c/others/dubai.jpg',
       order_number: 1,
       country_id: 224,
       location_id: 121449,
-      location_name: "Dubai",
-      location_type: "City",
+      location_name: 'Dubai',
+      location_type: 'City',
       short_description:
-        "Discover the modern marvels and luxurious experiences of Dubai.",
+        'Discover the modern marvels and luxurious experiences of Dubai.',
     },
     {
       agency_id,
-      thumbnail: "agent/b2c/others/kuala-lampur.avif",
+      thumbnail: 'agent/b2c/others/kuala-lampur.avif',
       order_number: 2,
       country_id: 129,
       location_id: 124046,
-      location_name: "Kuala Lumpur",
-      location_type: "City",
+      location_name: 'Kuala Lumpur',
+      location_type: 'City',
       short_description:
-        "Explore the vibrant cityscape of Kuala Lumpur, known for its iconic Petronas Towers.",
+        'Explore the vibrant cityscape of Kuala Lumpur, known for its iconic Petronas Towers.',
     },
     {
       agency_id,
-      thumbnail: "agent/b2c/others/bangkok.avif",
+      thumbnail: 'agent/b2c/others/bangkok.avif',
       order_number: 3,
       country_id: 211,
       location_id: 122861,
-      location_name: "Bangkok",
-      location_type: "City",
+      location_name: 'Bangkok',
+      location_type: 'City',
       short_description:
         "Experience the bustling life of Bangkok, Thailand's vibrant capital city.",
     },
     {
       agency_id,
-      thumbnail: "agent/b2c/others/singapore.avif",
+      thumbnail: 'agent/b2c/others/singapore.avif',
       order_number: 4,
       country_id: 192,
       location_id: 121673,
-      location_name: "Singapore",
-      location_type: "City",
+      location_name: 'Singapore',
+      location_type: 'City',
       short_description:
-        "Discover the beautiful and ultra-modern city of Singapore.",
+        'Discover the beautiful and ultra-modern city of Singapore.',
     },
     {
       agency_id,
-      thumbnail: "agent/b2c/others/bali.jpg",
+      thumbnail: 'agent/b2c/others/bali.jpg',
       order_number: 5,
       country_id: 100,
       location_id: 124781,
-      location_name: "Bali",
-      location_type: "City",
+      location_name: 'Bali',
+      location_type: 'City',
       short_description:
-        "Enjoy the serene beaches and tropical vibes of Bali, Indonesia.",
+        'Enjoy the serene beaches and tropical vibes of Bali, Indonesia.',
     },
     {
       agency_id,
-      thumbnail: "agent/b2c/others/colombo.webp",
+      thumbnail: 'agent/b2c/others/colombo.webp',
       order_number: 6,
       country_id: 224,
       location_id: 139467,
-      location_name: "Colombo",
-      location_type: "City",
+      location_name: 'Colombo',
+      location_type: 'City',
       short_description:
-        "Experience the cultural heritage and lush landscapes of Sri Lanka.",
+        'Experience the cultural heritage and lush landscapes of Sri Lanka.',
     },
   ];
 };
@@ -622,39 +621,39 @@ export const heroBG = (
   return [
     {
       agency_id,
-      content: "agent/b2c/hero-bg/hero-flight.jpg",
+      content: 'agent/b2c/hero-bg/hero-flight.jpg',
       order_number: 1,
-      type: "PHOTO",
-      quote: "Explore the Best Flight Options",
-      sub_quote: "Uncover unbeatable offers on global travel destinations",
-      tab: "FLIGHT",
+      type: 'PHOTO',
+      quote: 'Explore the Best Flight Options',
+      sub_quote: 'Uncover unbeatable offers on global travel destinations',
+      tab: 'FLIGHT',
     },
     {
       agency_id,
-      content: "agent/b2c/hero-bg/hero-hotel.jpg",
+      content: 'agent/b2c/hero-bg/hero-hotel.jpg',
       order_number: 2,
-      type: "PHOTO",
-      quote: "Discover Your Perfect Vacation Stay",
-      sub_quote: "Discover amazing deals to destinations worldwide",
-      tab: "HOTEL",
+      type: 'PHOTO',
+      quote: 'Discover Your Perfect Vacation Stay',
+      sub_quote: 'Discover amazing deals to destinations worldwide',
+      tab: 'HOTEL',
     },
     {
       agency_id,
-      content: "agent/b2c/hero-bg/hero-holiday.jpg",
+      content: 'agent/b2c/hero-bg/hero-holiday.jpg',
       order_number: 3,
-      type: "PHOTO",
-      quote: "Discover Your Next Tour",
-      sub_quote: "Discover amazing deals to destinations worldwide",
-      tab: "HOLIDAY",
+      type: 'PHOTO',
+      quote: 'Discover Your Next Tour',
+      sub_quote: 'Discover amazing deals to destinations worldwide',
+      tab: 'HOLIDAY',
     },
     {
       agency_id,
-      content: "agent/b2c/hero-bg/hero-visa.jpg",
+      content: 'agent/b2c/hero-bg/hero-visa.jpg',
       order_number: 4,
-      type: "PHOTO",
-      quote: "Visa Services Available for These Countries",
-      sub_quote: "Visa Services Available for These Countries",
-      tab: "VISA",
+      type: 'PHOTO',
+      quote: 'Visa Services Available for These Countries',
+      sub_quote: 'Visa Services Available for These Countries',
+      tab: 'VISA',
     },
   ];
 };

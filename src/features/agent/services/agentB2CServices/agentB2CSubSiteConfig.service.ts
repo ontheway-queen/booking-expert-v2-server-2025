@@ -124,11 +124,13 @@ export class AgentB2CSubSiteConfigService extends AbstractServices {
       ...restData
     } = siteConfig;
 
+    const { data } = await configModel.getHotDeals({ agency_id });
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: restData,
+      data: { ...restData, hot_deals: data },
     };
   }
 

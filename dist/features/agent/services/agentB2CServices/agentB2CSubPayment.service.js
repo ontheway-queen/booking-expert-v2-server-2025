@@ -48,14 +48,15 @@ class AgentB2CSubPaymentService extends abstract_service_1.default {
                 queryParams.created_by = query.user_id;
             }
             if (query.limit) {
-                queryParams.filter = query.limit;
+                queryParams.limit = Number(query.limit);
             }
             if (query.status !== undefined) {
                 queryParams.status = query.status;
             }
             if (query.skip) {
-                queryParams.filter = query.skip;
+                queryParams.skip = Number(query.skip);
             }
+            console.log(queryParams);
             const data = yield depositModel.getAgentB2CDepositRequestList(queryParams, true);
             return {
                 success: true,

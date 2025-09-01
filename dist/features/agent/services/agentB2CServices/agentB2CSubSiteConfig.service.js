@@ -108,11 +108,12 @@ class AgentB2CSubSiteConfigService extends abstract_service_1.default {
                 };
             }
             const { agency_id: no_need_agency_id, id, about_us_content, contact_us_content, about_us_thumbnail, contact_us_thumbnail, privacy_policy_content, updated_by, updated_by_name, terms_and_conditions_content, last_updated } = siteConfig, restData = __rest(siteConfig, ["agency_id", "id", "about_us_content", "contact_us_content", "about_us_thumbnail", "contact_us_thumbnail", "privacy_policy_content", "updated_by", "updated_by_name", "terms_and_conditions_content", "last_updated"]);
+            const { data } = yield configModel.getHotDeals({ agency_id });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: restData,
+                data: Object.assign(Object.assign({}, restData), { hot_deals: data }),
             };
         });
     }

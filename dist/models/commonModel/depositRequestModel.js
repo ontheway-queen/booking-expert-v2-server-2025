@@ -206,6 +206,7 @@ class DepositRequestModel extends schema_1.default {
     getAgentB2CDepositRequestList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, is_total = false) {
             var _a;
+            console.log({ query });
             const data = yield this.db('deposit_request as dr')
                 .withSchema(this.DBO_SCHEMA)
                 .select('dr.id', 'ad.bank_name', 'ad.bank_logo', 'dr.amount', 'dr.request_no', 'dr.status', 'dr.payment_date', 'dr.created_at')
@@ -214,9 +215,6 @@ class DepositRequestModel extends schema_1.default {
                 qb.andWhere('dr.source', constants_1.SOURCE_AGENT_B2C);
                 if (query.agency_id) {
                     qb.andWhere('dr.agency_id', query.agency_id);
-                }
-                if (query.created_by) {
-                    qb.andWhere('dr.created_by', query.created_by);
                 }
                 if (query.from_date && query.to_date) {
                     qb.andWhereBetween('dr.payment_date', [
@@ -240,7 +238,7 @@ class DepositRequestModel extends schema_1.default {
                     .withSchema(this.DBO_SCHEMA)
                     .count('dr.id as total')
                     .where((qb) => {
-                    qb.andWhere('dr.source', constants_1.SOURCE_AGENT);
+                    qb.andWhere('dr.source', constants_1.SOURCE_AGENT_B2C);
                     if (query.agency_id) {
                         qb.andWhere('dr.agency_id', query.agency_id);
                     }

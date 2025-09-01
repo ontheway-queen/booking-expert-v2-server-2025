@@ -46,15 +46,15 @@ export class AgentB2CSubPaymentService extends AbstractServices {
       queryParams.created_by = query.user_id;
     }
     if (query.limit) {
-      queryParams.filter = query.limit;
+      queryParams.limit = Number(query.limit);
     }
     if (query.status !== undefined) {
       queryParams.status = query.status;
     }
     if (query.skip) {
-      queryParams.filter = query.skip;
+      queryParams.skip = Number(query.skip);
     }
-
+    console.log(queryParams);
     const data = await depositModel.getAgentB2CDepositRequestList(
       queryParams,
       true
@@ -96,8 +96,8 @@ export class AgentB2CSubPaymentService extends AbstractServices {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
       const { agency_id, user_id } = req.agencyUser;
-
       const depositModel = this.Model.DepositRequestModel(trx);
+
       const AgencyPaymentModel = this.Model.AgencyB2CPaymentModel(trx);
       const data = await depositModel.getSingleAgentB2CDepositRequest(
         Number(id),
