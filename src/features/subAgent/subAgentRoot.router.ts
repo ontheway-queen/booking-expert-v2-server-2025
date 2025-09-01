@@ -8,7 +8,7 @@ import SubAgentPaymentsRouter from './routers/subAgentPayments.router';
 import SubAgentHotelRouter from './routers/subAgentHotel.router';
 import SubAgentFlightRouter from './routers/subAgentFlight.router';
 import SubAgentDashboardRouter from './routers/subntDashboard.router';
-import SubAgentTravelerRouter from './routers/subAgentTraveler.router';
+import SubAgentTravelerRouter from './routers/subentTraveler.router';
 
 export default class SubAgentRootRouter {
   public Router = Router();
