@@ -3,7 +3,7 @@ import SubAgentConfigRouter from './routers/subAgentConfig.router';
 import SubAgentMainRouter from './routers/subAgentMain.router';
 import SubAgentProfileRouter from './routers/subAgentProfile.router';
 import AuthChecker from '../../middleware/authChecker/authChecker';
-import SubAgentSupportTicketRouter from './routers/subAgentSupportTicket.router';
+import SubAgentSupportTicketRouter from './routers/subentSupportTicket.router';
 import SubAgentPaymentsRouter from './routers/subAgentPayments.router';
 import SubAgentHotelRouter from './routers/subAgentHotel.router';
 import SubAgentFlightRouter from './routers/subAgentFlight.router';
