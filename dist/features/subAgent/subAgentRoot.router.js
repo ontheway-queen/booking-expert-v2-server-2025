@@ -12,7 +12,7 @@ const subentSupportTicket_router_1 = __importDefault(require("./routers/subentSu
 const subAgentPayments_router_1 = __importDefault(require("./routers/subAgentPayments.router"));
 const subAgentHotel_router_1 = __importDefault(require("./routers/subAgentHotel.router"));
 const subAgentFlight_router_1 = __importDefault(require("./routers/subAgentFlight.router"));
-const subAgentDashboard_router_1 = __importDefault(require("./routers/subAgentDashboard.router"));
+const subntDashboard_router_1 = __importDefault(require("./routers/subntDashboard.router"));
 const subAgentTraveler_router_1 = __importDefault(require("./routers/subAgentTraveler.router"));
 class SubAgentRootRouter {
     constructor() {
@@ -25,7 +25,7 @@ class SubAgentRootRouter {
         this.subAgentHotelRouter = new subAgentHotel_router_1.default();
         this.subAgentFlightRouter = new subAgentFlight_router_1.default();
         this.subAgentTravelerRouter = new subAgentTraveler_router_1.default();
-        this.subAgentDashboardRouter = new subAgentDashboard_router_1.default();
+        this.subAgentDashboardRouter = new subntDashboard_router_1.default();
         this.authChecker = new authChecker_1.default();
         this.callRouter();
     }
