@@ -31,7 +31,7 @@ class SiteConfigSupportService extends abstract_service_1.default {
                 address: JSON.stringify([{ title: 'Main Office', address }]),
                 contact_us_content: (0, pagesContent_1.contactUsContent)(address, phone, email),
                 privacy_policy_content: (0, pagesContent_1.privacyAndPolicy)(site_name),
-                terms_and_conditions_content: (0, pagesContent_1.privacyAndPolicy)(site_name),
+                terms_and_conditions_content: (0, pagesContent_1.termsAndConditions)(site_name),
                 site_name,
                 hero_quote: `Welcome to ${site_name}!`,
                 hero_sub_quote: 'Find Flights, Hotels, Visa & Holidays',
