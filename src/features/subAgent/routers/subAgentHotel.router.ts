@@ -1,5 +1,5 @@
 import AbstractRouter from '../../../abstract/abstract.router';
-import SubAgentHotelController from '../controllers/subAgentHotel.controller';
+import SubAgentHotelController from '../controllers/subAgentHot.controller';
 
 export default class SubAgentHotelRouter extends AbstractRouter {
   private controller = new SubAgentHotelController();
