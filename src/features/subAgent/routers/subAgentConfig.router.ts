@@ -1,5 +1,5 @@
 import AbstractRouter from '../../../abstract/abstract.router';
-import SubAgentConfigController from '../controllers/subAgentConfig.controller';
+import SubAgentConfigController from '../controllers/subentConfig.controller';
 
 export default class SubAgentConfigRouter extends AbstractRouter {
   private controller = new SubAgentConfigController();
