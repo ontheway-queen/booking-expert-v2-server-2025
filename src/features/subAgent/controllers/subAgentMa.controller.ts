@@ -1,7 +1,7 @@
 import AbstractController from '../../../abstract/abstract.controller';
 import { Request, Response } from 'express';
 import { SubAgentMainService } from '../services/subAgentMain.service';
-import SubAgentMainValidator from '../utils/validator/subAgentMain.validator';
+import SubAgentMainValidator from '../utils/validator/subAgentMa.validator';
 export class SubAgentMainController extends AbstractController {
   private validator = new SubAgentMainValidator();
   private service = new SubAgentMainService();
