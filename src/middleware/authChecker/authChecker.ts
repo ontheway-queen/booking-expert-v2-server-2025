@@ -18,7 +18,11 @@ import AgencyB2CUserModel from '../../models/agencyB2CModel/agencyB2CUserModel';
 
 export default class AuthChecker {
   // admin auth checker
-  public adminAuthChecker = async (req: Request, res: Response, next: NextFunction) => {
+  public adminAuthChecker = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     const { authorization } = req.headers;
 
     if (!authorization) {
@@ -38,7 +42,10 @@ export default class AuthChecker {
       return;
     }
 
-    const verify = Lib.verifyToken(authSplit[1], config.JWT_SECRET_ADMIN) as ITokenParseAdmin;
+    const verify = Lib.verifyToken(
+      authSplit[1],
+      config.JWT_SECRET_ADMIN
+    ) as ITokenParseAdmin;
 
     if (!verify) {
       res
@@ -78,7 +85,11 @@ export default class AuthChecker {
   };
 
   //B2C user auth checker
-  public b2cUserAuthChecker = async (req: Request, res: Response, next: NextFunction) => {
+  public b2cUserAuthChecker = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     const { authorization } = req.headers;
     if (!authorization) {
       res
@@ -97,7 +108,10 @@ export default class AuthChecker {
       return;
     }
 
-    const verify = Lib.verifyToken(authSplit[1], config.JWT_SECRET_USER) as ITokenParseUser;
+    const verify = Lib.verifyToken(
+      authSplit[1],
+      config.JWT_SECRET_USER
+    ) as ITokenParseUser;
 
     if (!verify) {
       res
@@ -135,9 +149,15 @@ export default class AuthChecker {
   };
 
   // agency user auth checker
-  public agencyUserAuthChecker = async (req: Request, res: Response, next: NextFunction) => {
+  public agencyUserAuthChecker = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     let { authorization } = req.headers;
-    if (!authorization) authorization = req.query.token as string;
+    if (!authorization) authorization = req.query.auth_token as string;
+
+    console.log({ authorization });
     if (!authorization) {
       res.status(StatusCode.HTTP_UNAUTHORIZED).json({
         statusCode: StatusCode.HTTP_UNAUTHORIZED,
@@ -159,7 +179,10 @@ export default class AuthChecker {
       return;
     }
 
-    const verify = Lib.verifyToken(authSplit[1], config.JWT_SECRET_AGENT) as ITokenParseAgencyUser;
+    const verify = Lib.verifyToken(
+      authSplit[1],
+      config.JWT_SECRET_AGENT
+    ) as ITokenParseAgencyUser;
 
     console.log(verify);
 
@@ -236,7 +259,11 @@ export default class AuthChecker {
   };
 
   //Agency B2C user auth checker
-  public agencyB2CUserAuthChecker = async (req: Request, res: Response, next: NextFunction) => {
+  public agencyB2CUserAuthChecker = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     const { authorization } = req.headers;
     if (!authorization) {
       res
@@ -310,8 +337,13 @@ export default class AuthChecker {
   };
 
   // Agency White label Auth Checker
-  public whiteLabelAuthChecker = async (req: Request, res: Response, next: NextFunction) => {
+  public whiteLabelAuthChecker = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     let { token } = req.headers as { token: string };
+
     if (!token) {
       token = req.query.token as string;
     }
@@ -338,7 +370,11 @@ export default class AuthChecker {
         agency_id: check_token?.agency_id,
       });
 
-      if (!check_agency || check_agency.status !== 'Active' || !check_agency.white_label) {
+      if (
+        !check_agency ||
+        check_agency.status !== 'Active' ||
+        !check_agency.white_label
+      ) {
         res
           .status(StatusCode.HTTP_UNAUTHORIZED)
           .json({ success: false, message: ResMsg.HTTP_UNAUTHORIZED });
@@ -396,13 +432,21 @@ export default class AuthChecker {
   };
 
   // Agency B2C API Authorizer
-  public agencyB2CAPIAccessChecker = async (req: Request, res: Response, next: NextFunction) => {
+  public agencyB2CAPIAccessChecker = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     req.agentAPI = { agency_email: '', agency_id: 1, agency_name: '' };
     next();
   };
 
   // External API Authorizer
-  public externalAPIAccessChecker = async (req: Request, res: Response, next: NextFunction) => {
+  public externalAPIAccessChecker = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     req.external = { external_email: '', external_id: 1, external_name: '' };
     next();
   };

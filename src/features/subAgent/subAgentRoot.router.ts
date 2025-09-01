@@ -3,12 +3,12 @@ import SubAgentConfigRouter from './routers/subAgentConfig.router';
 import SubAgentMainRouter from './routers/subAgentMain.router';
 import SubAgentProfileRouter from './routers/subAgentProfile.router';
 import AuthChecker from '../../middleware/authChecker/authChecker';
-import SubAgentSupportTicketRouter from './routers/subentSupportTicket.router';
+import SubAgentSupportTicketRouter from './routers/subAgentSupportTicket.router';
 import SubAgentPaymentsRouter from './routers/subAgentPayments.router';
 import SubAgentHotelRouter from './routers/subAgentHotel.router';
 import SubAgentFlightRouter from './routers/subAgentFlight.router';
-import SubAgentDashboardRouter from './routers/subntDashboard.router';
-import SubAgentTravelerRouter from './routers/subentTraveler.router';
+import SubAgentDashboardRouter from './routers/subAgentDashboard.router';
+import SubAgentTravelerRouter from './routers/subAgentTraveler.router';
 
 export default class SubAgentRootRouter {
   public Router = Router();

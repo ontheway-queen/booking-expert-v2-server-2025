@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import AbstractController from '../../../abstract/abstract.controller';
 import { SubAgentHotelService } from '../services/subAgentHotel.service';
-import SubAgentHotelValidator from '../utils/validator/subentHotel.validator';
+import SubAgentHotelValidator from '../utils/validator/subAgentHotel.validator';
 
 export default class SubAgentHotelController extends AbstractController {
   private service = new SubAgentHotelService();

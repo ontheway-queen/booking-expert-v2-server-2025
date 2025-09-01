@@ -401,6 +401,7 @@ class SubAgentFlightService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { agency_id, ref_agent_id, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
             const body = req.body;
+            console.log({ body });
             let booking_block = false;
             let refundable = false;
             let api_booking_ref = null;

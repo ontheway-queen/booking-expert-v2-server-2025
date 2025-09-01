@@ -131,7 +131,8 @@ class AuthChecker {
         this.agencyUserAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             let { authorization } = req.headers;
             if (!authorization)
-                authorization = req.query.token;
+                authorization = req.query.auth_token;
+            console.log({ authorization });
             if (!authorization) {
                 res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
                     statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
@@ -308,7 +309,9 @@ class AuthChecker {
                 const check_agency = yield agencyModel.checkAgency({
                     agency_id: check_token === null || check_token === void 0 ? void 0 : check_token.agency_id,
                 });
-                if (!check_agency || check_agency.status !== 'Active' || !check_agency.white_label) {
+                if (!check_agency ||
+                    check_agency.status !== 'Active' ||
+                    !check_agency.white_label) {
                     res
                         .status(statusCode_1.default.HTTP_UNAUTHORIZED)
                         .json({ success: false, message: responseMessage_1.default.HTTP_UNAUTHORIZED });

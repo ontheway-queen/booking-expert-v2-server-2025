@@ -159,7 +159,7 @@ export default class AgentFlightValidator {
         'any.required': 'Provide valid passenger code and quantity data',
         'any.invalid': 'Invalid format for passenger code and quantity data',
       }),
-    token: Joi.string().optional(),
+    auth_token: Joi.string().required(),
     airline_code: Joi.alternatives().try(
       Joi.array().optional(),
       Joi.string().custom((value, helpers) => {

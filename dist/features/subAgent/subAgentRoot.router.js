@@ -8,24 +8,24 @@ const subAgentConfig_router_1 = __importDefault(require("./routers/subAgentConfi
 const subAgentMain_router_1 = __importDefault(require("./routers/subAgentMain.router"));
 const subAgentProfile_router_1 = __importDefault(require("./routers/subAgentProfile.router"));
 const authChecker_1 = __importDefault(require("../../middleware/authChecker/authChecker"));
-const subentSupportTicket_router_1 = __importDefault(require("./routers/subentSupportTicket.router"));
+const subAgentSupportTicket_router_1 = __importDefault(require("./routers/subAgentSupportTicket.router"));
 const subAgentPayments_router_1 = __importDefault(require("./routers/subAgentPayments.router"));
 const subAgentHotel_router_1 = __importDefault(require("./routers/subAgentHotel.router"));
 const subAgentFlight_router_1 = __importDefault(require("./routers/subAgentFlight.router"));
-const subntDashboard_router_1 = __importDefault(require("./routers/subntDashboard.router"));
-const subentTraveler_router_1 = __importDefault(require("./routers/subentTraveler.router"));
+const subAgentDashboard_router_1 = __importDefault(require("./routers/subAgentDashboard.router"));
+const subAgentTraveler_router_1 = __importDefault(require("./routers/subAgentTraveler.router"));
 class SubAgentRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
         this.subAgentConfigRouter = new subAgentConfig_router_1.default();
         this.subAgentMainRouter = new subAgentMain_router_1.default();
         this.subAgentProfileRouter = new subAgentProfile_router_1.default();
-        this.subAgentSupportTicketRouter = new subentSupportTicket_router_1.default();
+        this.subAgentSupportTicketRouter = new subAgentSupportTicket_router_1.default();
         this.subAgentPaymentsRouter = new subAgentPayments_router_1.default();
         this.subAgentHotelRouter = new subAgentHotel_router_1.default();
         this.subAgentFlightRouter = new subAgentFlight_router_1.default();
-        this.subAgentTravelerRouter = new subentTraveler_router_1.default();
-        this.subAgentDashboardRouter = new subntDashboard_router_1.default();
+        this.subAgentTravelerRouter = new subAgentTraveler_router_1.default();
+        this.subAgentDashboardRouter = new subAgentDashboard_router_1.default();
         this.authChecker = new authChecker_1.default();
         this.callRouter();
     }

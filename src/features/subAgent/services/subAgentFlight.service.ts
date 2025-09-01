@@ -489,6 +489,8 @@ export class SubAgentFlightService extends AbstractServices {
 
     const body = req.body as IFlightBookingRequestBody;
 
+    console.log({ body });
+
     let booking_block = false;
     let refundable = false;
     let api_booking_ref: string | null = null;
