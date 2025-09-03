@@ -858,11 +858,12 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     source_id: agency_id,
                     source_type: constants_1.SOURCE_AGENT,
                 };
-                yield configModel.createVisaType(payload);
+                const visaType = yield configModel.createVisaType(payload);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: this.ResMsg.HTTP_SUCCESSFUL,
+                    data: visaType,
                 };
             }));
         });
@@ -874,12 +875,15 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
             const visaTypes = yield configModel.getAllVisaType({
                 source_id: agency_id,
                 source_type: constants_1.SOURCE_AGENT,
+                is_deleted: false,
             });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: visaTypes,
+                data: {
+                    id: visaTypes[0].id,
+                },
             };
         });
     }
@@ -903,6 +907,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 const visaModel = this.Model.VisaModel(trx);
                 const checkVisa = yield visaModel.checkVisaExistsByVisaType({
                     visa_type_id: Number(id),
+                    is_deleted: false,
                 });
                 if (checkVisa.length) {
                     return {
@@ -946,11 +951,14 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 source_id: agency_id,
                 source_type: constants_1.SOURCE_AGENT,
             };
-            yield configModel.createVisaMode(payload);
+            const visaMode = yield configModel.createVisaMode(payload);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_SUCCESSFUL,
                 message: this.ResMsg.HTTP_SUCCESSFUL,
+                data: {
+                    id: visaMode[0].id,
+                },
             };
         });
     }
@@ -961,6 +969,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
             const visaModes = yield configModel.getAllVisaMode({
                 source_id: agency_id,
                 source_type: constants_1.SOURCE_AGENT,
+                is_deleted: false,
             });
             return {
                 success: true,
@@ -978,6 +987,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 const configModel = this.Model.AgencyB2CConfigModel(trx);
                 const checkVisaMode = yield configModel.getSingleVisaMode({
                     id: Number(id),
+                    is_deleted: false,
                 });
                 if (!checkVisaMode) {
                     return {
@@ -990,6 +1000,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 const visaModel = this.Model.VisaModel(trx);
                 const checkVisa = yield visaModel.checkVisaExistsByVisaMode({
                     visa_mode_id: Number(id),
+                    is_deleted: false,
                 });
                 if (checkVisa.length) {
                     return {

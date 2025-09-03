@@ -69,6 +69,7 @@ export default class VisaModel extends Schema {
         'vt.name as visa_type',
         'vm.name as visa_mode',
         'v.max_validity',
+        'v.status',
         'v.image'
       )
       .joinRaw(`LEFT JOIN public.country AS c ON c.id = v.country_id`)
@@ -241,18 +242,20 @@ export default class VisaModel extends Schema {
       .andWhere('source_type', SOURCE_AGENT);
   }
 
-  public async checkVisaExistsByVisaType(query: { visa_type_id: number }) {
+  public async checkVisaExistsByVisaType(query: { visa_type_id: number, is_deleted:boolean }) {
     return this.db('visa')
       .withSchema(this.SERVICE_SCHEMA)
       .select('id')
-      .where('visa_type_id', query.visa_type_id);
+      .where('visa_type_id', query.visa_type_id)
+      .andWhere('is_deleted', false);
   }
 
-  public async checkVisaExistsByVisaMode(query: { visa_mode_id: number }) {
+  public async checkVisaExistsByVisaMode(query: { visa_mode_id: number, is_deleted:boolean }) {
     return this.db('visa')
       .withSchema(this.SERVICE_SCHEMA)
       .select('id')
-      .where('visa_mode_id', query.visa_mode_id);
+      .where('visa_mode_id', query.visa_mode_id)
+      .andWhere('is_deleted', false);
   }
 
   public async getAllVisaCreatedCountry(query: IGetAllVisaCreatedCountryQuery) {

@@ -1,4 +1,4 @@
-import Joi, { LanguageMessages } from 'joi';
+import Joi from 'joi';
 
 export class AgentB2CSubVisaValidator {
   public createVisaValidatorSchema = Joi.object({
@@ -8,7 +8,7 @@ export class AgentB2CSubVisaValidator {
     max_validity: Joi.number().required(),
     stay_validity: Joi.number().required(),
     visa_type_id: Joi.number().required(),
-    visa_mode_id: Joi.number().optional(),
+    visa_mode_id: Joi.number().required(),
     title: Joi.string().required(),
     description: Joi.string().optional(),
     documents_details: Joi.string().optional(),

@@ -150,6 +150,9 @@ class VisaApplicationModel extends schema_1.default {
                 if (query.status) {
                     qb.andWhere('va.status', query.status);
                 }
+                if (query.visa_id) {
+                    qb.andWhere('va.visa_id', query.visa_id);
+                }
                 if (query.filter) {
                     qb.andWhere((subQb) => {
                         subQb
@@ -175,6 +178,9 @@ class VisaApplicationModel extends schema_1.default {
                 }
                 if (query.status) {
                     qb.andWhere('va.status', query.status);
+                }
+                if (query.visa_id) {
+                    qb.andWhere('va.visa_id', query.visa_id);
                 }
                 if (query.filter) {
                     qb.andWhere((subQb) => {

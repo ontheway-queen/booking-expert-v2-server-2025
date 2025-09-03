@@ -282,9 +282,9 @@ export class AgentB2CSubConfigService extends AbstractServices {
       await this.insertAgentAudit(trx, {
         agency_id,
         created_by: user_id,
-        details: `New bg content(${body.type}) created for ${
-          body.tab || 'all tab'
-        }(${files[0].filename}).`,
+        details: `New bg content(${body.type}) created for ${body.tab || 'all tab'}(${
+          files[0].filename
+        }).`,
         payload: JSON.stringify({
           ...body,
           content: files[0].filename,
@@ -344,9 +344,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       if (payload.content && check[0].content) {
         const heroContent = heroBG(agency_id);
 
-        const found = heroContent.find(
-          (item) => item.content === check[0].content
-        );
+        const found = heroContent.find((item) => item.content === check[0].content);
 
         if (!found) {
           await this.manageFile.deleteFromCloud([check[0].content]);
@@ -392,9 +390,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       if (check[0].content) {
         const heroContent = heroBG(agency_id);
 
-        const found = heroContent.find(
-          (item) => item.content === check[0].content
-        );
+        const found = heroContent.find((item) => item.content === check[0].content);
 
         if (!found) {
           await this.manageFile.deleteFromCloud([check[0].content]);
@@ -583,9 +579,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       if (payload.thumbnail && check.thumbnail) {
         const heroContent = popularDestination(agency_id);
 
-        const found = heroContent.find(
-          (item) => item.thumbnail === check.thumbnail
-        );
+        const found = heroContent.find((item) => item.thumbnail === check.thumbnail);
 
         if (!found) {
           await this.manageFile.deleteFromCloud([check.thumbnail]);
@@ -640,9 +634,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       if (check.thumbnail) {
         const heroContent = popularDestination(agency_id);
 
-        const found = heroContent.find(
-          (item) => item.thumbnail === check.thumbnail
-        );
+        const found = heroContent.find((item) => item.thumbnail === check.thumbnail);
 
         if (!found) {
           await this.manageFile.deleteFromCloud([check.thumbnail]);
@@ -799,9 +791,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       if (payload.thumbnail && check.thumbnail) {
         const heroContent = popularPlaces(agency_id);
 
-        const found = heroContent.find(
-          (item) => item.thumbnail === check.thumbnail
-        );
+        const found = heroContent.find((item) => item.thumbnail === check.thumbnail);
 
         if (!found) {
           await this.manageFile.deleteFromCloud([check.thumbnail]);
@@ -857,9 +847,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       if (check.thumbnail) {
         const heroContent = popularPlaces(agency_id);
 
-        const found = heroContent.find(
-          (item) => item.thumbnail === check.thumbnail
-        );
+        const found = heroContent.find((item) => item.thumbnail === check.thumbnail);
 
         if (!found) {
           await this.manageFile.deleteFromCloud([check.thumbnail]);
@@ -1074,12 +1062,13 @@ export class AgentB2CSubConfigService extends AbstractServices {
         source_type: SOURCE_AGENT,
       };
 
-      await configModel.createVisaType(payload);
+      const visaType = await configModel.createVisaType(payload);
 
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: this.ResMsg.HTTP_SUCCESSFUL,
+        data: visaType,
       };
     });
   }
@@ -1092,13 +1081,16 @@ export class AgentB2CSubConfigService extends AbstractServices {
     const visaTypes = await configModel.getAllVisaType({
       source_id: agency_id,
       source_type: SOURCE_AGENT,
+      is_deleted: false,
     });
 
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: visaTypes,
+      data: {
+        id: visaTypes[0].id,
+      },
     };
   }
 
@@ -1125,14 +1117,14 @@ export class AgentB2CSubConfigService extends AbstractServices {
       const visaModel = this.Model.VisaModel(trx);
       const checkVisa = await visaModel.checkVisaExistsByVisaType({
         visa_type_id: Number(id),
+        is_deleted: false,
       });
 
       if (checkVisa.length) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message:
-            'Cannot delete this visa type as it is associated with existing visas.',
+          message: 'Cannot delete this visa type as it is associated with existing visas.',
         };
       }
 
@@ -1175,11 +1167,14 @@ export class AgentB2CSubConfigService extends AbstractServices {
       source_type: SOURCE_AGENT,
     };
 
-    await configModel.createVisaMode(payload);
+    const visaMode = await configModel.createVisaMode(payload);
     return {
       success: true,
       code: this.StatusCode.HTTP_SUCCESSFUL,
       message: this.ResMsg.HTTP_SUCCESSFUL,
+      data: {
+        id: visaMode[0].id,
+      },
     };
   }
 
@@ -1191,6 +1186,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
     const visaModes = await configModel.getAllVisaMode({
       source_id: agency_id,
       source_type: SOURCE_AGENT,
+      is_deleted: false,
     });
 
     return {
@@ -1210,6 +1206,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
 
       const checkVisaMode = await configModel.getSingleVisaMode({
         id: Number(id),
+        is_deleted: false,
       });
 
       if (!checkVisaMode) {
@@ -1224,13 +1221,13 @@ export class AgentB2CSubConfigService extends AbstractServices {
       const visaModel = this.Model.VisaModel(trx);
       const checkVisa = await visaModel.checkVisaExistsByVisaMode({
         visa_mode_id: Number(id),
+        is_deleted: false,
       });
       if (checkVisa.length) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message:
-            'Cannot delete this visa mode as it is associated with existing visas.',
+          message: 'Cannot delete this visa mode as it is associated with existing visas.',
         };
       }
 

@@ -487,7 +487,7 @@ class AgencyB2CConfigModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('visa_type')
                 .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload);
+                .insert(payload, 'id');
         });
     }
     getAllVisaType(query) {
@@ -496,7 +496,8 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id', 'name')
                 .where('source_id', query.source_id)
-                .andWhere('source_type', query.source_type);
+                .andWhere('source_type', query.source_type)
+                .andWhere('is_deleted', query.is_deleted);
         });
     }
     getSingleVisaType(query) {
@@ -505,6 +506,7 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('*')
                 .where('id', query.id)
+                .andWhere('is_deleted', false)
                 .first();
         });
     }
@@ -516,6 +518,7 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .whereILike('name', query.name)
                 .andWhere('source_id', query.source_id)
                 .andWhere('source_type', query.source_type)
+                .andWhere('is_deleted', false)
                 .first();
         });
     }
@@ -523,7 +526,7 @@ class AgencyB2CConfigModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('visa_type')
                 .withSchema(this.SERVICE_SCHEMA)
-                .del()
+                .update({ is_deleted: true })
                 .where('id', where.id)
                 .andWhere('source_id', where.source_id)
                 .andWhere('source_type', where.source_type);
@@ -533,7 +536,7 @@ class AgencyB2CConfigModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('visa_mode')
                 .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload);
+                .insert(payload, 'id');
         });
     }
     getAllVisaMode(query) {
@@ -542,7 +545,8 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id', 'name')
                 .where('source_id', query.source_id)
-                .andWhere('source_type', query.source_type);
+                .andWhere('source_type', query.source_type)
+                .andWhere('is_deleted', query.is_deleted);
         });
     }
     getSingleVisaMode(query) {
@@ -551,6 +555,7 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('*')
                 .where('id', query.id)
+                .andWhere('is_deleted', query.is_deleted)
                 .first();
         });
     }
@@ -569,7 +574,7 @@ class AgencyB2CConfigModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('visa_mode')
                 .withSchema(this.SERVICE_SCHEMA)
-                .del()
+                .update({ is_deleted: true })
                 .where('id', where.id)
                 .andWhere('source_id', where.source_id)
                 .andWhere('source_type', where.source_type);

@@ -100,6 +100,7 @@ export interface IGetVisaListData {
   visa_type: string;
   visa_mode: string;
   max_validity: number;
+  status:boolean;
   image: string;
 }
 

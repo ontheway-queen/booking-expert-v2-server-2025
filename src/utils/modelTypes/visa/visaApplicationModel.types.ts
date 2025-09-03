@@ -81,6 +81,7 @@ export interface IGetAllAgentB2CVisaApplicationQuery {
   filter?: string;
   limit?: number;
   skip?: number;
+  visa_id?:number
 }
 
 export interface IGetAllAgentB2CVisaApplicationData {

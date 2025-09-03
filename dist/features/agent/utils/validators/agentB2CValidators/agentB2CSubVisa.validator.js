@@ -14,7 +14,7 @@ class AgentB2CSubVisaValidator {
             max_validity: joi_1.default.number().required(),
             stay_validity: joi_1.default.number().required(),
             visa_type_id: joi_1.default.number().required(),
-            visa_mode_id: joi_1.default.number().optional(),
+            visa_mode_id: joi_1.default.number().required(),
             title: joi_1.default.string().required(),
             description: joi_1.default.string().optional(),
             documents_details: joi_1.default.string().optional(),

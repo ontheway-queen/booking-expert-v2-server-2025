@@ -160,6 +160,7 @@ class AgentB2CSubVisaService extends abstract_service_1.default {
                     payload.image = image.filename;
                     deleteImage.push(checkExist.image);
                 }
+                console.log(payload);
                 if (payload && Object.keys(payload).length) {
                     yield visaModel.updateVisa(payload, Number(id));
                 }
@@ -190,6 +191,19 @@ class AgentB2CSubVisaService extends abstract_service_1.default {
                     success: false,
                     code: this.StatusCode.HTTP_NOT_FOUND,
                     message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            const visaApplicationModel = this.Model.VisaApplicationModel();
+            const applicationCheck = yield visaApplicationModel.getAllAgentB2CVisaApplication({
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+                visa_id: Number(id),
+            });
+            if (applicationCheck.data.length) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_CONFLICT,
+                    message: 'Found application for this visa',
                 };
             }
             yield visaModel.updateVisa({ is_deleted: true }, Number(id));
