@@ -24,13 +24,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_controller_1 = __importDefault(require("../../../abstract/abstract.controller"));
-const agentAdministration_validator_1 = __importDefault(require("../utils/validators/agentAdministration.validator"));
-const agentAdministration_service_1 = require("../services/agentAdministration.service");
-class AgentAdministrationController extends abstract_controller_1.default {
+const subAgentAdministration_service_1 = require("../services/subAgentAdministration.service");
+const subAgentAdministration_validator_1 = __importDefault(require("../utils/validator/subAgentAdministration.validator"));
+class SubAgentAdministrationController extends abstract_controller_1.default {
     constructor() {
         super();
-        this.validator = new agentAdministration_validator_1.default();
-        this.service = new agentAdministration_service_1.AgentAdministrationService();
+        this.validator = new subAgentAdministration_validator_1.default();
+        this.service = new subAgentAdministration_service_1.SubAgentAdministrationService();
         this.createRole = this.asyncWrapper.wrap({ bodySchema: this.validator.createRole }, (req, res) => __awaiter(this, void 0, void 0, function* () {
             const _a = yield this.service.createRole(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
@@ -91,4 +91,4 @@ class AgentAdministrationController extends abstract_controller_1.default {
         }));
     }
 }
-exports.default = AgentAdministrationController;
+exports.default = SubAgentAdministrationController;

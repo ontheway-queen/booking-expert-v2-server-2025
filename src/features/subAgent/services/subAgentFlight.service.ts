@@ -489,8 +489,6 @@ export class SubAgentFlightService extends AbstractServices {
 
     const body = req.body as IFlightBookingRequestBody;
 
-    console.log({ body });
-
     let booking_block = false;
     let refundable = false;
     let api_booking_ref: string | null = null;
@@ -508,11 +506,11 @@ export class SubAgentFlightService extends AbstractServices {
       //get flight markup set id
       const agencyModel = this.Model.AgencyModel(trx);
 
-      const agency_details = await agencyModel.checkAgency({
+      const refAgent_details = await agencyModel.checkAgency({
         agency_id: ref_agent_id,
       });
 
-      if (!agency_details?.flight_markup_set) {
+      if (!refAgent_details?.flight_markup_set) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
@@ -520,7 +518,7 @@ export class SubAgentFlightService extends AbstractServices {
         };
       }
 
-      if (!agency_details.book_permission) {
+      if (!refAgent_details.book_permission) {
         return {
           success: false,
           code: this.StatusCode.HTTP_FORBIDDEN,
@@ -572,7 +570,7 @@ export class SubAgentFlightService extends AbstractServices {
         await flightSupportService.FlightRevalidate({
           search_id: body.search_id,
           flight_id: body.flight_id,
-          dynamic_fare_set_id: agency_details.flight_markup_set,
+          dynamic_fare_set_id: refAgent_details.flight_markup_set,
           markup_amount,
         });
 
@@ -632,7 +630,7 @@ export class SubAgentFlightService extends AbstractServices {
       //check if the booking is block
       const directBookingPermission =
         await bookingSupportService.checkDirectFlightBookingPermission({
-          markup_set_id: agency_details.flight_markup_set,
+          markup_set_id: refAgent_details.flight_markup_set,
           api_name: data.api,
           airline: data.carrier_code,
         });
@@ -697,7 +695,7 @@ export class SubAgentFlightService extends AbstractServices {
 
     return this.db.transaction(async (trx) => {
       try {
-        if (booking_block === false) {
+        /* if (booking_block === false) {
           if (data.api === SABRE_API) {
             const sabreSubService = new SabreFlightService(trx);
             const gds_pnr = await sabreSubService.FlightBookingService({
@@ -730,8 +728,9 @@ export class SubAgentFlightService extends AbstractServices {
             payload.status = FLIGHT_BOOKING_IN_PROCESS;
           }
         } else {
-          payload.status = FLIGHT_BOOKING_IN_PROCESS;
         }
+*/
+        payload.status = FLIGHT_BOOKING_IN_PROCESS;
       } catch (err: any) {
         await this.Model.ErrorLogsModel(trx).insertErrorLogs({
           http_method: 'POST',
@@ -1076,7 +1075,8 @@ export class SubAgentFlightService extends AbstractServices {
         };
       }
 
-      let status = false;
+      let status = true;
+      /*
       if (booking_data.api === SABRE_API) {
         const sabreSubService = new SabreFlightService(trx);
         const res = await sabreSubService.SabreBookingCancelService({
@@ -1088,7 +1088,7 @@ export class SubAgentFlightService extends AbstractServices {
       } else if (booking_data.api === CUSTOM_API) {
         status = true;
       }
-
+*/
       if (status) {
         const flightBookingSupportService =
           new CommonFlightBookingSupportService(trx);

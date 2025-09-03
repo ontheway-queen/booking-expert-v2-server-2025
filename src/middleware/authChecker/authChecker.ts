@@ -258,6 +258,115 @@ export default class AuthChecker {
     }
   };
 
+  // sub agent user auth checker
+  public subAgentUserAuthChecker = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    let { authorization } = req.headers;
+    if (!authorization) authorization = req.query.auth_token as string;
+
+    if (!authorization) {
+      res.status(StatusCode.HTTP_UNAUTHORIZED).json({
+        statusCode: StatusCode.HTTP_UNAUTHORIZED,
+        success: false,
+        message: ResMsg.HTTP_UNAUTHORIZED,
+      });
+
+      return;
+    }
+
+    const authSplit = authorization.split(' ');
+
+    if (authSplit.length !== 2) {
+      res.status(StatusCode.HTTP_UNAUTHORIZED).json({
+        statusCode: StatusCode.HTTP_UNAUTHORIZED,
+        success: false,
+        message: ResMsg.HTTP_UNAUTHORIZED,
+      });
+      return;
+    }
+
+    const verify = Lib.verifyToken(
+      authSplit[1],
+      config.JWT_SECRET_AGENT + req.agencyB2CWhiteLabel.agency_id
+    ) as ITokenParseAgencyUser;
+
+    console.log(verify);
+
+    if (!verify) {
+      res.status(StatusCode.HTTP_UNAUTHORIZED).json({
+        statusCode: StatusCode.HTTP_UNAUTHORIZED,
+        success: false,
+        message: ResMsg.HTTP_UNAUTHORIZED,
+      });
+      return;
+    } else {
+      const { user_id } = verify;
+
+      const agencyUserModel = new AgencyUserModel(db);
+
+      const checkAgencyUser = await agencyUserModel.checkUser({ id: user_id });
+
+      if (checkAgencyUser) {
+        console.log({
+          type: 'Agent',
+          agency_id: checkAgencyUser.agency_id,
+          user_id: checkAgencyUser.id,
+          agency_name: checkAgencyUser.agency_name,
+        });
+
+        if (!checkAgencyUser.status) {
+          res.status(StatusCode.HTTP_UNAUTHORIZED).json({
+            statusCode: StatusCode.HTTP_UNAUTHORIZED,
+            success: false,
+            message: ResMsg.HTTP_UNAUTHORIZED,
+          });
+          return;
+        }
+
+        if (
+          checkAgencyUser.agency_status === 'Inactive' ||
+          checkAgencyUser.agency_status === 'Incomplete' ||
+          checkAgencyUser.agency_status === 'Rejected'
+        ) {
+          res.status(StatusCode.HTTP_UNAUTHORIZED).json({
+            statusCode: StatusCode.HTTP_UNAUTHORIZED,
+            success: false,
+            message: ResMsg.HTTP_UNAUTHORIZED,
+          });
+          return;
+        } else {
+          req.agencyUser = {
+            agency_email: checkAgencyUser.agency_email,
+            agency_id: checkAgencyUser.agency_id,
+            agency_name: checkAgencyUser.agency_name,
+            is_main_user: checkAgencyUser.is_main_user,
+            name: checkAgencyUser.name,
+            photo: checkAgencyUser.photo,
+            user_email: checkAgencyUser.email,
+            user_id,
+            username: checkAgencyUser.username,
+            phone_number: checkAgencyUser.phone_number,
+            ref_agent_id: checkAgencyUser.ref_agent_id,
+            agency_type: checkAgencyUser.agency_type,
+            address: checkAgencyUser.address,
+            agency_logo: checkAgencyUser.agency_logo,
+          };
+          next();
+        }
+      } else {
+        res.status(StatusCode.HTTP_UNAUTHORIZED).json({
+          statusCode: StatusCode.HTTP_UNAUTHORIZED,
+          success: false,
+          message: ResMsg.HTTP_UNAUTHORIZED,
+        });
+        return;
+      }
+    }
+  };
+
   //Agency B2C user auth checker
   public agencyB2CUserAuthChecker = async (
     req: Request,

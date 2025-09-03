@@ -9,6 +9,7 @@ import SubAgentHotelRouter from './routers/subAgentHotel.router';
 import SubAgentFlightRouter from './routers/subAgentFlight.router';
 import SubAgentDashboardRouter from './routers/subAgentDash.router';
 import SubAgentTravelerRouter from './routers/subAgentTra.router';
+import SubAgentAdministrationRouter from './routers/subAgentAdministration.router';
 
 export default class SubAgentRootRouter {
   public Router = Router();
@@ -21,6 +22,7 @@ export default class SubAgentRootRouter {
   private subAgentFlightRouter = new SubAgentFlightRouter();
   private subAgentTravelerRouter = new SubAgentTravelerRouter();
   private subAgentDashboardRouter = new SubAgentDashboardRouter();
+  private subAgentAdministrationRouter = new SubAgentAdministrationRouter();
 
   private authChecker = new AuthChecker();
 
@@ -35,38 +37,43 @@ export default class SubAgentRootRouter {
     //with auth
     this.Router.use(
       '/profile',
-      this.authChecker.agencyUserAuthChecker,
+      this.authChecker.subAgentUserAuthChecker,
       this.subAgentProfileRouter.router
     );
     this.Router.use(
       '/flight',
-      this.authChecker.agencyUserAuthChecker,
+      this.authChecker.subAgentUserAuthChecker,
       this.subAgentFlightRouter.router
     );
     this.Router.use(
       '/hotel',
-      this.authChecker.agencyUserAuthChecker,
+      this.authChecker.subAgentUserAuthChecker,
       this.subAgentHotelRouter.router
     );
     this.Router.use(
       '/payments',
-      this.authChecker.agencyUserAuthChecker,
+      this.authChecker.subAgentUserAuthChecker,
       this.subAgentPaymentsRouter.router
     );
     this.Router.use(
       '/traveler',
-      this.authChecker.agencyUserAuthChecker,
+      this.authChecker.subAgentUserAuthChecker,
       this.subAgentTravelerRouter.router
     );
     this.Router.use(
       '/support-ticket',
-      this.authChecker.agencyUserAuthChecker,
+      this.authChecker.subAgentUserAuthChecker,
       this.subAgentSupportTicketRouter.router
     );
     this.Router.use(
       '/dashboard',
-      this.authChecker.agencyUserAuthChecker,
+      this.authChecker.subAgentUserAuthChecker,
       this.subAgentDashboardRouter.router
+    );
+    this.Router.use(
+      '/administration',
+      this.authChecker.subAgentUserAuthChecker,
+      this.subAgentAdministrationRouter.router
     );
   }
 }

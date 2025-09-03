@@ -1,19 +1,20 @@
-import { Request } from "express";
-import AbstractServices from "../../../abstract/abstract.service";
+import { Request } from 'express';
+import AbstractServices from '../../../abstract/abstract.service';
 import {
   ICreateSubAgentReqBody,
   ICreateSubAgentRoleReqBody,
   IGetSubAgentListReqQuery,
   IGetSubAgentRoleListReqQuery,
   IUpdateSubAgentRolePermissionsReqBody,
-} from "../utils/types/subAgentAdministration.types";
-import { IUpdateSubAgentReqBody } from "../utils/types/subAgentAdministration.types";
+} from '../utils/types/subAgentAdministration.types';
+import { IUpdateSubAgentReqBody } from '../utils/types/subAgentAdministration.types';
 import {
   ICreateAgencyUserPayload,
   IUpdateAgencyRolePayload,
   IUpdateAgencyUserPayload,
-} from "../../../utils/modelTypes/agentModel/agencyUserModelTypes";
-import Lib from "../../../utils/lib/lib";
+} from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
+import Lib from '../../../utils/lib/lib';
+import { SOURCE_SUB_AGENT } from '../../../utils/miscellaneous/constants';
 
 export class SubAgentAdministrationService extends AbstractServices {
   constructor() {
@@ -69,7 +70,7 @@ export class SubAgentAdministrationService extends AbstractServices {
 
       await this.insertAgentAudit(trx, {
         created_by: user_id,
-        type: "CREATE",
+        type: 'CREATE',
         details: `Role created with name ${role_name}`,
         agency_id,
       });
@@ -280,7 +281,7 @@ export class SubAgentAdministrationService extends AbstractServices {
       await this.insertAgentAudit(trx, {
         created_by: user_id,
         agency_id,
-        type: "UPDATE",
+        type: 'UPDATE',
         details: `Role updated with name ${check_role.role_name}`,
         payload: JSON.stringify(req.body),
       });
@@ -296,6 +297,7 @@ export class SubAgentAdministrationService extends AbstractServices {
   public async createAgencyUser(req: Request) {
     return this.db.transaction(async (trx) => {
       const { user_id, agency_id } = req.agencyUser;
+      const { agency_id: main_agent_id } = req.agencyB2CWhiteLabel;
 
       const { password, email, name, role_id, phone_number } =
         req.body as ICreateSubAgentReqBody;
@@ -305,13 +307,15 @@ export class SubAgentAdministrationService extends AbstractServices {
       //check admins email and phone number
       const check_user = await model.checkUser({
         email,
+        agency_type: SOURCE_SUB_AGENT,
+        ref_agent_id: main_agent_id,
       });
 
       if (check_user) {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "Email already exist.",
+          message: 'Email already exist.',
         };
       }
 
@@ -319,7 +323,13 @@ export class SubAgentAdministrationService extends AbstractServices {
 
       let suffix = 1;
 
-      while (await model.checkUser({ username })) {
+      while (
+        await model.checkUser({
+          username,
+          agency_type: SOURCE_SUB_AGENT,
+          ref_agent_id: main_agent_id,
+        })
+      ) {
         username = `${username}${suffix}`;
         suffix += 1;
       }
@@ -334,7 +344,7 @@ export class SubAgentAdministrationService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "Role id not found.",
+          message: 'Role id not found.',
         };
       }
 
@@ -364,7 +374,7 @@ export class SubAgentAdministrationService extends AbstractServices {
       await this.insertAgentAudit(trx, {
         created_by: user_id,
         details: `New agency user created. Name: ${name}(${username}) with role ${checkRole.name}`,
-        type: "CREATE",
+        type: 'CREATE',
         agency_id,
       });
 
@@ -453,7 +463,7 @@ export class SubAgentAdministrationService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_BAD_REQUEST,
-          message: "Invalid Role id.",
+          message: 'Invalid Role id.',
         };
       }
 

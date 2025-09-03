@@ -10,17 +10,14 @@ import {
 } from '../../../utils/miscellaneous/constants';
 import PublicEmailOTPService from '../../public/services/publicEmailOTP.service';
 import {
-  ICompleteAgencyRegisterParsedTokenData,
   ILogin2FAReqBody,
   ILoginReqBody,
-  IRegisterAgentReqBody,
   IRegisterSubAgentReqBody,
   IResetPassReqBody,
 } from '../utils/types/authTypes';
 import { ITokenParseAgencyUser } from '../../public/utils/types/publicCommon.types';
 import CustomError from '../../../utils/lib/customError';
 import { IInsertAgencyRolePermissionPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
-import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
 import EmailSendLib from '../../../utils/lib/emailSendLib';
 import { sendEmailOtpTemplate } from '../../../utils/templates/sendEmailOtpTemplate';
 
@@ -252,8 +249,7 @@ export default class AuthSubAgentService extends AbstractServices {
   public async registerComplete(req: Request) {
     return this.db.transaction(async (trx) => {
       const { email, otp } = req.body as { email: string; otp: string };
-      const { agency_id: main_agency_id, agency_name: main_agent_name } =
-        req.agencyB2CWhiteLabel;
+      const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
       const AgentModel = this.Model.AgencyModel(trx);
       const AgencyUserModel = this.Model.AgencyUserModel(trx);
       const commonModel = this.Model.CommonModel(trx);
@@ -294,8 +290,6 @@ export default class AuthSubAgentService extends AbstractServices {
           message: this.ResMsg.TOO_MUCH_ATTEMPT,
         };
       }
-
-      console.log({ otp, hashed_otp });
 
       const otpValidation = await Lib.compareHashValue(
         otp.toString(),
@@ -467,7 +461,11 @@ export default class AuthSubAgentService extends AbstractServices {
         agency_logo,
       };
 
-      const token = Lib.createToken(tokenData, config.JWT_SECRET_AGENT, '24h');
+      const token = Lib.createToken(
+        tokenData,
+        config.JWT_SECRET_AGENT + main_agency_id,
+        '24h'
+      );
 
       const role = await AgentUserModel.getSingleRoleWithPermissions(
         role_id,
@@ -598,7 +596,7 @@ export default class AuthSubAgentService extends AbstractServices {
 
       const authToken = Lib.createToken(
         tokenData,
-        config.JWT_SECRET_AGENT,
+        config.JWT_SECRET_AGENT + main_agency_id,
         '24h'
       );
 
@@ -642,10 +640,10 @@ export default class AuthSubAgentService extends AbstractServices {
 
   public async resetPassword(req: Request) {
     const { password, token } = req.body as IResetPassReqBody;
-    const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
+
     const data: any = Lib.verifyToken(
       token,
-      config.JWT_SECRET_AGENT + OTP_TYPES.reset_agent
+      config.JWT_SECRET_AGENT + OTP_TYPES.reset_sub_agent
     );
 
     if (!data) {

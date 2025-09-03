@@ -92,6 +92,7 @@ export class AdminAgentSupportTicketService extends AbstractServices {
     const data = await supportTicketModel.getAgentSupportTicket(
       {
         ...query,
+        source_type: SOURCE_AGENT,
       },
       true
     );

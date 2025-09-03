@@ -401,7 +401,6 @@ class SubAgentFlightService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { agency_id, ref_agent_id, user_id, user_email, name, phone_number, agency_email, agency_name, agency_logo, address, } = req.agencyUser;
             const body = req.body;
-            console.log({ body });
             let booking_block = false;
             let refundable = false;
             let api_booking_ref = null;
@@ -415,17 +414,17 @@ class SubAgentFlightService extends abstract_service_1.default {
                 const booking_confirm = body.booking_confirm;
                 //get flight markup set id
                 const agencyModel = this.Model.AgencyModel(trx);
-                const agency_details = yield agencyModel.checkAgency({
+                const refAgent_details = yield agencyModel.checkAgency({
                     agency_id: ref_agent_id,
                 });
-                if (!(agency_details === null || agency_details === void 0 ? void 0 : agency_details.flight_markup_set)) {
+                if (!(refAgent_details === null || refAgent_details === void 0 ? void 0 : refAgent_details.flight_markup_set)) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
                         message: 'No markup set has been found for the agency',
                     };
                 }
-                if (!agency_details.book_permission) {
+                if (!refAgent_details.book_permission) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_FORBIDDEN,
@@ -466,7 +465,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                 let rev_data = yield flightSupportService.FlightRevalidate({
                     search_id: body.search_id,
                     flight_id: body.flight_id,
-                    dynamic_fare_set_id: agency_details.flight_markup_set,
+                    dynamic_fare_set_id: refAgent_details.flight_markup_set,
                     markup_amount,
                 });
                 if (!rev_data) {
@@ -516,7 +515,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                 }
                 //check if the booking is block
                 const directBookingPermission = yield bookingSupportService.checkDirectFlightBookingPermission({
-                    markup_set_id: agency_details.flight_markup_set,
+                    markup_set_id: refAgent_details.flight_markup_set,
                     api_name: data.api,
                     airline: data.carrier_code,
                 });
@@ -573,39 +572,42 @@ class SubAgentFlightService extends abstract_service_1.default {
             }
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 try {
-                    if (booking_block === false) {
-                        if (data.api === flightConstant_1.SABRE_API) {
-                            const sabreSubService = new sabreFlightSupport_service_1.default(trx);
-                            const gds_pnr = yield sabreSubService.FlightBookingService({
-                                body,
-                                user_info: {
-                                    id: user_id,
-                                    name,
-                                    email: user_email,
-                                    phone: phone_number || '',
-                                },
-                                revalidate_data: data,
-                            });
-                            if (gds_pnr) {
-                                payload.gds_pnr = gds_pnr;
-                            }
-                            //get airline pnr, refundable status
-                            const grnData = yield sabreSubService.GRNUpdate({
-                                pnr: String(gds_pnr),
-                            });
-                            refundable = grnData.refundable;
-                            payload.status = flightConstant_1.FLIGHT_BOOKING_CONFIRMED;
-                            if (grnData.airline_pnr) {
-                                payload.airline_pnr = grnData.airline_pnr;
-                            }
+                    /* if (booking_block === false) {
+                      if (data.api === SABRE_API) {
+                        const sabreSubService = new SabreFlightService(trx);
+                        const gds_pnr = await sabreSubService.FlightBookingService({
+                          body,
+                          user_info: {
+                            id: user_id,
+                            name,
+                            email: user_email,
+                            phone: phone_number || '',
+                          },
+                          revalidate_data: data,
+                        });
+            
+                        if (gds_pnr) {
+                          payload.gds_pnr = gds_pnr;
                         }
-                        else if (data.api === flightConstant_1.CUSTOM_API) {
-                            payload.status = flightConstant_1.FLIGHT_BOOKING_IN_PROCESS;
+            
+                        //get airline pnr, refundable status
+                        const grnData = await sabreSubService.GRNUpdate({
+                          pnr: String(gds_pnr),
+                        });
+            
+                        refundable = grnData.refundable;
+                        payload.status = FLIGHT_BOOKING_CONFIRMED;
+            
+                        if (grnData.airline_pnr) {
+                          payload.airline_pnr = grnData.airline_pnr;
                         }
+                      } else if (data.api === CUSTOM_API) {
+                        payload.status = FLIGHT_BOOKING_IN_PROCESS;
+                      }
+                    } else {
                     }
-                    else {
-                        payload.status = flightConstant_1.FLIGHT_BOOKING_IN_PROCESS;
-                    }
+            */
+                    payload.status = flightConstant_1.FLIGHT_BOOKING_IN_PROCESS;
                 }
                 catch (err) {
                     yield this.Model.ErrorLogsModel(trx).insertErrorLogs({
@@ -891,19 +893,20 @@ class SubAgentFlightService extends abstract_service_1.default {
                         message: 'Cancellation is not allowed for this booking. Contact support team.',
                     };
                 }
-                let status = false;
-                if (booking_data.api === flightConstant_1.SABRE_API) {
-                    const sabreSubService = new sabreFlightSupport_service_1.default(trx);
-                    const res = yield sabreSubService.SabreBookingCancelService({
-                        pnr: String(booking_data.gds_pnr),
-                    });
-                    if (res === null || res === void 0 ? void 0 : res.success) {
-                        status = true;
-                    }
-                }
-                else if (booking_data.api === flightConstant_1.CUSTOM_API) {
+                let status = true;
+                /*
+                if (booking_data.api === SABRE_API) {
+                  const sabreSubService = new SabreFlightService(trx);
+                  const res = await sabreSubService.SabreBookingCancelService({
+                    pnr: String(booking_data.gds_pnr),
+                  });
+                  if (res?.success) {
                     status = true;
+                  }
+                } else if (booking_data.api === CUSTOM_API) {
+                  status = true;
                 }
+          */
                 if (status) {
                     const flightBookingSupportService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
                     //update booking data

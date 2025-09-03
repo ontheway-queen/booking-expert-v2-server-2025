@@ -85,7 +85,7 @@ class AdminAgentSupportTicketService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const supportTicketModel = this.Model.SupportTicketModel();
             const query = req.query;
-            const data = yield supportTicketModel.getAgentSupportTicket(Object.assign({}, query), true);
+            const data = yield supportTicketModel.getAgentSupportTicket(Object.assign(Object.assign({}, query), { source_type: constants_1.SOURCE_AGENT }), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,

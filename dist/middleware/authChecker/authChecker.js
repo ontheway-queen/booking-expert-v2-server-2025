@@ -219,6 +219,97 @@ class AuthChecker {
                 }
             }
         });
+        // sub agent user auth checker
+        this.subAgentUserAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            let { authorization } = req.headers;
+            if (!authorization)
+                authorization = req.query.auth_token;
+            if (!authorization) {
+                res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                    statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
+                    success: false,
+                    message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                });
+                return;
+            }
+            const authSplit = authorization.split(' ');
+            if (authSplit.length !== 2) {
+                res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                    statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
+                    success: false,
+                    message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                });
+                return;
+            }
+            const verify = lib_1.default.verifyToken(authSplit[1], config_1.default.JWT_SECRET_AGENT + req.agencyB2CWhiteLabel.agency_id);
+            console.log(verify);
+            if (!verify) {
+                res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                    statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
+                    success: false,
+                    message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                });
+                return;
+            }
+            else {
+                const { user_id } = verify;
+                const agencyUserModel = new agencyUserModel_1.default(database_1.db);
+                const checkAgencyUser = yield agencyUserModel.checkUser({ id: user_id });
+                if (checkAgencyUser) {
+                    console.log({
+                        type: 'Agent',
+                        agency_id: checkAgencyUser.agency_id,
+                        user_id: checkAgencyUser.id,
+                        agency_name: checkAgencyUser.agency_name,
+                    });
+                    if (!checkAgencyUser.status) {
+                        res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                            statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
+                            success: false,
+                            message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                        });
+                        return;
+                    }
+                    if (checkAgencyUser.agency_status === 'Inactive' ||
+                        checkAgencyUser.agency_status === 'Incomplete' ||
+                        checkAgencyUser.agency_status === 'Rejected') {
+                        res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                            statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
+                            success: false,
+                            message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                        });
+                        return;
+                    }
+                    else {
+                        req.agencyUser = {
+                            agency_email: checkAgencyUser.agency_email,
+                            agency_id: checkAgencyUser.agency_id,
+                            agency_name: checkAgencyUser.agency_name,
+                            is_main_user: checkAgencyUser.is_main_user,
+                            name: checkAgencyUser.name,
+                            photo: checkAgencyUser.photo,
+                            user_email: checkAgencyUser.email,
+                            user_id,
+                            username: checkAgencyUser.username,
+                            phone_number: checkAgencyUser.phone_number,
+                            ref_agent_id: checkAgencyUser.ref_agent_id,
+                            agency_type: checkAgencyUser.agency_type,
+                            address: checkAgencyUser.address,
+                            agency_logo: checkAgencyUser.agency_logo,
+                        };
+                        next();
+                    }
+                }
+                else {
+                    res.status(statusCode_1.default.HTTP_UNAUTHORIZED).json({
+                        statusCode: statusCode_1.default.HTTP_UNAUTHORIZED,
+                        success: false,
+                        message: responseMessage_1.default.HTTP_UNAUTHORIZED,
+                    });
+                    return;
+                }
+            }
+        });
         //Agency B2C user auth checker
         this.agencyB2CUserAuthChecker = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { authorization } = req.headers;

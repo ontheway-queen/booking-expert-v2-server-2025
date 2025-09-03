@@ -80,6 +80,7 @@ export class AgentSupportTicketService extends AbstractServices {
     const data = await supportTicketModel.getAgentSupportTicket(
       {
         agent_id: agency_id,
+        source_type: SOURCE_AGENT,
         ...query,
       },
       true

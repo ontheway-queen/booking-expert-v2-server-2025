@@ -86,7 +86,7 @@ class AgentSupportTicketService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const supportTicketModel = this.Model.SupportTicketModel();
             const query = req.query;
-            const data = yield supportTicketModel.getAgentSupportTicket(Object.assign({ agent_id: agency_id }, query), true);
+            const data = yield supportTicketModel.getAgentSupportTicket(Object.assign({ agent_id: agency_id, source_type: constants_1.SOURCE_AGENT }, query), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,

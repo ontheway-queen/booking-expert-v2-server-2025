@@ -23,11 +23,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SubAgentAdministrationService = void 0;
+exports.AgentAdministrationService = void 0;
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
-const constants_1 = require("../../../utils/miscellaneous/constants");
-class SubAgentAdministrationService extends abstract_service_1.default {
+class AgentAdministrationService extends abstract_service_1.default {
     constructor() {
         super();
     }
@@ -253,14 +252,11 @@ class SubAgentAdministrationService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { user_id, agency_id } = req.agencyUser;
-                const { agency_id: main_agent_id } = req.agencyB2CWhiteLabel;
                 const { password, email, name, role_id, phone_number } = req.body;
                 const model = this.Model.AgencyUserModel(trx);
                 //check admins email and phone number
                 const check_user = yield model.checkUser({
                     email,
-                    agency_type: constants_1.SOURCE_SUB_AGENT,
-                    ref_agent_id: main_agent_id,
                 });
                 if (check_user) {
                     return {
@@ -271,11 +267,7 @@ class SubAgentAdministrationService extends abstract_service_1.default {
                 }
                 let username = lib_1.default.generateUsername(name);
                 let suffix = 1;
-                while (yield model.checkUser({
-                    username,
-                    agency_type: constants_1.SOURCE_SUB_AGENT,
-                    ref_agent_id: main_agent_id,
-                })) {
+                while (yield model.checkUser({ username })) {
                     username = `${username}${suffix}`;
                     suffix += 1;
                 }
@@ -415,4 +407,4 @@ class SubAgentAdministrationService extends abstract_service_1.default {
         });
     }
 }
-exports.SubAgentAdministrationService = SubAgentAdministrationService;
+exports.AgentAdministrationService = AgentAdministrationService;

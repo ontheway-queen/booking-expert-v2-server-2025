@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 import AbstractController from '../../../abstract/abstract.controller';
+import { SubAgentAdministrationService } from '../services/subAgentAdministration.service';
+import SubAgentAdministrationValidator from '../utils/validator/subAgentAdministration.validator';
 
-import AgentAdministrationValidator from '../utils/validators/agentAdministration.validator';
-import { AgentAdministrationService } from '../services/agentAdministration.service';
-
-export default class AgentAdministrationController extends AbstractController {
-  private validator = new AgentAdministrationValidator();
-  private service = new AgentAdministrationService();
+export default class SubAgentAdministrationController extends AbstractController {
+  private validator = new SubAgentAdministrationValidator();
+  private service = new SubAgentAdministrationService();
   constructor() {
     super();
   }

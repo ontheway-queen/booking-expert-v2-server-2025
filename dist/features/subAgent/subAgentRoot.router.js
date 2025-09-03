@@ -14,6 +14,7 @@ const subAgentHotel_router_1 = __importDefault(require("./routers/subAgentHotel.
 const subAgentFlight_router_1 = __importDefault(require("./routers/subAgentFlight.router"));
 const subAgentDash_router_1 = __importDefault(require("./routers/subAgentDash.router"));
 const subAgentTra_router_1 = __importDefault(require("./routers/subAgentTra.router"));
+const subAgentAdministration_router_1 = __importDefault(require("./routers/subAgentAdministration.router"));
 class SubAgentRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
@@ -26,6 +27,7 @@ class SubAgentRootRouter {
         this.subAgentFlightRouter = new subAgentFlight_router_1.default();
         this.subAgentTravelerRouter = new subAgentTra_router_1.default();
         this.subAgentDashboardRouter = new subAgentDash_router_1.default();
+        this.subAgentAdministrationRouter = new subAgentAdministration_router_1.default();
         this.authChecker = new authChecker_1.default();
         this.callRouter();
     }
@@ -33,13 +35,14 @@ class SubAgentRootRouter {
         this.Router.use('/', this.subAgentMainRouter.router);
         this.Router.use('/config', this.subAgentConfigRouter.router);
         //with auth
-        this.Router.use('/profile', this.authChecker.agencyUserAuthChecker, this.subAgentProfileRouter.router);
-        this.Router.use('/flight', this.authChecker.agencyUserAuthChecker, this.subAgentFlightRouter.router);
-        this.Router.use('/hotel', this.authChecker.agencyUserAuthChecker, this.subAgentHotelRouter.router);
-        this.Router.use('/payments', this.authChecker.agencyUserAuthChecker, this.subAgentPaymentsRouter.router);
-        this.Router.use('/traveler', this.authChecker.agencyUserAuthChecker, this.subAgentTravelerRouter.router);
-        this.Router.use('/support-ticket', this.authChecker.agencyUserAuthChecker, this.subAgentSupportTicketRouter.router);
-        this.Router.use('/dashboard', this.authChecker.agencyUserAuthChecker, this.subAgentDashboardRouter.router);
+        this.Router.use('/profile', this.authChecker.subAgentUserAuthChecker, this.subAgentProfileRouter.router);
+        this.Router.use('/flight', this.authChecker.subAgentUserAuthChecker, this.subAgentFlightRouter.router);
+        this.Router.use('/hotel', this.authChecker.subAgentUserAuthChecker, this.subAgentHotelRouter.router);
+        this.Router.use('/payments', this.authChecker.subAgentUserAuthChecker, this.subAgentPaymentsRouter.router);
+        this.Router.use('/traveler', this.authChecker.subAgentUserAuthChecker, this.subAgentTravelerRouter.router);
+        this.Router.use('/support-ticket', this.authChecker.subAgentUserAuthChecker, this.subAgentSupportTicketRouter.router);
+        this.Router.use('/dashboard', this.authChecker.subAgentUserAuthChecker, this.subAgentDashboardRouter.router);
+        this.Router.use('/administration', this.authChecker.subAgentUserAuthChecker, this.subAgentAdministrationRouter.router);
     }
 }
 exports.default = SubAgentRootRouter;

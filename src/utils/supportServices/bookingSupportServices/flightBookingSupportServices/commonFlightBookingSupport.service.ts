@@ -469,6 +469,7 @@ export class CommonFlightBookingSupportService extends AbstractServices {
     const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(
       this.trx
     );
+
     const tracking_data: IInsertFlightBookingTrackingPayload[] = [];
     tracking_data.push({
       flight_booking_id: payload.booking_id,

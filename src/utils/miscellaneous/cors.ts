@@ -2,6 +2,7 @@ export const origin: string[] = [
   'http://localhost:3000',
   'http://localhost:3001',
   'http://localhost:3002',
+  'http://localhost:3003',
   'http://localhost:5000',
   'http://10.10.220.66:5000',
   'http://10.10.220.66:5001',

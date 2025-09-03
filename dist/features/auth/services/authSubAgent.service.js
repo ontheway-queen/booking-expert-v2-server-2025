@@ -211,7 +211,7 @@ class AuthSubAgentService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { email, otp } = req.body;
-                const { agency_id: main_agency_id, agency_name: main_agent_name } = req.agencyB2CWhiteLabel;
+                const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
                 const AgentModel = this.Model.AgencyModel(trx);
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
                 const commonModel = this.Model.CommonModel(trx);
@@ -246,7 +246,6 @@ class AuthSubAgentService extends abstract_service_1.default {
                         message: this.ResMsg.TOO_MUCH_ATTEMPT,
                     };
                 }
-                console.log({ otp, hashed_otp });
                 const otpValidation = yield lib_1.default.compareHashValue(otp.toString(), hashed_otp);
                 if (otpValidation) {
                     yield commonModel.updateOTP({
@@ -361,7 +360,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                     address,
                     agency_logo,
                 };
-                const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
+                const token = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT + main_agency_id, '24h');
                 const role = yield AgentUserModel.getSingleRoleWithPermissions(role_id, agency_id);
                 return {
                     success: true,
@@ -455,7 +454,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                     agency_logo,
                     agency_type: constants_1.SOURCE_SUB_AGENT,
                 };
-                const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT, '24h');
+                const authToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT + main_agency_id, '24h');
                 const role = yield AgencyUserModel.getSingleRoleWithPermissions(role_id, agency_id);
                 return {
                     success: true,
@@ -493,8 +492,7 @@ class AuthSubAgentService extends abstract_service_1.default {
     resetPassword(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const { password, token } = req.body;
-            const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
-            const data = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.reset_agent);
+            const data = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.reset_sub_agent);
             if (!data) {
                 return {
                     success: false,
