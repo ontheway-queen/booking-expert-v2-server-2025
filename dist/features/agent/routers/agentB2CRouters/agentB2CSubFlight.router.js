@@ -12,10 +12,11 @@ class AgentB2CSubFlightRouter extends abstract_router_1.default {
         this.callRouter();
     }
     callRouter() {
-        this.router.route('/booking')
-            .get(this.controller.getAllBooking);
-        this.router.route('/booking/:id')
-            .get(this.controller.getSingleBooking);
+        this.router.route('/booking').get(this.controller.getAllBooking);
+        this.router
+            .route('/booking/:id')
+            .get(this.controller.getSingleBooking)
+            .patch(this.controller.updateBooking);
     }
 }
 exports.default = AgentB2CSubFlightRouter;

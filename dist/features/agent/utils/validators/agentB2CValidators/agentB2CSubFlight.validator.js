@@ -16,6 +16,41 @@ class AgentB2CSubFlightValidator {
             limit: joi_1.default.number(),
             skip: joi_1.default.number(),
         });
+        this.updateFlightBookingSchema = joi_1.default.object({
+            status: joi_1.default.string()
+                .valid(flightConstant_1.FLIGHT_BOOKING_EXPIRED, flightConstant_1.FLIGHT_BOOKING_CONFIRMED, flightConstant_1.FLIGHT_BOOKING_CANCELLED, flightConstant_1.FLIGHT_TICKET_ISSUE, flightConstant_1.FLIGHT_BOOKING_VOID)
+                .required(),
+            gds_pnr: joi_1.default.when('status', {
+                is: flightConstant_1.FLIGHT_BOOKING_CONFIRMED,
+                then: joi_1.default.string().trim().required(),
+                otherwise: joi_1.default.forbidden(),
+            }),
+            airline_pnr: joi_1.default.when('status', {
+                is: flightConstant_1.FLIGHT_BOOKING_CONFIRMED,
+                then: joi_1.default.string().trim().required(),
+                otherwise: joi_1.default.forbidden(),
+            }),
+            ticket_issue_last_time: joi_1.default.when('status', {
+                is: flightConstant_1.FLIGHT_BOOKING_CONFIRMED,
+                then: joi_1.default.date().iso().raw().required(),
+                otherwise: joi_1.default.forbidden(),
+            }),
+            ticket_numbers: joi_1.default.when('status', {
+                is: flightConstant_1.FLIGHT_TICKET_ISSUE,
+                then: joi_1.default.array()
+                    .items(joi_1.default.object({
+                    passenger_id: joi_1.default.number().required(),
+                    ticket_number: joi_1.default.string().required(),
+                }))
+                    .required(),
+                otherwise: joi_1.default.forbidden(),
+            }),
+            charge_credit: joi_1.default.when('status', {
+                is: flightConstant_1.FLIGHT_TICKET_ISSUE,
+                then: joi_1.default.boolean().required(),
+                otherwise: joi_1.default.forbidden(),
+            }),
+        });
     }
 }
 exports.default = AgentB2CSubFlightValidator;

@@ -85,7 +85,9 @@ export class AgentFlightBookingSupportService extends AbstractServices {
   ) {
     //update booking
     const flightBookingModel = this.Model.FlightBookingModel(this.trx);
-    const bookingTravelerModel = this.Model.FlightBookingTravelerModel(this.trx);
+    const bookingTravelerModel = this.Model.FlightBookingTravelerModel(
+      this.trx
+    );
 
     const updateFlightPayload: IUpdateFlightBookingPayload = {
       status: payload.status,
@@ -106,7 +108,10 @@ export class AgentFlightBookingSupportService extends AbstractServices {
     });
 
     //ticket number update
-    if (payload.ticket_number?.length && payload?.travelers_info?.length === payload?.ticket_number?.length) {
+    if (
+      payload.ticket_number?.length &&
+      payload?.travelers_info?.length === payload?.ticket_number?.length
+    ) {
       await Promise.all(
         payload.ticket_number.map((ticket_num: string, ind: number) =>
           bookingTravelerModel.updateFlightBookingTraveler(
@@ -126,10 +131,11 @@ export class AgentFlightBookingSupportService extends AbstractServices {
 
     tracking_data.push({
       flight_booking_id: payload.booking_id,
-      description: `Ticket ${payload.status === FLIGHT_TICKET_IN_PROCESS
-        ? 'has been issued'
-        : 'is in process'
-        }. Issued by ${payload.issued_by_type}`,
+      description: `Ticket ${
+        payload.status === FLIGHT_TICKET_IN_PROCESS
+          ? 'has been issued'
+          : 'is in process'
+      }. Issued by ${payload.issued_by_type}`,
     });
 
     if (payload.issue_block) {
@@ -142,10 +148,13 @@ export class AgentFlightBookingSupportService extends AbstractServices {
     if (payload.due > 0) {
       tracking_data.push({
         flight_booking_id: payload.booking_id,
-        description: `${payload.paid_amount
-          } amount has been paid for the booking (loan amount - ${payload.loan_amount
-          }, balance amount - ${payload.paid_amount - payload.loan_amount
-          }). Due amount is ${payload.due}`,
+        description: `${
+          payload.paid_amount
+        } amount has been paid for the booking (loan amount - ${
+          payload.loan_amount
+        }, balance amount - ${
+          payload.paid_amount - payload.loan_amount
+        }). Due amount is ${payload.due}`,
       });
     }
 

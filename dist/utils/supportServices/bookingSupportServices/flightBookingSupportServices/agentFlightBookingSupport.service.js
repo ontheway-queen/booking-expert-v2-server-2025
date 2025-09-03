@@ -86,7 +86,8 @@ class AgentFlightBookingSupportService extends abstract_service_1.default {
                 source_type: constants_1.SOURCE_AGENT,
             });
             //ticket number update
-            if (((_a = payload.ticket_number) === null || _a === void 0 ? void 0 : _a.length) && ((_b = payload === null || payload === void 0 ? void 0 : payload.travelers_info) === null || _b === void 0 ? void 0 : _b.length) === ((_c = payload === null || payload === void 0 ? void 0 : payload.ticket_number) === null || _c === void 0 ? void 0 : _c.length)) {
+            if (((_a = payload.ticket_number) === null || _a === void 0 ? void 0 : _a.length) &&
+                ((_b = payload === null || payload === void 0 ? void 0 : payload.travelers_info) === null || _b === void 0 ? void 0 : _b.length) === ((_c = payload === null || payload === void 0 ? void 0 : payload.ticket_number) === null || _c === void 0 ? void 0 : _c.length)) {
                 yield Promise.all(payload.ticket_number.map((ticket_num, ind) => bookingTravelerModel.updateFlightBookingTraveler({ ticket_number: ticket_num }, payload.travelers_info ? payload.travelers_info[ind].id : 0)));
             }
             //add tracking
