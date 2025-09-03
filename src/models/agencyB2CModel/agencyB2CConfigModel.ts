@@ -639,6 +639,7 @@ export default class AgencyB2CConfigModel extends Schema {
     name: string;
     source_id: number;
     source_type: string;
+    is_deleted: boolean;
   }) {
     return await this.db('visa_type')
       .withSchema(this.SERVICE_SCHEMA)
@@ -646,7 +647,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .whereILike('name', query.name)
       .andWhere('source_id', query.source_id)
       .andWhere('source_type', query.source_type)
-      .andWhere('is_deleted', false)
+      .andWhere('is_deleted', query.is_deleted)
       .first();
   }
 
@@ -699,6 +700,7 @@ export default class AgencyB2CConfigModel extends Schema {
     name: string;
     source_id: number;
     source_type: string;
+    is_deleted: boolean;
   }) {
     return await this.db('visa_mode')
       .withSchema(this.SERVICE_SCHEMA)
@@ -706,6 +708,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .whereILike('name', query.name)
       .andWhere('source_id', query.source_id)
       .andWhere('source_type', query.source_type)
+      .andWhere('is_deleted', query.is_deleted)
       .first();
   }
 

@@ -1046,6 +1046,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
         name: name,
         source_id: agency_id,
         source_type: SOURCE_AGENT,
+        is_deleted: false,
       });
 
       if (existingVisaType) {
@@ -1151,6 +1152,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       name: name,
       source_id: agency_id,
       source_type: SOURCE_AGENT,
+      is_deleted: false,
     });
 
     if (existingVisaMode) {

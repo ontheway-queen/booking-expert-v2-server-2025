@@ -845,6 +845,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     name: name,
                     source_id: agency_id,
                     source_type: constants_1.SOURCE_AGENT,
+                    is_deleted: false,
                 });
                 if (existingVisaType) {
                     return {
@@ -938,6 +939,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 name: name,
                 source_id: agency_id,
                 source_type: constants_1.SOURCE_AGENT,
+                is_deleted: false,
             });
             if (existingVisaMode) {
                 return {

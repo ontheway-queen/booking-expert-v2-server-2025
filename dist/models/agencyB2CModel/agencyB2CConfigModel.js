@@ -518,7 +518,7 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .whereILike('name', query.name)
                 .andWhere('source_id', query.source_id)
                 .andWhere('source_type', query.source_type)
-                .andWhere('is_deleted', false)
+                .andWhere('is_deleted', query.is_deleted)
                 .first();
         });
     }
@@ -567,6 +567,7 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .whereILike('name', query.name)
                 .andWhere('source_id', query.source_id)
                 .andWhere('source_type', query.source_type)
+                .andWhere('is_deleted', query.is_deleted)
                 .first();
         });
     }
