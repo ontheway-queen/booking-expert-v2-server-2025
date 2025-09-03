@@ -1068,7 +1068,9 @@ export class AgentB2CSubConfigService extends AbstractServices {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: this.ResMsg.HTTP_SUCCESSFUL,
-        data: visaType,
+        data: {
+          id: visaType[0].id,
+        },
       };
     });
   }
@@ -1088,9 +1090,7 @@ export class AgentB2CSubConfigService extends AbstractServices {
       success: true,
       code: this.StatusCode.HTTP_OK,
       message: this.ResMsg.HTTP_OK,
-      data: {
-        id: visaTypes[0].id,
-      },
+      data: visaTypes,
     };
   }
 

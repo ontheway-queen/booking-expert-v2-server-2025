@@ -863,7 +863,9 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
                     message: this.ResMsg.HTTP_SUCCESSFUL,
-                    data: visaType,
+                    data: {
+                        id: visaType[0].id,
+                    },
                 };
             }));
         });
@@ -881,9 +883,7 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
                 message: this.ResMsg.HTTP_OK,
-                data: {
-                    id: visaTypes[0].id,
-                },
+                data: visaTypes,
             };
         });
     }
