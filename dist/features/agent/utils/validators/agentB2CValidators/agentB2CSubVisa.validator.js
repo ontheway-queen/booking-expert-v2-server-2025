@@ -14,7 +14,7 @@ class AgentB2CSubVisaValidator {
             max_validity: joi_1.default.number().required(),
             stay_validity: joi_1.default.number().required(),
             visa_type_id: joi_1.default.number().required(),
-            visa_mode_id: joi_1.default.number().optional(),
+            visa_mode_id: joi_1.default.number().required(),
             title: joi_1.default.string().required(),
             description: joi_1.default.string().optional(),
             documents_details: joi_1.default.string().optional(),
@@ -98,7 +98,10 @@ class AgentB2CSubVisaValidator {
             to_date: joi_1.default.date().optional(),
             limit: joi_1.default.number().optional(),
             skip: joi_1.default.number().optional(),
-            status: joi_1.default.string().optional(),
+            status: joi_1.default.custom((value, helpers) => {
+                const splitArray = value.split(',');
+                return splitArray;
+            }).optional(),
             filter: joi_1.default.string().max(100).optional(),
         });
         this.updateVisaApplicationValidatorSchema = joi_1.default.object({

@@ -88,7 +88,7 @@ export default class VisaApplicationModel extends Schema {
       })
       .limit(query.limit || 100)
       .offset(query.skip || 0)
-      .orderBy('va.application_date', 'desc');
+      .orderBy('va.id', 'desc');
 
     const total = await this.db('visa_application as va')
       .withSchema(this.SERVICE_SCHEMA)
@@ -211,8 +211,12 @@ export default class VisaApplicationModel extends Schema {
           qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
         }
 
-        if (query.status) {
-          qb.andWhere('va.status', query.status);
+        if (query.status?.length) {
+          qb.whereIn('va.status', query.status);
+        }
+
+        if (query.visa_id) {
+          qb.andWhere('va.visa_id', query.visa_id);
         }
 
         if (query.filter) {
@@ -240,9 +244,13 @@ export default class VisaApplicationModel extends Schema {
         if (query.from_date && query.to_date) {
           qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
         }
+        console.log('query.status', query.status);
+        if (query.status?.length) {
+          qb.whereIn('va.status', query.status);
+        }
 
-        if (query.status) {
-          qb.andWhere('va.status', query.status);
+        if (query.visa_id) {
+          qb.andWhere('va.visa_id', query.visa_id);
         }
 
         if (query.filter) {

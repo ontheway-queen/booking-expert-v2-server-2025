@@ -59,7 +59,7 @@ class VisaModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const queryResult = yield this.db('visa as v')
                 .withSchema(this.SERVICE_SCHEMA)
-                .select('v.id', 'c.nice_name as country_name', 'v.title', 'vt.name as visa_type', 'vm.name as visa_mode', 'v.max_validity', 'v.image')
+                .select('v.id', 'c.nice_name as country_name', 'v.title', 'vt.name as visa_type', 'vm.name as visa_mode', 'v.max_validity', 'v.status', 'v.image')
                 .joinRaw(`LEFT JOIN public.country AS c ON c.id = v.country_id`)
                 .leftJoin('visa_type as vt', 'vt.id', 'v.visa_type_id')
                 .leftJoin('visa_mode as vm', 'vm.id', 'v.visa_mode_id')
@@ -188,7 +188,8 @@ class VisaModel extends schema_1.default {
             return this.db('visa')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id')
-                .where('visa_type_id', query.visa_type_id);
+                .where('visa_type_id', query.visa_type_id)
+                .andWhere('is_deleted', false);
         });
     }
     checkVisaExistsByVisaMode(query) {
@@ -196,7 +197,8 @@ class VisaModel extends schema_1.default {
             return this.db('visa')
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('id')
-                .where('visa_mode_id', query.visa_mode_id);
+                .where('visa_mode_id', query.visa_mode_id)
+                .andWhere('is_deleted', false);
         });
     }
     getAllVisaCreatedCountry(query) {

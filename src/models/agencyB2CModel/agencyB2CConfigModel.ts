@@ -611,18 +611,20 @@ export default class AgencyB2CConfigModel extends Schema {
   }) {
     return await this.db('visa_type')
       .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload);
+      .insert(payload, 'id');
   }
 
   public async getAllVisaType(query: {
     source_id: number;
     source_type: string;
+    is_deleted: boolean;
   }) {
     return await this.db('visa_type')
       .withSchema(this.SERVICE_SCHEMA)
       .select('id', 'name')
       .where('source_id', query.source_id)
-      .andWhere('source_type', query.source_type);
+      .andWhere('source_type', query.source_type)
+      .andWhere('is_deleted', query.is_deleted);
   }
 
   public async getSingleVisaType(query: { id: number }) {
@@ -630,13 +632,15 @@ export default class AgencyB2CConfigModel extends Schema {
       .withSchema(this.SERVICE_SCHEMA)
       .select('*')
       .where('id', query.id)
-      .first();
+      .andWhere('is_deleted', false)
+      .first()
   }
 
   public async getSingleVisaTypeByName(query: {
     name: string;
     source_id: number;
     source_type: string;
+    is_deleted: boolean;
   }) {
     return await this.db('visa_type')
       .withSchema(this.SERVICE_SCHEMA)
@@ -644,6 +648,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .whereILike('name', query.name)
       .andWhere('source_id', query.source_id)
       .andWhere('source_type', query.source_type)
+      .andWhere('is_deleted', query.is_deleted)
       .first();
   }
 
@@ -654,7 +659,7 @@ export default class AgencyB2CConfigModel extends Schema {
   }) {
     return await this.db('visa_type')
       .withSchema(this.SERVICE_SCHEMA)
-      .del()
+      .update({ is_deleted: true })
       .where('id', where.id)
       .andWhere('source_id', where.source_id)
       .andWhere('source_type', where.source_type);
@@ -667,25 +672,28 @@ export default class AgencyB2CConfigModel extends Schema {
   }) {
     return await this.db('visa_mode')
       .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload);
+      .insert(payload, 'id');
   }
 
   public async getAllVisaMode(query: {
     source_id: number;
     source_type: string;
+    is_deleted: boolean;
   }) {
     return await this.db('visa_mode')
       .withSchema(this.SERVICE_SCHEMA)
       .select('id', 'name')
       .where('source_id', query.source_id)
-      .andWhere('source_type', query.source_type);
+      .andWhere('source_type', query.source_type)
+      .andWhere('is_deleted', query.is_deleted);
   }
 
-  public async getSingleVisaMode(query: { id: number }) {
+  public async getSingleVisaMode(query: { id: number , is_deleted: boolean}) {
     return await this.db('visa_mode')
       .withSchema(this.SERVICE_SCHEMA)
       .select('*')
       .where('id', query.id)
+      .andWhere('is_deleted', query.is_deleted)
       .first();
   }
 
@@ -693,6 +701,7 @@ export default class AgencyB2CConfigModel extends Schema {
     name: string;
     source_id: number;
     source_type: string;
+    is_deleted: boolean;
   }) {
     return await this.db('visa_mode')
       .withSchema(this.SERVICE_SCHEMA)
@@ -700,6 +709,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .whereILike('name', query.name)
       .andWhere('source_id', query.source_id)
       .andWhere('source_type', query.source_type)
+      .andWhere('is_deleted', query.is_deleted)
       .first();
   }
 
@@ -710,7 +720,7 @@ export default class AgencyB2CConfigModel extends Schema {
   }) {
     return await this.db('visa_mode')
       .withSchema(this.SERVICE_SCHEMA)
-      .del()
+      .update({ is_deleted: true })
       .where('id', where.id)
       .andWhere('source_id', where.source_id)
       .andWhere('source_type', where.source_type);

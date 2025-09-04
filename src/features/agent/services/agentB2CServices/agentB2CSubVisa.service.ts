@@ -163,6 +163,8 @@ export class AgentB2CSubVisaService extends AbstractServices {
         deleteImage.push(checkExist.image);
       }
 
+      console.log(payload);
+
       if (payload && Object.keys(payload).length) {
         await visaModel.updateVisa(payload, Number(id));
       }
@@ -197,6 +199,23 @@ export class AgentB2CSubVisaService extends AbstractServices {
         success: false,
         code: this.StatusCode.HTTP_NOT_FOUND,
         message: this.ResMsg.HTTP_NOT_FOUND,
+      };
+    }
+    const visaApplicationModel = this.Model.VisaApplicationModel();
+    const applicationCheck  = await visaApplicationModel.getAllAgentB2CVisaApplication({
+      source_id: agency_id,
+      source_type: SOURCE_AGENT,
+      visa_id: Number(id),
+    })
+
+
+
+
+    if(applicationCheck.data.length) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_CONFLICT,
+        message: 'Found application for this visa',
       };
     }
 

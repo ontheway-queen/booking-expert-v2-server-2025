@@ -109,6 +109,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
                 const { agency_id } = req.agencyB2CWhiteLabel;
                 const { user_id, name } = req.agencyB2CUser;
                 const { id } = req.params;
+                console.log(req.body);
                 const { from_date, to_date, contact_email, contact_number, whatsapp_number, nationality, residence, passengers, } = req.body;
                 const files = req.files || [];
                 const visaModel = this.Model.VisaModel(trx);

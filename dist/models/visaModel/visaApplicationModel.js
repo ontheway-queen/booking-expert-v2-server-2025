@@ -70,7 +70,7 @@ class VisaApplicationModel extends schema_1.default {
             })
                 .limit(query.limit || 100)
                 .offset(query.skip || 0)
-                .orderBy('va.application_date', 'desc');
+                .orderBy('va.id', 'desc');
             const total = yield this.db('visa_application as va')
                 .withSchema(this.SERVICE_SCHEMA)
                 .count('va.id as total')
@@ -142,13 +142,17 @@ class VisaApplicationModel extends schema_1.default {
                 .joinRaw(`LEFT JOIN public.country AS c ON v.country_id = c.id`)
                 .joinRaw(`LEFT JOIN agent_b2c.users as u ON va.user_id = u.id`)
                 .where((qb) => {
+                var _a;
                 qb.andWhere('va.source_id', query.source_id);
                 qb.andWhere('va.source_type', query.source_type);
                 if (query.from_date && query.to_date) {
                     qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
                 }
-                if (query.status) {
-                    qb.andWhere('va.status', query.status);
+                if ((_a = query.status) === null || _a === void 0 ? void 0 : _a.length) {
+                    qb.whereIn('va.status', query.status);
+                }
+                if (query.visa_id) {
+                    qb.andWhere('va.visa_id', query.visa_id);
                 }
                 if (query.filter) {
                     qb.andWhere((subQb) => {
@@ -168,13 +172,18 @@ class VisaApplicationModel extends schema_1.default {
                 .withSchema(this.SERVICE_SCHEMA)
                 .count('va.id as total')
                 .where((qb) => {
+                var _a;
                 qb.andWhere('va.source_id', query.source_id);
                 qb.andWhere('va.source_type', query.source_type);
                 if (query.from_date && query.to_date) {
                     qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
                 }
-                if (query.status) {
-                    qb.andWhere('va.status', query.status);
+                console.log('query.status', query.status);
+                if ((_a = query.status) === null || _a === void 0 ? void 0 : _a.length) {
+                    qb.whereIn('va.status', query.status);
+                }
+                if (query.visa_id) {
+                    qb.andWhere('va.visa_id', query.visa_id);
                 }
                 if (query.filter) {
                     qb.andWhere((subQb) => {
