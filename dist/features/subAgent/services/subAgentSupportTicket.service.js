@@ -86,6 +86,7 @@ class SubAgentSupportTicketService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const supportTicketModel = this.Model.SupportTicketModel();
             const query = req.query;
+            console.log({ agency_id });
             const data = yield supportTicketModel.getAgentSupportTicket(Object.assign({ agent_id: agency_id, source_type: constants_1.SOURCE_SUB_AGENT }, query), true);
             return {
                 success: true,

@@ -138,4 +138,6 @@ exports.origin = [
     'https://www.ticketmasterbd.net',
     'https://flyduronto.com',
     'https://www.flyduronto.com',
+    'https://airbeeholidays.com',
+    'https://www.airbeeholidays.com',
 ];

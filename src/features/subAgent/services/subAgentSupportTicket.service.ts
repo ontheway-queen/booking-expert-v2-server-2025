@@ -81,6 +81,7 @@ export class SubAgentSupportTicketService extends AbstractServices {
     const supportTicketModel = this.Model.SupportTicketModel();
     const query = req.query as ISubAgentGetSupportTicketReqQuery;
 
+    console.log({ agency_id });
     const data = await supportTicketModel.getAgentSupportTicket(
       {
         agent_id: agency_id,

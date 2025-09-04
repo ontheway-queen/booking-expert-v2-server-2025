@@ -101,9 +101,9 @@ export default class PublicCommonValidator {
 
   // get city
   public getCity = Joi.object({
-    name: Joi.string().optional(),
-    country_id: Joi.number().optional(),
-    city_id: Joi.number().optional(),
+    name: Joi.string(),
+    country_id: Joi.number().integer(),
+    city_id: Joi.number().integer(),
     limit: Joi.number(),
     skip: Joi.number(),
   });

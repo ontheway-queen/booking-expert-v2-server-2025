@@ -75,9 +75,9 @@ class PublicCommonValidator {
         });
         // get city
         this.getCity = joi_1.default.object({
-            name: joi_1.default.string().optional(),
-            country_id: joi_1.default.number().optional(),
-            city_id: joi_1.default.number().optional(),
+            name: joi_1.default.string(),
+            country_id: joi_1.default.number().integer(),
+            city_id: joi_1.default.number().integer(),
             limit: joi_1.default.number(),
             skip: joi_1.default.number(),
         });
