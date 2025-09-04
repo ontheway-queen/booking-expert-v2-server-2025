@@ -9,16 +9,7 @@ export class AgentB2CVisaValidator {
   private traveler_types = [
     'ADT',
     'INF',
-    'C02',
-    'C03',
-    'C04',
-    'C05',
-    'C06',
-    'C07',
-    'C08',
-    'C09',
-    'C10',
-    'C11',
+    'CHD'
   ];
 
   private traveler_titles = ['Miss', 'Master', 'Ms', 'Mr', 'Mrs'];
@@ -43,7 +34,7 @@ export class AgentB2CVisaValidator {
         passport_type: Joi.string().required(),
         city: Joi.string().optional(),
         country_id: Joi.number().optional(),
-        address: Joi.string().optional(),
+        address: Joi.string().optional().allow(''),
       })
     )
     .min(1)

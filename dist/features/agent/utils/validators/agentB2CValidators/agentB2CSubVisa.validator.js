@@ -98,7 +98,10 @@ class AgentB2CSubVisaValidator {
             to_date: joi_1.default.date().optional(),
             limit: joi_1.default.number().optional(),
             skip: joi_1.default.number().optional(),
-            status: joi_1.default.string().optional(),
+            status: joi_1.default.custom((value, helpers) => {
+                const splitArray = value.split(',');
+                return splitArray;
+            }).optional(),
             filter: joi_1.default.string().max(100).optional(),
         });
         this.updateVisaApplicationValidatorSchema = joi_1.default.object({

@@ -105,6 +105,7 @@ export class AgentB2CVisaService extends AbstractServices {
       const { agency_id } = req.agencyB2CWhiteLabel;
       const { user_id, name } = req.agencyB2CUser;
       const { id } = req.params;
+      console.log(req.body);
       const {
         from_date,
         to_date,

@@ -14,16 +14,7 @@ class AgentB2CVisaValidator {
         this.traveler_types = [
             'ADT',
             'INF',
-            'C02',
-            'C03',
-            'C04',
-            'C05',
-            'C06',
-            'C07',
-            'C08',
-            'C09',
-            'C10',
-            'C11',
+            'CHD'
         ];
         this.traveler_titles = ['Miss', 'Master', 'Ms', 'Mr', 'Mrs'];
         this.passengerSchema = joi_1.default.array()
@@ -45,7 +36,7 @@ class AgentB2CVisaValidator {
             passport_type: joi_1.default.string().required(),
             city: joi_1.default.string().optional(),
             country_id: joi_1.default.number().optional(),
-            address: joi_1.default.string().optional(),
+            address: joi_1.default.string().optional().allow(''),
         }))
             .min(1)
             .required();

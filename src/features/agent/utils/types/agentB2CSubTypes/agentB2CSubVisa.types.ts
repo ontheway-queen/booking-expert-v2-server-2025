@@ -9,7 +9,7 @@ export interface IGetVisaListQuery {
 export interface IGetAllAgentB2CVisaApplicationQuery {
   from_date?: Date;
   to_date?:Date;
-  status?: string;
+  status?: string[];
   filter?: string;
   limit?: number;
   skip?: number;

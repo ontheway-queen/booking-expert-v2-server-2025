@@ -77,7 +77,7 @@ export interface IGetAllAgentB2CVisaApplicationQuery {
   source_type: string;
   from_date?: Date;
   to_date?: Date;
-  status?: string;
+  status?: string[];
   filter?: string;
   limit?: number;
   skip?: number;

@@ -105,7 +105,10 @@ export class AgentB2CSubVisaValidator {
     to_date: Joi.date().optional(),
     limit: Joi.number().optional(),
     skip: Joi.number().optional(),
-    status: Joi.string().optional(),
+    status: Joi.custom((value, helpers) => {
+      const splitArray = value.split(',');
+      return splitArray;
+    }).optional(),
     filter: Joi.string().max(100).optional(),
   });
 
