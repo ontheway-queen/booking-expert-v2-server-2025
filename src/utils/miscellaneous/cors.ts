@@ -23,6 +23,7 @@ export const origin: string[] = [
   'http://10.10.220.31:3001',
   'http://localhost:5001',
   'https://sohiaviation.com',
+  'https://b2b.sohiaviation.com',
   'https://www.sohiaviation.com',
   'https://meherba.com',
   'https://www.meherba.com',
@@ -138,4 +139,10 @@ export const origin: string[] = [
   'https://www.flyduronto.com',
   'https://airbeeholidays.com',
   'https://www.airbeeholidays.com',
+  ' https://tripexpert.com.bd',
+  'https://www.tripexpert.com.bd',
+  'https://ticketbd.net',
+  'https://www.ticketbd.net',
+  'https://monihartoursandtravels.com',
+  'https://www.monihartoursandtravels.com',
 ];
