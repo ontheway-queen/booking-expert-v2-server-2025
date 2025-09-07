@@ -23,19 +23,6 @@ export class AgentB2CSubVisaValidator {
           try {
             const parsedRequiredFields = JSON.parse(value);
 
-            const parsedRequiredFieldsSchema = Joi.object({
-              passport: Joi.boolean().optional(),
-              nid: Joi.boolean().optional(),
-              birth_certificate: Joi.boolean().optional(),
-              marriage_certificate: Joi.boolean().optional(),
-              bank_statement: Joi.boolean().optional(),
-            });
-
-            const { error } = parsedRequiredFieldsSchema.validate(parsedRequiredFields);
-            if (error) {
-              return helpers.message(`Invalid required_fields: ${error.message}` as any);
-            }
-
             return parsedRequiredFields;
           } catch (error) {
             console.error('Error parsing passengers field:', error);
@@ -76,19 +63,6 @@ export class AgentB2CSubVisaValidator {
         Joi.string().custom((value, helpers) => {
           try {
             const parsedRequiredFields = JSON.parse(value);
-
-            const parsedRequiredFieldsSchema = Joi.object({
-              passport: Joi.boolean().optional(),
-              nid: Joi.boolean().optional(),
-              birth_certificate: Joi.boolean().optional(),
-              marriage_certificate: Joi.boolean().optional(),
-              bank_statement: Joi.boolean().optional(),
-            });
-
-            const { error } = parsedRequiredFieldsSchema.validate(parsedRequiredFields);
-            if (error) {
-              return helpers.message(`Invalid required_fields: ${error.message}` as any);
-            }
 
             return parsedRequiredFields;
           } catch (error) {

@@ -224,6 +224,25 @@ class AgentB2CSubConfigController extends abstract_controller_1.default {
             const _a = yield this.service.deleteVisaMode(req), { code } = _a, data = __rest(_a, ["code"]);
             res.status(code).json(data);
         }));
+        this.createVisaDocumentFieldName = this.asyncWrapper.wrap({ bodySchema: this.validator.createVisaDocumentFieldNameSchema }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.createVisaDocumentFieldName(req), { code } = _a, data = __rest(_a, ["code"]);
+            if (data.success) {
+                res.status(code).json(data);
+            }
+            else {
+                this.error(data.message, code);
+            }
+        }));
+        this.getAllVisaDocumentFieldName = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getAllVisaDocumentFieldName(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
+        this.deleteVisaDocumentFieldName = this.asyncWrapper.wrap({
+            paramSchema: this.commonValidator.singleParamNumValidator(),
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.deleteVisaRequiredDocumentFieldName(req), { code } = _a, data = __rest(_a, ["code"]);
+            res.status(code).json(data);
+        }));
     }
 }
 exports.default = AgentB2CSubConfigController;

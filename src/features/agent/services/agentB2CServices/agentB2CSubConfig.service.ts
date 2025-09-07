@@ -1246,4 +1246,96 @@ export class AgentB2CSubConfigService extends AbstractServices {
       };
     });
   }
+
+  public async createVisaDocumentFieldName(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const { name } = req.body;
+
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+
+      const isExists = await configModel.getVisaDocumentFieldNameByName({
+        name: name,
+        source_id: agency_id,
+        source_type: SOURCE_AGENT,
+        is_deleted: false,
+      });
+
+      if (isExists) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_CONFLICT,
+          message: this.ResMsg.HTTP_CONFLICT,
+        };
+      }
+
+      const data = await configModel.createVisaDocumentFieldName({
+        name: name,
+        source_id: agency_id,
+        source_type: SOURCE_AGENT,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: this.ResMsg.HTTP_SUCCESSFUL,
+        data: {
+          id: data[0].id,
+        },
+      };
+    });
+  }
+
+  public async getAllVisaDocumentFieldName(req: Request) {
+    const { agency_id } = req.agencyUser;
+
+    const configModel = this.Model.AgencyB2CConfigModel();
+
+    const requiredFieldName = await configModel.getAllVisaRDocumentFieldName({
+      source_id: agency_id,
+      source_type: SOURCE_AGENT,
+      is_deleted: false,
+    });
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      message: this.ResMsg.HTTP_OK,
+      data: requiredFieldName,
+    };
+  }
+
+  public async deleteVisaRequiredDocumentFieldName(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const { id } = req.params;
+
+      const configModel = this.Model.AgencyB2CConfigModel(trx);
+
+      const checkIsExists = await configModel.getSingleVisaRequiredFieldName({
+        id: Number(id),
+        is_deleted: false,
+      });
+
+      if (!checkIsExists) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      }
+
+      await configModel.deleteVisaDocumentFieldName({
+        id: Number(id),
+        source_id: agency_id,
+        source_type: SOURCE_AGENT,
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+      };
+    });
+  }
 }
