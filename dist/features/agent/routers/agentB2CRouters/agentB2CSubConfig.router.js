@@ -66,6 +66,13 @@ class AgentB2CSubConfigRouter extends abstract_router_1.default {
             .post(this.controller.createVisaMode)
             .get(this.controller.getAllVisaMode);
         this.router.route('/visa-mode/:id').delete(this.controller.deleteVisaMode);
+        this.router
+            .route('/visa-document-field')
+            .post(this.controller.createVisaDocumentFieldName)
+            .get(this.controller.getAllVisaDocumentFieldName);
+        this.router
+            .route('/visa-document-field/:id')
+            .delete(this.controller.deleteVisaDocumentFieldName);
     }
 }
 exports.default = AgentB2CSubConfigRouter;

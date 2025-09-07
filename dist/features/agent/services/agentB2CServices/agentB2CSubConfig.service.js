@@ -1024,5 +1024,87 @@ class AgentB2CSubConfigService extends abstract_service_1.default {
             }));
         });
     }
+    createVisaDocumentFieldName(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const { name } = req.body;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const isExists = yield configModel.getVisaDocumentFieldNameByName({
+                    name: name,
+                    source_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT,
+                    is_deleted: false,
+                });
+                if (isExists) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_CONFLICT,
+                        message: this.ResMsg.HTTP_CONFLICT,
+                    };
+                }
+                const data = yield configModel.createVisaDocumentFieldName({
+                    name: name,
+                    source_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT,
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: this.ResMsg.HTTP_SUCCESSFUL,
+                    data: {
+                        id: data[0].id,
+                    },
+                };
+            }));
+        });
+    }
+    getAllVisaDocumentFieldName(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyUser;
+            const configModel = this.Model.AgencyB2CConfigModel();
+            const requiredFieldName = yield configModel.getAllVisaRDocumentFieldName({
+                source_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
+                is_deleted: false,
+            });
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                message: this.ResMsg.HTTP_OK,
+                data: requiredFieldName,
+            };
+        });
+    }
+    deleteVisaRequiredDocumentFieldName(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const { id } = req.params;
+                const configModel = this.Model.AgencyB2CConfigModel(trx);
+                const checkIsExists = yield configModel.getSingleVisaRequiredFieldName({
+                    id: Number(id),
+                    is_deleted: false,
+                });
+                if (!checkIsExists) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                yield configModel.deleteVisaDocumentFieldName({
+                    id: Number(id),
+                    source_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT,
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    message: this.ResMsg.HTTP_OK,
+                };
+            }));
+        });
+    }
 }
 exports.AgentB2CSubConfigService = AgentB2CSubConfigService;

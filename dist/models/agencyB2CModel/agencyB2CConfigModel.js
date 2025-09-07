@@ -21,9 +21,7 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertHeroBGContent(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('hero_bg_content')
-                .withSchema(this.AGENT_B2C_SCHEMA)
-                .insert(payload, 'id');
+            return yield this.db('hero_bg_content').withSchema(this.AGENT_B2C_SCHEMA).insert(payload, 'id');
         });
     }
     getHeroBGContent(query_1) {
@@ -102,9 +100,7 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertPopularDestination(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('popular_destination')
-                .withSchema(this.AGENT_B2C_SCHEMA)
-                .insert(payload);
+            return yield this.db('popular_destination').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
         });
     }
     getPopularDestination(query_1) {
@@ -184,9 +180,7 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertPopularPlaces(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('popular_places')
-                .withSchema(this.AGENT_B2C_SCHEMA)
-                .insert(payload);
+            return yield this.db('popular_places').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
         });
     }
     getPopularPlaces(query_1) {
@@ -260,9 +254,7 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertSiteConfig(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('site_config')
-                .withSchema(this.AGENT_B2C_SCHEMA)
-                .insert(payload);
+            return yield this.db('site_config').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
         });
     }
     getSiteConfig(query) {
@@ -285,9 +277,7 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertSocialLink(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('social_links')
-                .withSchema(this.AGENT_B2C_SCHEMA)
-                .insert(payload, 'id');
+            return yield this.db('social_links').withSchema(this.AGENT_B2C_SCHEMA).insert(payload, 'id');
         });
     }
     getSocialLink(query_1) {
@@ -361,9 +351,7 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertHotDeals(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('hot_deals')
-                .withSchema(this.AGENT_B2C_SCHEMA)
-                .insert(payload);
+            return yield this.db('hot_deals').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
         });
     }
     getHotDeals(query_1) {
@@ -434,9 +422,7 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     insertPopUpBanner(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('pop_up_banner')
-                .withSchema(this.AGENT_B2C_SCHEMA)
-                .insert(payload);
+            return yield this.db('pop_up_banner').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
         });
     }
     getPopUpBanner(query) {
@@ -486,9 +472,7 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     createVisaType(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_type')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
+            return yield this.db('visa_type').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
         });
     }
     getAllVisaType(query) {
@@ -535,9 +519,7 @@ class AgencyB2CConfigModel extends schema_1.default {
     }
     createVisaMode(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_mode')
-                .withSchema(this.SERVICE_SCHEMA)
-                .insert(payload, 'id');
+            return yield this.db('visa_mode').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
         });
     }
     getAllVisaMode(query) {
@@ -580,6 +562,55 @@ class AgencyB2CConfigModel extends schema_1.default {
                 .where('id', where.id)
                 .andWhere('source_id', where.source_id)
                 .andWhere('source_type', where.source_type);
+        });
+    }
+    createVisaDocumentFieldName(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('visa_document_fields')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload, 'id');
+        });
+    }
+    getAllVisaRDocumentFieldName(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('visa_document_fields')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('id', 'name')
+                .where('source_id', query.source_id)
+                .andWhere('source_type', query.source_type)
+                .andWhere('is_deleted', query.is_deleted);
+        });
+    }
+    deleteVisaDocumentFieldName(where) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('visa_document_fields')
+                .withSchema(this.SERVICE_SCHEMA)
+                .update({ is_deleted: true })
+                .where('id', where.id)
+                .andWhere('source_id', where.source_id)
+                .andWhere('source_type', where.source_type);
+        });
+    }
+    getVisaDocumentFieldNameByName(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('visa_document_fields')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('*')
+                .whereILike('name', query.name)
+                .andWhere('source_id', query.source_id)
+                .andWhere('source_type', query.source_type)
+                .andWhere('is_deleted', query.is_deleted)
+                .first();
+        });
+    }
+    getSingleVisaRequiredFieldName(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('visa_document_fields')
+                .withSchema(this.SERVICE_SCHEMA)
+                .select('*')
+                .where('id', query.id)
+                .andWhere('is_deleted', query.is_deleted)
+                .first();
         });
     }
 }

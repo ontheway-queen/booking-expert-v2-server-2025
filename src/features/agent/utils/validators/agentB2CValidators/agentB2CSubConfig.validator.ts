@@ -17,18 +17,10 @@ import {
 
 export class AgentB2CSubConfigValidator {
   public upsertB2CMarkup = Joi.object({
-    flight_markup_type: Joi.string()
-      .valid(MARKUP_TYPE_PER, MARKUP_TYPE_FLAT)
-      .required(),
-    hotel_markup_type: Joi.string()
-      .valid(MARKUP_TYPE_PER, MARKUP_TYPE_FLAT)
-      .required(),
-    flight_markup_mode: Joi.string()
-      .valid(MARKUP_MODE_INCREASE, MARKUP_MODE_DECREASE)
-      .required(),
-    hotel_markup_mode: Joi.string()
-      .valid(MARKUP_MODE_INCREASE, MARKUP_MODE_DECREASE)
-      .required(),
+    flight_markup_type: Joi.string().valid(MARKUP_TYPE_PER, MARKUP_TYPE_FLAT).required(),
+    hotel_markup_type: Joi.string().valid(MARKUP_TYPE_PER, MARKUP_TYPE_FLAT).required(),
+    flight_markup_mode: Joi.string().valid(MARKUP_MODE_INCREASE, MARKUP_MODE_DECREASE).required(),
+    hotel_markup_mode: Joi.string().valid(MARKUP_MODE_INCREASE, MARKUP_MODE_DECREASE).required(),
     flight_markup: Joi.number().required(),
     hotel_markup: Joi.number().required(),
   });
@@ -141,5 +133,9 @@ export class AgentB2CSubConfigValidator {
 
   public createVisaMode = Joi.object({
     name: Joi.string().required().trim(),
+  });
+
+  public createVisaDocumentFieldNameSchema = Joi.object({
+    name: Joi.string().required().max(50),
   });
 }

@@ -26,17 +26,6 @@ class AgentB2CSubVisaValidator {
                 .try(joi_1.default.object().optional(), joi_1.default.string().custom((value, helpers) => {
                 try {
                     const parsedRequiredFields = JSON.parse(value);
-                    const parsedRequiredFieldsSchema = joi_1.default.object({
-                        passport: joi_1.default.boolean().optional(),
-                        nid: joi_1.default.boolean().optional(),
-                        birth_certificate: joi_1.default.boolean().optional(),
-                        marriage_certificate: joi_1.default.boolean().optional(),
-                        bank_statement: joi_1.default.boolean().optional(),
-                    });
-                    const { error } = parsedRequiredFieldsSchema.validate(parsedRequiredFields);
-                    if (error) {
-                        return helpers.message(`Invalid required_fields: ${error.message}`);
-                    }
                     return parsedRequiredFields;
                 }
                 catch (error) {
@@ -73,17 +62,6 @@ class AgentB2CSubVisaValidator {
                 .try(joi_1.default.object().optional(), joi_1.default.string().custom((value, helpers) => {
                 try {
                     const parsedRequiredFields = JSON.parse(value);
-                    const parsedRequiredFieldsSchema = joi_1.default.object({
-                        passport: joi_1.default.boolean().optional(),
-                        nid: joi_1.default.boolean().optional(),
-                        birth_certificate: joi_1.default.boolean().optional(),
-                        marriage_certificate: joi_1.default.boolean().optional(),
-                        bank_statement: joi_1.default.boolean().optional(),
-                    });
-                    const { error } = parsedRequiredFieldsSchema.validate(parsedRequiredFields);
-                    if (error) {
-                        return helpers.message(`Invalid required_fields: ${error.message}`);
-                    }
                     return parsedRequiredFields;
                 }
                 catch (error) {

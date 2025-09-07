@@ -41,13 +41,9 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async insertHeroBGContent(
-    payload:
-      | ICreateAgencyB2CHeroBgContentPayload
-      | ICreateAgencyB2CHeroBgContentPayload[]
+    payload: ICreateAgencyB2CHeroBgContentPayload | ICreateAgencyB2CHeroBgContentPayload[]
   ) {
-    return await this.db('hero_bg_content')
-      .withSchema(this.AGENT_B2C_SCHEMA)
-      .insert(payload, 'id');
+    return await this.db('hero_bg_content').withSchema(this.AGENT_B2C_SCHEMA).insert(payload, 'id');
   }
 
   public async getHeroBGContent(
@@ -135,13 +131,9 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async insertPopularDestination(
-    payload:
-      | ICreateAgencyB2CPopularDestinationPayload
-      | ICreateAgencyB2CPopularDestinationPayload[]
+    payload: ICreateAgencyB2CPopularDestinationPayload | ICreateAgencyB2CPopularDestinationPayload[]
   ) {
-    return await this.db('popular_destination')
-      .withSchema(this.AGENT_B2C_SCHEMA)
-      .insert(payload);
+    return await this.db('popular_destination').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
   }
 
   public async getPopularDestination(
@@ -232,10 +224,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .where('id', where.id);
   }
 
-  public async deletePopularDestination(where: {
-    agency_id: number;
-    id: number;
-  }) {
+  public async deletePopularDestination(where: { agency_id: number; id: number }) {
     return await this.db('popular_destination')
       .withSchema(this.AGENT_B2C_SCHEMA)
       .del()
@@ -246,9 +235,7 @@ export default class AgencyB2CConfigModel extends Schema {
   public async insertPopularPlaces(
     payload: ICreateAgencyB2CPopularPlace | ICreateAgencyB2CPopularPlace[]
   ) {
-    return await this.db('popular_places')
-      .withSchema(this.AGENT_B2C_SCHEMA)
-      .insert(payload);
+    return await this.db('popular_places').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
   }
 
   public async getPopularPlaces(
@@ -331,9 +318,7 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async insertSiteConfig(payload: ICreateAgencyB2CSiteConfig) {
-    return await this.db('site_config')
-      .withSchema(this.AGENT_B2C_SCHEMA)
-      .insert(payload);
+    return await this.db('site_config').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
   }
 
   public async getSiteConfig(query: {
@@ -360,13 +345,9 @@ export default class AgencyB2CConfigModel extends Schema {
   }
 
   public async insertSocialLink(
-    payload:
-      | ICreateAgencyB2CSocialLinkPayload
-      | ICreateAgencyB2CSocialLinkPayload[]
+    payload: ICreateAgencyB2CSocialLinkPayload | ICreateAgencyB2CSocialLinkPayload[]
   ) {
-    return await this.db('social_links')
-      .withSchema(this.AGENT_B2C_SCHEMA)
-      .insert(payload, 'id');
+    return await this.db('social_links').withSchema(this.AGENT_B2C_SCHEMA).insert(payload, 'id');
   }
 
   public async getSocialLink(
@@ -384,9 +365,7 @@ export default class AgencyB2CConfigModel extends Schema {
         'sm.name AS media',
         'sm.logo'
       )
-      .joinRaw(
-        `LEFT JOIN public.social_media AS sm ON sl.social_media_id = sm.id`
-      )
+      .joinRaw(`LEFT JOIN public.social_media AS sm ON sl.social_media_id = sm.id`)
       .orderBy('sl.order_number', 'asc')
       .andWhere('sl.agency_id', query.agency_id)
       .where((qb) => {
@@ -459,12 +438,8 @@ export default class AgencyB2CConfigModel extends Schema {
       .where('id', where.id);
   }
 
-  public async insertHotDeals(
-    payload: ICreateAgencyB2CHotDeals | ICreateAgencyB2CHotDeals[]
-  ) {
-    return await this.db('hot_deals')
-      .withSchema(this.AGENT_B2C_SCHEMA)
-      .insert(payload);
+  public async insertHotDeals(payload: ICreateAgencyB2CHotDeals | ICreateAgencyB2CHotDeals[]) {
+    return await this.db('hot_deals').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
   }
 
   public async getHotDeals(
@@ -546,9 +521,7 @@ export default class AgencyB2CConfigModel extends Schema {
   public async insertPopUpBanner(
     payload: ICreateAgencyB2CPopUpBanner | ICreateAgencyB2CPopUpBanner[]
   ) {
-    return await this.db('pop_up_banner')
-      .withSchema(this.AGENT_B2C_SCHEMA)
-      .insert(payload);
+    return await this.db('pop_up_banner').withSchema(this.AGENT_B2C_SCHEMA).insert(payload);
   }
 
   public async getPopUpBanner(
@@ -604,14 +577,8 @@ export default class AgencyB2CConfigModel extends Schema {
       .where('id', where.id);
   }
 
-  public async createVisaType(payload: {
-    name: string;
-    source_id: number;
-    source_type: string;
-  }) {
-    return await this.db('visa_type')
-      .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload, 'id');
+  public async createVisaType(payload: { name: string; source_id: number; source_type: string }) {
+    return await this.db('visa_type').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
   }
 
   public async getAllVisaType(query: {
@@ -633,7 +600,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .select('*')
       .where('id', query.id)
       .andWhere('is_deleted', false)
-      .first()
+      .first();
   }
 
   public async getSingleVisaTypeByName(query: {
@@ -652,11 +619,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .first();
   }
 
-  public async deleteVisaType(where: {
-    id: number;
-    source_id: number;
-    source_type: string;
-  }) {
+  public async deleteVisaType(where: { id: number; source_id: number; source_type: string }) {
     return await this.db('visa_type')
       .withSchema(this.SERVICE_SCHEMA)
       .update({ is_deleted: true })
@@ -665,14 +628,8 @@ export default class AgencyB2CConfigModel extends Schema {
       .andWhere('source_type', where.source_type);
   }
 
-  public async createVisaMode(payload: {
-    name: string;
-    source_id: number;
-    source_type: string;
-  }) {
-    return await this.db('visa_mode')
-      .withSchema(this.SERVICE_SCHEMA)
-      .insert(payload, 'id');
+  public async createVisaMode(payload: { name: string; source_id: number; source_type: string }) {
+    return await this.db('visa_mode').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
   }
 
   public async getAllVisaMode(query: {
@@ -688,7 +645,7 @@ export default class AgencyB2CConfigModel extends Schema {
       .andWhere('is_deleted', query.is_deleted);
   }
 
-  public async getSingleVisaMode(query: { id: number , is_deleted: boolean}) {
+  public async getSingleVisaMode(query: { id: number; is_deleted: boolean }) {
     return await this.db('visa_mode')
       .withSchema(this.SERVICE_SCHEMA)
       .select('*')
@@ -713,16 +670,73 @@ export default class AgencyB2CConfigModel extends Schema {
       .first();
   }
 
-  public async deleteVisaMode(where: {
-    id: number;
-    source_id: number;
-    source_type: string;
-  }) {
+  public async deleteVisaMode(where: { id: number; source_id: number; source_type: string }) {
     return await this.db('visa_mode')
       .withSchema(this.SERVICE_SCHEMA)
       .update({ is_deleted: true })
       .where('id', where.id)
       .andWhere('source_id', where.source_id)
       .andWhere('source_type', where.source_type);
+  }
+
+  public async createVisaDocumentFieldName(payload: {
+    name: string;
+    source_id: number;
+    source_type: string;
+  }) {
+    return await this.db('visa_document_fields')
+      .withSchema(this.SERVICE_SCHEMA)
+      .insert(payload, 'id');
+  }
+
+  public async getAllVisaRDocumentFieldName(query: {
+    source_id: number;
+    source_type: string;
+    is_deleted: boolean;
+  }): Promise<{ id: number; name: string }[]> {
+    return await this.db('visa_document_fields')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('id', 'name')
+      .where('source_id', query.source_id)
+      .andWhere('source_type', query.source_type)
+      .andWhere('is_deleted', query.is_deleted);
+  }
+
+  public async deleteVisaDocumentFieldName(where: {
+    id: number;
+    source_id: number;
+    source_type: string;
+  }) {
+    return await this.db('visa_document_fields')
+      .withSchema(this.SERVICE_SCHEMA)
+      .update({ is_deleted: true })
+      .where('id', where.id)
+      .andWhere('source_id', where.source_id)
+      .andWhere('source_type', where.source_type);
+  }
+
+  public async getVisaDocumentFieldNameByName(query:{
+    name: string;
+    source_id: number;
+    source_type: string;
+    is_deleted: boolean;
+  }){
+    return await this.db('visa_document_fields')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('*')
+      .whereILike('name', query.name)
+      .andWhere('source_id', query.source_id)
+      .andWhere('source_type', query.source_type)
+      .andWhere('is_deleted', query.is_deleted)
+      .first();
+  }
+
+  public async getSingleVisaRequiredFieldName(query: { id: number; is_deleted: boolean }) {
+    return await this.db('visa_document_fields')
+      .withSchema(this.SERVICE_SCHEMA)
+      .select('*')
+      .where('id', query.id)
+      .andWhere('is_deleted', query.is_deleted)
+      .first();
   }
 }

@@ -310,4 +310,35 @@ export default class AgentB2CSubConfigController extends AbstractController {
       res.status(code).json(data);
     }
   );
+
+
+  public createVisaDocumentFieldName = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.createVisaDocumentFieldNameSchema },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.createVisaDocumentFieldName(req);
+      if (data.success) {
+        res.status(code).json(data);
+      } else {
+        this.error(data.message, code);
+      }
+    }
+  );
+
+  public getAllVisaDocumentFieldName = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.getAllVisaDocumentFieldName(req);
+      res.status(code).json(data);
+    }
+  );
+
+  public deleteVisaDocumentFieldName = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.singleParamNumValidator(),
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...data } = await this.service.deleteVisaRequiredDocumentFieldName(req);
+      res.status(code).json(data);
+    }
+  );
 }
