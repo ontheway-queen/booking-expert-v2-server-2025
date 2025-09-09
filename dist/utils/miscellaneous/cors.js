@@ -151,4 +151,6 @@ exports.origin = [
     'https://www.monihartoursandtravels.com',
     'https://b2b.amarbooking.com',
     'https://www.b2b.amarbooking.com',
+    'https://ezflight.net',
+    'https://www.ezflight.net',
 ];
