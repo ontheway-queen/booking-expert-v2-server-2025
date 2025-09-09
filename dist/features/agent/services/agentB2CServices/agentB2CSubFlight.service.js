@@ -70,7 +70,7 @@ class AgentB2CSubFlightService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params;
-                const { name, user_email, user_id } = req.admin;
+                const { name, user_email, user_id } = req.agencyUser;
                 const { status, airline_pnr, charge_credit, gds_pnr, ticket_issue_last_time, ticket_numbers, } = req.body;
                 const flightBookingModel = this.Model.FlightBookingModel(trx);
                 const flightBookingTrackingModel = this.Model.FlightBookingTrackingModel(trx);

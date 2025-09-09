@@ -115,6 +115,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                 });
                 let sabreData = [];
                 let customData = [];
+                console.log({ sabre_supplier_id });
                 if (sabre_supplier_id) {
                     const sabreSubService = new sabreFlightSupport_service_1.default(trx);
                     sabreData = yield sabreSubService.FlightSearch({

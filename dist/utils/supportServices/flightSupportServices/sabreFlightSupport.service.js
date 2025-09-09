@@ -409,7 +409,9 @@ class SabreFlightService extends abstract_service_1.default {
                         passenger_count: passenger.passengerInfo.passengerNumber,
                         segmentDetails,
                     });
-                    const per_pax_discount = Number(passenger_info.passengerTotalFare.equivalentAmount) * ((commission + agent_discount) / Number(fare.totalFare.equivalentAmount));
+                    const per_pax_discount = Number(passenger_info.passengerTotalFare.equivalentAmount) *
+                        ((commission + agent_discount) /
+                            Number(fare.totalFare.equivalentAmount));
                     const per_pax_markup = (markup + agent_markup) / pax_count;
                     const total_pax_markup = pax_markup + per_pax_markup;
                     const per_pax_ait = ait / pax_count;
@@ -670,7 +672,7 @@ class SabreFlightService extends abstract_service_1.default {
                         const ArrivalDateTime = this.flightUtils.convertDateTime(option.arrival.date, option.arrival.time);
                         const flight_data = {
                             Number: Number(option === null || option === void 0 ? void 0 : option.carrier.carrier_marketing_flight_number),
-                            ClassOfService: (booking_code === null || booking_code === void 0 ? void 0 : booking_code[booking_ind]) || "",
+                            ClassOfService: (booking_code === null || booking_code === void 0 ? void 0 : booking_code[booking_ind]) || '',
                             DepartureDateTime,
                             ArrivalDateTime,
                             Type: 'A',

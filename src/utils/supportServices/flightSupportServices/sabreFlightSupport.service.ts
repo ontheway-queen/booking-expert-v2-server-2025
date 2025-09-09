@@ -435,7 +435,7 @@ export default class SabreFlightService extends AbstractServices {
         ((Number(fare.totalFare.equivalentAmount) +
           Number(fare.totalFare.totalTaxAmount)) /
           100) *
-        0.3
+          0.3
       );
 
       const new_fare: IFormattedFare = {
@@ -562,15 +562,15 @@ export default class SabreFlightService extends AbstractServices {
             segments,
             baggage: newBaggage?.id
               ? {
-                id: newBaggage?.id,
-                unit: newBaggage.unit || 'pieces',
-                count: newBaggage.weight || newBaggage.pieceCount,
-              }
+                  id: newBaggage?.id,
+                  unit: newBaggage.unit || 'pieces',
+                  count: newBaggage.weight || newBaggage.pieceCount,
+                }
               : {
-                id: 1,
-                unit: 'N/A',
-                count: 'N/A',
-              },
+                  id: 1,
+                  unit: 'N/A',
+                  count: 'N/A',
+                },
           });
           segments = [];
         }
@@ -581,7 +581,10 @@ export default class SabreFlightService extends AbstractServices {
           segmentDetails,
         });
 
-        const per_pax_discount = Number(passenger_info.passengerTotalFare.equivalentAmount) * ((commission + agent_discount) / Number(fare.totalFare.equivalentAmount));
+        const per_pax_discount =
+          Number(passenger_info.passengerTotalFare.equivalentAmount) *
+          ((commission + agent_discount) /
+            Number(fare.totalFare.equivalentAmount));
         const per_pax_markup = (markup + agent_markup) / pax_count;
 
         const total_pax_markup = pax_markup + per_pax_markup;
@@ -816,12 +819,12 @@ export default class SabreFlightService extends AbstractServices {
         availability,
         modifiedFare: with_modified_fare
           ? {
-            agent_discount,
-            agent_markup,
-            commission,
-            markup,
-            pax_markup,
-          }
+              agent_discount,
+              agent_markup,
+              commission,
+              markup,
+              pax_markup,
+            }
           : undefined,
         partial_payment,
         leg_description: [],
@@ -907,7 +910,7 @@ export default class SabreFlightService extends AbstractServices {
         if (seg_elm?.passenger?.[0]?.booking_code) {
           booking_code.push(seg_elm?.passenger?.[0]?.booking_code);
         }
-      })
+      });
     });
 
     let booking_ind = 0;
@@ -935,7 +938,7 @@ export default class SabreFlightService extends AbstractServices {
 
             const flight_data = {
               Number: Number(option?.carrier.carrier_marketing_flight_number),
-              ClassOfService: booking_code?.[booking_ind] || "",
+              ClassOfService: booking_code?.[booking_ind] || '',
               DepartureDateTime,
               ArrivalDateTime,
               Type: 'A',
@@ -1058,7 +1061,7 @@ export default class SabreFlightService extends AbstractServices {
     const monthDiff = (date: string | Date): string => {
       const diff = Math.ceil(
         (new Date().getTime() - new Date(date).getTime()) /
-        (1000 * 60 * 60 * 24 * 30)
+          (1000 * 60 * 60 * 24 * 30)
       );
       return String(diff).padStart(2, '0');
     };
@@ -1130,8 +1133,8 @@ export default class SabreFlightService extends AbstractServices {
               item.type === 'INF' && item.gender === 'Male'
                 ? 'MI'
                 : item.type === 'INF' && item.gender === 'Female'
-                  ? 'FI'
-                  : item.gender[0],
+                ? 'FI'
+                : item.gender[0],
             GivenName: item.first_name,
             Surname: item.last_name,
           },
@@ -1206,8 +1209,8 @@ export default class SabreFlightService extends AbstractServices {
                 item.type === 'INF' && item.gender === 'Male'
                   ? 'MI'
                   : item.type === 'INF' && item.gender === 'Female'
-                    ? 'FI'
-                    : item.gender[0],
+                  ? 'FI'
+                  : item.gender[0],
               GivenName: item.first_name,
               Surname: item.last_name,
               DateOfBirth: String(item.date_of_birth)?.split('T')[0],
@@ -1223,8 +1226,8 @@ export default class SabreFlightService extends AbstractServices {
             item.type === 'INF'
               ? 'I' + monthDiff(item.date_of_birth)
               : item.type === 'ADT'
-                ? ''
-                : item.type,
+              ? ''
+              : item.type,
           GivenName: item.first_name + ' ' + item.reference,
           Surname: item.last_name,
           PassengerType: item.type,

@@ -23,6 +23,7 @@ exports.origin = [
     'http://10.10.220.42:5000',
     'http://10.10.220.42:5001',
     'http://10.10.220.42:3001',
+    'http://10.10.220.42:3002',
     'http://10.10.220.31:3001',
     'http://localhost:5001',
     'https://sohiaviation.com',
@@ -148,4 +149,6 @@ exports.origin = [
     'https://www.ticketbd.net',
     'https://monihartoursandtravels.com',
     'https://www.monihartoursandtravels.com',
+    'https://b2b.amarbooking.com',
+    'https://www.b2b.amarbooking.com',
 ];

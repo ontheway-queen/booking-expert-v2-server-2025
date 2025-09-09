@@ -134,6 +134,8 @@ export class SubAgentFlightService extends AbstractServices {
       let sabreData: any[] = [];
       let customData: any[] = [];
 
+      console.log({ sabre_supplier_id });
+
       if (sabre_supplier_id) {
         const sabreSubService = new SabreFlightService(trx);
         sabreData = await sabreSubService.FlightSearch({

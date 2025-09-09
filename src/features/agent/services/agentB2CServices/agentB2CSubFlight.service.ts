@@ -85,7 +85,7 @@ export class AgentB2CSubFlightService extends AbstractServices {
   public async updateBooking(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
-      const { name, user_email, user_id } = req.admin;
+      const { name, user_email, user_id } = req.agencyUser;
       const {
         status,
         airline_pnr,
