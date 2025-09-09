@@ -230,11 +230,16 @@ class AgentSubAgentService extends abstract_service_1.default {
                 if (!checkAgency) {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
                 }
-                if (checkAgency.status === 'Incomplete' ||
-                    checkAgency.status === 'Pending' ||
-                    checkAgency.status === 'Rejected') {
-                    throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
-                }
+                // if (
+                //   checkAgency.status === 'Incomplete' ||
+                //   checkAgency.status === 'Pending' ||
+                //   checkAgency.status === 'Rejected'
+                // ) {
+                //   throw new CustomError(
+                //     this.ResMsg.HTTP_NOT_FOUND,
+                //     this.StatusCode.HTTP_NOT_FOUND
+                //   );
+                // }
                 const _a = req.body, { flight_markup_type, hotel_markup_type, flight_markup_mode, hotel_markup_mode, flight_markup, hotel_markup } = _a, rest = __rest(_a, ["flight_markup_type", "hotel_markup_type", "flight_markup_mode", "hotel_markup_mode", "flight_markup", "hotel_markup"]);
                 const files = req.files || [];
                 const payload = rest;

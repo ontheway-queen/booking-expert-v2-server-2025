@@ -267,16 +267,16 @@ export default class AgentSubAgentService extends AbstractServices {
         );
       }
 
-      if (
-        checkAgency.status === 'Incomplete' ||
-        checkAgency.status === 'Pending' ||
-        checkAgency.status === 'Rejected'
-      ) {
-        throw new CustomError(
-          this.ResMsg.HTTP_NOT_FOUND,
-          this.StatusCode.HTTP_NOT_FOUND
-        );
-      }
+      // if (
+      //   checkAgency.status === 'Incomplete' ||
+      //   checkAgency.status === 'Pending' ||
+      //   checkAgency.status === 'Rejected'
+      // ) {
+      //   throw new CustomError(
+      //     this.ResMsg.HTTP_NOT_FOUND,
+      //     this.StatusCode.HTTP_NOT_FOUND
+      //   );
+      // }
 
       const {
         flight_markup_type,
