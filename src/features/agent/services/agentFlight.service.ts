@@ -706,19 +706,21 @@ export class AgentFlightService extends AbstractServices {
             if (grnData.airline_pnr) {
               payload.airline_pnr = grnData.airline_pnr;
             }
-          } else if (data.api === VERTEIL_API) {
-            const verteilSubService = new VerteilFlightService(trx);
-            const res = await verteilSubService.FlightBookService({
-              search_id: body.search_id,
-              flight_id: body.flight_id,
-              passengers: body.passengers,
-            });
-            payload.gds_pnr = res.pnr;
-            payload.airline_pnr = res.pnr;
-            payload.ticket_issue_last_time = res.paymentTimeLimit;
-            payload.api_booking_ref = res.apiBookingId;
-            payload.status = FLIGHT_BOOKING_CONFIRMED;
-          } else if (data.api === CUSTOM_API) {
+          } 
+          // else if (data.api === VERTEIL_API) {
+          //   const verteilSubService = new VerteilFlightService(trx);
+          //   const res = await verteilSubService.FlightBookService({
+          //     search_id: body.search_id,
+          //     flight_id: body.flight_id,
+          //     passengers: body.passengers,
+          //   });
+          //   payload.gds_pnr = res.pnr;
+          //   payload.airline_pnr = res.pnr;
+          //   payload.ticket_issue_last_time = res.paymentTimeLimit;
+          //   payload.api_booking_ref = res.apiBookingId;
+          //   payload.status = FLIGHT_BOOKING_CONFIRMED;
+          // } 
+          else if (data.api === CUSTOM_API) {
             payload.status = FLIGHT_BOOKING_IN_PROCESS;
           }
         } else {
@@ -983,26 +985,27 @@ export class AgentFlightService extends AbstractServices {
               : FLIGHT_BOOKING_ON_HOLD;
             ticket_number = res.data;
           }
-        } else if (booking_data.api === VERTEIL_API) {
-          const segmentDetails =
-            await bookingSegmentModel.getFlightBookingSegment(Number(id));
-          const verteilSubService = new VerteilFlightService(trx);
-          const res = await verteilSubService.TicketIssueService({
-            airlineCode: segmentDetails[0].airline_code,
-            oldFare: {
-              vendor_total: booking_data.vendor_fare.net_fare,
-            },
-            passengers: get_travelers,
-            pnr: String(booking_data.airline_pnr),
-          });
+        } 
+        // else if (booking_data.api === VERTEIL_API) {
+        //   const segmentDetails =
+        //     await bookingSegmentModel.getFlightBookingSegment(Number(id));
+        //   const verteilSubService = new VerteilFlightService(trx);
+        //   const res = await verteilSubService.TicketIssueService({
+        //     airlineCode: segmentDetails[0].airline_code,
+        //     oldFare: {
+        //       vendor_total: booking_data.vendor_fare.net_fare,
+        //     },
+        //     passengers: get_travelers,
+        //     pnr: String(booking_data.airline_pnr),
+        //   });
 
-          if (res?.success) {
-            status = res.data?.length
-              ? FLIGHT_TICKET_ISSUE
-              : FLIGHT_BOOKING_ON_HOLD;
-            if (res?.data?.length) ticket_number = res.data;
-          }
-        }
+        //   if (res?.success) {
+        //     status = res.data?.length
+        //       ? FLIGHT_TICKET_ISSUE
+        //       : FLIGHT_BOOKING_ON_HOLD;
+        //     if (res?.data?.length) ticket_number = res.data;
+        //   }
+        // }
       }
       if (status !== null) {
         await agentFlightBookingSupportService.updateDataAfterTicketIssue({
