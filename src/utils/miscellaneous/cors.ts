@@ -154,4 +154,5 @@ export const origin: string[] = [
   'http://www.globalgatewaybd.com',
   'http://baitalnukhba.com',
   'http://www.baitalnukhba.com',
+  'https://ota.weflydream.com',
 ];
