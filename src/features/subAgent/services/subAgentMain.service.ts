@@ -163,12 +163,12 @@ export class SubAgentMainService extends AbstractServices {
         );
 
         //--change it
-        let secret = config.JWT_SECRET_AGENT_B2C;
+        let secret = config.JWT_SECRET_AGENT + type;
         let tokenValidity: SignOptions['expiresIn'] = '3m';
 
         switch (type) {
-          case OTP_TYPES.reset_agent_b2c:
-            secret = config.JWT_SECRET_AGENT_B2C;
+          case OTP_TYPES.reset_sub_agent:
+            secret = config.JWT_SECRET_AGENT + type;
             break;
 
           default:

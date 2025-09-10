@@ -646,6 +646,8 @@ export default class AuthSubAgentService extends AbstractServices {
       config.JWT_SECRET_AGENT + OTP_TYPES.reset_sub_agent
     );
 
+    console.log({ data });
+
     if (!data) {
       return {
         success: false,
