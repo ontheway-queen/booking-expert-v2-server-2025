@@ -502,7 +502,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                 };
             }
             const { email, type } = data;
-            if (type !== constants_1.OTP_TYPES.reset_agent) {
+            if (type !== constants_1.OTP_TYPES.reset_sub_agent) {
                 return {
                     success: false,
                     code: this.StatusCode.HTTP_FORBIDDEN,

@@ -657,7 +657,7 @@ export default class AuthSubAgentService extends AbstractServices {
     }
     const { email, type } = data;
 
-    if (type !== OTP_TYPES.reset_agent) {
+    if (type !== OTP_TYPES.reset_sub_agent) {
       return {
         success: false,
         code: this.StatusCode.HTTP_FORBIDDEN,

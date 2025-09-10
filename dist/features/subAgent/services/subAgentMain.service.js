@@ -150,11 +150,11 @@ class SubAgentMainService extends abstract_service_1.default {
                         matched: 1,
                     }, { id: email_otp_id });
                     //--change it
-                    let secret = config_1.default.JWT_SECRET_AGENT + type;
+                    let secret = config_1.default.JWT_SECRET_AGENT;
                     let tokenValidity = '3m';
                     switch (type) {
                         case constants_1.OTP_TYPES.reset_sub_agent:
-                            secret = config_1.default.JWT_SECRET_AGENT + type;
+                            secret = config_1.default.JWT_SECRET_AGENT;
                             break;
                         default:
                             break;
