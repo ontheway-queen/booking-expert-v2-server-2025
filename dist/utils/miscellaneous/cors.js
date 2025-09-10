@@ -153,4 +153,8 @@ exports.origin = [
     'https://www.b2b.amarbooking.com',
     'https://ezflight.net',
     'https://www.ezflight.net',
+    'http://globalgatewaybd.com',
+    'http://www.globalgatewaybd.com',
+    'http://baitalnukhba.com',
+    'http://www.baitalnukhba.com',
 ];
