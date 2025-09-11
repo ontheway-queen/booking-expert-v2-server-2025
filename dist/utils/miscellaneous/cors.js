@@ -158,4 +158,12 @@ exports.origin = [
     'https://baitalnukhba.com',
     'https://www.baitalnukhba.com',
     'https://ota.weflydream.com',
+    'https://flyaxies.com',
+    'https://www.flyaxies.com',
+    'https://ark-travels.com',
+    'https://www.ark-travels.com',
+    'https://flight.ontheway.com.bd',
+    'https://www.flight.ontheway.com.bd',
+    'https://airbeeholidays.com',
+    'https://www.airbeeholidays.com',
 ];
