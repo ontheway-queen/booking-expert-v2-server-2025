@@ -173,4 +173,12 @@ export const origin: string[] = [
   'https://www.knglobaltravels.com',
   'https://trustglobalbd.com',
   'https://www.trustglobalbd.com',
+  'https://tripondemands.com',
+  'https://www.tripondemands.com',
+  'https://travelworldconsultancy.com',
+  'https://www.travelworldconsultancy.com',
+  'https://mollahtravelsbd.com',
+  'https://www.mollahtravelsbd.com',
+  'https://sydneytradeint.com',
+  'https://www.sydneytradeint.com',
 ];
