@@ -40,7 +40,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const query = req.query;
             const AgencyModel = this.Model.AgencyModel();
-            const data = yield AgencyModel.getAgencyList(query, true);
+            const data = yield AgencyModel.getAgencyList(Object.assign(Object.assign({}, query), { agency_type: constants_1.SOURCE_AGENT }), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -451,6 +451,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 const adminModel = this.Model.AdminModel(trx);
                 const checkSubAgentName = yield agencyModel.checkAgency({
                     name: body.agency_name,
+                    agency_type: constants_1.SOURCE_AGENT,
                 });
                 if (checkSubAgentName) {
                     return {
@@ -461,6 +462,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 }
                 const checkAgentUser = yield agencyUserModel.checkUser({
                     email: body.email,
+                    agency_type: constants_1.SOURCE_AGENT,
                 });
                 if (checkAgentUser) {
                     return {

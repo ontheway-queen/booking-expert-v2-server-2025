@@ -37,7 +37,10 @@ export default class AdminAgentAgencyService extends AbstractServices {
     const query = req.query as unknown as IAdminAgentGetAgencyReqQuery;
     const AgencyModel = this.Model.AgencyModel();
 
-    const data = await AgencyModel.getAgencyList(query, true);
+    const data = await AgencyModel.getAgencyList(
+      { ...query, agency_type: SOURCE_AGENT },
+      true
+    );
 
     return {
       success: true,
@@ -556,6 +559,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       const checkSubAgentName = await agencyModel.checkAgency({
         name: body.agency_name,
+        agency_type: SOURCE_AGENT,
       });
 
       if (checkSubAgentName) {
@@ -569,6 +573,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       const checkAgentUser = await agencyUserModel.checkUser({
         email: body.email,
+        agency_type: SOURCE_AGENT,
       });
 
       if (checkAgentUser) {

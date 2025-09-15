@@ -108,7 +108,7 @@ export class SubAgentPaymentsService extends AbstractServices {
       let docs = '';
       files.forEach((file) => {
         switch (file.fieldname) {
-          case 'docs':
+          case 'document':
             docs = file.filename;
             break;
           default:
