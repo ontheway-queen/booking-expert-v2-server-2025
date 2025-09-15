@@ -585,6 +585,7 @@ export default class SabreFlightService extends AbstractServices {
           Number(passenger_info.passengerTotalFare.equivalentAmount) *
           ((commission + agent_discount) /
             Number(fare.totalFare.equivalentAmount));
+
         const per_pax_markup = (markup + agent_markup) / pax_count;
 
         const total_pax_markup = pax_markup + per_pax_markup;
