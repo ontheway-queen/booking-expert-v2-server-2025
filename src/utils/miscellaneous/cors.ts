@@ -195,4 +195,8 @@ export const origin: string[] = [
   'https://www.priyotours.net',
   'https://b2b.flyngo.xyz',
   'https://www.b2b.flyngo.xyz',
+  'https://huzrat.com',
+  'https://www.huzrat.com',
+  'https://ahtravelsbd.com',
+  'https://www.ahtravelsbd.com',
 ];
