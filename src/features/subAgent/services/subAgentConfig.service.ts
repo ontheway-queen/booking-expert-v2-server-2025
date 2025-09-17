@@ -47,6 +47,11 @@ export class SubAgentConfigService extends AbstractServices {
         status: true,
       });
 
+      const hotDeals = await configModel.getHotDeals({
+        agency_id,
+        status: true,
+      });
+
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
@@ -54,6 +59,7 @@ export class SubAgentConfigService extends AbstractServices {
         data: {
           site_data: restData,
           social_links,
+          hot_deals: hotDeals,
           popup: {
             allow: popUpBanner.length ? true : false,
             pop_up_data: popUpBanner[0],

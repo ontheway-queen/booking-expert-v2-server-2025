@@ -53,6 +53,10 @@ class SubAgentConfigService extends abstract_service_1.default {
                     pop_up_for: 'AGENT',
                     status: true,
                 });
+                const hotDeals = yield configModel.getHotDeals({
+                    agency_id,
+                    status: true,
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -60,6 +64,7 @@ class SubAgentConfigService extends abstract_service_1.default {
                     data: {
                         site_data: restData,
                         social_links,
+                        hot_deals: hotDeals,
                         popup: {
                             allow: popUpBanner.length ? true : false,
                             pop_up_data: popUpBanner[0],
