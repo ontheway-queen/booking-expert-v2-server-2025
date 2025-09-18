@@ -38,6 +38,7 @@ export default class AuthSubAgentService extends AbstractServices {
       const AgentModel = this.Model.AgencyModel(trx);
       const AgencyUserModel = this.Model.AgencyUserModel(trx);
       const commonModel = this.Model.CommonModel(trx);
+      const SubAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
 
       const files = (req.files as Express.Multer.File[]) || [];
 
@@ -151,6 +152,16 @@ export default class AuthSubAgentService extends AbstractServices {
           national_id,
           agency_type: SOURCE_SUB_AGENT,
           ref_agent_id: main_agent,
+        });
+
+        await SubAgentMarkupModel.createSubAgentMarkup({
+          agency_id: newAgency[0].id,
+          flight_markup_mode: 'INCREASE',
+          hotel_markup_mode: 'INCREASE',
+          flight_markup_type: 'PER',
+          hotel_markup_type: 'PER',
+          flight_markup: 1,
+          hotel_markup: 1,
         });
 
         const newRole = await AgencyUserModel.createRole({

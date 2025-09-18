@@ -32,6 +32,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                 const AgentModel = this.Model.AgencyModel(trx);
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
                 const commonModel = this.Model.CommonModel(trx);
+                const SubAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
                 const files = req.files || [];
                 const checkAgentName = yield AgentModel.checkAgency({
                     name: agency_name,
@@ -128,6 +129,15 @@ class AuthSubAgentService extends abstract_service_1.default {
                         national_id,
                         agency_type: constants_1.SOURCE_SUB_AGENT,
                         ref_agent_id: main_agent,
+                    });
+                    yield SubAgentMarkupModel.createSubAgentMarkup({
+                        agency_id: newAgency[0].id,
+                        flight_markup_mode: 'INCREASE',
+                        hotel_markup_mode: 'INCREASE',
+                        flight_markup_type: 'PER',
+                        hotel_markup_type: 'PER',
+                        flight_markup: 1,
+                        hotel_markup: 1,
                     });
                     const newRole = yield AgencyUserModel.createRole({
                         agency_id: newAgency[0].id,

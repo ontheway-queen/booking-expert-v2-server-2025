@@ -169,7 +169,7 @@ export default class AgentSubAgentService extends AbstractServices {
 
       await EmailSendLib.sendEmailAgent(trx, agency_id, {
         email,
-        emailSub: `Booking Expert Agency Credentials`,
+        emailSub: `${agency_name} Agency Credentials`,
         emailBody: registrationVerificationCompletedTemplate(agency_name, {
           email: email,
           password: password,
@@ -232,6 +232,14 @@ export default class AgentSubAgentService extends AbstractServices {
         };
       }
 
+      const {
+        flight_markup_set,
+        hotel_markup_set,
+        flight_markup_set_name,
+        hotel_markup_set_name,
+        ...rest
+      } = data;
+
       const markup_data = await subAgentMarkupModel.getSubAgentMarkup(
         Number(id)
       );
@@ -241,8 +249,18 @@ export default class AgentSubAgentService extends AbstractServices {
         code: this.StatusCode.HTTP_OK,
         message: this.ResMsg.HTTP_OK,
         data: {
-          ...data,
-          markup_data,
+          ...rest,
+          markup_data: markup_data
+            ? markup_data
+            : {
+                agency_id: id,
+                flight_markup_type: 'PER',
+                hotel_markup_type: 0,
+                flight_markup_mode: 'INCREASE',
+                hotel_markup_mode: 'INCREASE',
+                flight_markup: 0,
+                hotel_markup: 0,
+              },
         },
       };
     });
@@ -371,6 +389,7 @@ export default class AgentSubAgentService extends AbstractServices {
         hotel_markup_type
       ) {
         const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
+
         await subAgentMarkupModel.updateSubAgentMarkup(
           {
             flight_markup_mode,

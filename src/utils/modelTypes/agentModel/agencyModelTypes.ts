@@ -117,6 +117,8 @@ export interface IGetSingleAgencyData {
   allow_api: boolean;
   flight_markup_set: string;
   hotel_markup_set: string;
+  flight_markup_set_name: string;
+  hotel_markup_set_name: string;
   ref_id?: number;
   ref_agent_id?: number;
   agency_type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;

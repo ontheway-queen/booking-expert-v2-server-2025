@@ -149,7 +149,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                 });
                 yield emailSendLib_1.default.sendEmailAgent(trx, agency_id, {
                     email,
-                    emailSub: `Booking Expert Agency Credentials`,
+                    emailSub: `${agency_name} Agency Credentials`,
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(agency_name, {
                         email: email,
                         password: password,
@@ -205,12 +205,23 @@ class AgentSubAgentService extends abstract_service_1.default {
                         message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
+                const { flight_markup_set, hotel_markup_set, flight_markup_set_name, hotel_markup_set_name } = data, rest = __rest(data, ["flight_markup_set", "hotel_markup_set", "flight_markup_set_name", "hotel_markup_set_name"]);
                 const markup_data = yield subAgentMarkupModel.getSubAgentMarkup(Number(id));
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: Object.assign(Object.assign({}, data), { markup_data }),
+                    data: Object.assign(Object.assign({}, rest), { markup_data: markup_data
+                            ? markup_data
+                            : {
+                                agency_id: id,
+                                flight_markup_type: 'PER',
+                                hotel_markup_type: 0,
+                                flight_markup_mode: 'INCREASE',
+                                hotel_markup_mode: 'INCREASE',
+                                flight_markup: 0,
+                                hotel_markup: 0,
+                            } }),
                 };
             }));
         });
