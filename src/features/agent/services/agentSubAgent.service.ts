@@ -5,6 +5,7 @@ import {
   IAgentGetSubAgencyReqQuery,
   IAgentSubAgencyUsersQueryFilter,
   IAgentUpdateSubAgencyPayload,
+  IAgentUpdateSubAgencyUserReqBody,
 } from '../utils/types/agentSubAgent.types';
 import CustomError from '../../../utils/lib/customError';
 import Lib from '../../../utils/lib/lib';
@@ -14,6 +15,7 @@ import {
 } from '../../../utils/miscellaneous/constants';
 import EmailSendLib from '../../../utils/lib/emailSendLib';
 import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
+import { IUpdateAgencyUserPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
 
 export default class AgentSubAgentService extends AbstractServices {
   constructor() {
@@ -426,5 +428,71 @@ export default class AgentSubAgentService extends AbstractServices {
       data: users.data,
       total: users.total,
     };
+  }
+
+  public async updateAgencyUser(req: Request) {
+    return this.db.transaction(async (trx) => {
+      const { agency_id, user_id } = req.params;
+      const { agency_id: my_agency_id } = req.agencyB2CWhiteLabel;
+      const AgencyUserModel = this.Model.AgencyUserModel(trx);
+      const checkUser = await AgencyUserModel.checkUser({
+        id: Number(user_id),
+        agency_id: Number(agency_id),
+        agency_type: 'SUB AGENT',
+        ref_agent_id: my_agency_id,
+      });
+
+      if (!checkUser) {
+        throw new CustomError(
+          this.ResMsg.HTTP_NOT_FOUND,
+          this.StatusCode.HTTP_NOT_FOUND
+        );
+      }
+
+      const body = req.body as IAgentUpdateSubAgencyUserReqBody;
+
+      const files = (req.files as Express.Multer.File[]) || [];
+
+      const payload: IUpdateAgencyUserPayload = body;
+
+      if (files.length) {
+        payload.photo = files[0].filename;
+      }
+
+      if (payload.email) {
+        const checkEmail = await AgencyUserModel.checkUser({
+          email: body.email,
+          agency_id: Number(agency_id),
+          agency_type: 'SUB AGENT',
+          ref_agent_id: my_agency_id,
+        });
+
+        if (checkEmail) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_CONFLICT,
+            message: 'Email already exists. Please use another email',
+          };
+        }
+      }
+
+      await AgencyUserModel.updateUser(payload, {
+        agency_id: Number(agency_id),
+        id: Number(user_id),
+      });
+
+      if (checkUser.photo && payload.photo) {
+        await this.manageFile.deleteFromCloud([checkUser.photo]);
+      }
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        message: this.ResMsg.HTTP_OK,
+        data: {
+          photo: payload.photo,
+        },
+      };
+    });
   }
 }

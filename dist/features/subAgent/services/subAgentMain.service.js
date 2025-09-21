@@ -126,7 +126,6 @@ class SubAgentMainService extends abstract_service_1.default {
                 const checkOtp = yield commonModel.getOTP({
                     email,
                     type,
-                    agency_id,
                 });
                 if (!checkOtp.length) {
                     return {

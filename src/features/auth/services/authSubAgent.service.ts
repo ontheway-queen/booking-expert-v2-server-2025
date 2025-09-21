@@ -651,13 +651,12 @@ export default class AuthSubAgentService extends AbstractServices {
 
   public async resetPassword(req: Request) {
     const { password, token } = req.body as IResetPassReqBody;
+    const { agency_id } = req.agencyB2CWhiteLabel;
 
     const data: any = Lib.verifyToken(
       token,
       config.JWT_SECRET_AGENT + OTP_TYPES.reset_sub_agent
     );
-
-    console.log({ data });
 
     if (!data) {
       return {
@@ -680,7 +679,11 @@ export default class AuthSubAgentService extends AbstractServices {
 
     const hashed_password = await Lib.hashValue(password);
 
-    await AgencyUserModel.updateUserByEmail({ hashed_password }, email);
+    await AgencyUserModel.updateUserByEmail(
+      { hashed_password },
+      email,
+      agency_id
+    );
 
     return {
       success: true,

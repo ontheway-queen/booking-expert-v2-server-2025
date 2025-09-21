@@ -60,4 +60,19 @@ export class AgentSubAgentController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public updateAgencyUser = this.asyncWrapper.wrap(
+    {
+      paramSchema: this.commonValidator.multipleParamsNumValidator([
+        'agency_id',
+        'user_id',
+      ]),
+
+      bodySchema: this.validator.updateAgencyUser,
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.updateAgencyUser(req);
+      res.status(code).json(rest);
+    }
+  );
 }

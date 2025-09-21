@@ -199,4 +199,6 @@ export const origin: string[] = [
   'https://www.huzrat.com',
   'https://ahtravelsbd.com',
   'https://www.ahtravelsbd.com',
+  'https://flycon.net',
+  'https://www.flycon.net',
 ];

@@ -502,8 +502,8 @@ class AuthSubAgentService extends abstract_service_1.default {
     resetPassword(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const { password, token } = req.body;
+            const { agency_id } = req.agencyB2CWhiteLabel;
             const data = lib_1.default.verifyToken(token, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.reset_sub_agent);
-            console.log({ data });
             if (!data) {
                 return {
                     success: false,
@@ -521,7 +521,7 @@ class AuthSubAgentService extends abstract_service_1.default {
             }
             const AgencyUserModel = this.Model.AgencyUserModel();
             const hashed_password = yield lib_1.default.hashValue(password);
-            yield AgencyUserModel.updateUserByEmail({ hashed_password }, email);
+            yield AgencyUserModel.updateUserByEmail({ hashed_password }, email, agency_id);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,

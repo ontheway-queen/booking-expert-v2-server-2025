@@ -1,5 +1,5 @@
-import AbstractRouter from '../../../abstract/abstract.router';
 import { AgentSubAgentController } from '../controllers/agentSubAgent.controller';
+import AbstractRouter from '../../../abstract/abstract.router';
 
 export default class AgentSubAgentRouter extends AbstractRouter {
   private controller = new AgentSubAgentController();
@@ -36,5 +36,12 @@ export default class AgentSubAgentRouter extends AbstractRouter {
       );
 
     this.router.route('/:id/users').get(this.controller.getAllUsersOfAgency);
+
+    this.router
+      .route('/:agent_id/users/:user_id')
+      .patch(
+        this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_USER, ['photo']),
+        this.controller.updateAgencyUser
+      );
   }
 }

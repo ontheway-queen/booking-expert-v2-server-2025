@@ -51,12 +51,19 @@ export default class AgencyUserModel extends Schema {
 
   public async updateUserByEmail(
     payload: IUpdateAgencyUserPayload,
-    email: string
+    email: string,
+    ref_agent_id?: number
   ) {
-    return await this.db('agency_user')
+    return await this.db('agency_user AS au')
       .withSchema(this.AGENT_SCHEMA)
       .update(payload)
-      .where('email', email);
+      .leftJoin('agency AS a', 'au.agency_id', 'a.id')
+      .where((qb) => {
+        qb.andWhere('au.email', email);
+        if (ref_agent_id) {
+          qb.andWhere('a.ref_agent_id', ref_agent_id);
+        }
+      });
   }
 
   // get user list

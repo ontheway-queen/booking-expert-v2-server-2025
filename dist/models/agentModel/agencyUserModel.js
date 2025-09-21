@@ -37,12 +37,18 @@ class AgencyUserModel extends schema_1.default {
                 .andWhere('agency_id', agency_id);
         });
     }
-    updateUserByEmail(payload, email) {
+    updateUserByEmail(payload, email, ref_agent_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('agency_user')
+            return yield this.db('agency_user AS au')
                 .withSchema(this.AGENT_SCHEMA)
                 .update(payload)
-                .where('email', email);
+                .leftJoin('agency AS a', 'au.agency_id', 'a.id')
+                .where((qb) => {
+                qb.andWhere('au.email', email);
+                if (ref_agent_id) {
+                    qb.andWhere('a.ref_agent_id', ref_agent_id);
+                }
+            });
         });
     }
     // get user list

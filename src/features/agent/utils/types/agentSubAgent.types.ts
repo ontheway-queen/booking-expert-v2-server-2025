@@ -43,3 +43,11 @@ export interface IAgentSubAgencyUsersQueryFilter {
   skip?: string;
   status?: boolean;
 }
+
+export interface IAgentUpdateSubAgencyUserReqBody {
+  name?: string;
+  email?: string;
+  phone_number?: string;
+  is_main_user?: boolean;
+  status?: boolean;
+}

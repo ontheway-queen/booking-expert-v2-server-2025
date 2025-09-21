@@ -32,6 +32,7 @@ export class SubAgentMainService extends AbstractServices {
             agency_type: SOURCE_SUB_AGENT,
             ref_agent_id: agency_id,
           });
+
           if (!check_user) {
             return {
               success: false,
@@ -127,7 +128,6 @@ export class SubAgentMainService extends AbstractServices {
       const checkOtp = await commonModel.getOTP({
         email,
         type,
-        agency_id,
       });
 
       if (!checkOtp.length) {

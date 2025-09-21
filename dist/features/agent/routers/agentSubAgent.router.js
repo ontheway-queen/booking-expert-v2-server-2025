@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const abstract_router_1 = __importDefault(require("../../../abstract/abstract.router"));
 const agentSubAgent_controller_1 = require("../controllers/agentSubAgent.controller");
+const abstract_router_1 = __importDefault(require("../../../abstract/abstract.router"));
 class AgentSubAgentRouter extends abstract_router_1.default {
     constructor() {
         super();
@@ -31,6 +31,9 @@ class AgentSubAgentRouter extends abstract_router_1.default {
             'national_id',
         ]), this.controller.updateAgency);
         this.router.route('/:id/users').get(this.controller.getAllUsersOfAgency);
+        this.router
+            .route('/:agent_id/users/:user_id')
+            .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_USER, ['photo']), this.controller.updateAgencyUser);
     }
 }
 exports.default = AgentSubAgentRouter;
