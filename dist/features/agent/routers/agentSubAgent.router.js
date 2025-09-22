@@ -32,7 +32,7 @@ class AgentSubAgentRouter extends abstract_router_1.default {
         ]), this.controller.updateAgency);
         this.router.route('/:id/users').get(this.controller.getAllUsersOfAgency);
         this.router
-            .route('/:agent_id/users/:user_id')
+            .route('/:agency_id/users/:user_id')
             .patch(this.uploader.cloudUploadRaw(this.fileFolders.AGENCY_USER, ['photo']), this.controller.updateAgencyUser);
     }
 }

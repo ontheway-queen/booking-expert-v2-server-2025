@@ -350,7 +350,7 @@ class AgentSubAgentService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id, user_id } = req.params;
-                const { agency_id: my_agency_id } = req.agencyB2CWhiteLabel;
+                const { agency_id: my_agency_id } = req.agencyUser;
                 const AgencyUserModel = this.Model.AgencyUserModel(trx);
                 const checkUser = yield AgencyUserModel.checkUser({
                     id: Number(user_id),

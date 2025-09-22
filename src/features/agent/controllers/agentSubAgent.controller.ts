@@ -67,7 +67,6 @@ export class AgentSubAgentController extends AbstractController {
         'agency_id',
         'user_id',
       ]),
-
       bodySchema: this.validator.updateAgencyUser,
     },
     async (req: Request, res: Response) => {

@@ -433,7 +433,7 @@ export default class AgentSubAgentService extends AbstractServices {
   public async updateAgencyUser(req: Request) {
     return this.db.transaction(async (trx) => {
       const { agency_id, user_id } = req.params;
-      const { agency_id: my_agency_id } = req.agencyB2CWhiteLabel;
+      const { agency_id: my_agency_id } = req.agencyUser;
       const AgencyUserModel = this.Model.AgencyUserModel(trx);
       const checkUser = await AgencyUserModel.checkUser({
         id: Number(user_id),
