@@ -1,13 +1,13 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
-import { IBookAgentB2CUmrahPackageReqBody } from '../utils/types/agentB2CUmrah.types';
 import Lib from '../../../utils/lib/lib';
 import {
-  SOURCE_AGENT_B2C,
+  SOURCE_SUB_AGENT,
   UMRAH_BOOKING_STATUS_CANCELLED,
 } from '../../../utils/miscellaneous/constants';
+import { IBookSubAgentUmrahPackageReqBody } from '../utils/types/subAgentUmrah.types';
 
-export default class AgentB2CUmrahService extends AbstractServices {
+export default class SubAgentUmrahService extends AbstractServices {
   constructor() {
     super();
   }
@@ -68,17 +68,17 @@ export default class AgentB2CUmrahService extends AbstractServices {
 
   public async bookUmrahPackages(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyB2CWhiteLabel;
-      const { user_id } = req.agencyB2CUser;
+      const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
+      const { user_id, agency_id } = req.agencyUser;
       const { id } = req.params;
       const { traveler_adult, traveler_child, note, ...contact } =
-        req.body as IBookAgentB2CUmrahPackageReqBody;
+        req.body as IBookSubAgentUmrahPackageReqBody;
 
       const umrahBookingModel = this.Model.UmrahBookingModel(trx);
       const umrahModel = this.Model.UmrahPackageModel(trx);
 
       const check = await umrahModel.getSingleAgentB2CUmrahPackageDetails({
-        source_id: agency_id,
+        source_id: main_agency_id,
         umrah_id: Number(id),
       });
 
@@ -107,7 +107,7 @@ export default class AgentB2CUmrahService extends AbstractServices {
         note_from_customer: note,
         per_adult_price: Number(check.adult_price),
         per_child_price: Number(check.child_price),
-        source_type: SOURCE_AGENT_B2C,
+        source_type: SOURCE_SUB_AGENT,
         traveler_adult: traveler_adult,
         traveler_child: traveler_child,
         total_price: total_adult_price + total_child_price,
@@ -130,8 +130,7 @@ export default class AgentB2CUmrahService extends AbstractServices {
   }
 
   public async getUmrahPackagesBooking(req: Request) {
-    const { agency_id } = req.agencyB2CWhiteLabel;
-    const { user_id } = req.agencyB2CUser;
+    const { user_id, agency_id } = req.agencyUser;
     const UmrahBookingModel = this.Model.UmrahBookingModel();
 
     const query = req.query as {
@@ -145,7 +144,7 @@ export default class AgentB2CUmrahService extends AbstractServices {
     const data = await UmrahBookingModel.getAgentB2CUmrahBookingList(
       {
         agency_id,
-        source_type: SOURCE_AGENT_B2C,
+        source_type: SOURCE_SUB_AGENT,
         user_id,
         ...query,
       },
@@ -162,8 +161,7 @@ export default class AgentB2CUmrahService extends AbstractServices {
   }
 
   public async getSingleUmrahBooking(req: Request) {
-    const { agency_id } = req.agencyB2CWhiteLabel;
-    const { user_id } = req.agencyB2CUser;
+    const { user_id, agency_id } = req.agencyUser;
     const { id } = req.params;
     const booking_id = Number(id);
     const UmrahBookingModel = this.Model.UmrahBookingModel();
@@ -171,7 +169,7 @@ export default class AgentB2CUmrahService extends AbstractServices {
     const data = await UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
       id: booking_id,
       source_id: agency_id,
-      source_type: SOURCE_AGENT_B2C,
+      source_type: SOURCE_SUB_AGENT,
       user_id,
     });
 
@@ -197,15 +195,14 @@ export default class AgentB2CUmrahService extends AbstractServices {
   }
 
   public async cancelUmrahBooking(req: Request) {
-    const { agency_id } = req.agencyB2CWhiteLabel;
-    const { user_id } = req.agencyB2CUser;
+    const { user_id, agency_id } = req.agencyUser;
     const { id } = req.params;
     const booking_id = Number(id);
     const UmrahBookingModel = this.Model.UmrahBookingModel();
 
     const data = await UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
       id: booking_id,
-      source_type: SOURCE_AGENT_B2C,
+      source_type: SOURCE_SUB_AGENT,
       source_id: agency_id,
       user_id,
     });

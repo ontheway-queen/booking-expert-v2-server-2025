@@ -21,17 +21,23 @@ class UmrahPackageModel extends schema_1.default {
     }
     insertUmrahPackage(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
+            return yield this.db('umrah_package')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload, 'id');
         });
     }
     insertUmrahPackageImage(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package_photos').withSchema(this.SERVICE_SCHEMA).insert(payload);
+            return yield this.db('umrah_package_photos')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload);
         });
     }
     insertPackageInclude(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_package_include').withSchema(this.SERVICE_SCHEMA).insert(payload);
+            return yield this.db('umrah_package_include')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload);
         });
     }
     getUmrahPackageInclude(umrah_id) {

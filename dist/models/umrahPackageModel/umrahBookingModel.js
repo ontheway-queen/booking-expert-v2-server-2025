@@ -21,7 +21,9 @@ class UmrahBookingModel extends schema_1.default {
     }
     insertUmrahBooking(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('umrah_booking').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
+            return yield this.db('umrah_booking')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload, 'id');
         });
     }
     updateUmrahBooking(payload, booking_id) {
@@ -42,7 +44,7 @@ class UmrahBookingModel extends schema_1.default {
                 .joinRaw('LEFT JOIN agent_b2c.users AS abu ON ub.user_id = abu.id')
                 .where((qb) => {
                 var _a;
-                qb.where('ub.source_type', constants_1.SOURCE_AGENT_B2C).andWhere('ub.source_id', query.agency_id);
+                qb.where('ub.source_type', query.source_type).andWhere('ub.source_id', query.agency_id);
                 if (query.user_id) {
                     qb.andWhere('ub.user_id', query.user_id);
                 }
@@ -64,7 +66,7 @@ class UmrahBookingModel extends schema_1.default {
                     .count('* AS total')
                     .withSchema(this.SERVICE_SCHEMA)
                     .where((qb) => {
-                    qb.where('ub.source_type', constants_1.SOURCE_AGENT_B2C).andWhere('ub.source_id', query.agency_id);
+                    qb.where('ub.source_type', query.source_type).andWhere('ub.source_id', query.agency_id);
                     if (query.user_id) {
                         qb.andWhere('ub.user_id', query.user_id);
                     }
@@ -72,7 +74,10 @@ class UmrahBookingModel extends schema_1.default {
                         qb.andWhere('ub.status', query.status);
                     }
                     if (query.from_date && query.to_date) {
-                        qb.andWhereBetween('ub.created_at', [query.from_date, query.to_date]);
+                        qb.andWhereBetween('ub.created_at', [
+                            query.from_date,
+                            query.to_date,
+                        ]);
                     }
                 });
             }
@@ -92,7 +97,7 @@ class UmrahBookingModel extends schema_1.default {
                 .leftJoin('umrah_package AS up', 'up.id', 'ub.umrah_id')
                 .andWhere('ub.id', query.id)
                 .andWhere('ub.source_id', query.source_id)
-                .andWhere('ub.source_type', constants_1.SOURCE_AGENT_B2C)
+                .andWhere('ub.source_type', query.source_type)
                 .where((qb) => {
                 if (query.user_id) {
                     qb.andWhere('ub.user_id', query.user_id);

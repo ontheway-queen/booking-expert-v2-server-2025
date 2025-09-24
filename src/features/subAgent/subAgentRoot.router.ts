@@ -10,6 +10,9 @@ import SubAgentFlightRouter from './routers/subAgentFlight.router';
 import SubAgentDashboardRouter from './routers/subAgentDash.router';
 import SubAgentTravelerRouter from './routers/subAgentTra.router';
 import SubAgentAdministrationRouter from './routers/subAgentAdministration.router';
+import SubAgentUmrahRouter from './routers/agentB2CUmrah.router';
+import SubAgentHolidayRouter from './routers/agentB2CHoliday.router';
+import SubAgentVisaRouter from './routers/subAgentVisa.router';
 
 export default class SubAgentRootRouter {
   public Router = Router();
@@ -23,6 +26,9 @@ export default class SubAgentRootRouter {
   private subAgentTravelerRouter = new SubAgentTravelerRouter();
   private subAgentDashboardRouter = new SubAgentDashboardRouter();
   private subAgentAdministrationRouter = new SubAgentAdministrationRouter();
+  private subAgentUmrahRouter = new SubAgentUmrahRouter();
+  private subAgentHolidayRouter = new SubAgentHolidayRouter();
+  private subAgentVisaRouter = new SubAgentVisaRouter();
 
   private authChecker = new AuthChecker();
 
@@ -74,6 +80,24 @@ export default class SubAgentRootRouter {
       '/administration',
       this.authChecker.subAgentUserAuthChecker,
       this.subAgentAdministrationRouter.router
+    );
+
+    this.Router.use(
+      '/umrah',
+      this.authChecker.subAgentUserAuthChecker,
+      this.subAgentUmrahRouter.router
+    );
+
+    this.Router.use(
+      '/visa',
+      this.authChecker.subAgentUserAuthChecker,
+      this.subAgentVisaRouter.router
+    );
+
+    this.Router.use(
+      '/holiday',
+      this.authChecker.subAgentUserAuthChecker,
+      this.subAgentHolidayRouter.router
     );
   }
 }

@@ -204,4 +204,10 @@ exports.origin = [
     'https://www.ahtravelsbd.com',
     'https://flycon.net',
     'https://www.flycon.net',
+    'https://weflydream.com',
+    'https://www.weflydream.com',
+    'https://flight.mtt.com.bd',
+    'https://www.flight.mtt.com.bd',
+    'https://safwantravels.com',
+    'https://www.safwantravels.com',
 ];

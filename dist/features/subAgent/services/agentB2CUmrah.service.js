@@ -133,7 +133,8 @@ class AgentB2CUmrahService extends abstract_service_1.default {
             const { user_id } = req.agencyB2CUser;
             const UmrahBookingModel = this.Model.UmrahBookingModel();
             const query = req.query;
-            const data = yield UmrahBookingModel.getAgentB2CUmrahBookingList(Object.assign({ agency_id, source_type: constants_1.SOURCE_AGENT_B2C, user_id }, query), true);
+            const data = yield UmrahBookingModel.getAgentB2CUmrahBookingList(Object.assign({ agency_id,
+                user_id }, query), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -153,7 +154,6 @@ class AgentB2CUmrahService extends abstract_service_1.default {
             const data = yield UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
                 id: booking_id,
                 source_id: agency_id,
-                source_type: constants_1.SOURCE_AGENT_B2C,
                 user_id,
             });
             if (!data) {
@@ -181,7 +181,6 @@ class AgentB2CUmrahService extends abstract_service_1.default {
             const UmrahBookingModel = this.Model.UmrahBookingModel();
             const data = yield UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
                 id: booking_id,
-                source_type: constants_1.SOURCE_AGENT_B2C,
                 source_id: agency_id,
                 user_id,
             });

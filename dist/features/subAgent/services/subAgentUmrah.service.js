@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
-class AgentB2CUmrahService extends abstract_service_1.default {
+class SubAgentUmrahService extends abstract_service_1.default {
     constructor() {
         super();
     }
@@ -79,14 +79,14 @@ class AgentB2CUmrahService extends abstract_service_1.default {
     bookUmrahPackages(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyB2CWhiteLabel;
-                const { user_id } = req.agencyB2CUser;
+                const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
+                const { user_id, agency_id } = req.agencyUser;
                 const { id } = req.params;
                 const _a = req.body, { traveler_adult, traveler_child, note } = _a, contact = __rest(_a, ["traveler_adult", "traveler_child", "note"]);
                 const umrahBookingModel = this.Model.UmrahBookingModel(trx);
                 const umrahModel = this.Model.UmrahPackageModel(trx);
                 const check = yield umrahModel.getSingleAgentB2CUmrahPackageDetails({
-                    source_id: agency_id,
+                    source_id: main_agency_id,
                     umrah_id: Number(id),
                 });
                 if (!check) {
@@ -110,7 +110,7 @@ class AgentB2CUmrahService extends abstract_service_1.default {
                     note_from_customer: note,
                     per_adult_price: Number(check.adult_price),
                     per_child_price: Number(check.child_price),
-                    source_type: constants_1.SOURCE_AGENT_B2C,
+                    source_type: constants_1.SOURCE_SUB_AGENT,
                     traveler_adult: traveler_adult,
                     traveler_child: traveler_child,
                     total_price: total_adult_price + total_child_price,
@@ -129,11 +129,10 @@ class AgentB2CUmrahService extends abstract_service_1.default {
     }
     getUmrahPackagesBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyB2CWhiteLabel;
-            const { user_id } = req.agencyB2CUser;
+            const { user_id, agency_id } = req.agencyUser;
             const UmrahBookingModel = this.Model.UmrahBookingModel();
             const query = req.query;
-            const data = yield UmrahBookingModel.getAgentB2CUmrahBookingList(Object.assign({ agency_id, source_type: constants_1.SOURCE_AGENT_B2C, user_id }, query), true);
+            const data = yield UmrahBookingModel.getAgentB2CUmrahBookingList(Object.assign({ agency_id, source_type: constants_1.SOURCE_SUB_AGENT, user_id }, query), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -145,15 +144,14 @@ class AgentB2CUmrahService extends abstract_service_1.default {
     }
     getSingleUmrahBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyB2CWhiteLabel;
-            const { user_id } = req.agencyB2CUser;
+            const { user_id, agency_id } = req.agencyUser;
             const { id } = req.params;
             const booking_id = Number(id);
             const UmrahBookingModel = this.Model.UmrahBookingModel();
             const data = yield UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
                 id: booking_id,
                 source_id: agency_id,
-                source_type: constants_1.SOURCE_AGENT_B2C,
+                source_type: constants_1.SOURCE_SUB_AGENT,
                 user_id,
             });
             if (!data) {
@@ -174,14 +172,13 @@ class AgentB2CUmrahService extends abstract_service_1.default {
     }
     cancelUmrahBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { agency_id } = req.agencyB2CWhiteLabel;
-            const { user_id } = req.agencyB2CUser;
+            const { user_id, agency_id } = req.agencyUser;
             const { id } = req.params;
             const booking_id = Number(id);
             const UmrahBookingModel = this.Model.UmrahBookingModel();
             const data = yield UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
                 id: booking_id,
-                source_type: constants_1.SOURCE_AGENT_B2C,
+                source_type: constants_1.SOURCE_SUB_AGENT,
                 source_id: agency_id,
                 user_id,
             });
@@ -201,4 +198,4 @@ class AgentB2CUmrahService extends abstract_service_1.default {
         });
     }
 }
-exports.default = AgentB2CUmrahService;
+exports.default = SubAgentUmrahService;

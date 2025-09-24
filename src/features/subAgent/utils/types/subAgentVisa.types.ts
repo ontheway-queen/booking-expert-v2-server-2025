@@ -1,4 +1,4 @@
-export interface IAgentB2CVisaApplicationPayload {
+export interface ISubAgentVisaApplicationPayload {
   from_date: string;
   to_date: string;
   traveler: number;

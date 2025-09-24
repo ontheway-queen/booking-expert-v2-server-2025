@@ -26,19 +26,27 @@ export default class UmrahPackageModel extends Schema {
   }
 
   public async insertUmrahPackage(payload: IInsertUmrahPackagePayload) {
-    return await this.db('umrah_package').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
+    return await this.db('umrah_package')
+      .withSchema(this.SERVICE_SCHEMA)
+      .insert(payload, 'id');
   }
 
   public async insertUmrahPackageImage(
     payload: IInsertUmrahPackageImagePayload | IInsertUmrahPackageImagePayload[]
   ) {
-    return await this.db('umrah_package_photos').withSchema(this.SERVICE_SCHEMA).insert(payload);
+    return await this.db('umrah_package_photos')
+      .withSchema(this.SERVICE_SCHEMA)
+      .insert(payload);
   }
 
   public async insertPackageInclude(
-    payload: IInsertUmrahPackageIncludeServicePayload | IInsertUmrahPackageIncludeServicePayload[]
+    payload:
+      | IInsertUmrahPackageIncludeServicePayload
+      | IInsertUmrahPackageIncludeServicePayload[]
   ) {
-    return await this.db('umrah_package_include').withSchema(this.SERVICE_SCHEMA).insert(payload);
+    return await this.db('umrah_package_include')
+      .withSchema(this.SERVICE_SCHEMA)
+      .insert(payload);
   }
 
   public async getUmrahPackageInclude(
@@ -164,14 +172,12 @@ export default class UmrahPackageModel extends Schema {
         qb.andWhere('source_type', SOURCE_AGENT);
         qb.andWhere('is_deleted', is_deleted);
 
-
         if (query.slug) {
           qb.andWhere('slug', query.slug);
         }
         if (query.umrah_id) {
           qb.andWhere('id', query.umrah_id);
         }
-        
       })
       .first();
   }
@@ -226,7 +232,10 @@ export default class UmrahPackageModel extends Schema {
       .where('umrah_id', query.umrah_id);
   }
 
-  public async updateUmrahPackage(payload: { umrah_id: number; data: IUpdateUmrahPackage }) {
+  public async updateUmrahPackage(payload: {
+    umrah_id: number;
+    data: IUpdateUmrahPackage;
+  }) {
     return await this.db('umrah_package')
       .withSchema(this.SERVICE_SCHEMA)
       .where('id', payload.umrah_id)

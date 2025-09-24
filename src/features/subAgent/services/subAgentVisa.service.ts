@@ -3,12 +3,11 @@ import AbstractServices from '../../../abstract/abstract.service';
 import Lib from '../../../utils/lib/lib';
 import {
   SOURCE_AGENT,
-  SOURCE_AGENT_B2C,
-  SOURCE_B2C,
+  SOURCE_SUB_AGENT,
 } from '../../../utils/miscellaneous/constants';
-import { IAgentB2CVisaApplicationPayload } from '../utils/types/agentB2CVisa.types';
+import { ISubAgentVisaApplicationPayload } from '../utils/types/subAgentVisa.types';
 
-export class AgentB2CVisaService extends AbstractServices {
+export class subAgentVisaService extends AbstractServices {
   //get all visa type
   public async getAllVisaType(req: Request) {
     const { agency_id } = req.agencyB2CWhiteLabel;
@@ -31,14 +30,12 @@ export class AgentB2CVisaService extends AbstractServices {
     const { agency_id } = req.agencyB2CWhiteLabel;
     const visaModel = this.Model.VisaModel();
 
-    console.log('agency_id', agency_id);
-
     const countryList = await visaModel.getAllVisaCreatedCountry({
       is_deleted: false,
       source_id: agency_id,
       source_type: SOURCE_AGENT,
       status: true,
-      visa_for: SOURCE_B2C,
+      visa_for: SOURCE_AGENT,
     });
 
     return {
@@ -104,10 +101,10 @@ export class AgentB2CVisaService extends AbstractServices {
   //create visa application
   public async createVisaApplication(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id } = req.agencyB2CWhiteLabel;
-      const { user_id, name } = req.agencyB2CUser;
+      const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
+      const { user_id, name, agency_id } = req.agencyUser;
       const { id } = req.params;
-      console.log(req.body);
+
       const {
         from_date,
         to_date,
@@ -117,7 +114,7 @@ export class AgentB2CVisaService extends AbstractServices {
         nationality,
         residence,
         passengers,
-      } = req.body as IAgentB2CVisaApplicationPayload;
+      } = req.body as ISubAgentVisaApplicationPayload;
       const files = (req.files as Express.Multer.File[]) || [];
 
       const visaModel = this.Model.VisaModel(trx);
@@ -126,7 +123,7 @@ export class AgentB2CVisaService extends AbstractServices {
       const singleVisa = await visaModel.getSingleVisa({
         is_deleted: false,
         source_id: agency_id,
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_SUB_AGENT,
         id: Number(id),
         status: true,
       });
@@ -159,7 +156,7 @@ export class AgentB2CVisaService extends AbstractServices {
         traveler: passengers?.length,
         visa_id: singleVisa.id,
         source_id: agency_id,
-        source_type: SOURCE_AGENT_B2C,
+        source_type: SOURCE_SUB_AGENT,
         visa_fee: singleVisa.visa_fee,
         processing_fee: singleVisa.processing_fee,
         application_date: new Date(),
@@ -216,8 +213,9 @@ export class AgentB2CVisaService extends AbstractServices {
 
   //get visa application list
   public async getVisaApplicationList(req: Request) {
-    const { user_id } = req.agencyB2CUser;
+    const { user_id } = req.agencyUser;
     const { agency_id } = req.agencyB2CWhiteLabel;
+
     const query = req.query as unknown as {
       limit: number;
       skip: number;
@@ -233,7 +231,7 @@ export class AgentB2CVisaService extends AbstractServices {
       await visaApplicationModel.getAgentB2CVisaApplicationList({
         user_id,
         source_id: agency_id,
-        source_type: SOURCE_AGENT_B2C,
+        source_type: SOURCE_SUB_AGENT,
         limit: query.limit,
         skip: query.skip,
         filter: query.filter,
@@ -262,7 +260,7 @@ export class AgentB2CVisaService extends AbstractServices {
       await visaApplicationModel.getAgentB2CSingleVisaApplication({
         user_id,
         source_id: agency_id,
-        source_type: SOURCE_AGENT_B2C,
+        source_type: SOURCE_SUB_AGENT,
         id: Number(id),
       });
 

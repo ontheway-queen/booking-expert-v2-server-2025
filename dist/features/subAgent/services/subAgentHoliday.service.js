@@ -24,7 +24,8 @@ class SubAgentHolidayService extends abstract_service_1.default {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
                 const query = req.query;
-                const data = yield holidayPackageModel.getHolidayPackageList(Object.assign(Object.assign({}, query), { created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN, holiday_for: constants_1.SOURCE_AGENT, status: true }), true);
+                const { agency_id } = req.agencyB2CWhiteLabel;
+                const data = yield holidayPackageModel.getHolidayPackageList(Object.assign(Object.assign({}, query), { created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT, holiday_for: constants_1.SOURCE_AGENT, status: true, agency_id }), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -37,13 +38,15 @@ class SubAgentHolidayService extends abstract_service_1.default {
     getSingleHolidayPackage(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyB2CWhiteLabel;
                 const { slug } = req.params;
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
                 const get_holiday_data = yield holidayPackageModel.getSingleHolidayPackage({
                     slug,
-                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN,
+                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT,
                     holiday_for: constants_1.SOURCE_AGENT,
                     status: true,
+                    agency_id,
                 });
                 if (!get_holiday_data) {
                     return {
@@ -66,13 +69,15 @@ class SubAgentHolidayService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id, user_id } = req.agencyUser;
+                const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
                 const body = req.body;
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const get_holiday_data = yield holidayPackageModel.getSingleHolidayPackage({
                     id: body.holiday_package_id,
-                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_ADMIN,
+                    created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT,
                     holiday_for: constants_1.SOURCE_AGENT,
+                    agency_id: main_agency_id,
                 });
                 if (!get_holiday_data) {
                     return {
@@ -84,7 +89,7 @@ class SubAgentHolidayService extends abstract_service_1.default {
                 //check duplicate booking
                 const check_duplicate_booking = yield holidayPackageBookingModel.getHolidayBookingList({
                     holiday_package_id: body.holiday_package_id,
-                    booked_by: constants_1.SOURCE_AGENT,
+                    booked_by: constants_1.SOURCE_SUB_AGENT,
                     source_id: agency_id,
                     status: [
                         holidayConstants_1.HOLIDAY_BOOKING_STATUS.PENDING,
@@ -115,7 +120,7 @@ class SubAgentHolidayService extends abstract_service_1.default {
                 let total_markup = 0;
                 if (price_details.markup_type) {
                     total_markup =
-                        price_details.markup_type === "FLAT"
+                        price_details.markup_type === 'FLAT'
                             ? Number(price_details.markup_price)
                             : Number(total_price) * (Number(price_details.markup_price) / 100);
                     total_price -= total_markup;
@@ -124,7 +129,7 @@ class SubAgentHolidayService extends abstract_service_1.default {
                     trx,
                     type: constants_1.GENERATE_AUTO_UNIQUE_ID.agent_holiday,
                 });
-                const booking_body = Object.assign(Object.assign({}, body), { booking_ref, source_type: constants_1.SOURCE_AGENT, source_id: agency_id, user_id,
+                const booking_body = Object.assign(Object.assign({}, body), { booking_ref, source_type: constants_1.SOURCE_SUB_AGENT, source_id: agency_id, user_id,
                     total_adult_price,
                     total_child_price,
                     total_markup,
@@ -134,7 +139,7 @@ class SubAgentHolidayService extends abstract_service_1.default {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_SUCCESSFUL,
-                        message: "Holiday package has been booked successfully",
+                        message: 'Holiday package has been booked successfully',
                         data: {
                             id: booking_res[0].id,
                             booking_ref,
@@ -146,7 +151,7 @@ class SubAgentHolidayService extends abstract_service_1.default {
                     };
                 }
                 else {
-                    throw new customError_1.default("An error occurred while booking the holiday package", this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
+                    throw new customError_1.default('An error occurred while booking the holiday package', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
                 }
             }));
         });
@@ -157,8 +162,7 @@ class SubAgentHolidayService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const query = req.query;
-                console.log({ agency_id });
-                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ booked_by: constants_1.SOURCE_AGENT, source_id: agency_id }, query), true);
+                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ booked_by: constants_1.SOURCE_SUB_AGENT, source_id: agency_id }, query), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -236,11 +240,11 @@ class SubAgentHolidayService extends abstract_service_1.default {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        message: "Booking has been cancelled successfully",
+                        message: 'Booking has been cancelled successfully',
                     };
                 }
                 else {
-                    throw new customError_1.default("Something went wrong while cancelling the holiday package booking", this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
+                    throw new customError_1.default('Something went wrong while cancelling the holiday package booking', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
                 }
             }));
         });

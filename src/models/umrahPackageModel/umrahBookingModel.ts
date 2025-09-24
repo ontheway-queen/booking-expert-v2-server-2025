@@ -1,5 +1,8 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
-import { DATA_LIMIT, SOURCE_AGENT_B2C } from '../../utils/miscellaneous/constants';
+import {
+  DATA_LIMIT,
+  SOURCE_AGENT_B2C,
+} from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
   IGetAgentB2CSingleUmrahBookingData,
@@ -21,10 +24,15 @@ export default class UmrahBookingModel extends Schema {
   }
 
   public async insertUmrahBooking(payload: IInsertUmrahBookingPayload) {
-    return await this.db('umrah_booking').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
+    return await this.db('umrah_booking')
+      .withSchema(this.SERVICE_SCHEMA)
+      .insert(payload, 'id');
   }
 
-  public async updateUmrahBooking(payload: IUpdateUmrahBookingPayload, booking_id: number) {
+  public async updateUmrahBooking(
+    payload: IUpdateUmrahBookingPayload,
+    booking_id: number
+  ) {
     return await this.db('umrah_booking')
       .withSchema(this.SERVICE_SCHEMA)
       .update(payload)
@@ -54,7 +62,10 @@ export default class UmrahBookingModel extends Schema {
       .leftJoin('umrah_package AS up', 'up.id', 'ub.umrah_id')
       .joinRaw('LEFT JOIN agent_b2c.users AS abu ON ub.user_id = abu.id')
       .where((qb) => {
-        qb.where('ub.source_type', SOURCE_AGENT_B2C).andWhere('ub.source_id', query.agency_id);
+        qb.where('ub.source_type', query.source_type).andWhere(
+          'ub.source_id',
+          query.agency_id
+        );
         if (query.user_id) {
           qb.andWhere('ub.user_id', query.user_id);
         }
@@ -82,7 +93,10 @@ export default class UmrahBookingModel extends Schema {
         .count('* AS total')
         .withSchema(this.SERVICE_SCHEMA)
         .where((qb) => {
-          qb.where('ub.source_type', SOURCE_AGENT_B2C).andWhere('ub.source_id', query.agency_id);
+          qb.where('ub.source_type', query.source_type).andWhere(
+            'ub.source_id',
+            query.agency_id
+          );
           if (query.user_id) {
             qb.andWhere('ub.user_id', query.user_id);
           }
@@ -90,7 +104,10 @@ export default class UmrahBookingModel extends Schema {
             qb.andWhere('ub.status', query.status);
           }
           if (query.from_date && query.to_date) {
-            qb.andWhereBetween('ub.created_at', [query.from_date, query.to_date]);
+            qb.andWhereBetween('ub.created_at', [
+              query.from_date,
+              query.to_date,
+            ]);
           }
         });
     }
@@ -124,7 +141,7 @@ export default class UmrahBookingModel extends Schema {
       .leftJoin('umrah_package AS up', 'up.id', 'ub.umrah_id')
       .andWhere('ub.id', query.id)
       .andWhere('ub.source_id', query.source_id)
-      .andWhere('ub.source_type', SOURCE_AGENT_B2C)
+      .andWhere('ub.source_type', query.source_type)
       .where((qb) => {
         if (query.user_id) {
           qb.andWhere('ub.user_id', query.user_id);
@@ -139,7 +156,9 @@ export default class UmrahBookingModel extends Schema {
       .insert(payload, 'id');
   }
 
-  public async getUmrahBookingContacts(bookingId: number): Promise<IGetUmrahBookingContactData> {
+  public async getUmrahBookingContacts(
+    bookingId: number
+  ): Promise<IGetUmrahBookingContactData> {
     return await this.db('umrah_booking_contact')
       .withSchema(this.SERVICE_SCHEMA)
       .select('id', 'name', 'email', 'phone', 'address')

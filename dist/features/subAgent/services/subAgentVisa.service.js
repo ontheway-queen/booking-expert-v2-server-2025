@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AgentB2CVisaService = void 0;
+exports.subAgentVisaService = void 0;
 const abstract_service_1 = __importDefault(require("../../../abstract/abstract.service"));
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
-class AgentB2CVisaService extends abstract_service_1.default {
+class subAgentVisaService extends abstract_service_1.default {
     //get all visa type
     getAllVisaType(req) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,13 +38,12 @@ class AgentB2CVisaService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { agency_id } = req.agencyB2CWhiteLabel;
             const visaModel = this.Model.VisaModel();
-            console.log('agency_id', agency_id);
             const countryList = yield visaModel.getAllVisaCreatedCountry({
                 is_deleted: false,
                 source_id: agency_id,
                 source_type: constants_1.SOURCE_AGENT,
                 status: true,
-                visa_for: constants_1.SOURCE_B2C,
+                visa_for: constants_1.SOURCE_AGENT,
             });
             return {
                 success: true,
@@ -106,10 +105,9 @@ class AgentB2CVisaService extends abstract_service_1.default {
     createVisaApplication(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { agency_id } = req.agencyB2CWhiteLabel;
-                const { user_id, name } = req.agencyB2CUser;
+                const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
+                const { user_id, name, agency_id } = req.agencyUser;
                 const { id } = req.params;
-                console.log(req.body);
                 const { from_date, to_date, contact_email, contact_number, whatsapp_number, nationality, residence, passengers, } = req.body;
                 const files = req.files || [];
                 const visaModel = this.Model.VisaModel(trx);
@@ -117,7 +115,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
                 const singleVisa = yield visaModel.getSingleVisa({
                     is_deleted: false,
                     source_id: agency_id,
-                    source_type: constants_1.SOURCE_AGENT,
+                    source_type: constants_1.SOURCE_SUB_AGENT,
                     id: Number(id),
                     status: true,
                 });
@@ -145,7 +143,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
                     traveler: passengers === null || passengers === void 0 ? void 0 : passengers.length,
                     visa_id: singleVisa.id,
                     source_id: agency_id,
-                    source_type: constants_1.SOURCE_AGENT_B2C,
+                    source_type: constants_1.SOURCE_SUB_AGENT,
                     visa_fee: singleVisa.visa_fee,
                     processing_fee: singleVisa.processing_fee,
                     application_date: new Date(),
@@ -193,14 +191,14 @@ class AgentB2CVisaService extends abstract_service_1.default {
     //get visa application list
     getVisaApplicationList(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { user_id } = req.agencyB2CUser;
+            const { user_id } = req.agencyUser;
             const { agency_id } = req.agencyB2CWhiteLabel;
             const query = req.query;
             const visaApplicationModel = this.Model.VisaApplicationModel();
             const { data, total } = yield visaApplicationModel.getAgentB2CVisaApplicationList({
                 user_id,
                 source_id: agency_id,
-                source_type: constants_1.SOURCE_AGENT_B2C,
+                source_type: constants_1.SOURCE_SUB_AGENT,
                 limit: query.limit,
                 skip: query.skip,
                 filter: query.filter,
@@ -227,7 +225,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
             const application_data = yield visaApplicationModel.getAgentB2CSingleVisaApplication({
                 user_id,
                 source_id: agency_id,
-                source_type: constants_1.SOURCE_AGENT_B2C,
+                source_type: constants_1.SOURCE_SUB_AGENT,
                 id: Number(id),
             });
             if (!application_data) {
@@ -252,4 +250,4 @@ class AgentB2CVisaService extends abstract_service_1.default {
         });
     }
 }
-exports.AgentB2CVisaService = AgentB2CVisaService;
+exports.subAgentVisaService = subAgentVisaService;

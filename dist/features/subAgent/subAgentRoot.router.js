@@ -15,6 +15,9 @@ const subAgentFlight_router_1 = __importDefault(require("./routers/subAgentFligh
 const subAgentDash_router_1 = __importDefault(require("./routers/subAgentDash.router"));
 const subAgentTra_router_1 = __importDefault(require("./routers/subAgentTra.router"));
 const subAgentAdministration_router_1 = __importDefault(require("./routers/subAgentAdministration.router"));
+const agentB2CUmrah_router_1 = __importDefault(require("./routers/agentB2CUmrah.router"));
+const agentB2CHoliday_router_1 = __importDefault(require("./routers/agentB2CHoliday.router"));
+const subAgentVisa_router_1 = __importDefault(require("./routers/subAgentVisa.router"));
 class SubAgentRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
@@ -28,6 +31,9 @@ class SubAgentRootRouter {
         this.subAgentTravelerRouter = new subAgentTra_router_1.default();
         this.subAgentDashboardRouter = new subAgentDash_router_1.default();
         this.subAgentAdministrationRouter = new subAgentAdministration_router_1.default();
+        this.subAgentUmrahRouter = new agentB2CUmrah_router_1.default();
+        this.subAgentHolidayRouter = new agentB2CHoliday_router_1.default();
+        this.subAgentVisaRouter = new subAgentVisa_router_1.default();
         this.authChecker = new authChecker_1.default();
         this.callRouter();
     }
@@ -43,6 +49,9 @@ class SubAgentRootRouter {
         this.Router.use('/support-ticket', this.authChecker.subAgentUserAuthChecker, this.subAgentSupportTicketRouter.router);
         this.Router.use('/dashboard', this.authChecker.subAgentUserAuthChecker, this.subAgentDashboardRouter.router);
         this.Router.use('/administration', this.authChecker.subAgentUserAuthChecker, this.subAgentAdministrationRouter.router);
+        this.Router.use('/umrah', this.authChecker.subAgentUserAuthChecker, this.subAgentUmrahRouter.router);
+        this.Router.use('/visa', this.authChecker.subAgentUserAuthChecker, this.subAgentVisaRouter.router);
+        this.Router.use('/holiday', this.authChecker.subAgentUserAuthChecker, this.subAgentHolidayRouter.router);
     }
 }
 exports.default = SubAgentRootRouter;

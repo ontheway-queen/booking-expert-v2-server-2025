@@ -1,31 +1,34 @@
-import AbstractServices from "../../../abstract/abstract.service";
-import { Request } from "express";
+import AbstractServices from '../../../abstract/abstract.service';
+import { Request } from 'express';
 import {
   HOLIDAY_BOOKING_STATUS,
-  HOLIDAY_CREATED_BY_ADMIN,
-} from "../../../utils/miscellaneous/holidayConstants";
+  HOLIDAY_CREATED_BY_AGENT,
+} from '../../../utils/miscellaneous/holidayConstants';
 import {
   GENERATE_AUTO_UNIQUE_ID,
   SOURCE_AGENT,
-} from "../../../utils/miscellaneous/constants";
-import Lib from "../../../utils/lib/lib";
-import CustomError from "../../../utils/lib/customError";
+  SOURCE_SUB_AGENT,
+} from '../../../utils/miscellaneous/constants';
+import Lib from '../../../utils/lib/lib';
+import CustomError from '../../../utils/lib/customError';
 import {
   IGetSingleHolidayPackageBySubAgentParams,
   IHolidayPackageBookBySubAgentPayload,
-} from "../utils/types/subAgentHoliday.types";
+} from '../utils/types/subAgentHoliday.types';
 
 export class SubAgentHolidayService extends AbstractServices {
   public async searchHolidayPackage(req: Request) {
     return this.db.transaction(async (trx) => {
       const holidayPackageModel = this.Model.HolidayPackageModel(trx);
       const query = req.query;
+      const { agency_id } = req.agencyB2CWhiteLabel;
       const data = await holidayPackageModel.getHolidayPackageList(
         {
           ...query,
-          created_by: HOLIDAY_CREATED_BY_ADMIN,
+          created_by: HOLIDAY_CREATED_BY_AGENT,
           holiday_for: SOURCE_AGENT,
           status: true,
+          agency_id,
         },
         true
       );
@@ -41,6 +44,7 @@ export class SubAgentHolidayService extends AbstractServices {
 
   public async getSingleHolidayPackage(req: Request) {
     return await this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyB2CWhiteLabel;
       const { slug } =
         req.params as unknown as IGetSingleHolidayPackageBySubAgentParams;
       const holidayPackageModel = this.Model.HolidayPackageModel(trx);
@@ -48,9 +52,10 @@ export class SubAgentHolidayService extends AbstractServices {
       const get_holiday_data =
         await holidayPackageModel.getSingleHolidayPackage({
           slug,
-          created_by: HOLIDAY_CREATED_BY_ADMIN,
+          created_by: HOLIDAY_CREATED_BY_AGENT,
           holiday_for: SOURCE_AGENT,
           status: true,
+          agency_id,
         });
       if (!get_holiday_data) {
         return {
@@ -71,6 +76,8 @@ export class SubAgentHolidayService extends AbstractServices {
   public async bookHolidayPackage(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { agency_id, user_id } = req.agencyUser;
+      const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
+
       const body = req.body as IHolidayPackageBookBySubAgentPayload;
       const holidayPackageModel = this.Model.HolidayPackageModel(trx);
       const holidayPackageBookingModel =
@@ -79,8 +86,9 @@ export class SubAgentHolidayService extends AbstractServices {
       const get_holiday_data =
         await holidayPackageModel.getSingleHolidayPackage({
           id: body.holiday_package_id,
-          created_by: HOLIDAY_CREATED_BY_ADMIN,
+          created_by: HOLIDAY_CREATED_BY_AGENT,
           holiday_for: SOURCE_AGENT,
+          agency_id: main_agency_id,
         });
 
       if (!get_holiday_data) {
@@ -95,7 +103,7 @@ export class SubAgentHolidayService extends AbstractServices {
       const check_duplicate_booking =
         await holidayPackageBookingModel.getHolidayBookingList({
           holiday_package_id: body.holiday_package_id,
-          booked_by: SOURCE_AGENT,
+          booked_by: SOURCE_SUB_AGENT,
           source_id: agency_id,
           status: [
             HOLIDAY_BOOKING_STATUS.PENDING,
@@ -133,7 +141,7 @@ export class SubAgentHolidayService extends AbstractServices {
       let total_markup = 0;
       if (price_details.markup_type) {
         total_markup =
-          price_details.markup_type === "FLAT"
+          price_details.markup_type === 'FLAT'
             ? Number(price_details.markup_price)
             : Number(total_price) * (Number(price_details.markup_price) / 100);
         total_price -= total_markup;
@@ -147,7 +155,7 @@ export class SubAgentHolidayService extends AbstractServices {
       const booking_body = {
         ...body,
         booking_ref,
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_SUB_AGENT,
         source_id: agency_id,
         user_id,
         total_adult_price,
@@ -165,7 +173,7 @@ export class SubAgentHolidayService extends AbstractServices {
         return {
           success: true,
           code: this.StatusCode.HTTP_SUCCESSFUL,
-          message: "Holiday package has been booked successfully",
+          message: 'Holiday package has been booked successfully',
           data: {
             id: booking_res[0].id,
             booking_ref,
@@ -177,7 +185,7 @@ export class SubAgentHolidayService extends AbstractServices {
         };
       } else {
         throw new CustomError(
-          "An error occurred while booking the holiday package",
+          'An error occurred while booking the holiday package',
           this.StatusCode.HTTP_INTERNAL_SERVER_ERROR
         );
       }
@@ -191,11 +199,10 @@ export class SubAgentHolidayService extends AbstractServices {
         this.Model.HolidayPackageBookingModel(trx);
       const query = req.query;
 
-      console.log({ agency_id });
       const getBookingList =
         await holidayPackageBookingModel.getHolidayBookingList(
           {
-            booked_by: SOURCE_AGENT,
+            booked_by: SOURCE_SUB_AGENT,
             source_id: agency_id,
             ...query,
           },
@@ -292,11 +299,11 @@ export class SubAgentHolidayService extends AbstractServices {
         return {
           success: true,
           code: this.StatusCode.HTTP_OK,
-          message: "Booking has been cancelled successfully",
+          message: 'Booking has been cancelled successfully',
         };
       } else {
         throw new CustomError(
-          "Something went wrong while cancelling the holiday package booking",
+          'Something went wrong while cancelling the holiday package booking',
           this.StatusCode.HTTP_INTERNAL_SERVER_ERROR
         );
       }
