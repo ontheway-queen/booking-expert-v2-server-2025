@@ -25,6 +25,7 @@ class SubAgentHolidayService extends abstract_service_1.default {
                 const holidayPackageModel = this.Model.HolidayPackageModel(trx);
                 const query = req.query;
                 const { agency_id } = req.agencyB2CWhiteLabel;
+                console.log({ query, agency_id });
                 const data = yield holidayPackageModel.getHolidayPackageList(Object.assign(Object.assign({}, query), { created_by: holidayConstants_1.HOLIDAY_CREATED_BY_AGENT, holiday_for: constants_1.SOURCE_AGENT, status: true, agency_id }), true);
                 return {
                     success: true,

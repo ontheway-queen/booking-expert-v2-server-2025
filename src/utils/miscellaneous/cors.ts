@@ -207,4 +207,6 @@ export const origin: string[] = [
   'https://www.flight.mtt.com.bd',
   'https://safwantravels.com',
   'https://www.safwantravels.com',
+  'https://smworldtourstravel.com',
+  'https://www.smworldtourstravel.com',
 ];

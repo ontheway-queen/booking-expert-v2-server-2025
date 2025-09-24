@@ -22,6 +22,8 @@ export class SubAgentHolidayService extends AbstractServices {
       const holidayPackageModel = this.Model.HolidayPackageModel(trx);
       const query = req.query;
       const { agency_id } = req.agencyB2CWhiteLabel;
+
+      console.log({ query, agency_id });
       const data = await holidayPackageModel.getHolidayPackageList(
         {
           ...query,
