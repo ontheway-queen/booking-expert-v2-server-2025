@@ -49,14 +49,14 @@ export class subAgentVisaService extends AbstractServices {
   //Get all visa list
   public async getAllVisaList(req: Request) {
     const { country_id, visa_type_id } = req.query;
-    const { agency_id } = req.agencyB2CWhiteLabel;
+    const { agency_id: main_agency_id } = req.agencyB2CWhiteLabel;
     const visaModel = this.Model.VisaModel();
 
     const visaList = await visaModel.getAgentB2CVisaList({
       country_id: Number(country_id),
       visa_type_id: Number(visa_type_id),
       is_deleted: false,
-      source_id: agency_id,
+      source_id: main_agency_id,
       status: true,
     });
 
@@ -122,8 +122,8 @@ export class subAgentVisaService extends AbstractServices {
 
       const singleVisa = await visaModel.getSingleVisa({
         is_deleted: false,
-        source_id: agency_id,
-        source_type: SOURCE_SUB_AGENT,
+        source_id: main_agency_id,
+        source_type: SOURCE_AGENT,
         id: Number(id),
         status: true,
       });

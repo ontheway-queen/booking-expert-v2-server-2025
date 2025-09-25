@@ -22,12 +22,17 @@ class VisaModel extends schema_1.default {
     }
     createVisa(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.db('visa').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
+            return this.db('visa')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload, 'id');
         });
     }
     updateVisa(payload, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.db('visa').withSchema(this.SERVICE_SCHEMA).update(payload).where({ id });
+            return this.db('visa')
+                .withSchema(this.SERVICE_SCHEMA)
+                .update(payload)
+                .where({ id });
         });
     }
     checkVisa(query) {
@@ -151,7 +156,9 @@ class VisaModel extends schema_1.default {
                 }
                 qb.andWhere('v.status', query.status);
                 qb.andWhere((subQb) => {
-                    subQb.andWhere('v.visa_for', visaConstants_1.VISA_FOR_B2C).orWhere('v.visa_for', visaConstants_1.VISA_FOR_BOTH);
+                    subQb
+                        .andWhere('v.visa_for', visaConstants_1.VISA_FOR_B2C)
+                        .orWhere('v.visa_for', visaConstants_1.VISA_FOR_BOTH);
                 });
             });
         });
@@ -214,7 +221,9 @@ class VisaModel extends schema_1.default {
                 qb.andWhere('source_id', query.source_id);
                 qb.andWhere('status', query.status);
                 qb.andWhere((subQb) => {
-                    subQb.where('v.visa_for', query.visa_for).orWhere('v.visa_for', visaConstants_1.VISA_FOR_BOTH);
+                    subQb
+                        .where('v.visa_for', query.visa_for)
+                        .orWhere('v.visa_for', visaConstants_1.VISA_FOR_BOTH);
                 });
             });
         });

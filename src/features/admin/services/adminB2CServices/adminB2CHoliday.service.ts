@@ -12,7 +12,7 @@ export class AdminB2CHolidayService extends AbstractServices {
       const query = req.query;
       const getBookingList =
         await holidayPackageBookingModel.getHolidayBookingList({
-          booked_by: SOURCE_B2C,
+          source_type: SOURCE_B2C,
           ...query,
         });
 

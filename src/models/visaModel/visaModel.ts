@@ -1,7 +1,10 @@
 import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import { SOURCE_AGENT } from '../../utils/miscellaneous/constants';
 import Schema from '../../utils/miscellaneous/schema';
-import { VISA_FOR_B2C, VISA_FOR_BOTH } from '../../utils/miscellaneous/visaConstants';
+import {
+  VISA_FOR_B2C,
+  VISA_FOR_BOTH,
+} from '../../utils/miscellaneous/visaConstants';
 import {
   ICheckVisaData,
   ICheckVisaQuery,
@@ -26,11 +29,16 @@ export default class VisaModel extends Schema {
   }
 
   public async createVisa(payload: ICreateVisaPayload) {
-    return this.db('visa').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
+    return this.db('visa')
+      .withSchema(this.SERVICE_SCHEMA)
+      .insert(payload, 'id');
   }
 
   public async updateVisa(payload: IUpdateVisaPayload, id: number) {
-    return this.db('visa').withSchema(this.SERVICE_SCHEMA).update(payload).where({ id });
+    return this.db('visa')
+      .withSchema(this.SERVICE_SCHEMA)
+      .update(payload)
+      .where({ id });
   }
 
   public async checkVisa(query: ICheckVisaQuery): Promise<ICheckVisaData[]> {
@@ -125,7 +133,9 @@ export default class VisaModel extends Schema {
     };
   }
 
-  public async getSingleVisa(query: IGetSingleVisa): Promise<IGetSingleVisaData> {
+  public async getSingleVisa(
+    query: IGetSingleVisa
+  ): Promise<IGetSingleVisaData> {
     return this.db('visa')
       .withSchema(this.SERVICE_SCHEMA)
       .select(
@@ -194,7 +204,9 @@ export default class VisaModel extends Schema {
 
         qb.andWhere('v.status', query.status);
         qb.andWhere((subQb) => {
-          subQb.andWhere('v.visa_for', VISA_FOR_B2C).orWhere('v.visa_for', VISA_FOR_BOTH);
+          subQb
+            .andWhere('v.visa_for', VISA_FOR_B2C)
+            .orWhere('v.visa_for', VISA_FOR_BOTH);
         });
       });
   }
@@ -242,7 +254,10 @@ export default class VisaModel extends Schema {
       .andWhere('source_type', SOURCE_AGENT);
   }
 
-  public async checkVisaExistsByVisaType(query: { visa_type_id: number, is_deleted:boolean }) {
+  public async checkVisaExistsByVisaType(query: {
+    visa_type_id: number;
+    is_deleted: boolean;
+  }) {
     return this.db('visa')
       .withSchema(this.SERVICE_SCHEMA)
       .select('id')
@@ -250,7 +265,10 @@ export default class VisaModel extends Schema {
       .andWhere('is_deleted', false);
   }
 
-  public async checkVisaExistsByVisaMode(query: { visa_mode_id: number, is_deleted:boolean }) {
+  public async checkVisaExistsByVisaMode(query: {
+    visa_mode_id: number;
+    is_deleted: boolean;
+  }) {
     return this.db('visa')
       .withSchema(this.SERVICE_SCHEMA)
       .select('id')
@@ -270,7 +288,9 @@ export default class VisaModel extends Schema {
         qb.andWhere('source_id', query.source_id);
         qb.andWhere('status', query.status);
         qb.andWhere((subQb) => {
-          subQb.where('v.visa_for', query.visa_for).orWhere('v.visa_for', VISA_FOR_BOTH);
+          subQb
+            .where('v.visa_for', query.visa_for)
+            .orWhere('v.visa_for', VISA_FOR_BOTH);
         });
       });
   }

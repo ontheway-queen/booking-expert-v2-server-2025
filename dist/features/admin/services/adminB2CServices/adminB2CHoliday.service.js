@@ -23,7 +23,7 @@ class AdminB2CHolidayService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const query = req.query;
-                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ booked_by: constants_1.SOURCE_B2C }, query));
+                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ source_type: constants_1.SOURCE_B2C }, query));
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,

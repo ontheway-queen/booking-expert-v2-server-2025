@@ -23,12 +23,12 @@ class AdminAgentHolidayService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const query = req.query;
-                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ booked_by: constants_1.SOURCE_AGENT }, query));
+                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ source_type: constants_1.SOURCE_AGENT }, query));
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     total: getBookingList.total,
-                    data: getBookingList.data
+                    data: getBookingList.data,
                 };
             }));
         });
@@ -40,23 +40,22 @@ class AdminAgentHolidayService extends abstract_service_1.default {
                 const { id } = req.params;
                 const get_booking = yield holidayPackageBookingModel.getSingleHolidayBooking({
                     id,
-                    booked_by: constants_1.SOURCE_AGENT
+                    booked_by: constants_1.SOURCE_AGENT,
                 });
                 if (!get_booking) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
                 else {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        data: get_booking
+                        data: get_booking,
                     };
                 }
-                ;
             }));
         });
     }
@@ -68,34 +67,43 @@ class AdminAgentHolidayService extends abstract_service_1.default {
                 const { id } = req.params;
                 const get_booking = yield holidayPackageBookingModel.getSingleHolidayBooking({
                     id,
-                    booked_by: constants_1.SOURCE_AGENT
+                    booked_by: constants_1.SOURCE_AGENT,
                 });
                 if (!get_booking) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: this.ResMsg.HTTP_NOT_FOUND
+                        message: this.ResMsg.HTTP_NOT_FOUND,
                     };
                 }
-                if ([holidayConstants_1.HOLIDAY_BOOKING_STATUS.CONFIRMED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.CANCELLED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.REJECTED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.COMPLETED, holidayConstants_1.HOLIDAY_BOOKING_STATUS.REFUNDED].includes(get_booking.status)) {
+                if ([
+                    holidayConstants_1.HOLIDAY_BOOKING_STATUS.CONFIRMED,
+                    holidayConstants_1.HOLIDAY_BOOKING_STATUS.CANCELLED,
+                    holidayConstants_1.HOLIDAY_BOOKING_STATUS.REJECTED,
+                    holidayConstants_1.HOLIDAY_BOOKING_STATUS.COMPLETED,
+                    holidayConstants_1.HOLIDAY_BOOKING_STATUS.REFUNDED,
+                ].includes(get_booking.status)) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_BAD_REQUEST,
-                        message: this.ResMsg.BOOKING_STATUS_NOT_ALLOWED_TO_CHANGE
+                        message: this.ResMsg.BOOKING_STATUS_NOT_ALLOWED_TO_CHANGE,
                     };
                 }
-                const update_res = yield holidayPackageBookingModel.updateHolidayBooking({ status: req.body.status, updated_by: user_id, updated_at: new Date() }, id);
+                const update_res = yield holidayPackageBookingModel.updateHolidayBooking({
+                    status: req.body.status,
+                    updated_by: user_id,
+                    updated_at: new Date(),
+                }, id);
                 if (update_res) {
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        message: "Booking has been updated successfully"
+                        message: 'Booking has been updated successfully',
                     };
                 }
                 else {
-                    throw new customError_1.default("Something went wrong while updating the holiday package booking", this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
+                    throw new customError_1.default('Something went wrong while updating the holiday package booking', this.StatusCode.HTTP_INTERNAL_SERVER_ERROR);
                 }
-                ;
             }));
         });
     }

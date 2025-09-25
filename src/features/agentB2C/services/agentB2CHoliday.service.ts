@@ -100,7 +100,7 @@ export class AgentB2CHolidayService extends AbstractServices {
       const check_duplicate_booking =
         await holidayPackageBookingModel.getHolidayBookingList({
           holiday_package_id: body.holiday_package_id,
-          booked_by: SOURCE_AGENT_B2C,
+          source_type: SOURCE_AGENT_B2C,
           source_id: agency_id,
           status: [
             HOLIDAY_BOOKING_STATUS.PENDING,
@@ -214,7 +214,7 @@ export class AgentB2CHolidayService extends AbstractServices {
       const getBookingList =
         await holidayPackageBookingModel.getHolidayBookingList(
           {
-            booked_by: SOURCE_AGENT_B2C,
+            source_type: SOURCE_AGENT_B2C,
             source_id: agency_id,
             ...query,
           },

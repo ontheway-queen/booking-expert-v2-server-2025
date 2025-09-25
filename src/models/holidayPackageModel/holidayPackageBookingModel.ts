@@ -2,11 +2,13 @@ import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import {
   SOURCE_AGENT_B2C,
   SOURCE_B2C,
+  SOURCE_SUB_AGENT,
 } from '../../utils/miscellaneous/constants';
 import {
   VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT,
   VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT_B2C,
   VIEW_HOLIDAY_PACKAGE_BOOKING_BY_B2C,
+  VIEW_HOLIDAY_PACKAGE_BOOKING_BY_SUB_AGENT,
 } from '../../utils/miscellaneous/holidayConstants';
 import Schema from '../../utils/miscellaneous/schema';
 import {
@@ -39,13 +41,14 @@ export default class HolidayPackageBookingModel extends Schema {
     is_total: boolean = false
   ): Promise<{ data: IGetHolidayPackageBookingList[]; total?: number }> {
     const view_name =
-      query.booked_by === SOURCE_B2C
+      query.source_type === SOURCE_B2C
         ? VIEW_HOLIDAY_PACKAGE_BOOKING_BY_B2C
-        : query.booked_by === SOURCE_AGENT_B2C
+        : query.source_type === SOURCE_AGENT_B2C
         ? VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT_B2C
+        : query.source_type === SOURCE_SUB_AGENT
+        ? VIEW_HOLIDAY_PACKAGE_BOOKING_BY_SUB_AGENT
         : VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT;
 
-    console.log({ view_name });
     const data = await this.db(`${view_name} as hb`)
       .withSchema(this.SERVICE_SCHEMA)
       .select(
@@ -145,6 +148,8 @@ export default class HolidayPackageBookingModel extends Schema {
         ? VIEW_HOLIDAY_PACKAGE_BOOKING_BY_B2C
         : where.booked_by === SOURCE_AGENT_B2C
         ? VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT_B2C
+        : where.booked_by === SOURCE_SUB_AGENT
+        ? VIEW_HOLIDAY_PACKAGE_BOOKING_BY_SUB_AGENT
         : VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT;
 
     return await this.db(`${view_name} as hb`)

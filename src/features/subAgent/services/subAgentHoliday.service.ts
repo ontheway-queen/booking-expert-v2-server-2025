@@ -105,7 +105,7 @@ export class SubAgentHolidayService extends AbstractServices {
       const check_duplicate_booking =
         await holidayPackageBookingModel.getHolidayBookingList({
           holiday_package_id: body.holiday_package_id,
-          booked_by: SOURCE_SUB_AGENT,
+          source_type: SOURCE_SUB_AGENT,
           source_id: agency_id,
           status: [
             HOLIDAY_BOOKING_STATUS.PENDING,
@@ -127,6 +127,7 @@ export class SubAgentHolidayService extends AbstractServices {
       const price_details = get_holiday_data.pricing.find(
         (item) => item.price_for === SOURCE_AGENT
       );
+
       if (!price_details) {
         return {
           success: false,
@@ -204,7 +205,7 @@ export class SubAgentHolidayService extends AbstractServices {
       const getBookingList =
         await holidayPackageBookingModel.getHolidayBookingList(
           {
-            booked_by: SOURCE_SUB_AGENT,
+            source_type: SOURCE_SUB_AGENT,
             source_id: agency_id,
             ...query,
           },

@@ -84,7 +84,7 @@ class AgentHolidayService extends abstract_service_1.default {
                 //check duplicate booking
                 const check_duplicate_booking = yield holidayPackageBookingModel.getHolidayBookingList({
                     holiday_package_id: body.holiday_package_id,
-                    booked_by: constants_1.SOURCE_AGENT,
+                    source_type: constants_1.SOURCE_AGENT,
                     source_id: agency_id,
                     status: [
                         holidayConstants_1.HOLIDAY_BOOKING_STATUS.PENDING,
@@ -158,7 +158,7 @@ class AgentHolidayService extends abstract_service_1.default {
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const query = req.query;
                 console.log({ agency_id });
-                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ booked_by: constants_1.SOURCE_AGENT, source_id: agency_id }, query), true);
+                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ source_type: constants_1.SOURCE_AGENT, source_id: agency_id }, query), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,

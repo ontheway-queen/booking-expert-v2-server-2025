@@ -86,7 +86,7 @@ class B2CHolidayService extends abstract_service_1.default {
                 //check duplicate booking
                 const check_duplicate_booking = yield holidayPackageBookingModel.getHolidayBookingList({
                     holiday_package_id: body.holiday_package_id,
-                    booked_by: constants_1.SOURCE_B2C,
+                    source_type: constants_1.SOURCE_B2C,
                     user_id,
                     status: [
                         holidayConstants_1.HOLIDAY_BOOKING_STATUS.PENDING,
@@ -159,7 +159,7 @@ class B2CHolidayService extends abstract_service_1.default {
                 const { user_id } = req.user;
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const query = req.query;
-                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ booked_by: constants_1.SOURCE_B2C, user_id }, query));
+                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ source_type: constants_1.SOURCE_B2C, user_id }, query));
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,

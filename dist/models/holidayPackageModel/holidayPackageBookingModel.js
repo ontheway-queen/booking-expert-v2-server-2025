@@ -30,12 +30,13 @@ class HolidayPackageBookingModel extends schema_1.default {
     getHolidayBookingList(query_1) {
         return __awaiter(this, arguments, void 0, function* (query, is_total = false) {
             var _a;
-            const view_name = query.booked_by === constants_1.SOURCE_B2C
+            const view_name = query.source_type === constants_1.SOURCE_B2C
                 ? holidayConstants_1.VIEW_HOLIDAY_PACKAGE_BOOKING_BY_B2C
-                : query.booked_by === constants_1.SOURCE_AGENT_B2C
+                : query.source_type === constants_1.SOURCE_AGENT_B2C
                     ? holidayConstants_1.VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT_B2C
-                    : holidayConstants_1.VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT;
-            console.log({ view_name });
+                    : query.source_type === constants_1.SOURCE_SUB_AGENT
+                        ? holidayConstants_1.VIEW_HOLIDAY_PACKAGE_BOOKING_BY_SUB_AGENT
+                        : holidayConstants_1.VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT;
             const data = yield this.db(`${view_name} as hb`)
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('hb.id', 'hb.booking_ref', 'hb.holiday_package_title', 'hb.source_type', 'hb.source_name', 'hb.total_adult', 'hb.total_child', 'hb.total_price', 'hb.travel_date', 'hb.created_at', 'hb.status')
@@ -117,7 +118,9 @@ class HolidayPackageBookingModel extends schema_1.default {
                 ? holidayConstants_1.VIEW_HOLIDAY_PACKAGE_BOOKING_BY_B2C
                 : where.booked_by === constants_1.SOURCE_AGENT_B2C
                     ? holidayConstants_1.VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT_B2C
-                    : holidayConstants_1.VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT;
+                    : where.booked_by === constants_1.SOURCE_SUB_AGENT
+                        ? holidayConstants_1.VIEW_HOLIDAY_PACKAGE_BOOKING_BY_SUB_AGENT
+                        : holidayConstants_1.VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT;
             return yield this.db(`${view_name} as hb`)
                 .withSchema(this.SERVICE_SCHEMA)
                 .select('*')

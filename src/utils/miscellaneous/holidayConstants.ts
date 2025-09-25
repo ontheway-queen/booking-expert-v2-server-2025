@@ -29,11 +29,11 @@ export const HOLIDAY_CREATED_BY_AGENT = 'AGENT';
 export const VIEW_HOLIDAY_PACKAGE_BOOKING_BY_B2C = 'b2c_holiday_booking_view';
 export const VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT =
   'agent_holiday_booking_view';
+export const VIEW_HOLIDAY_PACKAGE_BOOKING_BY_SUB_AGENT =
+  'sub_agent_holiday_booking_view';
 export const VIEW_HOLIDAY_PACKAGE_BOOKING_BY_AGENT_B2C =
   'agent_b2c_holiday_booking_view';
 export const VIEW_HOLIDAY_PACKAGE_CREATED_BY_ADMIN =
   'admin_holiday_package_view';
 export const VIEW_HOLIDAY_PACKAGE_CREATED_BY_AGENT =
   'agent_holiday_package_view';
-
-
