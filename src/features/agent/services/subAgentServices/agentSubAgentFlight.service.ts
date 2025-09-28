@@ -1,5 +1,10 @@
-import { Request } from 'express';
-import AbstractServices from '../../../../abstract/abstract.service';
+import { Request } from "express";
+import AbstractServices from "../../../../abstract/abstract.service";
+import {
+  SOURCE_AGENT,
+  SOURCE_SUB_AGENT,
+} from "../../../../utils/miscellaneous/constants";
+import { ISubAgentGetFlightBookingReqQuery } from "../../../subAgent/utils/types/subAgentFlight.types";
 
 export class AgentSubAgentFlightService extends AbstractServices {
   constructor() {
