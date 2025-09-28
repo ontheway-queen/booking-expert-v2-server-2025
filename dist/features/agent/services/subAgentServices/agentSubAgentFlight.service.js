@@ -1,1 +1,84 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AgentSubAgentFlightService = void 0;
+const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
+class AgentSubAgentFlightService extends abstract_service_1.default {
+    constructor() {
+        super();
+    }
+    getAllBookingList(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const flightBookingModel = this.Model.FlightBookingModel(trx);
+                const query = req.query;
+                const data = yield flightBookingModel.getFlightBookingList(Object.assign(Object.assign({}, query), { source_id: agency_id, booked_by: SOURCE_SUB_AGENT }), true);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    total: data.total,
+                    data: data.data,
+                };
+            }));
+        });
+    }
+    getSingleBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const { id } = req.params;
+                const flightBookingModel = this.Model.FlightBookingModel(trx);
+                const flightSegmentModel = this.Model.FlightBookingSegmentModel(trx);
+                const flightTravelerModel = this.Model.FlightBookingTravelerModel(trx);
+                const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(trx);
+                const booking_data = yield flightBookingModel.getSingleFlightBooking({
+                    id: Number(id),
+                    booked_by: SOURCE_AGENT,
+                    agency_id,
+                });
+                if (!booking_data) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                const price_breakdown_data = yield flightPriceBreakdownModel.getFlightBookingPriceBreakdown(Number(id));
+                const segment_data = yield flightSegmentModel.getFlightBookingSegment(Number(id));
+                const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(Number(id));
+                const { vendor_fare, source_type } = booking_data, restData = __rest(booking_data, ["vendor_fare", "source_type"]);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    data: Object.assign(Object.assign({}, restData), { price_breakdown_data,
+                        segment_data,
+                        traveler_data }),
+                };
+            }));
+        });
+    }
+}
+exports.AgentSubAgentFlightService = AgentSubAgentFlightService;
