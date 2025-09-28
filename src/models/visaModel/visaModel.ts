@@ -205,7 +205,7 @@ export default class VisaModel extends Schema {
         qb.andWhere('v.status', query.status);
         qb.andWhere((subQb) => {
           subQb
-            .andWhere('v.visa_for', VISA_FOR_B2C)
+            .andWhere('v.visa_for', query.visa_for)
             .orWhere('v.visa_for', VISA_FOR_BOTH);
         });
       });

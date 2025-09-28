@@ -1,6 +1,5 @@
 import { Request } from 'express';
 import AbstractServices from '../../../abstract/abstract.service';
-
 import Lib from '../../../utils/lib/lib';
 import {
   SOURCE_AGENT,
@@ -81,7 +80,7 @@ export class SubAgentSupportTicketService extends AbstractServices {
     const supportTicketModel = this.Model.SupportTicketModel();
     const query = req.query as ISubAgentGetSupportTicketReqQuery;
 
-    console.log({ agency_id });
+    console.log({ agency_id }, query);
     const data = await supportTicketModel.getAgentSupportTicket(
       {
         agent_id: agency_id,
@@ -90,6 +89,8 @@ export class SubAgentSupportTicketService extends AbstractServices {
       },
       true
     );
+
+    console.log(data);
 
     return {
       success: true,
@@ -110,6 +111,7 @@ export class SubAgentSupportTicketService extends AbstractServices {
     const ticket = await supportTicketModel.getSingleAgentSupportTicket({
       id: ticket_id,
       agent_id: agency_id,
+      source_type: 'SUB AGENT',
     });
 
     if (!ticket) {
@@ -150,6 +152,7 @@ export class SubAgentSupportTicketService extends AbstractServices {
     const ticket = await supportTicketModel.getSingleAgentSupportTicket({
       id: ticket_id,
       agent_id: agency_id,
+      source_type: 'SUB AGENT',
     });
 
     if (!ticket) {
@@ -184,6 +187,7 @@ export class SubAgentSupportTicketService extends AbstractServices {
       const ticket = await supportTicketModel.getSingleAgentSupportTicket({
         id: support_ticket_id,
         agent_id: agency_id,
+        source_type: SOURCE_SUB_AGENT,
       });
 
       if (!ticket) {
@@ -241,6 +245,7 @@ export class SubAgentSupportTicketService extends AbstractServices {
       const ticket = await supportTicketModel.getSingleAgentSupportTicket({
         id: support_ticket_id,
         agent_id: agency_id,
+        source_type: SOURCE_SUB_AGENT,
       });
 
       if (!ticket) {
@@ -267,7 +272,7 @@ export class SubAgentSupportTicketService extends AbstractServices {
           status: 'Closed',
         },
         support_ticket_id,
-        SOURCE_AGENT
+        SOURCE_SUB_AGENT
       );
 
       return {

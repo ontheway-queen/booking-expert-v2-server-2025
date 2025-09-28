@@ -58,6 +58,7 @@ export class subAgentVisaService extends AbstractServices {
       is_deleted: false,
       source_id: main_agency_id,
       status: true,
+      visa_for: 'AGENT',
     });
 
     return {
@@ -252,7 +253,7 @@ export class subAgentVisaService extends AbstractServices {
   //get single visa
   public async getSingleVisaApplication(req: Request) {
     const { id } = req.params;
-    const { user_id } = req.agencyB2CUser;
+    const { user_id } = req.agencyUser;
     const { agency_id } = req.agencyB2CWhiteLabel;
     const visaApplicationModel = this.Model.VisaApplicationModel();
 

@@ -1,21 +1,21 @@
 import { Request } from 'express';
-import AbstractServices from '../../../abstract/abstract.service';
+import AbstractServices from '../../../../abstract/abstract.service';
 import {
   IAgentCreateSubAgentReqBody,
   IAgentGetSubAgencyReqQuery,
   IAgentSubAgencyUsersQueryFilter,
   IAgentUpdateSubAgencyPayload,
   IAgentUpdateSubAgencyUserReqBody,
-} from '../utils/types/agentSubAgent.types';
-import CustomError from '../../../utils/lib/customError';
-import Lib from '../../../utils/lib/lib';
+} from '../../utils/types/agentSubAgent.types';
+import CustomError from '../../../../utils/lib/customError';
+import Lib from '../../../../utils/lib/lib';
 import {
   GENERATE_AUTO_UNIQUE_ID,
   SOURCE_SUB_AGENT,
-} from '../../../utils/miscellaneous/constants';
-import EmailSendLib from '../../../utils/lib/emailSendLib';
-import { registrationVerificationCompletedTemplate } from '../../../utils/templates/registrationVerificationCompletedTemplate';
-import { IUpdateAgencyUserPayload } from '../../../utils/modelTypes/agentModel/agencyUserModelTypes';
+} from '../../../../utils/miscellaneous/constants';
+import EmailSendLib from '../../../../utils/lib/emailSendLib';
+import { registrationVerificationCompletedTemplate } from '../../../../utils/templates/registrationVerificationCompletedTemplate';
+import { IUpdateAgencyUserPayload } from '../../../../utils/modelTypes/agentModel/agencyUserModelTypes';
 
 export default class AgentSubAgentService extends AbstractServices {
   constructor() {

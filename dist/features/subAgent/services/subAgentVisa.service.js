@@ -65,6 +65,7 @@ class subAgentVisaService extends abstract_service_1.default {
                 is_deleted: false,
                 source_id: main_agency_id,
                 status: true,
+                visa_for: 'AGENT',
             });
             return {
                 success: true,
@@ -219,7 +220,7 @@ class subAgentVisaService extends abstract_service_1.default {
     getSingleVisaApplication(req) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const { user_id } = req.agencyB2CUser;
+            const { user_id } = req.agencyUser;
             const { agency_id } = req.agencyB2CWhiteLabel;
             const visaApplicationModel = this.Model.VisaApplicationModel();
             const application_data = yield visaApplicationModel.getAgentB2CSingleVisaApplication({

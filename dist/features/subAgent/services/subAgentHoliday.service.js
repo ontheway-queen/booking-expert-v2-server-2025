@@ -181,7 +181,7 @@ class SubAgentHolidayService extends abstract_service_1.default {
                 const { id } = req.params;
                 const get_booking = yield holidayPackageBookingModel.getSingleHolidayBooking({
                     id,
-                    booked_by: constants_1.SOURCE_AGENT,
+                    booked_by: constants_1.SOURCE_SUB_AGENT,
                     source_id: agency_id,
                 });
                 if (!get_booking) {

@@ -86,8 +86,9 @@ class SubAgentSupportTicketService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const supportTicketModel = this.Model.SupportTicketModel();
             const query = req.query;
-            console.log({ agency_id });
+            console.log({ agency_id }, query);
             const data = yield supportTicketModel.getAgentSupportTicket(Object.assign({ agent_id: agency_id, source_type: constants_1.SOURCE_SUB_AGENT }, query), true);
+            console.log(data);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -106,6 +107,7 @@ class SubAgentSupportTicketService extends abstract_service_1.default {
             const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                 id: ticket_id,
                 agent_id: agency_id,
+                source_type: 'SUB AGENT',
             });
             if (!ticket) {
                 return {
@@ -136,6 +138,7 @@ class SubAgentSupportTicketService extends abstract_service_1.default {
             const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                 id: ticket_id,
                 agent_id: agency_id,
+                source_type: 'SUB AGENT',
             });
             if (!ticket) {
                 return {
@@ -167,6 +170,7 @@ class SubAgentSupportTicketService extends abstract_service_1.default {
                 const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                     id: support_ticket_id,
                     agent_id: agency_id,
+                    source_type: constants_1.SOURCE_SUB_AGENT,
                 });
                 if (!ticket) {
                     return {
@@ -212,6 +216,7 @@ class SubAgentSupportTicketService extends abstract_service_1.default {
                 const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                     id: support_ticket_id,
                     agent_id: agency_id,
+                    source_type: constants_1.SOURCE_SUB_AGENT,
                 });
                 if (!ticket) {
                     return {
@@ -232,7 +237,7 @@ class SubAgentSupportTicketService extends abstract_service_1.default {
                     closed_by: 'Customer',
                     closed_by_user_id: user_id,
                     status: 'Closed',
-                }, support_ticket_id, constants_1.SOURCE_AGENT);
+                }, support_ticket_id, constants_1.SOURCE_SUB_AGENT);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,

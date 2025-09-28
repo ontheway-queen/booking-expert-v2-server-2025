@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import AbstractController from '../../../abstract/abstract.controller';
-import AgentSubAgentService from '../services/agentSubAgent.service';
+import AgentSubAgentService from '../services/subAgentServices/agentSubAgent.service';
 import { AgentSubAgentValidator } from '../utils/validators/agentSubAgent.validator';
 
 export class AgentSubAgentController extends AbstractController {

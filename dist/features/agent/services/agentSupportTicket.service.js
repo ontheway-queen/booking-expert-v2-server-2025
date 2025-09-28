@@ -105,6 +105,7 @@ class AgentSupportTicketService extends abstract_service_1.default {
             const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                 id: ticket_id,
                 agent_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
             });
             if (!ticket) {
                 return {
@@ -135,6 +136,7 @@ class AgentSupportTicketService extends abstract_service_1.default {
             const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                 id: ticket_id,
                 agent_id: agency_id,
+                source_type: constants_1.SOURCE_AGENT,
             });
             if (!ticket) {
                 return {
@@ -166,6 +168,7 @@ class AgentSupportTicketService extends abstract_service_1.default {
                 const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                     id: support_ticket_id,
                     agent_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT,
                 });
                 if (!ticket) {
                     return {
@@ -211,6 +214,7 @@ class AgentSupportTicketService extends abstract_service_1.default {
                 const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                     id: support_ticket_id,
                     agent_id: agency_id,
+                    source_type: constants_1.SOURCE_AGENT,
                 });
                 if (!ticket) {
                     return {

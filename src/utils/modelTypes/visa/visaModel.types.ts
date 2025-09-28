@@ -1,5 +1,11 @@
 interface IVisaType {
-  type: 'Student' | 'Government Delegates' | 'Business' | 'Tourist' | 'Investor' | 'Work';
+  type:
+    | 'Student'
+    | 'Government Delegates'
+    | 'Business'
+    | 'Tourist'
+    | 'Investor'
+    | 'Work';
 }
 
 export interface ICreateVisaPayload {
@@ -100,7 +106,7 @@ export interface IGetVisaListData {
   visa_type: string;
   visa_mode: string;
   max_validity: number;
-  status:boolean;
+  status: boolean;
   image: string;
 }
 
@@ -144,41 +150,39 @@ interface IVisaRequiredField {
 
 export interface IGetAgentB2CVisaListQuery {
   country_id: number;
-  visa_type_id:number;
-  source_id:number;
+  visa_type_id: number;
+  source_id: number;
   is_deleted: boolean;
   status: boolean;
+  visa_for: 'B2C' | 'AGENT';
 }
 
-
-export interface IGetAgentB2CSingleVisaQuery{
+export interface IGetAgentB2CSingleVisaQuery {
   is_deleted: boolean;
   source_id: number;
   slug: string;
-  status:Boolean
+  status: Boolean;
 }
 
-
-export interface IGetAgentB2CSingleVisaData{
-  id:number;
-  country_name:string,
-  title:string,
-  visa_fee:number,
-  processing_fee:number,
-  max_validity:number,
-  stay_validity:number,
-  visa_type:string,
-  visa_mode:string,
-  description:string,
-  documents_details:string,
-  required_fields:string,
-  image:string,
-  meta_title:string,
-  meta_description:string
+export interface IGetAgentB2CSingleVisaData {
+  id: number;
+  country_name: string;
+  title: string;
+  visa_fee: number;
+  processing_fee: number;
+  max_validity: number;
+  stay_validity: number;
+  visa_type: string;
+  visa_mode: string;
+  description: string;
+  documents_details: string;
+  required_fields: string;
+  image: string;
+  meta_title: string;
+  meta_description: string;
 }
 
-
-export interface IGetAllVisaCreatedCountryQuery{
+export interface IGetAllVisaCreatedCountryQuery {
   is_deleted: boolean;
   source_id: number;
   source_type: string;
