@@ -333,30 +333,41 @@ class Lib {
       .replace(/>\s+</g, '><') // Remove spaces between tags
       .trim();
   };
+
+  //get adjusted amount from the payment gateways
+  public static calculateAdjustedAmount(
+    totalAmount: number,
+    percentage: number,
+    operation: 'add' | 'subtract'
+  ) {
+    return operation === 'add'
+      ? Math.round(totalAmount * (1 + percentage / 100))
+      : Math.round(totalAmount / (1 + percentage / 100));
+  }
 }
 export default Lib;
 
 interface IGenNoParams {
   trx: TDB;
   type:
-    | 'Agent'
-    | 'Sub_Agent'
-    | 'Agent_Flight'
-    | 'Agent_Visa'
-    | 'Agent_Tour'
-    | 'Agent_Umrah'
-    | 'Agent_GroupFare'
-    | 'Agent_SupportTicket'
-    | 'Agent_B2C_SupportTicket'
-    | 'Agent_Hotel'
-    | 'Agent_Deposit_Request'
-    | 'B2C_Deposit_Request'
-    | 'User_Flight'
-    | 'User_Visa'
-    | 'User_Tour'
-    | 'User_Umrah'
-    | 'User_SupportTicket'
-    | 'ADM_Management'
-    | 'Money_Receipt'
-    | 'Invoice';
+  | 'Agent'
+  | 'Sub_Agent'
+  | 'Agent_Flight'
+  | 'Agent_Visa'
+  | 'Agent_Tour'
+  | 'Agent_Umrah'
+  | 'Agent_GroupFare'
+  | 'Agent_SupportTicket'
+  | 'Agent_B2C_SupportTicket'
+  | 'Agent_Hotel'
+  | 'Agent_Deposit_Request'
+  | 'B2C_Deposit_Request'
+  | 'User_Flight'
+  | 'User_Visa'
+  | 'User_Tour'
+  | 'User_Umrah'
+  | 'User_SupportTicket'
+  | 'ADM_Management'
+  | 'Money_Receipt'
+  | 'Invoice';
 }

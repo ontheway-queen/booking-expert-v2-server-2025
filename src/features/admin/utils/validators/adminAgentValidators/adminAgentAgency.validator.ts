@@ -35,6 +35,7 @@ export default class AdminAgentAgencyValidator {
             umrah: Joi.boolean().required(),
             group_fare: Joi.boolean().required(),
             blog: Joi.boolean().required(),
+            b2c_link: Joi.string().optional()
           });
           const parsedValue = JSON.parse(value);
 
@@ -101,6 +102,7 @@ export default class AdminAgentAgencyValidator {
             umrah: Joi.boolean().required(),
             group_fare: Joi.boolean().required(),
             blog: Joi.boolean().required(),
+            b2c_link: Joi.string().optional()
           });
           const parsedValue = JSON.parse(value);
           const { error } = innerSchema.validate(parsedValue);
@@ -114,5 +116,42 @@ export default class AdminAgentAgencyValidator {
           return helpers.error('any.invalid');
         }
       }),
+  });
+
+  public upsertAgencyEmailCredential = Joi.object({
+    type: Joi.string()
+      .valid('GMAIL', 'HOSTINGER', 'NAMECHEAP', 'ZOHO', 'CPANEL', 'OTHER')
+      .required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+    host: Joi.string().optional(),
+    port: Joi.number().optional(),
+    status: Joi.boolean().optional(),
+  });
+
+  public upsertAgencyPaymentGatewayCredential = Joi.object({
+    gateway_name: Joi.string().valid("SSL", "BKASH").required(),
+    cred: Joi.array()
+      .items(
+        Joi.object({
+          key: Joi.string()
+            .when(Joi.ref("...gateway_name"), {
+              is: "SSL",
+              then: Joi.valid("SSL_STORE_ID", "SSL_STORE_PASSWORD").required(),
+            })
+            .when(Joi.ref("...gateway_name"), {
+              is: "BKASH",
+              then: Joi.valid(
+                "BKASH_APP_KEY",
+                "BKASH_APP_SECRET",
+                "BKASH_USERNAME",
+                "BKASH_PASSWORD"
+              ).required(),
+            }),
+          value: Joi.string().required(),
+        })
+      )
+      .min(1)
+      .required(),
   });
 }

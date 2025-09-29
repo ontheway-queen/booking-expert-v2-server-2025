@@ -33,6 +33,7 @@ export default class EmailSendLib {
     const otherModel = new OthersModel(trx);
 
     const creds = await otherModel.getEmailCreds(agency_id);
+    console.log({agency_id});
 
     if (!creds) {
       return await this.sendEmailHostinger(payload, {

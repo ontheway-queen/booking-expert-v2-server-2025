@@ -1,3 +1,5 @@
+import { TYPE_PAYMENT_GATEWAY_BKASH, TYPE_PAYMENT_GATEWAY_SSL } from "../../../../../utils/miscellaneous/constants";
+
 export interface IAdminAgentGetAgencyReqQuery {
   filter?: string;
   limit?: string;
@@ -65,5 +67,22 @@ export interface IAdminCreateAgentReqBody {
     umrah: boolean;
     group_fare: boolean;
     blog: boolean;
+    b2c_link?: string;
   };
+}
+
+export interface IAdminUpsertAgentEmailCredentialReqBody {
+  type: 'GMAIL' | 'HOSTINGER' | 'NAMECHEAP' | 'ZOHO' | 'CPANEL' | 'OTHER';
+  email: string;
+  port: number;
+  host: string;
+  password: string;
+}
+
+export interface IAdminGetAgentEmailCredentialReqQuery {
+  gateway_name: typeof TYPE_PAYMENT_GATEWAY_SSL | typeof TYPE_PAYMENT_GATEWAY_BKASH;
+  cred: {
+    key: string;
+    value: string;
+  }[];
 }

@@ -16,6 +16,8 @@ const abstract_service_1 = __importDefault(require("../../../abstract/abstract.s
 const config_1 = __importDefault(require("../../../config/config"));
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
+const emailSendLib_1 = __importDefault(require("../../../utils/lib/emailSendLib"));
+const registrationCompleteTemplate_1 = require("../../../utils/templates/registrationCompleteTemplate");
 class AuthAgentB2CService extends abstract_service_1.default {
     constructor() {
         super();
@@ -76,6 +78,18 @@ class AuthAgentB2CService extends abstract_service_1.default {
                     phone_number,
                 };
                 const AuthToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_AGENT_B2C, '24h');
+                const white_label_permissions = yield AgentModel.getWhiteLabelPermission({ agency_id });
+                yield emailSendLib_1.default.sendEmailAgent(trx, agency_id, {
+                    email,
+                    emailSub: 'Registration Completed',
+                    emailBody: (0, registrationCompleteTemplate_1.registrationTemplate)({
+                        agency: String(agent_details === null || agent_details === void 0 ? void 0 : agent_details.agency_name),
+                        agency_phone: String(agent_details === null || agent_details === void 0 ? void 0 : agent_details.phone),
+                        logo: String(agent_details === null || agent_details === void 0 ? void 0 : agent_details.agency_logo),
+                        name,
+                        website_link: (white_label_permissions === null || white_label_permissions === void 0 ? void 0 : white_label_permissions.b2c_link) || '',
+                    }),
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,

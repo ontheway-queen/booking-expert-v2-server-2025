@@ -24,6 +24,13 @@ export const TYPE_EMAIL_SERVER_ZOHO = 'ZOHO';
 export const TYPE_EMAIL_SERVER_CPANEL = 'CPANEL';
 export const TYPE_EMAIL_SERVER_OTHER = 'OTHER';
 
+// Payment gateway types
+export const TYPE_PAYMENT_GATEWAY_SSL = 'SSL';
+export const TYPE_PAYMENT_GATEWAY_BKASH = 'BKASH';
+
+export const BKASH_TOKEN_ENV = 'bkash_refresh_token';
+export const BKASH_PERCENTAGE = 1.5;
+
 //Project Info
 export const PROJECT_NAME = 'Booking Expert V2';
 export const PROJECT_LOGO =

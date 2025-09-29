@@ -2,6 +2,7 @@ import { TDB } from '../../features/public/utils/types/publicCommon.types';
 import {
   DATA_LIMIT,
   OTP_DEFAULT_EXPIRY,
+  TYPE_PAYMENT_GATEWAY_BKASH,
 } from '../../utils/miscellaneous/constants';
 import { PRIORITY_AIRPORTS } from '../../utils/miscellaneous/flightConstant';
 import Schema from '../../utils/miscellaneous/schema';
@@ -765,6 +766,43 @@ class CommonModel extends Schema {
       .withSchema(this.PUBLIC_SCHEMA)
       .select('id', 'name', 'status', 'created_at')
       .whereRaw(`name ILIKE ?`, [`%${filter}%`]);
+  }
+
+  public async upsertPaymentGatewayToken(payload: {
+    gateway_name: typeof TYPE_PAYMENT_GATEWAY_BKASH;
+    key: string;
+    value: string;
+  }) {
+    const check_entry = await this.db("payment_gateway_token")
+      .withSchema(this.DBO_SCHEMA)
+      .select("*")
+      .where('gateway_name', payload.gateway_name)
+      .andWhere('key', payload.key);
+
+    if (check_entry?.length) {
+      await this.db("payment_gateway_token")
+        .withSchema(this.DBO_SCHEMA)
+        .update({
+          value: payload.value,
+          updated_at: new Date()
+        })
+        .where('gateway_name', payload.gateway_name)
+        .andWhere('key', payload.key)
+    } else {
+      const res = await this.db("payment_gateway_token")
+        .withSchema(this.DBO_SCHEMA)
+        .insert(payload)
+    }
+  }
+
+  public async getPaymentGatewayToken(payload: {
+    gateway_name: typeof TYPE_PAYMENT_GATEWAY_BKASH;
+    key: string;
+  }) {
+    return await this.db("payment_gateway_token")
+      .withSchema(this.DBO_SCHEMA)
+      .select('*')
+      .where(payload);
   }
 }
 export default CommonModel;

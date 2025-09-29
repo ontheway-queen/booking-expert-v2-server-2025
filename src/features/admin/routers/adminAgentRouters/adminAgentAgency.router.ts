@@ -47,5 +47,9 @@ export default class AdminAgentAgencyRouter extends AbstractRouter {
       .patch(this.controller.updateAgencyApplication);
 
     this.router.route('/:id/login').get(this.controller.agencyLogin);
+
+    this.router.route('/:agency_id/email-config').post(this.controller.upsertAgencyEmailCredential);
+
+    this.router.route('/:agency_id/payment-gateway-config').post(this.controller.upsertAgencyPaymentGatewayCredential);
   }
 }

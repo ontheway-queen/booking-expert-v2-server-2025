@@ -16,6 +16,7 @@ const abstract_service_1 = __importDefault(require("../../../abstract/abstract.s
 const constants_1 = require("../../../utils/miscellaneous/constants");
 const lib_1 = __importDefault(require("../../../utils/lib/lib"));
 const customError_1 = __importDefault(require("../../../utils/lib/customError"));
+const paymentSupport_service_1 = require("../../../utils/supportServices/paymentSupportServices/paymentSupport.service");
 class AgentB2CPaymentService extends abstract_service_1.default {
     constructor() {
         super();
@@ -292,6 +293,121 @@ class AgentB2CPaymentService extends abstract_service_1.default {
                 data: data.data,
                 total: data.total || 0,
             };
+        });
+    }
+    getPaymentGatewayList(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { agency_id } = req.agencyB2CWhiteLabel;
+            const paymentGatewayModel = this.Model.OthersModel();
+            const data = yield paymentGatewayModel.getUniquePaymentGatewayList(agency_id);
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                data
+            };
+        });
+    }
+    topUpUsingPaymentGateway(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                var _a, _b, _c, _d, _e, _f;
+                const { user_id, user_email, phone_number, name } = req.agencyB2CUser;
+                const { agency_id } = req.agencyB2CWhiteLabel;
+                const { amount, payment_gateway, success_page, failed_page, cancelled_page } = req.body;
+                const othersModel = this.Model.OthersModel(trx);
+                if (payment_gateway === 'SSL') {
+                    const SSL_STORE_ID = yield othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'SSL', key: 'SSL_STORE_ID' });
+                    if (!SSL_STORE_ID || !SSL_STORE_ID.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Payment gateway is not configured. Please contact with support team.'
+                        };
+                    }
+                    const SSL_STORE_PASSWORD = yield othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'SSL', key: 'SSL_STORE_PASSWORD' });
+                    if (!SSL_STORE_PASSWORD || !SSL_STORE_PASSWORD.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Payment gateway is not configured. Please contact with support team.'
+                        };
+                    }
+                    const paymentSupportService = new paymentSupport_service_1.PaymentSupportService();
+                    return yield paymentSupportService.SSLPaymentGateway({
+                        total_amount: amount,
+                        currency: 'BDT',
+                        tran_id: `${constants_1.SOURCE_AGENT_B2C}-${agency_id}-${user_id}`,
+                        cus_name: name,
+                        cus_email: user_email,
+                        cus_phone: phone_number,
+                        product_name: 'credit load',
+                        success_page,
+                        failed_page,
+                        cancelled_page,
+                        store_id: (_a = SSL_STORE_ID === null || SSL_STORE_ID === void 0 ? void 0 : SSL_STORE_ID[0]) === null || _a === void 0 ? void 0 : _a.value,
+                        store_passwd: (_b = SSL_STORE_PASSWORD === null || SSL_STORE_PASSWORD === void 0 ? void 0 : SSL_STORE_PASSWORD[0]) === null || _b === void 0 ? void 0 : _b.value
+                    });
+                }
+                else if (payment_gateway === 'BKASH') {
+                    const BKASH_APP_KEY = yield othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'BKASH', key: 'BKASH_APP_KEY' });
+                    if (!BKASH_APP_KEY || !BKASH_APP_KEY.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Payment gateway is not configured. Please contact with support team.'
+                        };
+                    }
+                    const BKASH_APP_SECRET = yield othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'BKASH', key: 'BKASH_APP_SECRET' });
+                    if (!BKASH_APP_SECRET || !BKASH_APP_SECRET.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Payment gateway is not configured. Please contact with support team.'
+                        };
+                    }
+                    const BKASH_USERNAME = yield othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'BKASH', key: 'BKASH_USERNAME' });
+                    if (!BKASH_USERNAME || !BKASH_USERNAME.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Payment gateway is not configured. Please contact with support team.'
+                        };
+                    }
+                    const BKASH_PASSWORD = yield othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'BKASH', key: 'BKASH_PASSWORD' });
+                    if (!BKASH_PASSWORD || !BKASH_PASSWORD.length) {
+                        return {
+                            success: false,
+                            code: this.StatusCode.HTTP_BAD_REQUEST,
+                            message: 'Payment gateway is not configured. Please contact with support team.'
+                        };
+                    }
+                    const paymentSupportService = new paymentSupport_service_1.PaymentSupportService();
+                    return yield paymentSupportService.createBkashPaymentSession({
+                        mobile_number: String(phone_number),
+                        success_page,
+                        failed_page,
+                        cancelled_page,
+                        amount,
+                        ref_id: `AGENT_B2C-${agency_id}-${user_id}-${new Date().getTime()}`,
+                        trx,
+                        user_id,
+                        source: constants_1.SOURCE_AGENT_B2C,
+                        cred: {
+                            BKASH_APP_KEY: (_c = BKASH_APP_KEY === null || BKASH_APP_KEY === void 0 ? void 0 : BKASH_APP_KEY[0]) === null || _c === void 0 ? void 0 : _c.value,
+                            BKASH_APP_SECRET: (_d = BKASH_APP_SECRET === null || BKASH_APP_SECRET === void 0 ? void 0 : BKASH_APP_SECRET[0]) === null || _d === void 0 ? void 0 : _d.value,
+                            BKASH_USERNAME: (_e = BKASH_USERNAME === null || BKASH_USERNAME === void 0 ? void 0 : BKASH_USERNAME[0]) === null || _e === void 0 ? void 0 : _e.value,
+                            BKASH_PASSWORD: (_f = BKASH_PASSWORD === null || BKASH_PASSWORD === void 0 ? void 0 : BKASH_PASSWORD[0]) === null || _f === void 0 ? void 0 : _f.value
+                        }
+                    });
+                }
+                else {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: this.ResMsg.HTTP_BAD_REQUEST
+                    };
+                }
+            }));
         });
     }
 }

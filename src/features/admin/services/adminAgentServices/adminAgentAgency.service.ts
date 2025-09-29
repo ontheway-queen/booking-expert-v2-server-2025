@@ -6,6 +6,8 @@ import {
   IAdminAgentUpdateAgencyApplicationReqBody,
   IAdminCreateAgentReqBody,
   IAdminAgentUpdateAgencyUserReqBody,
+  IAdminUpsertAgentEmailCredentialReqBody,
+  IAdminGetAgentEmailCredentialReqQuery,
 } from '../../utils/types/adminAgentTypes/adminAgentAgency.types';
 import CustomError from '../../../../utils/lib/customError';
 import { IUpdateAgencyPayload } from '../../../../utils/modelTypes/agentModel/agencyModelTypes';
@@ -94,6 +96,11 @@ export default class AdminAgentAgencyService extends AbstractServices {
         }
       }
 
+      const otherModel = this.Model.OthersModel(trx);
+      const email_credential = await otherModel.getEmailCreds(agency_id);
+
+      const payment_gateway_creds = await otherModel.getPaymentGatewayCreds({agency_id});
+
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
@@ -103,6 +110,8 @@ export default class AdminAgentAgencyService extends AbstractServices {
           users: users.data,
           total_user: users.total,
           whiteLabelPermissions,
+          email_credential: email_credential || null,
+          payment_gateway_creds: payment_gateway_creds,
         },
       };
     });
@@ -753,6 +762,106 @@ export default class AdminAgentAgencyService extends AbstractServices {
           national_id,
         },
       };
+    });
+  }
+
+  public async upsertAgencyEmailCredential(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { user_id } = req.admin;
+      const { agency_id } = req.params;
+      const body = req.body as IAdminUpsertAgentEmailCredentialReqBody;
+      const model = this.Model.OthersModel(trx);
+      const AgentModel = this.Model.AgencyModel(trx);
+      const checkAgency = await AgentModel.checkAgency({
+        agency_id: Number(agency_id),
+      });
+
+      if (!checkAgency) {
+        throw new CustomError(
+          this.ResMsg.HTTP_NOT_FOUND,
+          this.StatusCode.HTTP_NOT_FOUND
+        );
+      }
+      const check_duplicate = await model.getEmailCreds(Number(agency_id));
+      //update
+      if (check_duplicate) {
+        await model.updateEmailCreds(body, Number(agency_id));
+        await this.insertAdminAudit(trx, {
+          created_by: user_id,
+          details: `Email credentials has been updated for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
+          type: 'UPDATE',
+          payload: body
+        });
+        return {
+          success: true,
+          code: this.StatusCode.HTTP_OK,
+          message: 'Email credentials has been updated'
+        }
+      }
+
+      //create
+      await model.insertEmailCreds({ ...body, agency_id: Number(agency_id) });
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        details: `Email credentials has been created for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
+        type: 'CREATE',
+        payload: body
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: 'Email credentials has been added',
+      }
+    });
+  }
+
+  public async upsertAgencyPaymentGatewayCredential(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { user_id } = req.admin;
+      const { agency_id } = req.params;
+      const body = req.body as IAdminGetAgentEmailCredentialReqQuery;
+
+      const agencyModel = this.Model.AgencyModel(trx);
+      const othersModel = this.Model.OthersModel(trx);
+      const checkAgency = await agencyModel.checkAgency({
+        agency_id: Number(agency_id),
+      });
+      if (!checkAgency) {
+        throw new CustomError(
+          this.ResMsg.HTTP_NOT_FOUND,
+          this.StatusCode.HTTP_NOT_FOUND
+        );
+      }
+
+      await Promise.all(body.cred.map(async (item) => {
+        const check_duplicate = await othersModel.getPaymentGatewayCreds(
+          { agency_id: Number(agency_id), gateway_name: body.gateway_name, key: item.key }
+        );
+
+        if (check_duplicate?.length) {
+          await othersModel.updatePaymentGatewayCreds({ value: item.value }, check_duplicate[0].id);
+        } else {
+          await othersModel.insertPaymentGatewayCreds({
+            agency_id: Number(agency_id),
+            gateway_name: body.gateway_name,
+            ...item
+          });
+        }
+      }));
+
+      await this.insertAdminAudit(trx, {
+        created_by: user_id,
+        details: `Payment gateway credentials has been updated for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
+        type: 'UPDATE',
+        payload: body
+      });
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_SUCCESSFUL,
+        message: 'Payment gateway credentials has been updated',
+      }
     });
   }
 }

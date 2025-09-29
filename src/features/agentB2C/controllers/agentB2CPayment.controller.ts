@@ -80,4 +80,22 @@ export default class AgentB2CPaymentController extends AbstractController {
       res.status(code).json(rest);
     }
   );
+
+  public getPaymentGatewayList = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.getPaymentGatewayList(req);
+      res.status(code).json(rest);
+    }
+  );
+
+  public topUpUsingPaymentGateway = this.asyncWrapper.wrap(
+    { bodySchema: this.validator.topUpUsingPaymentGateway },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.topUpUsingPaymentGateway(
+        req
+      );
+      res.status(code).json(rest);
+    }
+  );
 }

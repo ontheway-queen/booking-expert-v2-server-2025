@@ -91,6 +91,30 @@ class AdminAgentAgencyController extends abstract_controller_1.default {
                 this.error(rest.message, code);
             }
         }));
+        this.upsertAgencyEmailCredential = this.asyncWrapper.wrap({
+            bodySchema: this.validator.upsertAgencyEmailCredential,
+            paramSchema: this.commonValidator.singleParamNumValidator('agency_id')
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.upsertAgencyEmailCredential(req), { code } = _a, rest = __rest(_a, ["code"]);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
+        }));
+        this.upsertAgencyPaymentGatewayCredential = this.asyncWrapper.wrap({
+            bodySchema: this.validator.upsertAgencyPaymentGatewayCredential,
+            paramSchema: this.commonValidator.singleParamNumValidator('agency_id')
+        }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.services.upsertAgencyPaymentGatewayCredential(req), { code } = _a, rest = __rest(_a, ["code"]);
+            if (rest.success) {
+                res.status(code).json(rest);
+            }
+            else {
+                this.error(rest.message, code);
+            }
+        }));
     }
 }
 exports.default = AdminAgentAgencyController;

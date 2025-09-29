@@ -30,5 +30,8 @@ export default class AgentB2CPaymentRouter extends AbstractRouter {
       .route('/invoice/:id')
       .get(this.controller.getSingleInvoice)
       .post(this.controller.clearDueOfInvoice);
+
+    this.router.route('/gateway-list').get(this.controller.getPaymentGatewayList)
+    this.router.route('/top-up').post(this.controller.topUpUsingPaymentGateway);
   }
 }

@@ -43,6 +43,11 @@ const getConfig = () => {
         CT_API_KEY: process.env.CT_API_KEY,
         SERVER_URL: process.env.SERVER_URL,
         WFTT_URL: process.env.WFTT_URL,
+        BKASH_APP_SECRET: process.env.BKASH_APP_SECRET,
+        BKASH_APP_KEY: process.env.BKASH_APP_KEY,
+        BKASH_USERNAME: process.env.BKASH_USERNAME,
+        BKASH_PASSWORD: process.env.BKASH_PASSWORD,
+        BKASH_BASE_URL: process.env.BKASH_BASE_URL,
     };
 };
 const getSanitzedConfig = (config) => {

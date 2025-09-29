@@ -20,4 +20,16 @@ export class PublicPaymentController extends AbstractController {
       }
     }
   );
+
+  public transactionUsingBkash = this.asyncWrapper.wrap(
+    null,
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.service.transactionUsingBkash(req);
+      if (rest.redirect_url) {
+        res.status(code).redirect(rest.redirect_url);
+      } else {
+        res.status(code).json(rest);
+      }
+    }
+  );
 }

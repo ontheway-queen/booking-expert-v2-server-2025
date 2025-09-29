@@ -173,5 +173,45 @@ class OthersModel extends schema_1.default {
                 .first();
         });
     }
+    insertPaymentGatewayCreds(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('payment_gateway_creds')
+                .withSchema(this.AGENT_SCHEMA)
+                .insert(payload);
+        });
+    }
+    updatePaymentGatewayCreds(payload, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('payment_gateway_creds')
+                .withSchema(this.AGENT_SCHEMA)
+                .update(payload)
+                .where('id', id);
+        });
+    }
+    getPaymentGatewayCreds(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db('payment_gateway_creds')
+                .withSchema(this.AGENT_SCHEMA)
+                .select('*')
+                .where('agency_id', query.agency_id)
+                .andWhere((qb) => {
+                if (query.gateway_name) {
+                    qb.andWhere('gateway_name', query.gateway_name);
+                }
+                if (query.key) {
+                    qb.andWhere('key', query.key);
+                }
+            });
+        });
+    }
+    getUniquePaymentGatewayList(agency_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield this.db('payment_gateway_creds')
+                .withSchema(this.AGENT_SCHEMA)
+                .distinct('gateway_name')
+                .where('agency_id', agency_id);
+            return result.map(r => r.gateway_name);
+        });
+    }
 }
 exports.default = OthersModel;

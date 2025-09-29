@@ -12,6 +12,8 @@ import {
   OTP_TYPES,
   SOURCE_AGENT,
 } from '../../../utils/miscellaneous/constants';
+import EmailSendLib from '../../../utils/lib/emailSendLib';
+import { registrationTemplate } from '../../../utils/templates/registrationCompleteTemplate';
 
 export default class AuthAgentB2CService extends AbstractServices {
   constructor() {
@@ -87,6 +89,22 @@ export default class AuthAgentB2CService extends AbstractServices {
         config.JWT_SECRET_AGENT_B2C,
         '24h'
       );
+
+      const white_label_permissions = await AgentModel.getWhiteLabelPermission(
+        {agency_id}
+      );
+
+      await EmailSendLib.sendEmailAgent(trx, agency_id, {
+        email,
+        emailSub: 'Registration Completed',
+        emailBody: registrationTemplate({
+          agency: String(agent_details?.agency_name),
+          agency_phone: String(agent_details?.phone),
+          logo : String(agent_details?.agency_logo),
+          name,
+          website_link: white_label_permissions?.b2c_link || '',
+        }),
+      });
 
       return {
         success: true,

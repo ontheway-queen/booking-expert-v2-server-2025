@@ -97,4 +97,34 @@ export default class AdminAgentAgencyController extends AbstractController {
       }
     }
   );
+
+  public upsertAgencyEmailCredential = this.asyncWrapper.wrap(
+    {
+      bodySchema: this.validator.upsertAgencyEmailCredential,
+      paramSchema: this.commonValidator.singleParamNumValidator('agency_id')
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.upsertAgencyEmailCredential(req);
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
+    }
+  );
+
+  public upsertAgencyPaymentGatewayCredential = this.asyncWrapper.wrap(
+    {
+      bodySchema: this.validator.upsertAgencyPaymentGatewayCredential,
+      paramSchema: this.commonValidator.singleParamNumValidator('agency_id')
+    },
+    async (req: Request, res: Response) => {
+      const { code, ...rest } = await this.services.upsertAgencyPaymentGatewayCredential(req);
+      if (rest.success) {
+        res.status(code).json(rest);
+      } else {
+        this.error(rest.message, code);
+      }
+    }
+  );
 }

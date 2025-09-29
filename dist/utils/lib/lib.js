@@ -252,6 +252,12 @@ class Lib {
         }
         return amount;
     }
+    //get adjusted amount from the payment gateways
+    static calculateAdjustedAmount(totalAmount, percentage, operation) {
+        return operation === 'add'
+            ? Math.round(totalAmount * (1 + percentage / 100))
+            : Math.round(totalAmount / (1 + percentage / 100));
+    }
 }
 Lib.gibberishChecker = (value) => {
     var _a;
