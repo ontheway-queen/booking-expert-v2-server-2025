@@ -6,7 +6,7 @@ import {
   IAgentSubAgencyUsersQueryFilter,
   IAgentUpdateSubAgencyPayload,
   IAgentUpdateSubAgencyUserReqBody,
-} from '../../utils/types/agentSubAgent.types';
+} from '../../utils/types/agentSubAgentTypes/agentSubAgent.types';
 import CustomError from '../../../../utils/lib/customError';
 import Lib from '../../../../utils/lib/lib';
 import {

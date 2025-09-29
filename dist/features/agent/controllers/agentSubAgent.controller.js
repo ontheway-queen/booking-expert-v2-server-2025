@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentSubAgentController = void 0;
 const abstract_controller_1 = __importDefault(require("../../../abstract/abstract.controller"));
 const agentSubAgent_service_1 = __importDefault(require("../services/subAgentServices/agentSubAgent.service"));
-const agentSubAgent_validator_1 = require("../utils/validators/agentSubAgent.validator");
+const agentSubAgent_validator_1 = require("../utils/validators/agentSubAgentValidators/agentSubAgent.validator");
 class AgentSubAgentController extends abstract_controller_1.default {
     constructor() {
         super();
