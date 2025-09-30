@@ -35,13 +35,8 @@ class AgentSubAgentFlightService extends abstract_service_1.default {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { agency_id } = req.agencyUser;
                 const flightBookingModel = this.Model.FlightBookingModel(trx);
-<<<<<<< HEAD
                 const _a = req.query, { agency_id: sub_agent_id } = _a, query = __rest(_a, ["agency_id"]);
                 const data = yield flightBookingModel.getFlightBookingList(Object.assign(Object.assign({}, query), { source_id: sub_agent_id, booked_by: constants_1.SOURCE_SUB_AGENT, ref_agent_id: agency_id }), true);
-=======
-                const query = req.query;
-                const data = yield flightBookingModel.getFlightBookingList(Object.assign(Object.assign({}, query), { source_id: agency_id, booked_by: constants_1.SOURCE_SUB_AGENT }), true);
->>>>>>> 178d2bb6bf309af42b24509c14ca449feaad9ab1
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -62,13 +57,8 @@ class AgentSubAgentFlightService extends abstract_service_1.default {
                 const flightPriceBreakdownModel = this.Model.FlightBookingPriceBreakdownModel(trx);
                 const booking_data = yield flightBookingModel.getSingleFlightBooking({
                     id: Number(id),
-<<<<<<< HEAD
                     booked_by: constants_1.SOURCE_SUB_AGENT,
                     ref_agent_id: agency_id,
-=======
-                    booked_by: constants_1.SOURCE_AGENT,
-                    agency_id,
->>>>>>> 178d2bb6bf309af42b24509c14ca449feaad9ab1
                 });
                 if (!booking_data) {
                     return {
