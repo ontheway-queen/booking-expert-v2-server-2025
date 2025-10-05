@@ -1,7 +1,24 @@
 import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
-import { SOURCE_SUB_AGENT } from '../../../../utils/miscellaneous/constants';
-import { IAgentSubAgentGetFlightBookingReqQuery } from '../../utils/types/agentSubAgentTypes/agentSubAgentFlight.types';
+import {
+  SOURCE_AGENT,
+  SOURCE_SUB_AGENT,
+} from '../../../../utils/miscellaneous/constants';
+import {
+  IAgentSubAgentGetFlightBookingReqQuery,
+  IAgentUpdateSubAgentFlightBookingReqBody,
+} from '../../utils/types/agentSubAgentTypes/agentSubAgentFlight.types';
+import {
+  FLIGHT_BOOKING_CONFIRMED,
+  FLIGHT_BOOKING_IN_PROCESS,
+  FLIGHT_BOOKING_PENDING,
+  FLIGHT_TICKET_IN_PROCESS,
+  FLIGHT_TICKET_ISSUE,
+  PAYMENT_TYPE_FULL,
+} from '../../../../utils/miscellaneous/flightConstant';
+import { IUpdateFlightBookingPayload } from '../../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
+import { AgentFlightBookingSupportService } from '../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service';
+import { IAgentUpdateDataAfterTicketIssue } from '../../../../utils/supportTypes/bookingSupportTypes/flightBookingSupportTypes/agentFlightBookingTypes';
 
 export class AgentSubAgentFlightService extends AbstractServices {
   constructor() {
@@ -88,7 +105,7 @@ export class AgentSubAgentFlightService extends AbstractServices {
   public async updateBooking(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { id } = req.params;
-      const { name, user_email, user_id } = req.agencyUser;
+      const { name, user_email, user_id, agency_id } = req.agencyUser;
       const {
         status,
         airline_pnr,
@@ -96,7 +113,7 @@ export class AgentSubAgentFlightService extends AbstractServices {
         gds_pnr,
         ticket_issue_last_time,
         ticket_numbers,
-      } = req.body as IAgentUpdateAgentB2CFlightBookingReqBody;
+      } = req.body as IAgentUpdateSubAgentFlightBookingReqBody;
 
       const flightBookingModel = this.Model.FlightBookingModel(trx);
       const flightBookingTrackingModel =
@@ -104,7 +121,8 @@ export class AgentSubAgentFlightService extends AbstractServices {
 
       const booking_data = await flightBookingModel.getSingleFlightBooking({
         id: Number(id),
-        booked_by: SOURCE_AGENT_B2C,
+        booked_by: SOURCE_SUB_AGENT,
+        ref_agent_id: agency_id,
       });
 
       if (!booking_data) {
@@ -220,7 +238,7 @@ export class AgentSubAgentFlightService extends AbstractServices {
 
       await flightBookingModel.updateFlightBooking(payload, {
         id: Number(id),
-        source_type: SOURCE_AGENT_B2C,
+        source_type: SOURCE_SUB_AGENT,
       });
 
       await flightBookingTrackingModel.insertFlightBookingTracking({

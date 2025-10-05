@@ -9,9 +9,7 @@ const agentReport_router_1 = __importDefault(require("./routers/agentReport.rout
 const agentAdministration_router_1 = __importDefault(require("./routers/agentAdministration.router"));
 const agentSupportTicket_router_1 = __importDefault(require("./routers/agentSupportTicket.router"));
 const agentPayments_router_1 = __importDefault(require("./routers/agentPayments.router"));
-const agentB2C_router_1 = __importDefault(require("./routers/agentB2C.router"));
 const agentTraveler_router_1 = __importDefault(require("./routers/agentTraveler.router"));
-const agentSubAgent_router_1 = __importDefault(require("./routers/agentSubAgent.router"));
 const agentUmrah_router_1 = __importDefault(require("./routers/agentUmrah.router"));
 const agentGroupFare_router_1 = __importDefault(require("./routers/agentGroupFare.router"));
 const agentHoliday_router_1 = __importDefault(require("./routers/agentHoliday.router"));
@@ -19,6 +17,8 @@ const agentVisa_router_1 = __importDefault(require("./routers/agentVisa.router")
 const agentHotel_router_1 = __importDefault(require("./routers/agentHotel.router"));
 const agentFlight_router_1 = __importDefault(require("./routers/agentFlight.router"));
 const agentProfile_router_1 = __importDefault(require("./routers/agentProfile.router"));
+const agentSubAgentMain_router_1 = __importDefault(require("./routers/agentSubAgentMain.router"));
+const agentB2CMain_router_1 = __importDefault(require("../agentB2C/routers/agentB2CMain.router"));
 class AgentRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();
@@ -34,11 +34,11 @@ class AgentRootRouter {
         this.agentHolidayRouter = new agentHoliday_router_1.default();
         this.agentGroupFareRouter = new agentGroupFare_router_1.default();
         this.agentUmrahRouter = new agentUmrah_router_1.default();
-        this.agentSubAgentRouter = new agentSubAgent_router_1.default();
         this.agentTravelerRouter = new agentTraveler_router_1.default();
         this.agentProfileRouter = new agentProfile_router_1.default();
         // Agent B2C Sub Root Router Class
-        this.agentB2CRouter = new agentB2C_router_1.default();
+        this.agentB2CMainRouter = new agentB2CMain_router_1.default();
+        this.agentSubAgentMainRouter = new agentSubAgentMain_router_1.default();
         this.callRouter();
     }
     callRouter() {
@@ -50,14 +50,14 @@ class AgentRootRouter {
         this.Router.use('/holiday', this.agentHolidayRouter.router);
         this.Router.use('/group-fare', this.agentGroupFareRouter.router);
         this.Router.use('/umrah', this.agentUmrahRouter.router);
-        this.Router.use('/sub-agent', this.agentSubAgentRouter.router);
         this.Router.use('/traveler', this.agentTravelerRouter.router);
         this.Router.use('/payments', this.agentPaymentsRouter.router);
         this.Router.use('/support-ticket', this.agentSupportTicketRouter.router);
         this.Router.use('/report', this.agentReportRouter.router);
         this.Router.use('/administration', this.agentAdministrationRouter.router);
-        // Agent B2C Root Routes
-        this.Router.use('/b2c', this.agentB2CRouter.router);
+        // Agent B2C/Sub Agent Root Routes
+        this.Router.use('/b2c', this.agentB2CMainRouter.router);
+        this.Router.use('/sub-agent', this.agentSubAgentMainRouter.router);
     }
 }
 exports.default = AgentRootRouter;
