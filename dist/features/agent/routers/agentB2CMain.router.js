@@ -16,7 +16,7 @@ const abstract_router_1 = __importDefault(require("../../../abstract/abstract.ro
 const agentB2CSubBlog_router_1 = __importDefault(require("./agentB2CRouters/agentB2CSubBlog.router"));
 const agentB2CSubSiteConfig_router_1 = __importDefault(require("./agentB2CRouters/agentB2CSubSiteConfig.router"));
 const agentB2CSubPayment_router_1 = __importDefault(require("./agentB2CRouters/agentB2CSubPayment.router"));
-class AgentB2CRouter extends abstract_router_1.default {
+class AgentB2CMainRouter extends abstract_router_1.default {
     constructor() {
         super();
         // Agent B2C Sub Classes
@@ -49,4 +49,4 @@ class AgentB2CRouter extends abstract_router_1.default {
         this.router.use('/payments', this.agentB2CSubPaymentRouter.router);
     }
 }
-exports.default = AgentB2CRouter;
+exports.default = AgentB2CMainRouter;

@@ -1,7 +1,7 @@
 import AbstractRouter from '../../../abstract/abstract.router';
 import { AgentB2CMainController } from '../controllers/agentB2CMain.controller';
 
-export default class AgentB2CMainRouter extends AbstractRouter {
+export default class AgentB2CRouter extends AbstractRouter {
   private controller = new AgentB2CMainController();
   constructor() {
     super();

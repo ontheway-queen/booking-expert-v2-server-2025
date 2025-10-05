@@ -7,7 +7,7 @@ import {
 } from '../../../../utils/miscellaneous/constants';
 import {
   deposit_status,
-  IGetAgentB2CDepositRequestListFilterQuery,
+  IGetDepositRequestListFilterQuery,
 } from '../../../../utils/modelTypes/commonModelTypes/depositRequestModel.types';
 import {
   IAdjustAgentB2CSubLedgerReqBody,
@@ -32,7 +32,7 @@ export class AgentB2CSubPaymentService extends AbstractServices {
     const { agency_id } = req.agencyUser;
     const depositModel = this.Model.DepositRequestModel();
 
-    const queryParams: IGetAgentB2CDepositRequestListFilterQuery = {
+    const queryParams: IGetDepositRequestListFilterQuery = {
       agency_id,
     };
     if (query.filter) {

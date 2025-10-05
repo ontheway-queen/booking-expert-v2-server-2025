@@ -13,7 +13,7 @@ import AgentHotelRouter from './routers/agentHotel.router';
 import AgentFlightRouter from './routers/agentFlight.router';
 import AgentProfileRouter from './routers/agentProfile.router';
 import AgentSubAgentMainRouter from './routers/agentSubAgentMain.router';
-import AgentB2CMainRouter from '../agentB2C/routers/agentB2CMain.router';
+import AgentB2CMainRouter from './routers/agentB2CMain.router';
 
 export default class AgentRootRouter {
   public Router = Router();

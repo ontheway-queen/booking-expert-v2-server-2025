@@ -18,7 +18,7 @@ const agentHotel_router_1 = __importDefault(require("./routers/agentHotel.router
 const agentFlight_router_1 = __importDefault(require("./routers/agentFlight.router"));
 const agentProfile_router_1 = __importDefault(require("./routers/agentProfile.router"));
 const agentSubAgentMain_router_1 = __importDefault(require("./routers/agentSubAgentMain.router"));
-const agentB2CMain_router_1 = __importDefault(require("../agentB2C/routers/agentB2CMain.router"));
+const agentB2CMain_router_1 = __importDefault(require("./routers/agentB2CMain.router"));
 class AgentRootRouter {
     constructor() {
         this.Router = (0, express_1.Router)();

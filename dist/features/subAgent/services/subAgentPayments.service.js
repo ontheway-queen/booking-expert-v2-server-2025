@@ -114,7 +114,10 @@ class SubAgentPaymentsService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const id = Number(req.params.id);
                 const paymentModel = this.Model.DepositRequestModel(trx);
-                const singleDeposit = yield paymentModel.getSingleSubAgentDepositRequest(id, agency_id);
+                const singleDeposit = yield paymentModel.getSingleSubAgentDepositRequest({
+                    id,
+                    agency_id,
+                });
                 if (!singleDeposit) {
                     return {
                         success: false,

@@ -102,19 +102,8 @@ export interface IGetSingleAgentB2CDepositRequestData {
   update_note?: string;
 }
 
-export interface IGetAgentDepositRequestListFilterQuery {
+export interface IGetDepositRequestListFilterQuery {
   agency_id?: number;
-  status?: deposit_status;
-  from_date?: Date;
-  to_date?: Date;
-  limit?: number;
-  skip?: number;
-  filter?: string;
-  created_by?: number;
-}
-
-export interface IGetAgentB2CDepositRequestListFilterQuery {
-  agency_id: number;
   status?: deposit_status;
   from_date?: string;
   to_date?: string;
@@ -122,4 +111,5 @@ export interface IGetAgentB2CDepositRequestListFilterQuery {
   skip?: number;
   filter?: string;
   created_by?: number;
+  ref_agency_id?: number;
 }

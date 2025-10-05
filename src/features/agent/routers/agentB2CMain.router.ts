@@ -12,7 +12,7 @@ import AgentB2CSubBlogRouter from './agentB2CRouters/agentB2CSubBlog.router';
 import AgentB2CSubSiteConfigRouter from './agentB2CRouters/agentB2CSubSiteConfig.router';
 import AgentB2CSubPaymentRouter from './agentB2CRouters/agentB2CSubPayment.router';
 
-export default class AgentB2CRouter extends AbstractRouter {
+export default class AgentB2CMainRouter extends AbstractRouter {
   // Agent B2C Sub Classes
   private agentB2CSubRouter = new AgentB2CSubRouter();
   private agentB2CSubConfigRouter = new AgentB2CSubConfigRouter();
@@ -26,7 +26,6 @@ export default class AgentB2CRouter extends AbstractRouter {
   private agentB2CSubBlogRouter = new AgentB2CSubBlogRouter();
   private agentB2CSubSiteConfigRouter = new AgentB2CSubSiteConfigRouter();
   private agentB2CSubPaymentRouter = new AgentB2CSubPaymentRouter();
-
 
   constructor() {
     super();

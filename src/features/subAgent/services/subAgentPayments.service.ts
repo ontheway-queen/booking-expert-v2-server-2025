@@ -146,10 +146,10 @@ export class SubAgentPaymentsService extends AbstractServices {
       const { agency_id } = req.agencyUser;
       const id = Number(req.params.id);
       const paymentModel = this.Model.DepositRequestModel(trx);
-      const singleDeposit = await paymentModel.getSingleSubAgentDepositRequest(
+      const singleDeposit = await paymentModel.getSingleSubAgentDepositRequest({
         id,
-        agency_id
-      );
+        agency_id,
+      });
       if (!singleDeposit) {
         return {
           success: false,
