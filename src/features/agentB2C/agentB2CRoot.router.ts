@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import AgentB2CMainRouter from './routers/agentB2CMain.router';
+import AgentB2CRouter from './routers/agentB2C.router';
 import AgentB2CFlightRouter from './routers/agentB2CFlight.router';
 import AgentB2CHolidayRouter from './routers/agentB2CHoliday.router';
 import AgentB2CHotelRouter from './routers/agentB2CHotel.router';
@@ -19,7 +19,7 @@ export default class AgentB2CRootRouter {
   private authChecker = new AuthChecker();
 
   // Router classes
-  private mainRouter = new AgentB2CMainRouter();
+  private mainRouter = new AgentB2CRouter();
   private flightRouter = new AgentB2CFlightRouter();
   private holidayRouter = new AgentB2CHolidayRouter();
   private hotelRouter = new AgentB2CHotelRouter();

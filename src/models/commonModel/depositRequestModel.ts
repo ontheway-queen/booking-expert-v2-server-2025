@@ -7,9 +7,8 @@ import {
 import Schema from '../../utils/miscellaneous/schema';
 import {
   ICreateDepositRequestPayload,
-  IGetAgentB2CDepositRequestListFilterQuery,
+  IGetDepositRequestListFilterQuery,
   IGetAgentDepositRequestData,
-  IGetAgentDepositRequestListFilterQuery,
   IGetSingleAgentB2CDepositRequestData,
   IGetSingleAgentDepositRequestData,
   IUpdateDepositRequestPayload,
@@ -42,7 +41,7 @@ export default class DepositRequestModel extends Schema {
   }
 
   public async getAgentDepositRequestList(
-    query: IGetAgentDepositRequestListFilterQuery,
+    query: IGetDepositRequestListFilterQuery,
     is_total: boolean = false
   ): Promise<{ data: IGetAgentDepositRequestData[]; total?: number }> {
     const data = await this.db('deposit_request as dr')
@@ -165,7 +164,7 @@ export default class DepositRequestModel extends Schema {
   }
 
   public async getSubAgentDepositRequestList(
-    query: IGetAgentB2CDepositRequestListFilterQuery,
+    query: IGetDepositRequestListFilterQuery,
     is_total: boolean = false
   ): Promise<{ data: IGetAgentDepositRequestData[]; total?: number }> {
     const data = await this.db('deposit_request as dr')
@@ -246,10 +245,15 @@ export default class DepositRequestModel extends Schema {
     };
   }
 
-  public async getSingleSubAgentDepositRequest(
-    id: number,
-    agency_id?: number
-  ): Promise<IGetSingleAgentDepositRequestData | null> {
+  public async getSingleSubAgentDepositRequest({
+    id,
+    agency_id,
+    ref_agency_id,
+  }: {
+    id: number;
+    agency_id?: number;
+    ref_agency_id?: number;
+  }): Promise<IGetSingleAgentDepositRequestData | null> {
     return await this.db('deposit_request as dr')
       .withSchema(this.AGENT_SCHEMA)
       .select(
@@ -281,12 +285,15 @@ export default class DepositRequestModel extends Schema {
         if (agency_id) {
           qb.andWhere('dr.agency_id', agency_id);
         }
+        if (ref_agency_id) {
+          qb.andWhere('a.ref_agency_id', ref_agency_id);
+        }
       })
       .first();
   }
 
   public async getAgentB2CDepositRequestList(
-    query: IGetAgentB2CDepositRequestListFilterQuery,
+    query: IGetDepositRequestListFilterQuery,
     is_total: boolean = false
   ): Promise<{ data: IGetAgentDepositRequestData[]; total?: number }> {
     console.log({ query });

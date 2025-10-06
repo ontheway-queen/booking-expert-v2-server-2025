@@ -231,7 +231,7 @@ export class SubAgentHolidayService extends AbstractServices {
       const get_booking =
         await holidayPackageBookingModel.getSingleHolidayBooking({
           id,
-          booked_by: SOURCE_AGENT,
+          booked_by: SOURCE_SUB_AGENT,
           source_id: agency_id,
         });
 

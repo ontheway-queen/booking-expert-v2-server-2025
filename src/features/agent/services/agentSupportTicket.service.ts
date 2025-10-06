@@ -105,6 +105,7 @@ export class AgentSupportTicketService extends AbstractServices {
     const ticket = await supportTicketModel.getSingleAgentSupportTicket({
       id: ticket_id,
       agent_id: agency_id,
+      source_type: SOURCE_AGENT,
     });
 
     if (!ticket) {
@@ -145,6 +146,7 @@ export class AgentSupportTicketService extends AbstractServices {
     const ticket = await supportTicketModel.getSingleAgentSupportTicket({
       id: ticket_id,
       agent_id: agency_id,
+      source_type: SOURCE_AGENT,
     });
 
     if (!ticket) {
@@ -179,6 +181,7 @@ export class AgentSupportTicketService extends AbstractServices {
       const ticket = await supportTicketModel.getSingleAgentSupportTicket({
         id: support_ticket_id,
         agent_id: agency_id,
+        source_type: SOURCE_AGENT,
       });
 
       if (!ticket) {
@@ -236,6 +239,7 @@ export class AgentSupportTicketService extends AbstractServices {
       const ticket = await supportTicketModel.getSingleAgentSupportTicket({
         id: support_ticket_id,
         agent_id: agency_id,
+        source_type: SOURCE_AGENT,
       });
 
       if (!ticket) {

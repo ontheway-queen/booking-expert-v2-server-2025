@@ -16,6 +16,7 @@ import {
 } from '../../../../utils/miscellaneous/flightConstant';
 import { AgentFlightBookingSupportService } from '../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service';
 import { IAgentUpdateDataAfterTicketIssue } from '../../../../utils/supportTypes/bookingSupportTypes/flightBookingSupportTypes/agentFlightBookingTypes';
+
 export class AgentB2CSubFlightService extends AbstractServices {
   public async getAllBooking(req: Request) {
     const { agency_id } = req.agencyUser;

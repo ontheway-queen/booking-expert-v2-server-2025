@@ -66,6 +66,7 @@ class AgentB2CVisaService extends abstract_service_1.default {
                 is_deleted: false,
                 source_id: agency_id,
                 status: true,
+                visa_for: 'B2C',
             });
             return {
                 success: true,

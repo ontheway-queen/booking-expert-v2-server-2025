@@ -4,12 +4,14 @@ export interface IInsertAgencyLedgerPayload {
   amount: number;
   details: string;
   voucher_no: string;
+  ledger_date?: string;
 }
 
 export interface IGetAgencyLedgerQuery {
   type?: 'Debit' | 'Credit';
   voucher_no?: string;
   agency_id?: number;
+  ref_agency_id?: number;
   from_date?: string;
   to_date?: string;
   limit?: string;

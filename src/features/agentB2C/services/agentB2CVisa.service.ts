@@ -61,6 +61,7 @@ export class AgentB2CVisaService extends AbstractServices {
       is_deleted: false,
       source_id: agency_id,
       status: true,
+      visa_for: 'B2C',
     });
 
     return {

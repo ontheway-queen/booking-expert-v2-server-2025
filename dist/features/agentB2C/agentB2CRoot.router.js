@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const agentB2CMain_router_1 = __importDefault(require("./routers/agentB2CMain.router"));
+const agentB2C_router_1 = __importDefault(require("./routers/agentB2C.router"));
 const agentB2CFlight_router_1 = __importDefault(require("./routers/agentB2CFlight.router"));
 const agentB2CHoliday_router_1 = __importDefault(require("./routers/agentB2CHoliday.router"));
 const agentB2CHotel_router_1 = __importDefault(require("./routers/agentB2CHotel.router"));
@@ -22,7 +22,7 @@ class AgentB2CRootRouter {
         this.Router = (0, express_1.Router)();
         this.authChecker = new authChecker_1.default();
         // Router classes
-        this.mainRouter = new agentB2CMain_router_1.default();
+        this.mainRouter = new agentB2C_router_1.default();
         this.flightRouter = new agentB2CFlight_router_1.default();
         this.holidayRouter = new agentB2CHoliday_router_1.default();
         this.hotelRouter = new agentB2CHotel_router_1.default();
