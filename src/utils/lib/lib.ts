@@ -234,7 +234,7 @@ class Lib {
     const word = value.trim();
 
     // Must contain at least one vowel
-    if (!/[aeiouAEIOU]/.test(word)) return true;
+    // if (!/[aeiouAEIOU]/.test(word)) return true;
 
     // Avoid long nonsense strings
     if (word.length > 20) return true;
@@ -248,10 +248,10 @@ class Lib {
     const secondHalf = word.slice(half);
     if (firstHalf === secondHalf && firstHalf.length > 2) return true;
 
-    // Vowel/consonant ratio check: require at least 1 vowel per 4 letters
-    const vowels = word.match(/[aeiou]/gi)?.length || 0;
-    const ratio = vowels / word.length;
-    if (ratio < 0.2) return true;
+    // // Vowel/consonant ratio check: require at least 1 vowel per 4 letters
+    // const vowels = word.match(/[aeiou]/gi)?.length || 0;
+    // const ratio = vowels / word.length;
+    // if (ratio < 0.2) return true;
 
     return false;
   };
@@ -333,30 +333,41 @@ class Lib {
       .replace(/>\s+</g, '><') // Remove spaces between tags
       .trim();
   };
+
+  //get adjusted amount from the payment gateways
+  public static calculateAdjustedAmount(
+    totalAmount: number,
+    percentage: number,
+    operation: 'add' | 'subtract'
+  ) {
+    return operation === 'add'
+      ? Math.round(totalAmount * (1 + percentage / 100))
+      : Math.round(totalAmount / (1 + percentage / 100));
+  }
 }
 export default Lib;
 
 interface IGenNoParams {
   trx: TDB;
   type:
-    | 'Agent'
-    | 'Sub_Agent'
-    | 'Agent_Flight'
-    | 'Agent_Visa'
-    | 'Agent_Tour'
-    | 'Agent_Umrah'
-    | 'Agent_GroupFare'
-    | 'Agent_SupportTicket'
-    | 'Agent_B2C_SupportTicket'
-    | 'Agent_Hotel'
-    | 'Agent_Deposit_Request'
-    | 'B2C_Deposit_Request'
-    | 'User_Flight'
-    | 'User_Visa'
-    | 'User_Tour'
-    | 'User_Umrah'
-    | 'User_SupportTicket'
-    | 'ADM_Management'
-    | 'Money_Receipt'
-    | 'Invoice';
+  | 'Agent'
+  | 'Sub_Agent'
+  | 'Agent_Flight'
+  | 'Agent_Visa'
+  | 'Agent_Tour'
+  | 'Agent_Umrah'
+  | 'Agent_GroupFare'
+  | 'Agent_SupportTicket'
+  | 'Agent_B2C_SupportTicket'
+  | 'Agent_Hotel'
+  | 'Agent_Deposit_Request'
+  | 'B2C_Deposit_Request'
+  | 'User_Flight'
+  | 'User_Visa'
+  | 'User_Tour'
+  | 'User_Umrah'
+  | 'User_SupportTicket'
+  | 'ADM_Management'
+  | 'Money_Receipt'
+  | 'Invoice';
 }

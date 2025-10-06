@@ -42,4 +42,13 @@ export default class AgentB2CPaymentValidator {
     limit: Joi.number(),
     skip: Joi.number(),
   });
+
+  public topUpUsingPaymentGateway = Joi.object({
+    amount: Joi.number().min(10).required(),
+    payment_gateway: Joi.string().valid('SSL', 'BKASH').required(),
+    success_page: Joi.string().required(),
+    failed_page: Joi.string().required(),
+    cancelled_page: Joi.string().required(),
+    is_app: Joi.boolean().optional(),
+  });
 }

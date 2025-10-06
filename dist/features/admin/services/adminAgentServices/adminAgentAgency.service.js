@@ -87,11 +87,14 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         whiteLabelPermissions = wPermissions;
                     }
                 }
+                const otherModel = this.Model.OthersModel(trx);
+                const email_credential = yield otherModel.getEmailCreds(agency_id);
+                const payment_gateway_creds = yield otherModel.getPaymentGatewayCreds({ agency_id });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
                     message: this.ResMsg.HTTP_OK,
-                    data: Object.assign(Object.assign({}, data), { users: users.data, total_user: users.total, whiteLabelPermissions }),
+                    data: Object.assign(Object.assign({}, data), { users: users.data, total_user: users.total, whiteLabelPermissions, email_credential: email_credential || null, payment_gateway_creds: payment_gateway_creds }),
                 };
             }));
         });
@@ -601,6 +604,89 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         trade_license,
                         national_id,
                     },
+                };
+            }));
+        });
+    }
+    upsertAgencyEmailCredential(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { user_id } = req.admin;
+                const { agency_id } = req.params;
+                const body = req.body;
+                const model = this.Model.OthersModel(trx);
+                const AgentModel = this.Model.AgencyModel(trx);
+                const checkAgency = yield AgentModel.checkAgency({
+                    agency_id: Number(agency_id),
+                });
+                if (!checkAgency) {
+                    throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
+                }
+                const check_duplicate = yield model.getEmailCreds(Number(agency_id));
+                //update
+                if (check_duplicate) {
+                    yield model.updateEmailCreds(body, Number(agency_id));
+                    yield this.insertAdminAudit(trx, {
+                        created_by: user_id,
+                        details: `Email credentials has been updated for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
+                        type: 'UPDATE',
+                        payload: body
+                    });
+                    return {
+                        success: true,
+                        code: this.StatusCode.HTTP_OK,
+                        message: 'Email credentials has been updated'
+                    };
+                }
+                //create
+                yield model.insertEmailCreds(Object.assign(Object.assign({}, body), { agency_id: Number(agency_id) }));
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    details: `Email credentials has been created for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
+                    type: 'CREATE',
+                    payload: body
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: 'Email credentials has been added',
+                };
+            }));
+        });
+    }
+    upsertAgencyPaymentGatewayCredential(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { user_id } = req.admin;
+                const { agency_id } = req.params;
+                const body = req.body;
+                const agencyModel = this.Model.AgencyModel(trx);
+                const othersModel = this.Model.OthersModel(trx);
+                const checkAgency = yield agencyModel.checkAgency({
+                    agency_id: Number(agency_id),
+                });
+                if (!checkAgency) {
+                    throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
+                }
+                yield Promise.all(body.cred.map((item) => __awaiter(this, void 0, void 0, function* () {
+                    const check_duplicate = yield othersModel.getPaymentGatewayCreds({ agency_id: Number(agency_id), gateway_name: body.gateway_name, key: item.key });
+                    if (check_duplicate === null || check_duplicate === void 0 ? void 0 : check_duplicate.length) {
+                        yield othersModel.updatePaymentGatewayCreds({ value: item.value }, check_duplicate[0].id);
+                    }
+                    else {
+                        yield othersModel.insertPaymentGatewayCreds(Object.assign({ agency_id: Number(agency_id), gateway_name: body.gateway_name }, item));
+                    }
+                })));
+                yield this.insertAdminAudit(trx, {
+                    created_by: user_id,
+                    details: `Payment gateway credentials has been updated for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
+                    type: 'UPDATE',
+                    payload: body
+                });
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_SUCCESSFUL,
+                    message: 'Payment gateway credentials has been updated',
                 };
             }));
         });

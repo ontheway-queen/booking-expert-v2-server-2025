@@ -12,6 +12,7 @@ import Lib from '../../../utils/lib/lib';
 import CustomError from '../../../utils/lib/customError';
 import { ICreateDepositPayload } from '../../agent/utils/types/agentPayment.types';
 import { ICreateDepositRequestPayload } from '../../../utils/modelTypes/commonModelTypes/depositRequestModel.types';
+import { PaymentSupportService } from '../../../utils/supportServices/paymentSupportServices/paymentSupport.service';
 
 export default class AgentB2CPaymentService extends AbstractServices {
   constructor() {
@@ -351,5 +352,120 @@ export default class AgentB2CPaymentService extends AbstractServices {
       data: data.data,
       total: data.total || 0,
     };
+  }
+
+  public async getPaymentGatewayList(req: Request) {
+    const { agency_id } = req.agencyB2CWhiteLabel;
+    const paymentGatewayModel = this.Model.OthersModel();
+    const data = await paymentGatewayModel.getUniquePaymentGatewayList(agency_id);
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      data
+    }
+  }
+
+  public async topUpUsingPaymentGateway(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { user_id, user_email, phone_number, name } = req.agencyB2CUser;
+      const { agency_id } = req.agencyB2CWhiteLabel;
+      const { amount, payment_gateway, success_page, failed_page, cancelled_page } = req.body;
+      const othersModel = this.Model.OthersModel(trx);
+      if (payment_gateway === 'SSL') {
+        const SSL_STORE_ID = await othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'SSL', key: 'SSL_STORE_ID' });
+        if (!SSL_STORE_ID || !SSL_STORE_ID.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Payment gateway is not configured. Please contact with support team.'
+          }
+        }
+        const SSL_STORE_PASSWORD = await othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'SSL', key: 'SSL_STORE_PASSWORD' });
+        if (!SSL_STORE_PASSWORD || !SSL_STORE_PASSWORD.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Payment gateway is not configured. Please contact with support team.'
+          }
+        }
+
+        const paymentSupportService = new PaymentSupportService();
+        return await paymentSupportService.SSLPaymentGateway({
+          total_amount: amount,
+          currency: 'BDT',
+          tran_id: `${SOURCE_AGENT_B2C}-${agency_id}-${user_id}`,
+          cus_name: name,
+          cus_email: user_email,
+          cus_phone: phone_number,
+          product_name: 'credit load',
+          success_page,
+          failed_page,
+          cancelled_page,
+          store_id: SSL_STORE_ID?.[0]?.value,
+          store_passwd: SSL_STORE_PASSWORD?.[0]?.value
+        });
+      } else if (payment_gateway === 'BKASH') {
+        const BKASH_APP_KEY = await othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'BKASH', key: 'BKASH_APP_KEY' });
+        if (!BKASH_APP_KEY || !BKASH_APP_KEY.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Payment gateway is not configured. Please contact with support team.'
+          }
+        }
+
+        const BKASH_APP_SECRET = await othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'BKASH', key: 'BKASH_APP_SECRET' });
+        if (!BKASH_APP_SECRET || !BKASH_APP_SECRET.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Payment gateway is not configured. Please contact with support team.'
+          }
+        }
+
+        const BKASH_USERNAME = await othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'BKASH', key: 'BKASH_USERNAME' });
+        if (!BKASH_USERNAME || !BKASH_USERNAME.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Payment gateway is not configured. Please contact with support team.'
+          }
+        }
+
+        const BKASH_PASSWORD = await othersModel.getPaymentGatewayCreds({ agency_id, gateway_name: 'BKASH', key: 'BKASH_PASSWORD' });
+        if (!BKASH_PASSWORD || !BKASH_PASSWORD.length) {
+          return {
+            success: false,
+            code: this.StatusCode.HTTP_BAD_REQUEST,
+            message: 'Payment gateway is not configured. Please contact with support team.'
+          }
+        }
+
+        const paymentSupportService = new PaymentSupportService();
+        return await paymentSupportService.createBkashPaymentSession({
+          mobile_number: String(phone_number),
+          success_page,
+          failed_page,
+          cancelled_page,
+          amount,
+          ref_id: `AGENT_B2C-${agency_id}-${user_id}-${new Date().getTime()}`,
+          trx,
+          user_id,
+          source: SOURCE_AGENT_B2C,
+          cred: {
+            BKASH_APP_KEY: BKASH_APP_KEY?.[0]?.value,
+            BKASH_APP_SECRET: BKASH_APP_SECRET?.[0]?.value,
+            BKASH_USERNAME: BKASH_USERNAME?.[0]?.value,
+            BKASH_PASSWORD: BKASH_PASSWORD?.[0]?.value
+          }
+        })
+      } else {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: this.ResMsg.HTTP_BAD_REQUEST
+        }
+      }
+    });
   }
 }

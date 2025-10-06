@@ -31,6 +31,7 @@ class EmailSendLib {
         return __awaiter(this, void 0, void 0, function* () {
             const otherModel = new othersModel_1.default(trx);
             const creds = yield otherModel.getEmailCreds(agency_id);
+            console.log({ agency_id });
             if (!creds) {
                 return yield this.sendEmailHostinger(payload, {
                     senderEmail: config_1.default.EMAIL_SEND_EMAIL_ID,

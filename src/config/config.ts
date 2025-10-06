@@ -39,6 +39,11 @@ interface ENV {
   CT_API_KEY: string | undefined;
   SERVER_URL: string | undefined;
   WFTT_URL: string | undefined;
+  BKASH_USERNAME: string | undefined;
+  BKASH_PASSWORD: string | undefined;
+  BKASH_APP_SECRET: string | undefined;
+  BKASH_APP_KEY: string | undefined;
+  BKASH_BASE_URL: string | undefined;
 }
 
 // Config types
@@ -76,6 +81,11 @@ interface Config {
   CT_API_KEY: string;
   SERVER_URL: string;
   WFTT_URL: string;
+  BKASH_USERNAME: string;
+  BKASH_PASSWORD: string;
+  BKASH_APP_SECRET: string;
+  BKASH_APP_KEY: string;
+  BKASH_BASE_URL: string;
 }
 
 // Loading process.env as  ENV interface
@@ -114,6 +124,11 @@ const getConfig = (): ENV => {
     CT_API_KEY: process.env.CT_API_KEY,
     SERVER_URL: process.env.SERVER_URL,
     WFTT_URL: process.env.WFTT_URL,
+    BKASH_APP_SECRET: process.env.BKASH_APP_SECRET,
+    BKASH_APP_KEY: process.env.BKASH_APP_KEY,
+    BKASH_USERNAME: process.env.BKASH_USERNAME,
+    BKASH_PASSWORD: process.env.BKASH_PASSWORD,
+    BKASH_BASE_URL: process.env.BKASH_BASE_URL,
   };
 };
 

@@ -252,13 +252,17 @@ class Lib {
         }
         return amount;
     }
+    //get adjusted amount from the payment gateways
+    static calculateAdjustedAmount(totalAmount, percentage, operation) {
+        return operation === 'add'
+            ? Math.round(totalAmount * (1 + percentage / 100))
+            : Math.round(totalAmount / (1 + percentage / 100));
+    }
 }
 Lib.gibberishChecker = (value) => {
-    var _a;
     const word = value.trim();
     // Must contain at least one vowel
-    if (!/[aeiouAEIOU]/.test(word))
-        return true;
+    // if (!/[aeiouAEIOU]/.test(word)) return true;
     // Avoid long nonsense strings
     if (word.length > 20)
         return true;
@@ -271,11 +275,10 @@ Lib.gibberishChecker = (value) => {
     const secondHalf = word.slice(half);
     if (firstHalf === secondHalf && firstHalf.length > 2)
         return true;
-    // Vowel/consonant ratio check: require at least 1 vowel per 4 letters
-    const vowels = ((_a = word.match(/[aeiou]/gi)) === null || _a === void 0 ? void 0 : _a.length) || 0;
-    const ratio = vowels / word.length;
-    if (ratio < 0.2)
-        return true;
+    // // Vowel/consonant ratio check: require at least 1 vowel per 4 letters
+    // const vowels = word.match(/[aeiou]/gi)?.length || 0;
+    // const ratio = vowels / word.length;
+    // if (ratio < 0.2) return true;
     return false;
 };
 // minify html

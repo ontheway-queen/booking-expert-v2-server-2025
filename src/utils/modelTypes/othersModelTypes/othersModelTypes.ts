@@ -7,6 +7,8 @@ import {
   TYPE_EMAIL_SERVER_NAMECHEAP,
   TYPE_EMAIL_SERVER_OTHER,
   TYPE_EMAIL_SERVER_ZOHO,
+  TYPE_PAYMENT_GATEWAY_BKASH,
+  TYPE_PAYMENT_GATEWAY_SSL,
 } from '../../miscellaneous/constants';
 
 export interface IInsertHotelSearchHistoryPayload {
@@ -103,14 +105,14 @@ export interface ICreateEmailCredPayload {
   email: string;
   password: string;
   host?: string;
-  port?: string;
+  port?: number;
 }
 export interface IUpdateEmailCredPayload {
   type?: email_server_type;
   email?: string;
   password?: string;
   host?: string;
-  port?: string;
+  port?: number;
 }
 
 export interface IGetEmailCredData {
@@ -120,6 +122,28 @@ export interface IGetEmailCredData {
   password: string;
   host?: string;
   port?: number;
+  status: boolean;
+  created_at: string;
+}
+
+export interface ICreatePaymentGatewayPayload {
+  agency_id:  number;
+  gateway_name: typeof TYPE_PAYMENT_GATEWAY_SSL | typeof TYPE_PAYMENT_GATEWAY_BKASH;
+  key: string;
+  value: string;
+}
+
+export interface IUpdatePaymentGatewayPayload {
+  value?: string;
+  status?: boolean;
+}
+
+export interface IGetPaymentGatewayData {
+  id: number;
+  agency_id: number;
+  gateway_name: typeof TYPE_PAYMENT_GATEWAY_SSL | typeof TYPE_PAYMENT_GATEWAY_BKASH;
+  key: string;
+  value: string;
   status: boolean;
   created_at: string;
 }

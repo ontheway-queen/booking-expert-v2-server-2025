@@ -14,6 +14,7 @@ class PublicPaymentRouter extends abstract_router_1.default {
     }
     callRouter() {
         this.router.route('/ssl').post(this.controller.transactionUsingSSL);
+        this.router.route('/bkash').get(this.controller.transactionUsingBkash);
     }
 }
 exports.PublicPaymentRouter = PublicPaymentRouter;

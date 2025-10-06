@@ -39,6 +39,15 @@ class PublicPaymentController extends abstract_controller_1.default {
                 res.status(code).json(rest);
             }
         }));
+        this.transactionUsingBkash = this.asyncWrapper.wrap(null, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.transactionUsingBkash(req), { code } = _a, rest = __rest(_a, ["code"]);
+            if (rest.redirect_url) {
+                res.status(code).redirect(rest.redirect_url);
+            }
+            else {
+                res.status(code).json(rest);
+            }
+        }));
     }
 }
 exports.PublicPaymentController = PublicPaymentController;

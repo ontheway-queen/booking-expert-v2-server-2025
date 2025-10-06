@@ -8,14 +8,17 @@ import Schema from '../../utils/miscellaneous/schema';
 import {
   ICreateBankAccountPayload,
   ICreateEmailCredPayload,
+  ICreatePaymentGatewayPayload,
   IGetBankAccountData,
   IGetBankAccountQuery,
   IGetEmailCredData,
   IGetHotelSearchHistoryData,
   IGetHotelSearchHistoryQuery,
+  IGetPaymentGatewayData,
   IInsertHotelSearchHistoryPayload,
   IUpdateBankAccountPayload,
   IUpdateEmailCredPayload,
+  IUpdatePaymentGatewayPayload,
 } from '../../utils/modelTypes/othersModelTypes/othersModelTypes';
 
 export default class OthersModel extends Schema {
@@ -253,5 +256,46 @@ export default class OthersModel extends Schema {
       .select('*')
       .where('agency_id', agency_id)
       .first();
+  }
+
+  public async insertPaymentGatewayCreds(payload: ICreatePaymentGatewayPayload) {
+    return await this.db('payment_gateway_creds')
+      .withSchema(this.AGENT_SCHEMA)
+      .insert(payload);
+  }
+
+  public async updatePaymentGatewayCreds(
+    payload: IUpdatePaymentGatewayPayload,
+    id: number
+  ) {
+    return await this.db('payment_gateway_creds')
+      .withSchema(this.AGENT_SCHEMA)
+      .update(payload)
+      .where('id', id);
+  }
+
+  public async getPaymentGatewayCreds(
+    query: { agency_id: number, gateway_name?: string, key?: string }
+  ): Promise<IGetPaymentGatewayData[] | null> {
+    return await this.db('payment_gateway_creds')
+      .withSchema(this.AGENT_SCHEMA)
+      .select('*')
+      .where('agency_id', query.agency_id)
+      .andWhere((qb) => {
+        if (query.gateway_name) {
+          qb.andWhere('gateway_name', query.gateway_name)
+        }
+        if (query.key) {
+          qb.andWhere('key', query.key)
+        }
+      })
+  }
+
+  public async getUniquePaymentGatewayList(agency_id: number): Promise<string[]> {
+    const result = await this.db('payment_gateway_creds')
+      .withSchema(this.AGENT_SCHEMA)
+      .distinct('gateway_name')
+      .where('agency_id', agency_id);
+    return result.map(r => r.gateway_name);
   }
 }
