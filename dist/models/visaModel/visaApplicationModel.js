@@ -20,7 +20,9 @@ class VisaApplicationModel extends schema_1.default {
     }
     createVisaApplication(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db('visa_application').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
+            return yield this.db('visa_application')
+                .withSchema(this.SERVICE_SCHEMA)
+                .insert(payload, 'id');
         });
     }
     createVisaApplicationTracking(payload) {
@@ -52,7 +54,10 @@ class VisaApplicationModel extends schema_1.default {
                 qb.andWhere('va.source_type', query.source_type);
                 qb.andWhere('va.user_id', query.user_id);
                 if (query.from_date && query.to_date) {
-                    qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
+                    qb.andWhereBetween('va.application_date', [
+                        query.from_date,
+                        query.to_date,
+                    ]);
                 }
                 if (query.status) {
                     qb.andWhere('va.status', query.status);
@@ -79,7 +84,10 @@ class VisaApplicationModel extends schema_1.default {
                 qb.andWhere('va.source_type', query.source_type);
                 qb.andWhere('va.user_id', query.user_id);
                 if (query.from_date && query.to_date) {
-                    qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
+                    qb.andWhereBetween('va.application_date', [
+                        query.from_date,
+                        query.to_date,
+                    ]);
                 }
                 if (query.status) {
                     qb.andWhere('va.status', query.status);
@@ -146,7 +154,10 @@ class VisaApplicationModel extends schema_1.default {
                 qb.andWhere('va.source_id', query.source_id);
                 qb.andWhere('va.source_type', query.source_type);
                 if (query.from_date && query.to_date) {
-                    qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
+                    qb.andWhereBetween('va.application_date', [
+                        query.from_date,
+                        query.to_date,
+                    ]);
                 }
                 if ((_a = query.status) === null || _a === void 0 ? void 0 : _a.length) {
                     qb.whereIn('va.status', query.status);
@@ -176,7 +187,10 @@ class VisaApplicationModel extends schema_1.default {
                 qb.andWhere('va.source_id', query.source_id);
                 qb.andWhere('va.source_type', query.source_type);
                 if (query.from_date && query.to_date) {
-                    qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
+                    qb.andWhereBetween('va.application_date', [
+                        query.from_date,
+                        query.to_date,
+                    ]);
                 }
                 console.log('query.status', query.status);
                 if ((_a = query.status) === null || _a === void 0 ? void 0 : _a.length) {

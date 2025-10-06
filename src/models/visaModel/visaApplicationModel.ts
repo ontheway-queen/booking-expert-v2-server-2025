@@ -22,7 +22,9 @@ export default class VisaApplicationModel extends Schema {
   }
 
   public async createVisaApplication(payload: ICreateVisaApplicationPayload) {
-    return await this.db('visa_application').withSchema(this.SERVICE_SCHEMA).insert(payload, 'id');
+    return await this.db('visa_application')
+      .withSchema(this.SERVICE_SCHEMA)
+      .insert(payload, 'id');
   }
 
   public async createVisaApplicationTracking(
@@ -68,7 +70,10 @@ export default class VisaApplicationModel extends Schema {
         qb.andWhere('va.user_id', query.user_id);
 
         if (query.from_date && query.to_date) {
-          qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
+          qb.andWhereBetween('va.application_date', [
+            query.from_date,
+            query.to_date,
+          ]);
         }
 
         if (query.status) {
@@ -99,7 +104,10 @@ export default class VisaApplicationModel extends Schema {
         qb.andWhere('va.user_id', query.user_id);
 
         if (query.from_date && query.to_date) {
-          qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
+          qb.andWhereBetween('va.application_date', [
+            query.from_date,
+            query.to_date,
+          ]);
         }
 
         if (query.status) {
@@ -122,7 +130,9 @@ export default class VisaApplicationModel extends Schema {
   }
 
   // get agent b2c single application
-  public async getAgentB2CSingleVisaApplication(query: IGetAgentB2CSingleVisaApplicationQuery) {
+  public async getAgentB2CSingleVisaApplication(
+    query: IGetAgentB2CSingleVisaApplicationQuery
+  ) {
     return await this.db('visa_application as va')
       .withSchema(this.SERVICE_SCHEMA)
       .select(
@@ -155,7 +165,9 @@ export default class VisaApplicationModel extends Schema {
   }
 
   //get agent b2c single application traveler
-  public async getAgentB2CSingleVisaApplicationTraveler(query: { application_id: number }) {
+  public async getAgentB2CSingleVisaApplicationTraveler(query: {
+    application_id: number;
+  }) {
     console.log('application_id', query.application_id);
     return await this.db('visa_application_traveller as vat')
       .withSchema(this.SERVICE_SCHEMA)
@@ -208,7 +220,10 @@ export default class VisaApplicationModel extends Schema {
         qb.andWhere('va.source_type', query.source_type);
 
         if (query.from_date && query.to_date) {
-          qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
+          qb.andWhereBetween('va.application_date', [
+            query.from_date,
+            query.to_date,
+          ]);
         }
 
         if (query.status?.length) {
@@ -242,7 +257,10 @@ export default class VisaApplicationModel extends Schema {
         qb.andWhere('va.source_type', query.source_type);
 
         if (query.from_date && query.to_date) {
-          qb.andWhereBetween('va.application_date', [query.from_date, query.to_date]);
+          qb.andWhereBetween('va.application_date', [
+            query.from_date,
+            query.to_date,
+          ]);
         }
         console.log('query.status', query.status);
         if (query.status?.length) {
