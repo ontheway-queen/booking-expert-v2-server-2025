@@ -256,4 +256,6 @@ exports.origin = [
     'https://www.aerotivetours.com',
     'https://traveladda-z.com',
     'https://www.traveladda-z.com',
+    'https://b2b.suretrip.net',
+    'https://www.b2b.suretrip.net',
 ];
