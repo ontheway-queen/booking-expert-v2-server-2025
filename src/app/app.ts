@@ -37,12 +37,12 @@ class App {
     const services = new PublicCommonService();
 
     // Run every 3 days at 12:00 AM
-    cron.schedule("0 0 */3 * *", async () => {
+    cron.schedule('0 0 */3 * *', async () => {
       await services.getSabreToken();
     });
 
     //Run after every 12 hours
-    cron.schedule("0 */12 * * *", async () => {
+    cron.schedule('0 */12 * * *', async () => {
       await services.getVerteilToken();
     });
   }

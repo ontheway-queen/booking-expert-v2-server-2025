@@ -258,4 +258,10 @@ exports.origin = [
     'https://www.traveladda-z.com',
     'https://b2b.suretrip.net',
     'https://www.b2b.suretrip.net',
+    'https://traveldeal360.com',
+    'https://www.traveldeal360.com',
+    'https://justitairexpress.com',
+    'https://www.justitairexpress.com',
+    'https://rokeyaairtravels.com',
+    'https://www.rokeyaairtravels.com',
 ];
