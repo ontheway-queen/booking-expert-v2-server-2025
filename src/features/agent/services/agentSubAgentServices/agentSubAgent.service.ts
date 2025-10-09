@@ -16,6 +16,7 @@ import {
 import EmailSendLib from '../../../../utils/lib/emailSendLib';
 import { registrationVerificationCompletedTemplate } from '../../../../utils/templates/registrationVerificationCompletedTemplate';
 import { IUpdateAgencyUserPayload } from '../../../../utils/modelTypes/agentModel/agencyUserModelTypes';
+import { IUpdateSubAgencyMarkupPayload } from '../../../../utils/modelTypes/agentModel/subAgentMarkupModelTypes';
 
 export default class AgentSubAgentService extends AbstractServices {
   constructor() {
@@ -382,25 +383,36 @@ export default class AgentSubAgentService extends AbstractServices {
         await this.manageFile.deleteFromCloud(deleteFiles);
       }
 
-      if (
-        flight_markup ||
-        hotel_markup ||
-        flight_markup_mode ||
-        hotel_markup_mode ||
-        flight_markup_type ||
-        hotel_markup_type
-      ) {
+      const markupPayload: IUpdateSubAgencyMarkupPayload = {};
+
+      if (flight_markup !== undefined) {
+        markupPayload.flight_markup = flight_markup;
+      }
+      if (hotel_markup !== undefined) {
+        markupPayload.hotel_markup = hotel_markup;
+      }
+
+      if (flight_markup_type) {
+        markupPayload.flight_markup_type = flight_markup_type;
+      }
+
+      if (hotel_markup_type) {
+        markupPayload.hotel_markup_type = hotel_markup_type;
+      }
+
+      if (flight_markup_mode) {
+        markupPayload.flight_markup_mode = flight_markup_mode;
+      }
+
+      if (hotel_markup_mode) {
+        markupPayload.hotel_markup_mode = hotel_markup_mode;
+      }
+
+      if (Object.keys(markupPayload).length) {
         const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
 
         await subAgentMarkupModel.updateSubAgentMarkup(
-          {
-            flight_markup_mode,
-            hotel_markup_mode,
-            flight_markup_type,
-            hotel_markup_type,
-            flight_markup,
-            hotel_markup,
-          },
+          markupPayload,
           Number(id)
         );
       }

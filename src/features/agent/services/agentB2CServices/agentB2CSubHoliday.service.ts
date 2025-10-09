@@ -1,14 +1,14 @@
-import { Request } from "express";
-import AbstractServices from "../../../../abstract/abstract.service";
+import { Request } from 'express';
+import AbstractServices from '../../../../abstract/abstract.service';
 import {
   IAgencyB2CUpdateHolidayPackageReqBody,
   ICreateAgencyB2CHolidayReqBody,
-} from "../../utils/types/agentB2CSubTypes/agentB2CSubHoliday.types";
+} from '../../utils/types/agentB2CSubTypes/agentB2CSubHoliday.types';
 import {
   HOLIDAY_CREATED_BY_AGENT,
   HOLIDAY_FOR_AGENT_B2C,
-} from "../../../../utils/miscellaneous/holidayConstants";
-import { IGetHolidayPackageListFilterQuery } from "../../../../utils/modelTypes/holidayPackageModelTypes/holidayPackageModelTypes";
+} from '../../../../utils/miscellaneous/holidayConstants';
+import { IGetHolidayPackageListFilterQuery } from '../../../../utils/modelTypes/holidayPackageModelTypes/holidayPackageModelTypes';
 
 export class AgentB2CSubHolidayService extends AbstractServices {
   public async createHoliday(req: Request) {
@@ -101,7 +101,7 @@ export class AgentB2CSubHolidayService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
-        message: "Holiday package has been created successfully",
+        message: 'Holiday package has been created successfully',
         data: {
           id: holidayPackage[0].id,
           image_body,
@@ -182,7 +182,7 @@ export class AgentB2CSubHolidayService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: "Holiday package not found",
+          message: 'Holiday package not found',
         };
       }
 
@@ -323,7 +323,7 @@ export class AgentB2CSubHolidayService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: "Holiday package has been updated successfully",
+        message: 'Holiday package has been updated successfully',
         data: {
           imageBody,
         },
@@ -345,7 +345,7 @@ export class AgentB2CSubHolidayService extends AbstractServices {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,
-          message: "Holiday package not found",
+          message: 'Holiday package not found',
         };
       }
       await holidayPackageModel.updateHolidayPackage(
@@ -355,8 +355,64 @@ export class AgentB2CSubHolidayService extends AbstractServices {
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
-        message: "Holiday package has been deleted successfully",
+        message: 'Holiday package has been deleted successfully',
       };
+    });
+  }
+
+  public async getHolidayPackageBookingList(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const holidayPackageBookingModel =
+        this.Model.HolidayPackageBookingModel(trx);
+      const query = req.query;
+
+      const getBookingList =
+        await holidayPackageBookingModel.getHolidayBookingList(
+          {
+            source_type: SOURCE_SUB_AGENT,
+            source_id: agency_id,
+            ...query,
+          },
+          true
+        );
+
+      return {
+        success: true,
+        code: this.StatusCode.HTTP_OK,
+        total: getBookingList.total,
+        data: getBookingList.data,
+      };
+    });
+  }
+
+  public async getSingleHolidayPackageBooking(req: Request) {
+    return await this.db.transaction(async (trx) => {
+      const { agency_id } = req.agencyUser;
+      const holidayPackageBookingModel =
+        this.Model.HolidayPackageBookingModel(trx);
+      const { id } = req.params as unknown as { id: number };
+
+      const get_booking =
+        await holidayPackageBookingModel.getSingleHolidayBooking({
+          id,
+          booked_by: SOURCE_SUB_AGENT,
+          source_id: agency_id,
+        });
+
+      if (!get_booking) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_NOT_FOUND,
+          message: this.ResMsg.HTTP_NOT_FOUND,
+        };
+      } else {
+        return {
+          success: true,
+          code: this.StatusCode.HTTP_OK,
+          data: get_booking,
+        };
+      }
     });
   }
 }

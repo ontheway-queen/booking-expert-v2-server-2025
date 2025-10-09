@@ -30,12 +30,12 @@ export interface IAgentUpdateSubAgencyPayload {
   phone?: string;
   address?: string;
   status?: 'Active' | 'Inactive';
-  flight_markup_type: 'PER' | 'FLAT';
-  hotel_markup_type: 'PER' | 'FLAT';
-  flight_markup_mode: 'INCREASE' | 'DECREASE';
-  hotel_markup_mode: 'INCREASE' | 'DECREASE';
-  flight_markup: number;
-  hotel_markup: number;
+  flight_markup_type?: 'PER' | 'FLAT';
+  hotel_markup_type?: 'PER' | 'FLAT';
+  flight_markup_mode?: 'INCREASE' | 'DECREASE';
+  hotel_markup_mode?: 'INCREASE' | 'DECREASE';
+  flight_markup?: number;
+  hotel_markup?: number;
 }
 
 export interface IAgentSubAgencyUsersQueryFilter {

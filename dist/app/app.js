@@ -55,8 +55,8 @@ class App {
         return __awaiter(this, void 0, void 0, function* () {
             // setUpCorsOrigin();
             const services = new publicCommon_service_1.default();
-            yield services.getSabreToken();
-            yield services.getVerteilToken();
+            // await services.getSabreToken();
+            // await services.getVerteilToken();
             this.server.listen(this.port, () => {
                 console.log(`Booking Expert V2 OTA server has started successfully at port: ${this.port}...🚀`);
             });

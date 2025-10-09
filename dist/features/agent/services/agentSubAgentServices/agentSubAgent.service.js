@@ -307,21 +307,28 @@ class AgentSubAgentService extends abstract_service_1.default {
                 if (deleteFiles.length) {
                     yield this.manageFile.deleteFromCloud(deleteFiles);
                 }
-                if (flight_markup ||
-                    hotel_markup ||
-                    flight_markup_mode ||
-                    hotel_markup_mode ||
-                    flight_markup_type ||
-                    hotel_markup_type) {
+                const markupPayload = {};
+                if (flight_markup !== undefined) {
+                    markupPayload.flight_markup = flight_markup;
+                }
+                if (hotel_markup !== undefined) {
+                    markupPayload.hotel_markup = hotel_markup;
+                }
+                if (flight_markup_type) {
+                    markupPayload.flight_markup_type = flight_markup_type;
+                }
+                if (hotel_markup_type) {
+                    markupPayload.hotel_markup_type = hotel_markup_type;
+                }
+                if (flight_markup_mode) {
+                    markupPayload.flight_markup_mode = flight_markup_mode;
+                }
+                if (hotel_markup_mode) {
+                    markupPayload.hotel_markup_mode = hotel_markup_mode;
+                }
+                if (Object.keys(markupPayload).length) {
                     const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
-                    yield subAgentMarkupModel.updateSubAgentMarkup({
-                        flight_markup_mode,
-                        hotel_markup_mode,
-                        flight_markup_type,
-                        hotel_markup_type,
-                        flight_markup,
-                        hotel_markup,
-                    }, Number(id));
+                    yield subAgentMarkupModel.updateSubAgentMarkup(markupPayload, Number(id));
                 }
                 return {
                     success: true,

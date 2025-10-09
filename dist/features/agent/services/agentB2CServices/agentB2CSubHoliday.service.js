@@ -83,7 +83,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
-                    message: "Holiday package has been created successfully",
+                    message: 'Holiday package has been created successfully',
                     data: {
                         id: holidayPackage[0].id,
                         image_body,
@@ -159,7 +159,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: "Holiday package not found",
+                        message: 'Holiday package not found',
                     };
                 }
                 //check slug
@@ -259,7 +259,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "Holiday package has been updated successfully",
+                    message: 'Holiday package has been updated successfully',
                     data: {
                         imageBody,
                     },
@@ -282,15 +282,59 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,
-                        message: "Holiday package not found",
+                        message: 'Holiday package not found',
                     };
                 }
                 yield holidayPackageModel.updateHolidayPackage({ is_deleted: true }, Number(id));
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
-                    message: "Holiday package has been deleted successfully",
+                    message: 'Holiday package has been deleted successfully',
                 };
+            }));
+        });
+    }
+    getHolidayPackageBookingList(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
+                const query = req.query;
+                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ source_type: SOURCE_SUB_AGENT, source_id: agency_id }, query), true);
+                return {
+                    success: true,
+                    code: this.StatusCode.HTTP_OK,
+                    total: getBookingList.total,
+                    data: getBookingList.data,
+                };
+            }));
+        });
+    }
+    getSingleHolidayPackageBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const { agency_id } = req.agencyUser;
+                const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
+                const { id } = req.params;
+                const get_booking = yield holidayPackageBookingModel.getSingleHolidayBooking({
+                    id,
+                    booked_by: SOURCE_SUB_AGENT,
+                    source_id: agency_id,
+                });
+                if (!get_booking) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_NOT_FOUND,
+                        message: this.ResMsg.HTTP_NOT_FOUND,
+                    };
+                }
+                else {
+                    return {
+                        success: true,
+                        code: this.StatusCode.HTTP_OK,
+                        data: get_booking,
+                    };
+                }
             }));
         });
     }

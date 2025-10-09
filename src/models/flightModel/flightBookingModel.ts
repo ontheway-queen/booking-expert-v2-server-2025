@@ -140,6 +140,7 @@ export default class FlightBookingModel extends Schema {
         : booked_by === SOURCE_B2C
         ? 'view_flight_booking_by_b2c'
         : undefined;
+
     return await this.db(`${view_name}`)
       .withSchema(this.DBO_SCHEMA)
       .select('*')
