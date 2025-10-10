@@ -210,7 +210,7 @@ class OthersModel extends schema_1.default {
                 .withSchema(this.AGENT_SCHEMA)
                 .distinct('gateway_name')
                 .where('agency_id', agency_id);
-            return result.map(r => r.gateway_name);
+            return result.map((r) => r.gateway_name);
         });
     }
 }

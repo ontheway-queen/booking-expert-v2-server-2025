@@ -258,7 +258,9 @@ export default class OthersModel extends Schema {
       .first();
   }
 
-  public async insertPaymentGatewayCreds(payload: ICreatePaymentGatewayPayload) {
+  public async insertPaymentGatewayCreds(
+    payload: ICreatePaymentGatewayPayload
+  ) {
     return await this.db('payment_gateway_creds')
       .withSchema(this.AGENT_SCHEMA)
       .insert(payload);
@@ -274,28 +276,32 @@ export default class OthersModel extends Schema {
       .where('id', id);
   }
 
-  public async getPaymentGatewayCreds(
-    query: { agency_id: number, gateway_name?: string, key?: string }
-  ): Promise<IGetPaymentGatewayData[] | null> {
+  public async getPaymentGatewayCreds(query: {
+    agency_id: number;
+    gateway_name?: string;
+    key?: string;
+  }): Promise<IGetPaymentGatewayData[]> {
     return await this.db('payment_gateway_creds')
       .withSchema(this.AGENT_SCHEMA)
       .select('*')
       .where('agency_id', query.agency_id)
       .andWhere((qb) => {
         if (query.gateway_name) {
-          qb.andWhere('gateway_name', query.gateway_name)
+          qb.andWhere('gateway_name', query.gateway_name);
         }
         if (query.key) {
-          qb.andWhere('key', query.key)
+          qb.andWhere('key', query.key);
         }
-      })
+      });
   }
 
-  public async getUniquePaymentGatewayList(agency_id: number): Promise<string[]> {
+  public async getUniquePaymentGatewayList(
+    agency_id: number
+  ): Promise<string[]> {
     const result = await this.db('payment_gateway_creds')
       .withSchema(this.AGENT_SCHEMA)
       .distinct('gateway_name')
       .where('agency_id', agency_id);
-    return result.map(r => r.gateway_name);
+    return result.map((r) => r.gateway_name);
   }
 }

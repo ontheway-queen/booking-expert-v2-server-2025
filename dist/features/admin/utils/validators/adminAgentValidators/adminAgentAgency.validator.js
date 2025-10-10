@@ -39,7 +39,7 @@ class AdminAgentAgencyValidator {
                         umrah: joi_1.default.boolean().required(),
                         group_fare: joi_1.default.boolean().required(),
                         blog: joi_1.default.boolean().required(),
-                        b2c_link: joi_1.default.string().optional()
+                        b2c_link: joi_1.default.string().optional(),
                     });
                     const parsedValue = JSON.parse(value);
                     const { error } = innerSchema.validate(parsedValue);
@@ -103,7 +103,7 @@ class AdminAgentAgencyValidator {
                         umrah: joi_1.default.boolean().required(),
                         group_fare: joi_1.default.boolean().required(),
                         blog: joi_1.default.boolean().required(),
-                        b2c_link: joi_1.default.string().optional()
+                        b2c_link: joi_1.default.string().optional(),
                     });
                     const parsedValue = JSON.parse(value);
                     const { error } = innerSchema.validate(parsedValue);
@@ -130,17 +130,25 @@ class AdminAgentAgencyValidator {
             status: joi_1.default.boolean().optional(),
         });
         this.upsertAgencyPaymentGatewayCredential = joi_1.default.object({
-            gateway_name: joi_1.default.string().valid("SSL", "BKASH").required(),
+            gateway_name: joi_1.default.string().valid('SSL', 'BKASH').required(),
             cred: joi_1.default.array()
                 .items(joi_1.default.object({
-                key: joi_1.default.string()
-                    .when(joi_1.default.ref("...gateway_name"), {
-                    is: "SSL",
-                    then: joi_1.default.valid("SSL_STORE_ID", "SSL_STORE_PASSWORD").required(),
-                })
-                    .when(joi_1.default.ref("...gateway_name"), {
-                    is: "BKASH",
-                    then: joi_1.default.valid("BKASH_APP_KEY", "BKASH_APP_SECRET", "BKASH_USERNAME", "BKASH_PASSWORD").required(),
+                key: joi_1.default.when(joi_1.default.ref('...gateway_name'), {
+                    switch: [
+                        {
+                            is: 'SSL',
+                            then: joi_1.default.string()
+                                .valid('SSL_STORE_ID', 'SSL_STORE_PASSWORD')
+                                .required(),
+                        },
+                        {
+                            is: 'BKASH',
+                            then: joi_1.default.string()
+                                .valid('BKASH_APP_KEY', 'BKASH_APP_SECRET', 'BKASH_USERNAME', 'BKASH_PASSWORD')
+                                .required(),
+                        },
+                    ],
+                    // otherwise: Joi.forbidden(),
                 }),
                 value: joi_1.default.string().required(),
             }))

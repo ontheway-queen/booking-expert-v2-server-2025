@@ -99,7 +99,9 @@ export default class AdminAgentAgencyService extends AbstractServices {
       const otherModel = this.Model.OthersModel(trx);
       const email_credential = await otherModel.getEmailCreds(agency_id);
 
-      const payment_gateway_creds = await otherModel.getPaymentGatewayCreds({agency_id});
+      const payment_gateway_creds = await otherModel.getPaymentGatewayCreds({
+        agency_id,
+      });
 
       return {
         success: true,
@@ -783,6 +785,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
         );
       }
       const check_duplicate = await model.getEmailCreds(Number(agency_id));
+
       //update
       if (check_duplicate) {
         await model.updateEmailCreds(body, Number(agency_id));
@@ -790,29 +793,29 @@ export default class AdminAgentAgencyService extends AbstractServices {
           created_by: user_id,
           details: `Email credentials has been updated for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
           type: 'UPDATE',
-          payload: body
+          payload: body,
         });
         return {
           success: true,
           code: this.StatusCode.HTTP_OK,
-          message: 'Email credentials has been updated'
-        }
+          message: 'Email credentials has been updated',
+        };
+      } else {
+        //create
+        await model.insertEmailCreds({ ...body, agency_id: Number(agency_id) });
+        await this.insertAdminAudit(trx, {
+          created_by: user_id,
+          details: `Email credentials has been created for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
+          type: 'CREATE',
+          payload: body,
+        });
       }
-
-      //create
-      await model.insertEmailCreds({ ...body, agency_id: Number(agency_id) });
-      await this.insertAdminAudit(trx, {
-        created_by: user_id,
-        details: `Email credentials has been created for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
-        type: 'CREATE',
-        payload: body
-      });
 
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: 'Email credentials has been added',
-      }
+      };
     });
   }
 
@@ -834,34 +837,43 @@ export default class AdminAgentAgencyService extends AbstractServices {
         );
       }
 
-      await Promise.all(body.cred.map(async (item) => {
-        const check_duplicate = await othersModel.getPaymentGatewayCreds(
-          { agency_id: Number(agency_id), gateway_name: body.gateway_name, key: item.key }
-        );
-
-        if (check_duplicate?.length) {
-          await othersModel.updatePaymentGatewayCreds({ value: item.value }, check_duplicate[0].id);
-        } else {
-          await othersModel.insertPaymentGatewayCreds({
+      await Promise.all(
+        body.cred.map(async (item) => {
+          const check_duplicate = await othersModel.getPaymentGatewayCreds({
             agency_id: Number(agency_id),
             gateway_name: body.gateway_name,
-            ...item
+            key: item.key,
           });
-        }
-      }));
+
+          console.log(check_duplicate);
+
+          if (check_duplicate.length) {
+            await othersModel.updatePaymentGatewayCreds(
+              { value: item.value },
+              check_duplicate[0].id
+            );
+          } else {
+            await othersModel.insertPaymentGatewayCreds({
+              agency_id: Number(agency_id),
+              gateway_name: body.gateway_name,
+              ...item,
+            });
+          }
+        })
+      );
 
       await this.insertAdminAudit(trx, {
         created_by: user_id,
         details: `Payment gateway credentials has been updated for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
         type: 'UPDATE',
-        payload: body
+        payload: body,
       });
 
       return {
         success: true,
         code: this.StatusCode.HTTP_SUCCESSFUL,
         message: 'Payment gateway credentials has been updated',
-      }
+      };
     });
   }
 }

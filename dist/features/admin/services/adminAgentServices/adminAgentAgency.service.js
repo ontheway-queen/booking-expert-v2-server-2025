@@ -89,7 +89,9 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                 }
                 const otherModel = this.Model.OthersModel(trx);
                 const email_credential = yield otherModel.getEmailCreds(agency_id);
-                const payment_gateway_creds = yield otherModel.getPaymentGatewayCreds({ agency_id });
+                const payment_gateway_creds = yield otherModel.getPaymentGatewayCreds({
+                    agency_id,
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -630,22 +632,24 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                         created_by: user_id,
                         details: `Email credentials has been updated for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
                         type: 'UPDATE',
-                        payload: body
+                        payload: body,
                     });
                     return {
                         success: true,
                         code: this.StatusCode.HTTP_OK,
-                        message: 'Email credentials has been updated'
+                        message: 'Email credentials has been updated',
                     };
                 }
-                //create
-                yield model.insertEmailCreds(Object.assign(Object.assign({}, body), { agency_id: Number(agency_id) }));
-                yield this.insertAdminAudit(trx, {
-                    created_by: user_id,
-                    details: `Email credentials has been created for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
-                    type: 'CREATE',
-                    payload: body
-                });
+                else {
+                    //create
+                    yield model.insertEmailCreds(Object.assign(Object.assign({}, body), { agency_id: Number(agency_id) }));
+                    yield this.insertAdminAudit(trx, {
+                        created_by: user_id,
+                        details: `Email credentials has been created for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
+                        type: 'CREATE',
+                        payload: body,
+                    });
+                }
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -669,8 +673,13 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
                 }
                 yield Promise.all(body.cred.map((item) => __awaiter(this, void 0, void 0, function* () {
-                    const check_duplicate = yield othersModel.getPaymentGatewayCreds({ agency_id: Number(agency_id), gateway_name: body.gateway_name, key: item.key });
-                    if (check_duplicate === null || check_duplicate === void 0 ? void 0 : check_duplicate.length) {
+                    const check_duplicate = yield othersModel.getPaymentGatewayCreds({
+                        agency_id: Number(agency_id),
+                        gateway_name: body.gateway_name,
+                        key: item.key,
+                    });
+                    console.log(check_duplicate);
+                    if (check_duplicate.length) {
                         yield othersModel.updatePaymentGatewayCreds({ value: item.value }, check_duplicate[0].id);
                     }
                     else {
@@ -681,7 +690,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     created_by: user_id,
                     details: `Payment gateway credentials has been updated for agency - ${checkAgency.agency_name}(${checkAgency.agent_no})`,
                     type: 'UPDATE',
-                    payload: body
+                    payload: body,
                 });
                 return {
                     success: true,

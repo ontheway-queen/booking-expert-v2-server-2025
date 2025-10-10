@@ -1,4 +1,7 @@
-import { TYPE_PAYMENT_GATEWAY_BKASH, TYPE_PAYMENT_GATEWAY_SSL } from "../../../../../utils/miscellaneous/constants";
+import {
+  TYPE_PAYMENT_GATEWAY_BKASH,
+  TYPE_PAYMENT_GATEWAY_SSL,
+} from '../../../../../utils/miscellaneous/constants';
 
 export interface IAdminAgentGetAgencyReqQuery {
   filter?: string;
@@ -80,7 +83,9 @@ export interface IAdminUpsertAgentEmailCredentialReqBody {
 }
 
 export interface IAdminGetAgentEmailCredentialReqQuery {
-  gateway_name: typeof TYPE_PAYMENT_GATEWAY_SSL | typeof TYPE_PAYMENT_GATEWAY_BKASH;
+  gateway_name:
+    | typeof TYPE_PAYMENT_GATEWAY_SSL
+    | typeof TYPE_PAYMENT_GATEWAY_BKASH;
   cred: {
     key: string;
     value: string;
