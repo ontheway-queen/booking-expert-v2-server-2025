@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentSubAgentHotelService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
+const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AgentSubAgentHotelService extends abstract_service_1.default {
     constructor() {
         super();
@@ -24,7 +25,7 @@ class AgentSubAgentHotelService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const hotelBookingModel = this.Model.HotelBookingModel();
             const data = yield hotelBookingModel.getHotelBooking({
-                source_type: SOURCE_AGENT_B2C,
+                source_type: constants_1.SOURCE_SUB_AGENT,
                 filter,
                 from_date,
                 to_date,
@@ -50,7 +51,7 @@ class AgentSubAgentHotelService extends abstract_service_1.default {
             const data = yield hotelBookingModel.getSingleHotelBooking({
                 booking_id,
                 source_id: agency_id,
-                source_type: SOURCE_AGENT_B2C,
+                source_type: constants_1.SOURCE_SUB_AGENT,
             });
             if (!data) {
                 return {
@@ -78,7 +79,7 @@ class AgentSubAgentHotelService extends abstract_service_1.default {
                 const hotelBookingModel = this.Model.HotelBookingModel(trx);
                 const checkBooking = yield hotelBookingModel.getSingleHotelBooking({
                     booking_id,
-                    source_type: SOURCE_AGENT_B2C,
+                    source_type: constants_1.SOURCE_SUB_AGENT,
                     source_id: agency_id,
                 });
                 if (!checkBooking || Object.keys(checkBooking).length === 0) {

@@ -45,7 +45,10 @@ export default class PublicEmailOTPService extends AbstractServices {
           break;
         case OTP_TYPES.reset_agent:
           const agencyUserModel = this.Model.AgencyUserModel(trx);
-          const checkAgent = await agencyUserModel.checkUser({ email });
+          const checkAgent = await agencyUserModel.checkUser({
+            email,
+            agency_type: 'AGENT',
+          });
 
           if (!checkAgent) {
             return {

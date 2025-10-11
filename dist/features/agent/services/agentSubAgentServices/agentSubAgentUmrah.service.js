@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentSubAgentUmrahService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
+const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AgentSubAgentUmrahService extends abstract_service_1.default {
     constructor() {
         super();
@@ -24,7 +25,7 @@ class AgentSubAgentUmrahService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const query = req.query;
             const model = this.Model.UmrahBookingModel();
-            const data = yield model.getAgentB2CUmrahBookingList(Object.assign(Object.assign({ agency_id }, query), { source_type: SOURCE_AGENT_B2C }), true);
+            const data = yield model.getAgentB2CUmrahBookingList(Object.assign(Object.assign({ agency_id }, query), { source_type: constants_1.SOURCE_SUB_AGENT }), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -44,7 +45,7 @@ class AgentSubAgentUmrahService extends abstract_service_1.default {
             const data = yield UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
                 id: booking_id,
                 source_id: agency_id,
-                source_type: SOURCE_AGENT_B2C,
+                source_type: constants_1.SOURCE_SUB_AGENT,
             });
             if (!data) {
                 return {
@@ -73,7 +74,7 @@ class AgentSubAgentUmrahService extends abstract_service_1.default {
             const data = yield UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
                 id: booking_id,
                 source_id: agency_id,
-                source_type: SOURCE_AGENT_B2C,
+                source_type: constants_1.SOURCE_SUB_AGENT,
             });
             if (!data) {
                 return {

@@ -1,4 +1,6 @@
+import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
+import { SOURCE_SUB_AGENT } from '../../../../utils/miscellaneous/constants';
 
 export class AgentSubAgentHotelService extends AbstractServices {
   constructor() {
@@ -6,14 +8,20 @@ export class AgentSubAgentHotelService extends AbstractServices {
   }
 
   public async getBooking(req: Request) {
-    const { filter, from_date, limit, skip, to_date } =
-      req.query as IGetAgentB2CHotelBookingQuery;
+    const { filter, from_date, limit, skip, to_date } = req.query as {
+      filter?: string;
+      from_date?: string;
+      to_date?: string;
+      limit?: string;
+      skip?: string;
+    };
+
     const { agency_id } = req.agencyUser;
     const hotelBookingModel = this.Model.HotelBookingModel();
 
     const data = await hotelBookingModel.getHotelBooking(
       {
-        source_type: SOURCE_AGENT_B2C,
+        source_type: SOURCE_SUB_AGENT,
         filter,
         from_date,
         to_date,
@@ -44,7 +52,7 @@ export class AgentSubAgentHotelService extends AbstractServices {
     const data = await hotelBookingModel.getSingleHotelBooking({
       booking_id,
       source_id: agency_id,
-      source_type: SOURCE_AGENT_B2C,
+      source_type: SOURCE_SUB_AGENT,
     });
 
     if (!data) {
@@ -83,7 +91,7 @@ export class AgentSubAgentHotelService extends AbstractServices {
 
       const checkBooking = await hotelBookingModel.getSingleHotelBooking({
         booking_id,
-        source_type: SOURCE_AGENT_B2C,
+        source_type: SOURCE_SUB_AGENT,
         source_id: agency_id,
       });
 

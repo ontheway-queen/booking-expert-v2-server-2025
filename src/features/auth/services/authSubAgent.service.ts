@@ -679,10 +679,10 @@ export default class AuthSubAgentService extends AbstractServices {
 
     const hashed_password = await Lib.hashValue(password);
 
+    console.log({ email, agency_id });
     await AgencyUserModel.updateUserByEmail(
       { hashed_password },
-      email,
-      agency_id
+      { email, ref_agent_id: agency_id }
     );
 
     return {

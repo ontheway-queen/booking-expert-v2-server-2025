@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
+import { SOURCE_SUB_AGENT } from '../../../../utils/miscellaneous/constants';
 
 export class AgentSubAgentUmrahService extends AbstractServices {
   constructor() {
@@ -21,7 +22,7 @@ export class AgentSubAgentUmrahService extends AbstractServices {
     const model = this.Model.UmrahBookingModel();
 
     const data = await model.getAgentB2CUmrahBookingList(
-      { agency_id, ...query, source_type: SOURCE_AGENT_B2C },
+      { agency_id, ...query, source_type: SOURCE_SUB_AGENT },
       true
     );
 
@@ -44,7 +45,7 @@ export class AgentSubAgentUmrahService extends AbstractServices {
     const data = await UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
       id: booking_id,
       source_id: agency_id,
-      source_type: SOURCE_AGENT_B2C,
+      source_type: SOURCE_SUB_AGENT,
     });
 
     if (!data) {
@@ -79,7 +80,7 @@ export class AgentSubAgentUmrahService extends AbstractServices {
     const data = await UmrahBookingModel.getSingleAgentB2CUmrahBookingDetails({
       id: booking_id,
       source_id: agency_id,
-      source_type: SOURCE_AGENT_B2C,
+      source_type: SOURCE_SUB_AGENT,
     });
 
     if (!data) {

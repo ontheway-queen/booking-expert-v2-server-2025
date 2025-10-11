@@ -26,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentB2CSubHolidayService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
 const holidayConstants_1 = require("../../../../utils/miscellaneous/holidayConstants");
+const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AgentB2CSubHolidayService extends abstract_service_1.default {
     createHoliday(req) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -300,7 +301,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const query = req.query;
-                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ source_type: SOURCE_SUB_AGENT, source_id: agency_id }, query), true);
+                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ source_type: constants_1.SOURCE_AGENT_B2C, source_id: agency_id }, query), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -318,7 +319,7 @@ class AgentB2CSubHolidayService extends abstract_service_1.default {
                 const { id } = req.params;
                 const get_booking = yield holidayPackageBookingModel.getSingleHolidayBooking({
                     id,
-                    booked_by: SOURCE_SUB_AGENT,
+                    booked_by: constants_1.SOURCE_AGENT_B2C,
                     source_id: agency_id,
                 });
                 if (!get_booking) {

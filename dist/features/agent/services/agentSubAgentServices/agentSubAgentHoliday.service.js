@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentSubAgentHolidayService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
+const constants_1 = require("../../../../utils/miscellaneous/constants");
 class AgentSubAgentHolidayService extends abstract_service_1.default {
     constructor() {
         super();
@@ -24,7 +25,7 @@ class AgentSubAgentHolidayService extends abstract_service_1.default {
                 const { agency_id } = req.agencyUser;
                 const holidayPackageBookingModel = this.Model.HolidayPackageBookingModel(trx);
                 const query = req.query;
-                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ source_type: SOURCE_SUB_AGENT, source_id: agency_id }, query), true);
+                const getBookingList = yield holidayPackageBookingModel.getHolidayBookingList(Object.assign({ source_type: constants_1.SOURCE_SUB_AGENT, source_id: agency_id }, query), true);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,
@@ -42,7 +43,7 @@ class AgentSubAgentHolidayService extends abstract_service_1.default {
                 const { id } = req.params;
                 const get_booking = yield holidayPackageBookingModel.getSingleHolidayBooking({
                     id,
-                    booked_by: SOURCE_SUB_AGENT,
+                    booked_by: constants_1.SOURCE_SUB_AGENT,
                     source_id: agency_id,
                 });
                 if (!get_booking) {

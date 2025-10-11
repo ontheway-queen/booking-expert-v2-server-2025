@@ -9,6 +9,7 @@ import {
   HOLIDAY_FOR_AGENT_B2C,
 } from '../../../../utils/miscellaneous/holidayConstants';
 import { IGetHolidayPackageListFilterQuery } from '../../../../utils/modelTypes/holidayPackageModelTypes/holidayPackageModelTypes';
+import { SOURCE_AGENT_B2C } from '../../../../utils/miscellaneous/constants';
 
 export class AgentB2CSubHolidayService extends AbstractServices {
   public async createHoliday(req: Request) {
@@ -370,7 +371,7 @@ export class AgentB2CSubHolidayService extends AbstractServices {
       const getBookingList =
         await holidayPackageBookingModel.getHolidayBookingList(
           {
-            source_type: SOURCE_SUB_AGENT,
+            source_type: SOURCE_AGENT_B2C,
             source_id: agency_id,
             ...query,
           },
@@ -396,7 +397,7 @@ export class AgentB2CSubHolidayService extends AbstractServices {
       const get_booking =
         await holidayPackageBookingModel.getSingleHolidayBooking({
           id,
-          booked_by: SOURCE_SUB_AGENT,
+          booked_by: SOURCE_AGENT_B2C,
           source_id: agency_id,
         });
 
