@@ -521,7 +521,6 @@ class AuthSubAgentService extends abstract_service_1.default {
             }
             const AgencyUserModel = this.Model.AgencyUserModel();
             const hashed_password = yield lib_1.default.hashValue(password);
-            console.log({ email, agency_id });
             yield AgencyUserModel.updateUserByEmail({ hashed_password }, { email, ref_agent_id: agency_id });
             return {
                 success: true,

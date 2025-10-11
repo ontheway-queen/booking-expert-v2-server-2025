@@ -36,6 +36,7 @@ export default class AdminAgentAgencyValidator {
             group_fare: Joi.boolean().required(),
             blog: Joi.boolean().required(),
             b2c_link: Joi.string().optional(),
+            b2b_link: Joi.string().optional(),
           });
           const parsedValue = JSON.parse(value);
 

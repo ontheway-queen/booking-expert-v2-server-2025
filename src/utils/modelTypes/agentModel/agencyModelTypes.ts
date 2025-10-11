@@ -167,6 +167,8 @@ export interface ICheckAgencyData {
 export interface ICreateWhiteLabelPermissionPayload {
   agency_id: number;
   token: string;
+  b2c_link?: string;
+  b2b_link?: string;
   flight: boolean;
   hotel: boolean;
   visa: boolean;
@@ -185,6 +187,8 @@ export interface IUpdateWhiteLabelPermissionPayload {
   group_fare?: boolean;
   blog?: boolean;
   token?: string;
+  b2c_link?: string;
+  b2b_link?: string;
 }
 
 export interface ICreateAgentB2CMarkupPayload {
@@ -227,6 +231,7 @@ export interface IGetWhiteLabelPermissionData {
   umrah: boolean;
   blog: boolean;
   b2c_link: string | null;
+  b2b_link: string | null;
 }
 
 export interface ICreateAPICredsPayload {

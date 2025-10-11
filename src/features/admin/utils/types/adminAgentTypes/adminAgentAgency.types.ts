@@ -31,6 +31,8 @@ export interface IAdminAgentUpdateAgencyReqBody {
     umrah: boolean;
     group_fare: boolean;
     blog: boolean;
+    b2c_link?: string;
+    b2b_link?: string;
   };
 }
 
