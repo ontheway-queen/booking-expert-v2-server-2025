@@ -399,5 +399,24 @@ class CommonFlightSupportService extends abstract_service_1.default {
         }
         return route_type;
     }
+    //update data from API
+    updateFromAPI(payload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = this.Model.FlightBookingModel(this.trx);
+            if (!payload.ticket_issue_last_time) {
+                if (payload.api === flightConstant_1.SABRE_API) {
+                    const sabreSubService = new sabreFlightSupport_service_1.default(this.trx);
+                    const res = yield sabreSubService.GRNUpdate({
+                        pnr: payload.pnr
+                    });
+                    if (res.status && res.last_time) {
+                        yield model.updateFlightBooking({
+                            ticket_issue_last_time: res.last_time
+                        }, { id: payload.booking_id, source_type: payload.source_type });
+                    }
+                }
+            }
+        });
+    }
 }
 exports.CommonFlightSupportService = CommonFlightSupportService;
