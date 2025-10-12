@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_router_1 = __importDefault(require("../../../../abstract/abstract.router"));
-const agentB2CSubHotel_controller_1 = require("../../controllers/agentB2CControllers/agentB2CSubHotel.controller");
-class AgentB2CSubHotelRouter extends abstract_router_1.default {
+const agentSubAgentHotel_controller_1 = require("../../controllers/agentSubAgentControllers/agentSubAgentHotel.controller");
+class AgentSubAgentHotelRouter extends abstract_router_1.default {
     constructor() {
         super();
-        this.controller = new agentB2CSubHotel_controller_1.AgentB2CSubHotelController();
+        this.controller = new agentSubAgentHotel_controller_1.AgentSubAgentHotelController();
         this.callRouter();
     }
     callRouter() {
@@ -19,4 +19,4 @@ class AgentB2CSubHotelRouter extends abstract_router_1.default {
             .put(this.controller.updateBooking);
     }
 }
-exports.default = AgentB2CSubHotelRouter;
+exports.default = AgentSubAgentHotelRouter;

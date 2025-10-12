@@ -308,4 +308,6 @@ export const origin: string[] = [
   'https://www.ziarah-travels.com',
   'https://blazingbd.com',
   'https://www.blazingbd.com',
+  'https://shahriartrip.com',
+  'https://www.shahriartrip.com',
 ];

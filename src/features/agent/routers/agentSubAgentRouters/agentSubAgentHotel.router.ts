@@ -1,8 +1,8 @@
 import AbstractRouter from '../../../../abstract/abstract.router';
-import { AgentB2CSubHotelController } from '../../controllers/agentB2CControllers/agentB2CSubHotel.controller';
+import { AgentSubAgentHotelController } from '../../controllers/agentSubAgentControllers/agentSubAgentHotel.controller';
 
-export default class AgentB2CSubHotelRouter extends AbstractRouter {
-  private controller = new AgentB2CSubHotelController();
+export default class AgentSubAgentHotelRouter extends AbstractRouter {
+  private controller = new AgentSubAgentHotelController();
   constructor() {
     super();
     this.callRouter();
