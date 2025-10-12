@@ -706,7 +706,7 @@ export class AgentFlightService extends AbstractServices {
             if (grnData.airline_pnr) {
               payload.airline_pnr = grnData.airline_pnr;
             }
-          } 
+          }
           // else if (data.api === VERTEIL_API) {
           //   const verteilSubService = new VerteilFlightService(trx);
           //   const res = await verteilSubService.FlightBookService({
@@ -871,6 +871,14 @@ export class AgentFlightService extends AbstractServices {
 
       const { vendor_fare, source_type, ...restData } = booking_data;
 
+      await new CommonFlightSupportService(trx).updateFromAPI({
+        api: booking_data.api,
+        booking_id: Number(id),
+        pnr: String(booking_data.gds_pnr),
+        source_type: booking_data.source_type,
+        ticket_issue_last_time: booking_data.ticket_issue_last_time
+      });
+
       return {
         success: true,
         code: this.StatusCode.HTTP_OK,
@@ -985,7 +993,7 @@ export class AgentFlightService extends AbstractServices {
               : FLIGHT_BOOKING_ON_HOLD;
             ticket_number = res.data;
           }
-        } 
+        }
         // else if (booking_data.api === VERTEIL_API) {
         //   const segmentDetails =
         //     await bookingSegmentModel.getFlightBookingSegment(Number(id));

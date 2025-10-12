@@ -41,19 +41,19 @@ export interface IFlightBookingRequestBody {
 export interface IFlightBookingPassengerReqBody {
   key: string;
   type:
-    | 'ADT'
-    | 'CHD'
-    | 'C02'
-    | 'C03'
-    | 'C04'
-    | 'C05'
-    | 'C06'
-    | 'C07'
-    | 'C08'
-    | 'C09'
-    | 'C10'
-    | 'C11'
-    | 'INF';
+  | 'ADT'
+  | 'CHD'
+  | 'C02'
+  | 'C03'
+  | 'C04'
+  | 'C05'
+  | 'C06'
+  | 'C07'
+  | 'C08'
+  | 'C09'
+  | 'C10'
+  | 'C11'
+  | 'INF';
   reference: 'Mr' | 'Mrs' | 'Ms' | 'Miss' | 'MSTR';
   first_name: string;
   last_name: string;
@@ -91,12 +91,12 @@ export interface IInsertFlightBookingDataPayload {
   source_id?: number;
   payable_amount?: number;
   invoice_ref_type:
-    | typeof TYPE_FLIGHT
-    | typeof TYPE_HOTEL
-    | typeof TYPE_VISA
-    | typeof TYPE_UMRAH
-    | typeof TYPE_GROUP_FARE
-    | typeof TYPE_HOLIDAY;
+  | typeof TYPE_FLIGHT
+  | typeof TYPE_HOTEL
+  | typeof TYPE_VISA
+  | typeof TYPE_UMRAH
+  | typeof TYPE_GROUP_FARE
+  | typeof TYPE_HOLIDAY;
   coupon_code?: string;
   booking_block?: boolean;
 }
@@ -105,11 +105,11 @@ export interface IUpdateDataAfterFlightBookingCancelPayload {
   booking_id: number;
   booking_ref: string;
   cancelled_by_type:
-    | typeof SOURCE_AGENT
-    | typeof SOURCE_SUB_AGENT
-    | typeof SOURCE_AGENT_B2C
-    | typeof SOURCE_B2C
-    | typeof SOURCE_ADMIN;
+  | typeof SOURCE_AGENT
+  | typeof SOURCE_SUB_AGENT
+  | typeof SOURCE_AGENT_B2C
+  | typeof SOURCE_B2C
+  | typeof SOURCE_ADMIN;
   cancelled_by_user_id: number;
   api: string;
 }
@@ -127,10 +127,10 @@ export interface ISendFlightBookingEmailPayload {
   email: string;
   booking_id: number;
   booked_by:
-    | typeof SOURCE_AGENT
-    | typeof SOURCE_SUB_AGENT
-    | typeof SOURCE_AGENT_B2C
-    | typeof SOURCE_B2C;
+  | typeof SOURCE_AGENT
+  | typeof SOURCE_SUB_AGENT
+  | typeof SOURCE_AGENT_B2C
+  | typeof SOURCE_B2C;
   panel_link: string;
   agency: {
     agency_id: number;
@@ -146,10 +146,10 @@ export interface ISendFlightTicketIssueEmailPayload {
   email: string;
   booking_id: number;
   booked_by:
-    | typeof SOURCE_AGENT
-    | typeof SOURCE_SUB_AGENT
-    | typeof SOURCE_AGENT_B2C
-    | typeof SOURCE_B2C;
+  | typeof SOURCE_AGENT
+  | typeof SOURCE_SUB_AGENT
+  | typeof SOURCE_AGENT_B2C
+  | typeof SOURCE_B2C;
   panel_link: string;
   agency?: {
     email: string;
@@ -159,4 +159,12 @@ export interface ISendFlightTicketIssueEmailPayload {
     photo: string;
   };
   due: number;
+}
+
+export interface IUpdateDataFromAPI {
+  pnr: string;
+  ticket_issue_last_time: string | null;
+  api: string;
+  booking_id: number;
+  source_type: "AGENT" | "SUB AGENT" | "AGENT B2C" | "B2C" | "EXTERNAL";
 }
