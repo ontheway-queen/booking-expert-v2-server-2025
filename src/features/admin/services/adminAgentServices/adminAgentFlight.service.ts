@@ -27,6 +27,7 @@ import Lib from '../../../../utils/lib/lib';
 import { IUpdateFlightBookingPayload } from '../../../../utils/modelTypes/flightModelTypes/flightBookingModelTypes';
 import { IAgentUpdateDataAfterTicketIssue } from '../../../../utils/supportTypes/bookingSupportTypes/flightBookingSupportTypes/agentFlightBookingTypes';
 import VerteilFlightService from '../../../../utils/supportServices/flightSupportServices/verteilFlightSupport.service';
+import { CommonFlightSupportService } from '../../../../utils/supportServices/flightSupportServices/commonFlightSupport.service';
 
 export class AdminAgentFlightService extends AbstractServices {
   constructor() {
@@ -95,6 +96,14 @@ export class AdminAgentFlightService extends AbstractServices {
         source_type: SOURCE_AGENT,
         ref_id: Number(id),
         ref_type: TYPE_FLIGHT,
+      });
+
+      await new CommonFlightSupportService(trx).updateFromAPI({
+        api: booking_data.api,
+        booking_id,
+        pnr: String(booking_data.gds_pnr),
+        source_type: booking_data.source_type,
+        ticket_issue_last_time: booking_data.ticket_issue_last_time
       });
 
       return {

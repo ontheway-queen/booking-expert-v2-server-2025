@@ -18,7 +18,7 @@ import SabreFlightService from './sabreFlightSupport.service';
 import WfttFlightService from './wfttFlightSupport.service';
 import CustomError from '../../lib/customError';
 import { IGetSupplierAirlinesDynamicFareQuery } from '../../modelTypes/dynamicFareRulesModelTypes/dynamicFareModelTypes';
-import { IFlightBookingPassengerReqBody } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
+import { IFlightBookingPassengerReqBody, IUpdateDataFromAPI } from '../../supportTypes/bookingSupportTypes/flightBookingSupportTypes/commonFlightBookingTypes';
 import DateTimeLib from '../../lib/dateTimeLib';
 import { BD_AIRPORT } from '../../miscellaneous/staticData';
 import VerteilFlightService from './verteilFlightSupport.service';
@@ -528,5 +528,25 @@ export class CommonFlightSupportService extends AbstractServices {
     }
 
     return route_type;
+  }
+
+  //update data from API
+  public async updateFromAPI(
+    payload: IUpdateDataFromAPI
+  ) {
+    const model = this.Model.FlightBookingModel(this.trx);
+    if (!payload.ticket_issue_last_time) {
+      if (payload.api === SABRE_API) {
+        const sabreSubService = new SabreFlightService(this.trx);
+        const res = await sabreSubService.GRNUpdate({
+          pnr: payload.pnr
+        });
+        if (res.status && res.last_time) {
+          await model.updateFlightBooking({
+            ticket_issue_last_time: res.last_time
+          }, { id: payload.booking_id, source_type: payload.source_type })
+        }
+      }
+    }
   }
 }
