@@ -20,6 +20,8 @@ exports.origin = [
     'http://10.10.220.42:3001',
     'http://10.10.220.42:3002',
     'http://10.10.220.31:3001',
+    'http://10.10.220.42:5600',
+    'http://localhost:5600',
     'https://agent.bookingexpert.us',
     'https://www.bookingexpert.us',
     'https://admin-3f9e4x.bookingexpert.us',
