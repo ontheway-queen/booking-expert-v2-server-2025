@@ -207,7 +207,7 @@ class AuthAgentService extends abstract_service_1.default {
                         message: this.ResMsg.WRONG_CREDENTIALS,
                     };
                 }
-                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, white_label, agency_email, agency_phone_number, agency_logo, agency_name, is_main_user, ref_id, agency_type, ref_agent_id, allow_api, civil_aviation, kam_id, national_id, trade_license, address, } = checkUserAgency;
+                const { two_fa, status, email, id, username, name, role_id, photo, agency_id, agent_no, agency_status, hashed_password, phone_number, white_label, agency_email, agency_phone_number, agency_logo, agency_name, is_main_user, agency_type, ref_agent_id, allow_api, civil_aviation, kam_id, national_id, trade_license, address, } = checkUserAgency;
                 if (agency_status === 'Inactive' ||
                     agency_status === 'Incomplete' ||
                     agency_status === 'Rejected' ||
@@ -463,8 +463,19 @@ class AuthAgentService extends abstract_service_1.default {
                 };
             }
             const AgencyUserModel = this.Model.AgencyUserModel();
+            const checkUserAgency = yield AgencyUserModel.checkUser({
+                email,
+                agency_type: 'AGENT',
+            });
+            if (!checkUserAgency) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_UNAUTHORIZED,
+                    message: this.ResMsg.HTTP_UNAUTHORIZED,
+                };
+            }
             const hashed_password = yield lib_1.default.hashValue(password);
-            yield AgencyUserModel.updateUserByEmail({ hashed_password }, email);
+            yield AgencyUserModel.updateUser({ hashed_password }, { agency_id: checkUserAgency.agency_id, id: checkUserAgency.id });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
