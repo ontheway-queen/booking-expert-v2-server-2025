@@ -315,4 +315,6 @@ exports.origin = [
     'https://www.shahriartrip.com',
     'https://b2b.sammonitravels.com',
     'https://www.b2b.sammonitravels.com',
+    'https://ota.amarbooking.com',
+    'https://www.ota.amarbooking.com',
 ];

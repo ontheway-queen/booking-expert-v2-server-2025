@@ -11,7 +11,7 @@ class AdminConfigValidator {
             country_id: joi_1.default.number().optional(),
             limit: joi_1.default.number().optional(),
             skip: joi_1.default.number().optional(),
-            filter: joi_1.default.string().optional(),
+            name: joi_1.default.string().optional(),
         });
         this.createCity = joi_1.default.object({
             country_id: joi_1.default.number().required(),

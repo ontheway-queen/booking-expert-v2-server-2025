@@ -638,23 +638,23 @@ class CommonModel extends schema_1.default {
     }
     upsertPaymentGatewayToken(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            const check_entry = yield this.db("payment_gateway_token")
+            const check_entry = yield this.db('payment_gateway_token')
                 .withSchema(this.DBO_SCHEMA)
-                .select("*")
+                .select('*')
                 .where('gateway_name', payload.gateway_name)
                 .andWhere('key', payload.key);
             if (check_entry === null || check_entry === void 0 ? void 0 : check_entry.length) {
-                yield this.db("payment_gateway_token")
+                yield this.db('payment_gateway_token')
                     .withSchema(this.DBO_SCHEMA)
                     .update({
                     value: payload.value,
-                    updated_at: new Date()
+                    updated_at: new Date(),
                 })
                     .where('gateway_name', payload.gateway_name)
                     .andWhere('key', payload.key);
             }
             else {
-                const res = yield this.db("payment_gateway_token")
+                const res = yield this.db('payment_gateway_token')
                     .withSchema(this.DBO_SCHEMA)
                     .insert(payload);
             }
@@ -662,7 +662,7 @@ class CommonModel extends schema_1.default {
     }
     getPaymentGatewayToken(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.db("payment_gateway_token")
+            return yield this.db('payment_gateway_token')
                 .withSchema(this.DBO_SCHEMA)
                 .select('*')
                 .where(payload);
