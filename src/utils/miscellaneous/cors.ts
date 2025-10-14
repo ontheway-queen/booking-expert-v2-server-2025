@@ -310,4 +310,6 @@ export const origin: string[] = [
   'https://www.blazingbd.com',
   'https://shahriartrip.com',
   'https://www.shahriartrip.com',
+  'https://b2b.sammonitravels.com',
+  'https://www.b2b.sammonitravels.com',
 ];
