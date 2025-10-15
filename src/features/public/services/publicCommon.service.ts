@@ -3,11 +3,12 @@ import qs from 'qs';
 import AbstractServices from '../../../abstract/abstract.service';
 import config from '../../../config/config';
 import SabreAPIEndpoints from '../../../utils/miscellaneous/endpoints/sabreApiEndpoints';
-import { SABRE_TOKEN_ENV, VERTEIL_API, VERTEIL_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstant';
+import { PUBLIC_PNR_SABRE_API_SECRET, SABRE_TOKEN_ENV, VERTEIL_API, VERTEIL_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstant';
 import { Request } from 'express';
 import { CTHotelSupportService } from '../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service';
 import VerteilAPIEndpoints from '../../../utils/miscellaneous/endpoints/verteilApiEndpoints';
 import { ERROR_LEVEL_CRITICAL } from '../../../utils/miscellaneous/constants';
+import SabreRequests from '../../../utils/lib/flight/sabreRequest';
 
 export default class PublicCommonService extends AbstractServices {
   constructor() {
@@ -215,5 +216,53 @@ export default class PublicCommonService extends AbstractServices {
         data: visaType,
       };
     });
+  }
+
+  public async getSabreBooking(req: Request) {
+    const { pnr_code } = req.params;
+    const { authorization } = req.headers;
+    if (!authorization) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_UNAUTHORIZED,
+        message: this.ResMsg.HTTP_UNAUTHORIZED,
+      };
+    } else {
+      const token = authorization.split(' ')[1];
+
+      if (!token) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_UNAUTHORIZED,
+          message: this.ResMsg.HTTP_UNAUTHORIZED,
+        };
+      }
+
+      if (token !== PUBLIC_PNR_SABRE_API_SECRET) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_UNAUTHORIZED,
+          message: this.ResMsg.HTTP_UNAUTHORIZED,
+        };
+      }
+    }
+
+    const response = await new SabreRequests().postRequest(SabreAPIEndpoints.GET_BOOKING_ENDPOINT, {
+      confirmationId: pnr_code,
+    });
+
+    if (!response) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_NOT_FOUND,
+        message: this.ResMsg.HTTP_NOT_FOUND,
+      };
+    }
+
+    return {
+      success: true,
+      code: this.StatusCode.HTTP_OK,
+      data: response,
+    };
   }
 }

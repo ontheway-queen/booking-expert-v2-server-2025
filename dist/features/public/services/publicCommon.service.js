@@ -21,6 +21,7 @@ const flightConstant_1 = require("../../../utils/miscellaneous/flightConstant");
 const ctHotelSupport_service_1 = require("../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service");
 const verteilApiEndpoints_1 = __importDefault(require("../../../utils/miscellaneous/endpoints/verteilApiEndpoints"));
 const constants_1 = require("../../../utils/miscellaneous/constants");
+const sabreRequest_1 = __importDefault(require("../../../utils/lib/flight/sabreRequest"));
 class PublicCommonService extends abstract_service_1.default {
     constructor() {
         super();
@@ -222,6 +223,51 @@ class PublicCommonService extends abstract_service_1.default {
                     data: visaType,
                 };
             }));
+        });
+    }
+    getSabreBooking(req) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { pnr_code } = req.params;
+            const { authorization } = req.headers;
+            if (!authorization) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_UNAUTHORIZED,
+                    message: this.ResMsg.HTTP_UNAUTHORIZED,
+                };
+            }
+            else {
+                const token = authorization.split(' ')[1];
+                if (!token) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_UNAUTHORIZED,
+                        message: this.ResMsg.HTTP_UNAUTHORIZED,
+                    };
+                }
+                if (token !== flightConstant_1.PUBLIC_PNR_SABRE_API_SECRET) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_UNAUTHORIZED,
+                        message: this.ResMsg.HTTP_UNAUTHORIZED,
+                    };
+                }
+            }
+            const response = yield new sabreRequest_1.default().postRequest(sabreApiEndpoints_1.default.GET_BOOKING_ENDPOINT, {
+                confirmationId: pnr_code,
+            });
+            if (!response) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_NOT_FOUND,
+                    message: this.ResMsg.HTTP_NOT_FOUND,
+                };
+            }
+            return {
+                success: true,
+                code: this.StatusCode.HTTP_OK,
+                data: response,
+            };
         });
     }
 }

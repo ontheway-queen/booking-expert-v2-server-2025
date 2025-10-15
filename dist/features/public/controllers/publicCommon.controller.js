@@ -61,6 +61,10 @@ class PublicCommonController extends abstract_controller_1.default {
             const _a = yield this.service.getVisaType(req), { code } = _a, rest = __rest(_a, ["code"]);
             res.status(code).json(rest);
         }));
+        this.getSabreBooking = this.asyncWrapper.wrap({ paramSchema: this.commonValidator.singleParamStringValidator('pnr_code') }, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const _a = yield this.service.getSabreBooking(req), { code } = _a, rest = __rest(_a, ["code"]);
+            res.status(code).json(rest);
+        }));
     }
 }
 exports.default = PublicCommonController;

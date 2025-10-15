@@ -2,6 +2,9 @@ export const SABRE_TOKEN_ENV = 'sabre_token';
 export const WFTT_TOKEN_ENV = 'wftt_token';
 export const VERTEIL_TOKEN_ENV = 'verteil_token';
 
+export const PUBLIC_PNR_SABRE_API_SECRET =
+  'dkUm2wwaeYNe0jiOn6olLZ96Tg+dyUPwxqFXEtO4O60lVyNgbSUmMaHQd3YRsQI5F6OVGcJmyqjcIg83BUA8jg==';
+
 export const SABRE_FLIGHT_ITINS = '200ITINS';
 // Route type
 export const ROUTE_TYPE: {
