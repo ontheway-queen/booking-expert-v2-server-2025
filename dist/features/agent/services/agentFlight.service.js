@@ -719,6 +719,13 @@ class AgentFlightService extends abstract_service_1.default {
                 const segment_data = yield flightSegmentModel.getFlightBookingSegment(Number(id));
                 const traveler_data = yield flightTravelerModel.getFlightBookingTraveler(Number(id));
                 const { vendor_fare, source_type } = booking_data, restData = __rest(booking_data, ["vendor_fare", "source_type"]);
+                yield new commonFlightSupport_service_1.CommonFlightSupportService(trx).updateFromAPI({
+                    api: booking_data.api,
+                    booking_id: Number(id),
+                    pnr: String(booking_data.gds_pnr),
+                    source_type: booking_data.source_type,
+                    ticket_issue_last_time: booking_data.ticket_issue_last_time
+                });
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_OK,

@@ -18,5 +18,6 @@ export default class PublicCommonRouter extends AbstractRouter {
     this.router.route('/banks').get(this.controller.getBank);
     this.router.route('/social-media').get(this.controller.getSocialMedia);
     this.router.route('/visa-type').get(this.controller.getVisaType);
+    this.router.get('/get-booking/:pnr_code', this.controller.getSabreBooking);
   }
 }

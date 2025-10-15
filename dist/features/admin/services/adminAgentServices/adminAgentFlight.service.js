@@ -20,6 +20,7 @@ const sabreFlightSupport_service_1 = __importDefault(require("../../../../utils/
 const commonFlightBookingSupport_service_1 = require("../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/commonFlightBookingSupport.service");
 const agentFlightBookingSupport_service_1 = require("../../../../utils/supportServices/bookingSupportServices/flightBookingSupportServices/agentFlightBookingSupport.service");
 const verteilFlightSupport_service_1 = __importDefault(require("../../../../utils/supportServices/flightSupportServices/verteilFlightSupport.service"));
+const commonFlightSupport_service_1 = require("../../../../utils/supportServices/flightSupportServices/commonFlightSupport.service");
 class AdminAgentFlightService extends abstract_service_1.default {
     constructor() {
         super();
@@ -68,6 +69,13 @@ class AdminAgentFlightService extends abstract_service_1.default {
                     source_type: constants_1.SOURCE_AGENT,
                     ref_id: Number(id),
                     ref_type: constants_1.TYPE_FLIGHT,
+                });
+                yield new commonFlightSupport_service_1.CommonFlightSupportService(trx).updateFromAPI({
+                    api: booking_data.api,
+                    booking_id,
+                    pnr: String(booking_data.gds_pnr),
+                    source_type: booking_data.source_type,
+                    ticket_issue_last_time: booking_data.ticket_issue_last_time
                 });
                 return {
                     success: true,
