@@ -19,6 +19,8 @@ export interface IAdminAgentUpdateAgencyReqBody {
   kam_id?: number;
   ref_id?: number;
   address?: string;
+  b2c_link?: string;
+  b2b_link?: string;
   white_label?: boolean;
   allow_api?: boolean;
   book_permission?: boolean;

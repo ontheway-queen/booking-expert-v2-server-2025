@@ -403,7 +403,7 @@ class AgencyModel extends schema_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db('white_label_permissions')
                 .withSchema(this.AGENT_SCHEMA)
-                .select('agency_id', 'token', 'flight', 'hotel', 'visa', 'holiday', 'group_fare', 'umrah', 'blog')
+                .select('agency_id', 'token', 'flight', 'hotel', 'visa', 'holiday', 'group_fare', 'umrah', 'blog', 'b2b_link', 'b2c_link')
                 .where((qb) => {
                 if (query.agency_id) {
                     qb.where('agency_id', query.agency_id);

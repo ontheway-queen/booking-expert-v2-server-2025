@@ -19,6 +19,8 @@ class AdminAgentAgencyValidator {
             email: joi_1.default.string().lowercase().trim().optional(),
             phone: joi_1.default.string().trim().optional(),
             address: joi_1.default.string().trim().optional(),
+            b2b_link: joi_1.default.string().trim().optional(),
+            b2c_link: joi_1.default.string().trim().optional(),
             flight_markup_set: joi_1.default.number().optional(),
             hotel_markup_set: joi_1.default.number().optional(),
             kam_id: joi_1.default.number().optional(),

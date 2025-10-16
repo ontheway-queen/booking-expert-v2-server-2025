@@ -314,4 +314,13 @@ export const origin: string[] = [
   'https://www.b2b.sammonitravels.com',
   'https://ota.amarbooking.com',
   'https://www.ota.amarbooking.com',
+  'https://ubertrip.net',
+  'https://b2b.ubertrip.net',
+  'https://www.b2b.ubertrip.net',
+  'https://b2b.bhubanmajhi.com.bd',
+  'https://www.b2b.bhubanmajhi.com.bd',
+  'https://shadholidays.com',
+  'https://www.shadholidays.com',
+  'https://skyflyz.com',
+  'https://www.skyflyz.com',
 ];
