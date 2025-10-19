@@ -26,7 +26,7 @@ export interface ICreateDepositRequestPayload {
   account_id: number;
   amount: number;
   remarks?: string;
-  payment_date: Date;
+  payment_date: Date | string;
   docs: string;
   created_by: number;
 }

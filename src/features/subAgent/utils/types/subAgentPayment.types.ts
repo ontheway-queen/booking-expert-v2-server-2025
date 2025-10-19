@@ -1,5 +1,5 @@
 export interface IGetSubAgentLoanHistoryQuery {
-  type?: "Given" | "Taken";
+  type?: 'Given' | 'Taken';
   limit?: string;
   skip?: string;
   from_date?: string;
@@ -18,5 +18,5 @@ export interface ISubAgentCreateDepositPayload {
   account_id: number;
   amount: number;
   remarks?: string;
-  payment_date: Date;
+  payment_date: string;
 }

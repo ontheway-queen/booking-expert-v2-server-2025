@@ -168,6 +168,7 @@ export default class HotelBookingModel extends Schema {
     source_type?: 'AGENT' | 'AGENT B2C' | 'B2C' | 'SUB AGENT';
   }): Promise<IGetSingleBookingModelData | null> {
     let tableName = 'agent_hotel_booking_view AS hb';
+
     if (source_type === 'AGENT B2C') {
       tableName = 'agent_b2c_hotel_booking_view AS hb';
     }
