@@ -37,8 +37,8 @@ export default class AdminAgentAgencyValidator {
             umrah: Joi.boolean().required(),
             group_fare: Joi.boolean().required(),
             blog: Joi.boolean().required(),
-            b2c_link: Joi.string().optional(),
-            b2b_link: Joi.string().optional(),
+            b2c_link: Joi.string().optional().allow(""),
+            b2b_link: Joi.string().optional().allow(""),
           });
           const parsedValue = JSON.parse(value);
 

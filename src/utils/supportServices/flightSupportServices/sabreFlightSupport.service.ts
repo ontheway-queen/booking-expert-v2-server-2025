@@ -603,7 +603,7 @@ export default class SabreFlightService extends AbstractServices {
               total_pax_markup
             ).toFixed(2),
             tax: per_pax_tax.toFixed(2),
-            ait: per_pax_ait.toFixed(2),
+            ait: (Number(Number(passenger_info.passengerTotalFare.equivalentAmount) + Number(passenger_info.passengerTotalFare.totalTaxAmount)) * 0.003).toFixed(2),
             discount: per_pax_discount.toFixed(2),
             total_fare: (
               per_pax_ait +

@@ -41,8 +41,8 @@ class AdminAgentAgencyValidator {
                         umrah: joi_1.default.boolean().required(),
                         group_fare: joi_1.default.boolean().required(),
                         blog: joi_1.default.boolean().required(),
-                        b2c_link: joi_1.default.string().optional(),
-                        b2b_link: joi_1.default.string().optional(),
+                        b2c_link: joi_1.default.string().optional().allow(""),
+                        b2b_link: joi_1.default.string().optional().allow(""),
                     });
                     const parsedValue = JSON.parse(value);
                     const { error } = innerSchema.validate(parsedValue);
