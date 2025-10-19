@@ -327,4 +327,12 @@ exports.origin = [
     'https://www.shadholidays.com',
     'https://skyflyz.com',
     'https://www.skyflyz.com',
+    'https://g360tourstravel.com',
+    'https://www.g360tourstravel.com',
+    'https://b2b.flybml.com',
+    'https://www.b2b.flybml.com',
+    'https://flybml.com',
+    'https://www.flybml.com',
+    'https://b2b.firoztrip.com',
+    'https://www.b2b.firoztrip.com',
 ];
