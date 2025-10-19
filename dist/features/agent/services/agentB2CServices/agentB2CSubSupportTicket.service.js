@@ -23,11 +23,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AgentSubAgentSupportTicketService = void 0;
+exports.AgentB2CSubSupportTicketService = void 0;
 const abstract_service_1 = __importDefault(require("../../../../abstract/abstract.service"));
-const lib_1 = __importDefault(require("../../../../utils/lib/lib"));
-const constants_1 = require("../../../../utils/miscellaneous/constants");
-class AgentSubAgentSupportTicketService extends abstract_service_1.default {
+class AgentB2CSubSupportTicketService extends abstract_service_1.default {
     constructor() {
         super();
     }
@@ -35,9 +33,9 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const data = req.body;
-                const { user_id } = req.agencyUser;
+                const { user_id, agency_id } = req.agencyUser;
                 const supportTicketModel = this.Model.SupportTicketModel(trx);
-                const support_no = yield lib_1.default.generateNo({
+                const support_no = yield Lib.generateNo({
                     trx,
                     type: 'Agent_SupportTicket',
                 });
@@ -48,21 +46,21 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
                     subject: data.subject,
                     priority: data.priority,
                     created_by_user_id: user_id,
-                    created_by: 'Admin',
-                    source_id: data.agent_id,
-                    source_type: constants_1.SOURCE_SUB_AGENT,
+                    created_by: 'Customer',
+                    source_id: agency_id,
+                    source_type: SOURCE_AGENT,
                     support_no,
                 });
                 const msg = yield supportTicketModel.insertSupportTicketMessage({
                     support_ticket_id: ticket[0].id,
                     message: data.details,
-                    reply_by: 'Admin',
+                    reply_by: 'Customer',
                     sender_id: user_id,
                     attachments: JSON.stringify(files.map((file) => file.filename)),
                 });
                 yield supportTicketModel.updateSupportTicket({
                     last_message_id: msg[0].id,
-                }, ticket[0].id, constants_1.SOURCE_SUB_AGENT);
+                }, ticket[0].id, SOURCE_AGENT);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -86,7 +84,7 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const supportTicketModel = this.Model.SupportTicketModel();
             const query = req.query;
-            const data = yield supportTicketModel.getAgentSupportTicket(Object.assign({ ref_agent_id: agency_id, source_type: constants_1.SOURCE_SUB_AGENT }, query), true);
+            const data = yield supportTicketModel.getAgentSupportTicket(Object.assign({ agent_id: agency_id, source_type: SOURCE_AGENT }, query), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -104,8 +102,8 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
             const supportTicketModel = this.Model.SupportTicketModel();
             const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                 id: ticket_id,
-                source_type: constants_1.SOURCE_SUB_AGENT,
-                ref_agent_id: agency_id,
+                agent_id: agency_id,
+                source_type: SOURCE_AGENT,
             });
             if (!ticket) {
                 return {
@@ -135,8 +133,8 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
             const supportTicketModel = this.Model.SupportTicketModel();
             const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                 id: ticket_id,
-                ref_agent_id: agency_id,
-                source_type: constants_1.SOURCE_SUB_AGENT,
+                agent_id: agency_id,
+                source_type: SOURCE_AGENT,
             });
             if (!ticket) {
                 return {
@@ -167,8 +165,8 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
                 const supportTicketModel = this.Model.SupportTicketModel(trx);
                 const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                     id: support_ticket_id,
-                    ref_agent_id: agency_id,
-                    source_type: constants_1.SOURCE_SUB_AGENT,
+                    agent_id: agency_id,
+                    source_type: SOURCE_AGENT,
                 });
                 if (!ticket) {
                     return {
@@ -180,7 +178,7 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
                 const files = req.files || [];
                 const newMsg = yield supportTicketModel.insertSupportTicketMessage({
                     message,
-                    reply_by: 'Admin',
+                    reply_by: 'Customer',
                     sender_id: user_id,
                     support_ticket_id,
                     attachments: JSON.stringify(files.map((file) => file.filename)),
@@ -190,10 +188,10 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
                 };
                 if (ticket.status === 'Closed') {
                     payload.status = 'ReOpen';
-                    payload.reopen_by = 'Admin';
+                    payload.reopen_by = 'Customer';
                     payload.reopen_date = new Date();
                 }
-                yield supportTicketModel.updateSupportTicket(payload, support_ticket_id, constants_1.SOURCE_SUB_AGENT);
+                yield supportTicketModel.updateSupportTicket(payload, support_ticket_id, SOURCE_AGENT);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -213,8 +211,8 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
                 const supportTicketModel = this.Model.SupportTicketModel(trx);
                 const ticket = yield supportTicketModel.getSingleAgentSupportTicket({
                     id: support_ticket_id,
-                    ref_agent_id: agency_id,
-                    source_type: constants_1.SOURCE_SUB_AGENT,
+                    agent_id: agency_id,
+                    source_type: SOURCE_AGENT,
                 });
                 if (!ticket) {
                     return {
@@ -232,10 +230,10 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
                 }
                 yield supportTicketModel.updateSupportTicket({
                     close_date: new Date(),
-                    closed_by: 'Admin',
+                    closed_by: 'Customer',
                     closed_by_user_id: user_id,
                     status: 'Closed',
-                }, support_ticket_id, constants_1.SOURCE_SUB_AGENT);
+                }, support_ticket_id, SOURCE_AGENT);
                 return {
                     success: true,
                     code: this.StatusCode.HTTP_SUCCESSFUL,
@@ -245,4 +243,4 @@ class AgentSubAgentSupportTicketService extends abstract_service_1.default {
         });
     }
 }
-exports.AgentSubAgentSupportTicketService = AgentSubAgentSupportTicketService;
+exports.AgentB2CSubSupportTicketService = AgentB2CSubSupportTicketService;

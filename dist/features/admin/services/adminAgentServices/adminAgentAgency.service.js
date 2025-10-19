@@ -78,6 +78,8 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     group_fare: false,
                     blog: false,
                     token: '',
+                    b2b_link: '',
+                    b2c_link: '',
                 };
                 if (data.white_label) {
                     const wPermissions = yield AgencyModel.getWhiteLabelPermission({
@@ -169,7 +171,7 @@ class AdminAgentAgencyService extends abstract_service_1.default {
                     throw new customError_1.default(this.ResMsg.HTTP_NOT_FOUND, this.StatusCode.HTTP_NOT_FOUND);
                 }
                 const { user_id } = req.admin;
-                const _a = req.body, { white_label_permissions, kam_id, ref_id, email } = _a, restBody = __rest(_a, ["white_label_permissions", "kam_id", "ref_id", "email"]);
+                const _a = req.body, { white_label_permissions, kam_id, ref_id, email, b2b_link, b2c_link } = _a, restBody = __rest(_a, ["white_label_permissions", "kam_id", "ref_id", "email", "b2b_link", "b2c_link"]);
                 const files = req.files || [];
                 const payload = Object.assign({}, restBody);
                 if (email) {

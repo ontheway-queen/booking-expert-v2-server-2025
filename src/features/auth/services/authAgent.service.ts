@@ -265,7 +265,6 @@ export default class AuthAgentService extends AbstractServices {
         agency_logo,
         agency_name,
         is_main_user,
-        ref_id,
         agency_type,
         ref_agent_id,
         allow_api,
@@ -605,9 +604,25 @@ export default class AuthAgentService extends AbstractServices {
 
     const AgencyUserModel = this.Model.AgencyUserModel();
 
+    const checkUserAgency = await AgencyUserModel.checkUser({
+      email,
+      agency_type: 'AGENT',
+    });
+
+    if (!checkUserAgency) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_UNAUTHORIZED,
+        message: this.ResMsg.HTTP_UNAUTHORIZED,
+      };
+    }
+
     const hashed_password = await Lib.hashValue(password);
 
-    await AgencyUserModel.updateUserByEmail({ hashed_password }, email);
+    await AgencyUserModel.updateUser(
+      { hashed_password },
+      { agency_id: checkUserAgency.agency_id, id: checkUserAgency.id }
+    );
 
     return {
       success: true,

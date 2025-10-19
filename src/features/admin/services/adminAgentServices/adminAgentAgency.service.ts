@@ -84,6 +84,8 @@ export default class AdminAgentAgencyService extends AbstractServices {
         group_fare: false,
         blog: false,
         token: '',
+        b2b_link: '',
+        b2c_link: '',
       };
 
       if (data.white_label) {
@@ -209,8 +211,15 @@ export default class AdminAgentAgencyService extends AbstractServices {
       }
 
       const { user_id } = req.admin;
-      const { white_label_permissions, kam_id, ref_id, email, ...restBody } =
-        req.body as IAdminAgentUpdateAgencyReqBody;
+      const {
+        white_label_permissions,
+        kam_id,
+        ref_id,
+        email,
+        b2b_link,
+        b2c_link,
+        ...restBody
+      } = req.body as IAdminAgentUpdateAgencyReqBody;
 
       const files = (req.files as Express.Multer.File[]) || [];
       const payload: IUpdateAgencyPayload = { ...restBody };

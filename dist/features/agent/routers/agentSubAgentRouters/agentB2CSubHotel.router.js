@@ -16,7 +16,7 @@ class AgentB2CSubHotelRouter extends abstract_router_1.default {
         this.router
             .route('/booking/:id')
             .get(this.controller.getSingleBooking)
-            .put(this.controller.updateBooking);
+            .patch(this.controller.updateBooking);
     }
 }
 exports.default = AgentB2CSubHotelRouter;

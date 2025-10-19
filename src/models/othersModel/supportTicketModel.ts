@@ -132,6 +132,7 @@ export default class SupportTicketModel extends Schema {
       from_date,
       to_date,
       ref_type,
+      ref_agent_id,
       source_type,
     }: IGetAgencySupportTicketListQuery,
     need_total: boolean = false
@@ -160,6 +161,10 @@ export default class SupportTicketModel extends Schema {
       )
       .where((qb) => {
         qb.where('st.source_type', source_type);
+
+        if (ref_agent_id) {
+          qb.where('a.ref_agent_id', ref_agent_id);
+        }
         if (agent_id) {
           qb.where('st.source_id', agent_id);
         }
@@ -191,9 +196,13 @@ export default class SupportTicketModel extends Schema {
     if (need_total) {
       total = await this.db('support_tickets AS st')
         .withSchema(this.DBO_SCHEMA)
+        .joinRaw(`LEFT JOIN agent.agency AS a ON a.id = st.source_id`)
         .count('st.id AS total')
         .where((qb) => {
           qb.where('st.source_type', SOURCE_AGENT);
+          if (ref_agent_id) {
+            qb.where('a.ref_agent_id', ref_agent_id);
+          }
           if (agent_id) {
             qb.where('st.source_id', agent_id);
           }
@@ -325,10 +334,12 @@ export default class SupportTicketModel extends Schema {
     id,
     agent_id,
     source_type,
+    ref_agent_id,
   }: {
     id: number;
     agent_id?: number;
     source_type: 'AGENT' | 'SUB AGENT';
+    ref_agent_id?: number;
   }): Promise<IGetSingleAgentSupportTicketData | null> {
     return await this.db('support_tickets AS st')
       .withSchema(this.DBO_SCHEMA)
@@ -356,6 +367,9 @@ export default class SupportTicketModel extends Schema {
         qb.andWhere('st.source_type', source_type);
         if (agent_id) {
           qb.andWhere('st.source_id', agent_id);
+        }
+        if (ref_agent_id) {
+          qb.andWhere('a.ref_agent_id', ref_agent_id);
         }
       })
       .first();

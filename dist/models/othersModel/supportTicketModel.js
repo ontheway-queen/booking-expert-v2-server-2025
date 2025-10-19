@@ -69,7 +69,7 @@ class SupportTicketModel extends schema_1.default {
         });
     }
     getAgentSupportTicket(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ agent_id, limit, priority, reply_by, skip, status, created_by_user_id, from_date, to_date, ref_type, source_type, }, need_total = false) {
+        return __awaiter(this, arguments, void 0, function* ({ agent_id, limit, priority, reply_by, skip, status, created_by_user_id, from_date, to_date, ref_type, ref_agent_id, source_type, }, need_total = false) {
             var _b;
             const data = yield this.db('support_tickets AS st')
                 .withSchema(this.DBO_SCHEMA)
@@ -78,6 +78,9 @@ class SupportTicketModel extends schema_1.default {
                 .leftJoin('support_ticket_messages AS stm', 'st.last_message_id', 'stm.id')
                 .where((qb) => {
                 qb.where('st.source_type', source_type);
+                if (ref_agent_id) {
+                    qb.where('a.ref_agent_id', ref_agent_id);
+                }
                 if (agent_id) {
                     qb.where('st.source_id', agent_id);
                 }
@@ -107,9 +110,13 @@ class SupportTicketModel extends schema_1.default {
             if (need_total) {
                 total = yield this.db('support_tickets AS st')
                     .withSchema(this.DBO_SCHEMA)
+                    .joinRaw(`LEFT JOIN agent.agency AS a ON a.id = st.source_id`)
                     .count('st.id AS total')
                     .where((qb) => {
                     qb.where('st.source_type', constants_1.SOURCE_AGENT);
+                    if (ref_agent_id) {
+                        qb.where('a.ref_agent_id', ref_agent_id);
+                    }
                     if (agent_id) {
                         qb.where('st.source_id', agent_id);
                     }
@@ -201,7 +208,7 @@ class SupportTicketModel extends schema_1.default {
         });
     }
     getSingleAgentSupportTicket(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ id, agent_id, source_type, }) {
+        return __awaiter(this, arguments, void 0, function* ({ id, agent_id, source_type, ref_agent_id, }) {
             return yield this.db('support_tickets AS st')
                 .withSchema(this.DBO_SCHEMA)
                 .select('st.id', 'st.support_no', 'st.source_id', 'st.ref_type', 'st.close_date', 'st.closed_by', 'st.reopen_date', 'st.reopen_by', 'st.created_by_user_id', 'st.created_by', 'st.ref_id', 'st.subject', 'st.status', 'a.agency_name', 'a.agency_logo', 'st.created_at')
@@ -211,6 +218,9 @@ class SupportTicketModel extends schema_1.default {
                 qb.andWhere('st.source_type', source_type);
                 if (agent_id) {
                     qb.andWhere('st.source_id', agent_id);
+                }
+                if (ref_agent_id) {
+                    qb.andWhere('a.ref_agent_id', ref_agent_id);
                 }
             })
                 .first();

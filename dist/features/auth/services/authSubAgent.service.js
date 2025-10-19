@@ -521,7 +521,19 @@ class AuthSubAgentService extends abstract_service_1.default {
             }
             const AgencyUserModel = this.Model.AgencyUserModel();
             const hashed_password = yield lib_1.default.hashValue(password);
-            yield AgencyUserModel.updateUserByEmail({ hashed_password }, { email, ref_agent_id: agency_id });
+            const checkUserAgency = yield AgencyUserModel.checkUser({
+                email: email,
+                agency_type: constants_1.SOURCE_SUB_AGENT,
+                ref_agent_id: agency_id,
+            });
+            if (!checkUserAgency) {
+                return {
+                    success: false,
+                    code: this.StatusCode.HTTP_UNAUTHORIZED,
+                    message: this.ResMsg.WRONG_CREDENTIALS,
+                };
+            }
+            yield AgencyUserModel.updateUser({ hashed_password }, { id: checkUserAgency.id, agency_id: checkUserAgency.agency_id });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,

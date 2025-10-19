@@ -773,25 +773,25 @@ class CommonModel extends Schema {
     key: string;
     value: string;
   }) {
-    const check_entry = await this.db("payment_gateway_token")
+    const check_entry = await this.db('payment_gateway_token')
       .withSchema(this.DBO_SCHEMA)
-      .select("*")
+      .select('*')
       .where('gateway_name', payload.gateway_name)
       .andWhere('key', payload.key);
 
     if (check_entry?.length) {
-      await this.db("payment_gateway_token")
+      await this.db('payment_gateway_token')
         .withSchema(this.DBO_SCHEMA)
         .update({
           value: payload.value,
-          updated_at: new Date()
+          updated_at: new Date(),
         })
         .where('gateway_name', payload.gateway_name)
-        .andWhere('key', payload.key)
+        .andWhere('key', payload.key);
     } else {
-      const res = await this.db("payment_gateway_token")
+      const res = await this.db('payment_gateway_token')
         .withSchema(this.DBO_SCHEMA)
-        .insert(payload)
+        .insert(payload);
     }
   }
 
@@ -799,7 +799,7 @@ class CommonModel extends Schema {
     gateway_name: typeof TYPE_PAYMENT_GATEWAY_BKASH;
     key: string;
   }) {
-    return await this.db("payment_gateway_token")
+    return await this.db('payment_gateway_token')
       .withSchema(this.DBO_SCHEMA)
       .select('*')
       .where(payload);

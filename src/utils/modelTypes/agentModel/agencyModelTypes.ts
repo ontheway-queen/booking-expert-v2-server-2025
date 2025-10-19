@@ -230,8 +230,8 @@ export interface IGetWhiteLabelPermissionData {
   group_fare: boolean;
   umrah: boolean;
   blog: boolean;
-  b2c_link: string | null;
-  b2b_link: string | null;
+  b2c_link: string;
+  b2b_link: string;
 }
 
 export interface ICreateAPICredsPayload {

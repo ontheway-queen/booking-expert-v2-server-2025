@@ -45,6 +45,7 @@ export interface IGetAgencySupportTicketListQuery {
   status?: 'Open' | 'Closed' | 'ReOpen';
   source_type: 'AGENT' | 'AGENT B2C' | 'B2C' | 'SUB AGENT';
   agent_id?: number;
+  ref_agent_id?: number;
   created_by_user_id?: number;
   reply_by?: 'Admin' | 'Customer';
   priority?: 'Low' | 'Medium' | 'High' | 'Urgent';

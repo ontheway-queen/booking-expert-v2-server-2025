@@ -573,7 +573,9 @@ export default class AgencyModel extends Schema {
         'holiday',
         'group_fare',
         'umrah',
-        'blog'
+        'blog',
+        'b2b_link',
+        'b2c_link'
       )
       .where((qb) => {
         if (query.agency_id) {

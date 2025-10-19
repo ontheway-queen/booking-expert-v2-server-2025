@@ -15,6 +15,8 @@ export default class AdminAgentAgencyValidator {
     email: Joi.string().lowercase().trim().optional(),
     phone: Joi.string().trim().optional(),
     address: Joi.string().trim().optional(),
+    b2b_link: Joi.string().trim().optional(),
+    b2c_link: Joi.string().trim().optional(),
     flight_markup_set: Joi.number().optional(),
     hotel_markup_set: Joi.number().optional(),
     kam_id: Joi.number().optional(),
@@ -35,8 +37,8 @@ export default class AdminAgentAgencyValidator {
             umrah: Joi.boolean().required(),
             group_fare: Joi.boolean().required(),
             blog: Joi.boolean().required(),
-            b2c_link: Joi.string().optional(),
-            b2b_link: Joi.string().optional(),
+            b2c_link: Joi.string().optional().allow(""),
+            b2b_link: Joi.string().optional().allow(""),
           });
           const parsedValue = JSON.parse(value);
 

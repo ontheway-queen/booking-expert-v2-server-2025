@@ -679,9 +679,23 @@ export default class AuthSubAgentService extends AbstractServices {
 
     const hashed_password = await Lib.hashValue(password);
 
-    await AgencyUserModel.updateUserByEmail(
+    const checkUserAgency = await AgencyUserModel.checkUser({
+      email: email,
+      agency_type: SOURCE_SUB_AGENT,
+      ref_agent_id: agency_id,
+    });
+
+    if (!checkUserAgency) {
+      return {
+        success: false,
+        code: this.StatusCode.HTTP_UNAUTHORIZED,
+        message: this.ResMsg.WRONG_CREDENTIALS,
+      };
+    }
+
+    await AgencyUserModel.updateUser(
       { hashed_password },
-      { email, ref_agent_id: agency_id }
+      { id: checkUserAgency.id, agency_id: checkUserAgency.agency_id }
     );
 
     return {

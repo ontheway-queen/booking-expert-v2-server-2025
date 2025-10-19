@@ -10,7 +10,7 @@ export default class AdminConfigValidator {
     country_id: Joi.number().optional(),
     limit: Joi.number().optional(),
     skip: Joi.number().optional(),
-    filter: Joi.string().optional(),
+    name: Joi.string().optional(),
   });
 
   public createCity = Joi.object({

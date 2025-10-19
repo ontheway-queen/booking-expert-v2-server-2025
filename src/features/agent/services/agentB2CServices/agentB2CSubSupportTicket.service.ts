@@ -1,22 +1,13 @@
-import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
-import {
-  IAgentSubAgentCreateSupportTicketReqBody,
-  IAgentSubAgentGetSupportTicketReqQuery,
-} from '../../utils/types/agentSubAgentTypes/agentSubAgentSupportTicket.types';
-import Lib from '../../../../utils/lib/lib';
-import { SOURCE_SUB_AGENT } from '../../../../utils/miscellaneous/constants';
-import { IUpdateSupportTicketPayload } from '../../../../utils/modelTypes/othersModelTypes/supportTicketModelTypes';
 
-export class AgentSubAgentSupportTicketService extends AbstractServices {
+export class AgentB2CSubSupportTicketService extends AbstractServices {
   constructor() {
     super();
   }
-
   public async createSupportTicket(req: Request) {
     return this.db.transaction(async (trx) => {
-      const data = req.body as IAgentSubAgentCreateSupportTicketReqBody;
-      const { user_id } = req.agencyUser;
+      const data = req.body as IAgentCreateSupportTicketReqBody;
+      const { user_id, agency_id } = req.agencyUser;
       const supportTicketModel = this.Model.SupportTicketModel(trx);
 
       const support_no = await Lib.generateNo({
@@ -32,16 +23,16 @@ export class AgentSubAgentSupportTicketService extends AbstractServices {
         subject: data.subject,
         priority: data.priority,
         created_by_user_id: user_id,
-        created_by: 'Admin',
-        source_id: data.agent_id,
-        source_type: SOURCE_SUB_AGENT,
+        created_by: 'Customer',
+        source_id: agency_id,
+        source_type: SOURCE_AGENT,
         support_no,
       });
 
       const msg = await supportTicketModel.insertSupportTicketMessage({
         support_ticket_id: ticket[0].id,
         message: data.details,
-        reply_by: 'Admin',
+        reply_by: 'Customer',
         sender_id: user_id,
         attachments: JSON.stringify(files.map((file) => file.filename)),
       });
@@ -51,7 +42,7 @@ export class AgentSubAgentSupportTicketService extends AbstractServices {
           last_message_id: msg[0].id,
         },
         ticket[0].id,
-        SOURCE_SUB_AGENT
+        SOURCE_AGENT
       );
 
       return {
@@ -75,12 +66,12 @@ export class AgentSubAgentSupportTicketService extends AbstractServices {
   public async getSupportTicket(req: Request) {
     const { agency_id } = req.agencyUser;
     const supportTicketModel = this.Model.SupportTicketModel();
-    const query = req.query as IAgentSubAgentGetSupportTicketReqQuery;
+    const query = req.query as IAgentGetSupportTicketReqQuery;
 
     const data = await supportTicketModel.getAgentSupportTicket(
       {
-        ref_agent_id: agency_id,
-        source_type: SOURCE_SUB_AGENT,
+        agent_id: agency_id,
+        source_type: SOURCE_AGENT,
         ...query,
       },
       true
@@ -104,8 +95,8 @@ export class AgentSubAgentSupportTicketService extends AbstractServices {
 
     const ticket = await supportTicketModel.getSingleAgentSupportTicket({
       id: ticket_id,
-      source_type: SOURCE_SUB_AGENT,
-      ref_agent_id: agency_id,
+      agent_id: agency_id,
+      source_type: SOURCE_AGENT,
     });
 
     if (!ticket) {
@@ -145,8 +136,8 @@ export class AgentSubAgentSupportTicketService extends AbstractServices {
 
     const ticket = await supportTicketModel.getSingleAgentSupportTicket({
       id: ticket_id,
-      ref_agent_id: agency_id,
-      source_type: SOURCE_SUB_AGENT,
+      agent_id: agency_id,
+      source_type: SOURCE_AGENT,
     });
 
     if (!ticket) {
@@ -180,8 +171,8 @@ export class AgentSubAgentSupportTicketService extends AbstractServices {
 
       const ticket = await supportTicketModel.getSingleAgentSupportTicket({
         id: support_ticket_id,
-        ref_agent_id: agency_id,
-        source_type: SOURCE_SUB_AGENT,
+        agent_id: agency_id,
+        source_type: SOURCE_AGENT,
       });
 
       if (!ticket) {
@@ -196,7 +187,7 @@ export class AgentSubAgentSupportTicketService extends AbstractServices {
 
       const newMsg = await supportTicketModel.insertSupportTicketMessage({
         message,
-        reply_by: 'Admin',
+        reply_by: 'Customer',
         sender_id: user_id,
         support_ticket_id,
         attachments: JSON.stringify(files.map((file) => file.filename)),
@@ -208,14 +199,14 @@ export class AgentSubAgentSupportTicketService extends AbstractServices {
 
       if (ticket.status === 'Closed') {
         payload.status = 'ReOpen';
-        payload.reopen_by = 'Admin';
+        payload.reopen_by = 'Customer';
         payload.reopen_date = new Date();
       }
 
       await supportTicketModel.updateSupportTicket(
         payload,
         support_ticket_id,
-        SOURCE_SUB_AGENT
+        SOURCE_AGENT
       );
 
       return {
@@ -238,8 +229,8 @@ export class AgentSubAgentSupportTicketService extends AbstractServices {
 
       const ticket = await supportTicketModel.getSingleAgentSupportTicket({
         id: support_ticket_id,
-        ref_agent_id: agency_id,
-        source_type: SOURCE_SUB_AGENT,
+        agent_id: agency_id,
+        source_type: SOURCE_AGENT,
       });
 
       if (!ticket) {
@@ -261,12 +252,12 @@ export class AgentSubAgentSupportTicketService extends AbstractServices {
       await supportTicketModel.updateSupportTicket(
         {
           close_date: new Date(),
-          closed_by: 'Admin',
+          closed_by: 'Customer',
           closed_by_user_id: user_id,
           status: 'Closed',
         },
         support_ticket_id,
-        SOURCE_SUB_AGENT
+        SOURCE_AGENT
       );
 
       return {
