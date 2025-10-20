@@ -25,7 +25,7 @@ class SubAgentMainService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { email, type } = req.body;
-                const { agency_id } = req.agencyB2CWhiteLabel;
+                const { agency_id, agency_logo: main_agency_logo } = req.agencyB2CWhiteLabel;
                 let OTP_FOR = '';
                 switch (type) {
                     case constants_1.OTP_TYPES.reset_sub_agent:
@@ -77,7 +77,7 @@ class SubAgentMainService extends abstract_service_1.default {
                         emailBody: (0, sendEmailOtpTemplate_1.sendEmailOtpTemplate)({
                             otp,
                             otpFor: OTP_FOR,
-                            logo: siteData === null || siteData === void 0 ? void 0 : siteData.main_logo,
+                            logo: `${constants_1.LOGO_ROOT_LINK_2}${main_agency_logo}`,
                             project: siteData === null || siteData === void 0 ? void 0 : siteData.site_name,
                         }),
                     });

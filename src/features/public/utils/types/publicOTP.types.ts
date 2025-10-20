@@ -1,6 +1,8 @@
 export interface ISendEmailOTPReqBody {
   email: string;
   type: string;
+  logo?: string;
+  name?: string;
 }
 
 export interface IMatchOTPReqBody {

@@ -769,6 +769,7 @@ export class SubAgentFlightService extends AbstractServices {
           source_type: SOURCE_SUB_AGENT,
         });
 
+        const whiteLabelPermissions = await this.Model.AgencyModel(trx).getWhiteLabelPermission({ agency_id: ref_agent_id });
         //send email
         const bookingSubService = new CommonFlightBookingSupportService(trx);
 
@@ -784,7 +785,7 @@ export class SubAgentFlightService extends AbstractServices {
             address: address,
             photo: agency_logo,
           },
-          panel_link: new_booking_ref,
+          panel_link: whiteLabelPermissions?.b2b_link || 'N/A',
         });
       } catch (err) {
         console.log({ err });
@@ -899,6 +900,7 @@ export class SubAgentFlightService extends AbstractServices {
         phone_number,
         agency_logo,
         address,
+        ref_agent_id
       } = req.agencyUser;
 
       //get flight details
@@ -1006,6 +1008,8 @@ export class SubAgentFlightService extends AbstractServices {
           api: booking_data.api,
         });
 
+        const whiteLabelPermissions = await this.Model.AgencyModel(trx).getWhiteLabelPermission({ agency_id: ref_agent_id });
+
         //send email
         await bookingSubService.sendTicketIssueMail({
           booking_id: Number(id),
@@ -1018,7 +1022,7 @@ export class SubAgentFlightService extends AbstractServices {
             address: address,
             photo: agency_logo,
           },
-          panel_link: `${AGENT_PROJECT_LINK}${FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}`,
+          panel_link: whiteLabelPermissions?.b2b_link ? `${whiteLabelPermissions?.b2b_link}${FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}` : "N/A",
           due: Number(payment_data.due),
         });
         return {
@@ -1044,7 +1048,7 @@ export class SubAgentFlightService extends AbstractServices {
 
   public async cancelBooking(req: Request) {
     return await this.db.transaction(async (trx) => {
-      const { user_id, agency_id, agency_email, agency_logo } = req.agencyUser;
+      const { user_id, agency_id, agency_email, agency_logo, ref_agent_id } = req.agencyUser;
       const { id } = req.params; //booking id
       const flightBookingModel = this.Model.FlightBookingModel(trx);
       const booking_data = await flightBookingModel.getSingleFlightBooking({
@@ -1101,6 +1105,7 @@ export class SubAgentFlightService extends AbstractServices {
           api: booking_data.api,
         });
 
+        const whiteLabelPermissions = await this.Model.AgencyModel(trx).getWhiteLabelPermission({ agency_id: ref_agent_id });
         //send email
         await flightBookingSupportService.sendBookingCancelMail({
           email: agency_email,
@@ -1108,7 +1113,7 @@ export class SubAgentFlightService extends AbstractServices {
           agency: {
             photo: agency_logo,
           },
-          panel_link: `${AGENT_PROJECT_LINK}${FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}`,
+          panel_link: whiteLabelPermissions?.b2b_link ? `${whiteLabelPermissions?.b2b_link}${FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}` : "N/A",
         });
 
         return {

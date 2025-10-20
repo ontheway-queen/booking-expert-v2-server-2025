@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registrationVerificationCompletedTemplate = void 0;
 const constants_1 = require("../miscellaneous/constants");
-const registrationVerificationCompletedTemplate = (name, creds) => {
+const registrationVerificationCompletedTemplate = (name, creds, agency) => {
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -41,8 +41,8 @@ const registrationVerificationCompletedTemplate = (name, creds) => {
               <td align="center" style="padding: 20px;">
                 <!-- Logo -->
                 <img
-                  src="${constants_1.PROJECT_LOGO}"
-                  alt="${constants_1.PROJECT_NAME}"
+                 src="${(agency === null || agency === void 0 ? void 0 : agency.logo) ? `${constants_1.LOGO_ROOT_LINK_2}/${agency.logo}` : `${constants_1.PROJECT_LOGO}`}"
+                  alt="${(agency === null || agency === void 0 ? void 0 : agency.name) || constants_1.PROJECT_NAME}"
                   style="display: block; width: 80px; margin-bottom: 10px;"
                 />
               </td>
@@ -104,7 +104,7 @@ const registrationVerificationCompletedTemplate = (name, creds) => {
                     margin: 20px 0;
                   "
                 >
-                 ${constants_1.AGENT_PROJECT_LINK}/login
+                ${agency ? (agency.url ? `${agency.url}/login` : 'N/A') : `${constants_1.AGENT_PROJECT_LINK}/login`}
                 </div>
               </td>
             </tr>

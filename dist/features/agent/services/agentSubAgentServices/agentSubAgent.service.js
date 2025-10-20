@@ -36,7 +36,7 @@ class AgentSubAgentService extends abstract_service_1.default {
     createSubAgency(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { user_id, agency_id, agency_type } = req.agencyUser;
+                const { user_id, agency_id, agency_type, agency_logo: main_agency_logo, agency_name: main_agency_name } = req.agencyUser;
                 if (agency_type === 'SUB AGENT') {
                     return {
                         success: false,
@@ -49,6 +49,7 @@ class AgentSubAgentService extends abstract_service_1.default {
                 const agencyModel = this.Model.AgencyModel(trx);
                 const agencyUserModel = this.Model.AgencyUserModel(trx);
                 const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
+                const white_label_permissions = yield agencyModel.getWhiteLabelPermission({ agency_id });
                 const checkSubAgentName = yield agencyModel.checkAgency({
                     name: agency_name,
                     agency_type: constants_1.SOURCE_SUB_AGENT,
@@ -153,6 +154,10 @@ class AgentSubAgentService extends abstract_service_1.default {
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(agency_name, {
                         email: email,
                         password: password,
+                    }, {
+                        name: main_agency_name,
+                        logo: main_agency_logo,
+                        url: (white_label_permissions === null || white_label_permissions === void 0 ? void 0 : white_label_permissions.b2b_link) || null
                     }),
                 });
                 return {
