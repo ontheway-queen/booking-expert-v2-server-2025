@@ -25,7 +25,7 @@ export default class AgentSubAgentService extends AbstractServices {
 
   public async createSubAgency(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { user_id, agency_id, agency_type } = req.agencyUser;
+      const { user_id, agency_id, agency_type, agency_logo: main_agency_logo, agency_name: main_agency_name } = req.agencyUser;
       if (agency_type === 'SUB AGENT') {
         return {
           success: false,
@@ -52,6 +52,7 @@ export default class AgentSubAgentService extends AbstractServices {
       const agencyModel = this.Model.AgencyModel(trx);
       const agencyUserModel = this.Model.AgencyUserModel(trx);
       const subAgentMarkupModel = this.Model.SubAgentMarkupModel(trx);
+      const white_label_permissions = await agencyModel.getWhiteLabelPermission({ agency_id });
 
       const checkSubAgentName = await agencyModel.checkAgency({
         name: agency_name,
@@ -176,7 +177,13 @@ export default class AgentSubAgentService extends AbstractServices {
         emailBody: registrationVerificationCompletedTemplate(agency_name, {
           email: email,
           password: password,
-        }),
+        },
+          {
+            name: main_agency_name,
+            logo: main_agency_logo,
+            url: white_label_permissions?.b2b_link || null
+          }
+        ),
       });
 
       return {
@@ -256,14 +263,14 @@ export default class AgentSubAgentService extends AbstractServices {
           markup_data: markup_data
             ? markup_data
             : {
-                agency_id: id,
-                flight_markup_type: 'PER',
-                hotel_markup_type: 0,
-                flight_markup_mode: 'INCREASE',
-                hotel_markup_mode: 'INCREASE',
-                flight_markup: 0,
-                hotel_markup: 0,
-              },
+              agency_id: id,
+              flight_markup_type: 'PER',
+              hotel_markup_type: 0,
+              flight_markup_mode: 'INCREASE',
+              hotel_markup_mode: 'INCREASE',
+              flight_markup: 0,
+              hotel_markup: 0,
+            },
         },
       };
     });

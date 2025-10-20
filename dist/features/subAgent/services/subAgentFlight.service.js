@@ -643,6 +643,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                         id: new_booking_id,
                         source_type: constants_1.SOURCE_SUB_AGENT,
                     });
+                    const whiteLabelPermissions = yield this.Model.AgencyModel(trx).getWhiteLabelPermission({ agency_id: ref_agent_id });
                     //send email
                     const bookingSubService = new commonFlightBookingSupport_service_1.CommonFlightBookingSupportService(trx);
                     yield bookingSubService.sendFlightBookingMail({
@@ -657,7 +658,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                             address: address,
                             photo: agency_logo,
                         },
-                        panel_link: new_booking_ref,
+                        panel_link: (whiteLabelPermissions === null || whiteLabelPermissions === void 0 ? void 0 : whiteLabelPermissions.b2b_link) || 'N/A',
                     });
                 }
                 catch (err) {
@@ -745,7 +746,7 @@ class SubAgentFlightService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { id } = req.params; //booking id
-                const { agency_id, user_id, agency_email, agency_name, phone_number, agency_logo, address, } = req.agencyUser;
+                const { agency_id, user_id, agency_email, agency_name, phone_number, agency_logo, address, ref_agent_id } = req.agencyUser;
                 //get flight details
                 const flightBookingModel = this.Model.FlightBookingModel(trx);
                 const bookingTravelerModel = this.Model.FlightBookingTravelerModel(trx);
@@ -829,6 +830,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                         issue_block: ticketIssuePermission.issue_block,
                         api: booking_data.api,
                     });
+                    const whiteLabelPermissions = yield this.Model.AgencyModel(trx).getWhiteLabelPermission({ agency_id: ref_agent_id });
                     //send email
                     yield bookingSubService.sendTicketIssueMail({
                         booking_id: Number(id),
@@ -841,7 +843,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                             address: address,
                             photo: agency_logo,
                         },
-                        panel_link: `${constants_1.AGENT_PROJECT_LINK}${constants_1.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}`,
+                        panel_link: (whiteLabelPermissions === null || whiteLabelPermissions === void 0 ? void 0 : whiteLabelPermissions.b2b_link) ? `${whiteLabelPermissions === null || whiteLabelPermissions === void 0 ? void 0 : whiteLabelPermissions.b2b_link}${constants_1.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}` : "N/A",
                         due: Number(payment_data.due),
                     });
                     return {
@@ -867,7 +869,7 @@ class SubAgentFlightService extends abstract_service_1.default {
     cancelBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const { user_id, agency_id, agency_email, agency_logo } = req.agencyUser;
+                const { user_id, agency_id, agency_email, agency_logo, ref_agent_id } = req.agencyUser;
                 const { id } = req.params; //booking id
                 const flightBookingModel = this.Model.FlightBookingModel(trx);
                 const booking_data = yield flightBookingModel.getSingleFlightBooking({
@@ -917,6 +919,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                         cancelled_by_user_id: user_id,
                         api: booking_data.api,
                     });
+                    const whiteLabelPermissions = yield this.Model.AgencyModel(trx).getWhiteLabelPermission({ agency_id: ref_agent_id });
                     //send email
                     yield flightBookingSupportService.sendBookingCancelMail({
                         email: agency_email,
@@ -924,7 +927,7 @@ class SubAgentFlightService extends abstract_service_1.default {
                         agency: {
                             photo: agency_logo,
                         },
-                        panel_link: `${constants_1.AGENT_PROJECT_LINK}${constants_1.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}`,
+                        panel_link: (whiteLabelPermissions === null || whiteLabelPermissions === void 0 ? void 0 : whiteLabelPermissions.b2b_link) ? `${whiteLabelPermissions === null || whiteLabelPermissions === void 0 ? void 0 : whiteLabelPermissions.b2b_link}${constants_1.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT}${id}` : "N/A",
                     });
                     return {
                         success: true,

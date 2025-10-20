@@ -125,7 +125,7 @@ class PublicEmailOTPService extends abstract_service_1.default {
                             ? emailSendLib_1.default.sendEmail({
                                 email,
                                 emailSub: constants_1.OTP_EMAIL_SUBJECT,
-                                emailBody: (0, sendEmailOtpTemplate_1.sendEmailOtpTemplate)({ otp, otpFor: OTP_FOR }),
+                                emailBody: (0, sendEmailOtpTemplate_1.sendEmailOtpTemplate)({ otp, otpFor: OTP_FOR, logo: payload.logo, project: payload.name }),
                             })
                             : undefined,
                     ]);
