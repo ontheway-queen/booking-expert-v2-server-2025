@@ -70,7 +70,7 @@ class PublicCommonService extends abstract_service_1.default {
                         method: 'post',
                         url: `${config_1.default.VERTEIL_URL}${verteilApiEndpoints_1.default.GET_TOKEN_ENDPOINT}`,
                         headers: {
-                            Authorization: `Basic ${Buffer.from(`${config_1.default.VERTEIL_USERNAME}:${config_1.default.VERTEIL_PASSWORD}`).toString("base64")}`,
+                            Authorization: `Basic ${Buffer.from(`${config_1.default.VERTEIL_USERNAME}:${config_1.default.VERTEIL_PASSWORD}`).toString('base64')}`,
                         },
                         maxBodyLength: Infinity,
                         validateStatus: () => true,
@@ -91,7 +91,7 @@ class PublicCommonService extends abstract_service_1.default {
                                     password: config_1.default.VERTEIL_PASSWORD,
                                 },
                                 response: response.data,
-                            }
+                            },
                         });
                     }
                     else {
@@ -101,16 +101,16 @@ class PublicCommonService extends abstract_service_1.default {
                 }));
             }
             catch (err) {
-                console.error("Verteil Token Error:", err);
+                console.error('Verteil Token Error:', err);
             }
         });
     }
     //get all country
     getAllCountry(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { name } = req.query;
+            const { name, limit, skip } = req.query;
             const model = this.Model.CommonModel();
-            const country_list = yield model.getCountry({ name });
+            const country_list = yield model.getCountry({ name, limit, skip });
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,

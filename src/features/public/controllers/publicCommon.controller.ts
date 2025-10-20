@@ -72,7 +72,9 @@ export default class PublicCommonController extends AbstractController {
     }
   );
   public getSabreBooking = this.asyncWrapper.wrap(
-    {paramSchema: this.commonValidator.singleParamStringValidator('pnr_code')},
+    {
+      paramSchema: this.commonValidator.singleParamStringValidator('pnr_code'),
+    },
     async (req: Request, res: Response) => {
       const { code, ...rest } = await this.service.getSabreBooking(req);
       res.status(code).json(rest);

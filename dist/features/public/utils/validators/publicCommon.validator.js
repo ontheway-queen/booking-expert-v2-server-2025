@@ -72,6 +72,8 @@ class PublicCommonValidator {
         // get country
         this.getCountry = joi_1.default.object({
             name: joi_1.default.string().optional(),
+            limit: joi_1.default.number(),
+            skip: joi_1.default.number(),
         });
         // get city
         this.getCity = joi_1.default.object({

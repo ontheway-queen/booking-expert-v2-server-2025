@@ -3,7 +3,12 @@ import qs from 'qs';
 import AbstractServices from '../../../abstract/abstract.service';
 import config from '../../../config/config';
 import SabreAPIEndpoints from '../../../utils/miscellaneous/endpoints/sabreApiEndpoints';
-import { PUBLIC_PNR_SABRE_API_SECRET, SABRE_TOKEN_ENV, VERTEIL_API, VERTEIL_TOKEN_ENV } from '../../../utils/miscellaneous/flightConstant';
+import {
+  PUBLIC_PNR_SABRE_API_SECRET,
+  SABRE_TOKEN_ENV,
+  VERTEIL_API,
+  VERTEIL_TOKEN_ENV,
+} from '../../../utils/miscellaneous/flightConstant';
 import { Request } from 'express';
 import { CTHotelSupportService } from '../../../utils/supportServices/hotelSupportServices/ctHotelSupport.service';
 import VerteilAPIEndpoints from '../../../utils/miscellaneous/endpoints/verteilApiEndpoints';
@@ -61,7 +66,7 @@ export default class PublicCommonService extends AbstractServices {
           headers: {
             Authorization: `Basic ${Buffer.from(
               `${config.VERTEIL_USERNAME}:${config.VERTEIL_PASSWORD}`
-            ).toString("base64")}`,
+            ).toString('base64')}`,
           },
           maxBodyLength: Infinity,
           validateStatus: () => true,
@@ -84,23 +89,31 @@ export default class PublicCommonService extends AbstractServices {
                 password: config.VERTEIL_PASSWORD,
               },
               response: response.data,
-            }
+            },
           });
         } else {
           const authModel = this.Model.CommonModel(trx);
-          await authModel.updateEnv(VERTEIL_TOKEN_ENV, response.data.access_token);
+          await authModel.updateEnv(
+            VERTEIL_TOKEN_ENV,
+            response.data.access_token
+          );
         }
       });
     } catch (err) {
-      console.error("Verteil Token Error:", err);
+      console.error('Verteil Token Error:', err);
     }
   }
 
   //get all country
   public async getAllCountry(req: Request) {
-    const { name } = req.query as { name?: string };
+    const { name, limit, skip } = req.query as {
+      name?: string;
+      limit?: string;
+      skip?: string;
+    };
     const model = this.Model.CommonModel();
-    const country_list = await model.getCountry({ name });
+    const country_list = await model.getCountry({ name, limit, skip });
+
     return {
       success: true,
       code: this.StatusCode.HTTP_OK,
@@ -247,9 +260,12 @@ export default class PublicCommonService extends AbstractServices {
       }
     }
 
-    const response = await new SabreRequests().postRequest(SabreAPIEndpoints.GET_BOOKING_ENDPOINT, {
-      confirmationId: pnr_code,
-    });
+    const response = await new SabreRequests().postRequest(
+      SabreAPIEndpoints.GET_BOOKING_ENDPOINT,
+      {
+        confirmationId: pnr_code,
+      }
+    );
 
     if (!response) {
       return {

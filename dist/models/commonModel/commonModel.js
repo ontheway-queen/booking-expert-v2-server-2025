@@ -174,6 +174,8 @@ class CommonModel extends schema_1.default {
                     qb.andWhereILike('name', `%${payload.name}%`);
                 }
             })
+                .limit(payload.limit ? Number(payload.limit) : constants_1.DATA_LIMIT)
+                .offset(payload.skip ? Number(payload.skip) : 0)
                 .orderBy('name', 'asc');
         });
     }

@@ -173,7 +173,12 @@ class CommonModel extends Schema {
   }
 
   //get all country
-  public async getCountry(payload: { id?: number | number[]; name?: string }) {
+  public async getCountry(payload: {
+    id?: number | number[];
+    name?: string;
+    limit?: string;
+    skip?: string;
+  }) {
     return await this.db('country')
       .withSchema(this.PUBLIC_SCHEMA)
       .select('id', 'name', 'iso', 'iso3', 'phone_code')
@@ -186,6 +191,8 @@ class CommonModel extends Schema {
           qb.andWhereILike('name', `%${payload.name}%`);
         }
       })
+      .limit(payload.limit ? Number(payload.limit) : DATA_LIMIT)
+      .offset(payload.skip ? Number(payload.skip) : 0)
       .orderBy('name', 'asc');
   }
 
