@@ -88,6 +88,9 @@ export default class FlightBookingModel extends Schema {
         if (query.created_by) {
           qb.andWhere('created_by', query.created_by);
         }
+        if (query.ref_agent_id) {
+          qb.andWhere('ref_agent_id', query.ref_agent_id);
+        }
       })
       .orderBy('id', 'desc')
       .limit(query.limit || 100)
@@ -117,6 +120,9 @@ export default class FlightBookingModel extends Schema {
           }
           if (query.created_by) {
             qb.andWhere('created_by', query.created_by);
+          }
+          if (query.ref_agent_id) {
+            qb.andWhere('ref_agent_id', query.ref_agent_id);
           }
         });
     }
