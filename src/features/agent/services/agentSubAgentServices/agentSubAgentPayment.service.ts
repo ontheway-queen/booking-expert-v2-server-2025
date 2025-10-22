@@ -33,7 +33,7 @@ export class AgentSubAgentPaymentService extends AbstractServices {
     const depositModel = this.Model.DepositRequestModel();
 
     const queryParams: IGetDepositRequestListFilterQuery = {
-      ref_agency_id: agency_id,
+      ref_agent_id: agency_id,
     };
 
     if (query.filter) {
@@ -76,7 +76,7 @@ export class AgentSubAgentPaymentService extends AbstractServices {
     const depositModel = this.Model.DepositRequestModel();
     const data = await depositModel.getSingleSubAgentDepositRequest({
       id: Number(id),
-      ref_agency_id: agency_id,
+      ref_agent_id: agency_id,
     });
 
     if (!data) {
@@ -103,7 +103,7 @@ export class AgentSubAgentPaymentService extends AbstractServices {
       const AgencyPaymentModel = this.Model.AgencyPaymentModel(trx);
       const data = await depositModel.getSingleSubAgentDepositRequest({
         id: Number(id),
-        ref_agency_id: agency_id,
+        ref_agent_id: agency_id,
       });
 
       if (!data) {
@@ -172,7 +172,7 @@ export class AgentSubAgentPaymentService extends AbstractServices {
 
     const data = await AgencyB2CPaymentModel.getAgencyLedger(
       {
-        ref_agency_id: main_agency_id,
+        ref_agent_id: main_agency_id,
         ...query,
       },
       true
@@ -198,7 +198,7 @@ export class AgentSubAgentPaymentService extends AbstractServices {
       const checkVoucher = await AgencyPaymentModel.getAgencyLedger({
         voucher_no,
         agency_id,
-        ref_agency_id: main_agency_id,
+        ref_agent_id: main_agency_id,
       });
 
       if (checkVoucher.data.length > 0) {

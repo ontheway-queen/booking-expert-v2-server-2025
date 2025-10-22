@@ -34,7 +34,7 @@ export default class AgencyPaymentModel extends Schema {
       to_date,
       limit,
       skip,
-      ref_agency_id,
+      ref_agent_id,
     }: IGetAgencyLedgerQuery,
     need_total: boolean = false
   ): Promise<{ data: IGetAgencyLedgerData[]; total?: number }> {
@@ -57,8 +57,8 @@ export default class AgencyPaymentModel extends Schema {
         if (agency_id) {
           qb.andWhere('al.agency_id', agency_id);
         }
-        if (ref_agency_id) {
-          qb.andWhere('a.ref_agency_id', ref_agency_id);
+        if (ref_agent_id) {
+          qb.andWhere('a.ref_agent_id', ref_agent_id);
         }
         if (type) {
           qb.andWhere('al.type', type);

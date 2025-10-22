@@ -248,11 +248,11 @@ export default class DepositRequestModel extends Schema {
   public async getSingleSubAgentDepositRequest({
     id,
     agency_id,
-    ref_agency_id,
+    ref_agent_id,
   }: {
     id: number;
     agency_id?: number;
-    ref_agency_id?: number;
+    ref_agent_id?: number;
   }): Promise<IGetSingleAgentDepositRequestData | null> {
     return await this.db('deposit_request as dr')
       .withSchema(this.AGENT_SCHEMA)
@@ -285,8 +285,8 @@ export default class DepositRequestModel extends Schema {
         if (agency_id) {
           qb.andWhere('dr.agency_id', agency_id);
         }
-        if (ref_agency_id) {
-          qb.andWhere('a.ref_agency_id', ref_agency_id);
+        if (ref_agent_id) {
+          qb.andWhere('a.ref_agent_id', ref_agent_id);
         }
       })
       .first();

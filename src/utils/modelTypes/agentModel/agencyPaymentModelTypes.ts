@@ -11,7 +11,7 @@ export interface IGetAgencyLedgerQuery {
   type?: 'Debit' | 'Credit';
   voucher_no?: string;
   agency_id?: number;
-  ref_agency_id?: number;
+  ref_agent_id?: number;
   from_date?: string;
   to_date?: string;
   limit?: string;

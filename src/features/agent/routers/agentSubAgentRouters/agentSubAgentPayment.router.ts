@@ -1,8 +1,8 @@
 import AbstractRouter from '../../../../abstract/abstract.router';
-import { AgentB2CSubPaymentController } from '../../controllers/agentB2CControllers/agentB2CSubPayment.controller';
+import { AgentSubAgentPaymentController } from '../../controllers/agentSubAgentControllers/agentSubAgentPayment.controller';
 
 export default class AgentSubAgentPaymentRouter extends AbstractRouter {
-  private controller = new AgentB2CSubPaymentController();
+  private controller = new AgentSubAgentPaymentController();
   constructor() {
     super();
     this.callRouter();

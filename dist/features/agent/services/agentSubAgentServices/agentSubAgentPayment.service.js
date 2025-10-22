@@ -25,7 +25,7 @@ class AgentSubAgentPaymentService extends abstract_service_1.default {
             const { agency_id } = req.agencyUser;
             const depositModel = this.Model.DepositRequestModel();
             const queryParams = {
-                ref_agency_id: agency_id,
+                ref_agent_id: agency_id,
             };
             if (query.filter) {
                 queryParams.filter = query.filter;
@@ -61,7 +61,7 @@ class AgentSubAgentPaymentService extends abstract_service_1.default {
             const depositModel = this.Model.DepositRequestModel();
             const data = yield depositModel.getSingleSubAgentDepositRequest({
                 id: Number(id),
-                ref_agency_id: agency_id,
+                ref_agent_id: agency_id,
             });
             if (!data) {
                 return {
@@ -86,7 +86,7 @@ class AgentSubAgentPaymentService extends abstract_service_1.default {
                 const AgencyPaymentModel = this.Model.AgencyPaymentModel(trx);
                 const data = yield depositModel.getSingleSubAgentDepositRequest({
                     id: Number(id),
-                    ref_agency_id: agency_id,
+                    ref_agent_id: agency_id,
                 });
                 if (!data) {
                     return {
@@ -139,7 +139,7 @@ class AgentSubAgentPaymentService extends abstract_service_1.default {
             const { agency_id: main_agency_id } = req.agencyUser;
             const query = req.query;
             const AgencyB2CPaymentModel = this.Model.AgencyPaymentModel();
-            const data = yield AgencyB2CPaymentModel.getAgencyLedger(Object.assign({ ref_agency_id: main_agency_id }, query), true);
+            const data = yield AgencyB2CPaymentModel.getAgencyLedger(Object.assign({ ref_agent_id: main_agency_id }, query), true);
             return {
                 success: true,
                 code: this.StatusCode.HTTP_OK,
@@ -158,7 +158,7 @@ class AgentSubAgentPaymentService extends abstract_service_1.default {
                 const checkVoucher = yield AgencyPaymentModel.getAgencyLedger({
                     voucher_no,
                     agency_id,
-                    ref_agency_id: main_agency_id,
+                    ref_agent_id: main_agency_id,
                 });
                 if (checkVoucher.data.length > 0) {
                     return {

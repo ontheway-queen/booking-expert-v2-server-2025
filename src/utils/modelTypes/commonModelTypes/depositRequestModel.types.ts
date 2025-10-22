@@ -111,5 +111,5 @@ export interface IGetDepositRequestListFilterQuery {
   skip?: number;
   filter?: string;
   created_by?: number;
-  ref_agency_id?: number;
+  ref_agent_id?: number;
 }

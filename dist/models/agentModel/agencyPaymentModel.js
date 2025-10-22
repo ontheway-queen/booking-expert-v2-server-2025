@@ -27,7 +27,7 @@ class AgencyPaymentModel extends schema_1.default {
         });
     }
     getAgencyLedger(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ agency_id, type, voucher_no, from_date, to_date, limit, skip, ref_agency_id, }, need_total = false) {
+        return __awaiter(this, arguments, void 0, function* ({ agency_id, type, voucher_no, from_date, to_date, limit, skip, ref_agent_id, }, need_total = false) {
             var _b;
             const data = yield this.db('agency_ledger as al')
                 .withSchema(this.AGENT_SCHEMA)
@@ -37,8 +37,8 @@ class AgencyPaymentModel extends schema_1.default {
                 if (agency_id) {
                     qb.andWhere('al.agency_id', agency_id);
                 }
-                if (ref_agency_id) {
-                    qb.andWhere('a.ref_agency_id', ref_agency_id);
+                if (ref_agent_id) {
+                    qb.andWhere('a.ref_agent_id', ref_agent_id);
                 }
                 if (type) {
                     qb.andWhere('al.type', type);

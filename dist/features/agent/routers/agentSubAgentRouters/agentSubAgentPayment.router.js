@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const abstract_router_1 = __importDefault(require("../../../../abstract/abstract.router"));
-const agentB2CSubPayment_controller_1 = require("../../controllers/agentB2CControllers/agentB2CSubPayment.controller");
+const agentSubAgentPayment_controller_1 = require("../../controllers/agentSubAgentControllers/agentSubAgentPayment.controller");
 class AgentSubAgentPaymentRouter extends abstract_router_1.default {
     constructor() {
         super();
-        this.controller = new agentB2CSubPayment_controller_1.AgentB2CSubPaymentController();
+        this.controller = new agentSubAgentPayment_controller_1.AgentSubAgentPaymentController();
         this.callRouter();
     }
     callRouter() {

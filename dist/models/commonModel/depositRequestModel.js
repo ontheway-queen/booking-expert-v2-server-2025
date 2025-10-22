@@ -186,7 +186,7 @@ class DepositRequestModel extends schema_1.default {
         });
     }
     getSingleSubAgentDepositRequest(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ id, agency_id, ref_agency_id, }) {
+        return __awaiter(this, arguments, void 0, function* ({ id, agency_id, ref_agent_id, }) {
             return yield this.db('deposit_request as dr')
                 .withSchema(this.AGENT_SCHEMA)
                 .select('dr.id', 'dr.agency_id', 'dr.bank_name', 'dr.amount', 'dr.remarks', 'dr.request_no', 'dr.status', 'dr.payment_date', 'dr.created_at', 'dr.docs', 'dr.created_by', 'dr.updated_by', 'dr.updated_by_name', 'dr.updated_at', 'dr.update_note', 'au.name AS created_by_name', 'a.agency_name', 'a.agency_logo')
@@ -199,8 +199,8 @@ class DepositRequestModel extends schema_1.default {
                 if (agency_id) {
                     qb.andWhere('dr.agency_id', agency_id);
                 }
-                if (ref_agency_id) {
-                    qb.andWhere('a.ref_agency_id', ref_agency_id);
+                if (ref_agent_id) {
+                    qb.andWhere('a.ref_agent_id', ref_agent_id);
                 }
             })
                 .first();
