@@ -1,4 +1,12 @@
+import { Request } from 'express';
 import AbstractServices from '../../../../abstract/abstract.service';
+import {
+  IAgentCreateSupportTicketReqBody,
+  IAgentGetSupportTicketReqQuery,
+} from '../../utils/types/agentSupportTicket.types';
+import Lib from '../../../../utils/lib/lib';
+import { SOURCE_AGENT } from '../../../../utils/miscellaneous/constants';
+import { IUpdateSupportTicketPayload } from '../../../../utils/modelTypes/othersModelTypes/supportTicketModelTypes';
 
 export class AgentB2CSubSupportTicketService extends AbstractServices {
   constructor() {
