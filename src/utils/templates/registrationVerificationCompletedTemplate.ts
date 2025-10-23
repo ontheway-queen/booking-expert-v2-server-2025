@@ -1,8 +1,8 @@
 import {
   AGENT_PROJECT_LINK,
-  LOGO_ROOT_LINK_2,
+  LOGO_ROOT_LINK,
   PROJECT_LOGO,
-  PROJECT_NAME
+  PROJECT_NAME,
 } from '../miscellaneous/constants';
 
 export const registrationVerificationCompletedTemplate = (
@@ -55,7 +55,11 @@ export const registrationVerificationCompletedTemplate = (
               <td align="center" style="padding: 20px;">
                 <!-- Logo -->
                 <img
-                 src="${agency?.logo ? `${LOGO_ROOT_LINK_2}/${agency.logo}` : `${PROJECT_LOGO}`}"
+                 src="${
+                   agency?.logo
+                     ? `${LOGO_ROOT_LINK}/${agency.logo}`
+                     : `${PROJECT_LOGO}`
+                 }"
                   alt="${agency?.name || PROJECT_NAME}"
                   style="display: block; width: 80px; margin-bottom: 10px;"
                 />
@@ -118,7 +122,13 @@ export const registrationVerificationCompletedTemplate = (
                     margin: 20px 0;
                   "
                 >
-                ${agency ? (agency.url ? `${agency.url}/login` : 'N/A') : `${AGENT_PROJECT_LINK}/login`}
+                ${
+                  agency
+                    ? agency.url
+                      ? `${agency.url}/login`
+                      : 'N/A'
+                    : `${AGENT_PROJECT_LINK}/login`
+                }
                 </div>
               </td>
             </tr>

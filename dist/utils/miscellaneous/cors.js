@@ -355,4 +355,6 @@ exports.origin = [
     'https://www.onmaxholidays.com',
     'https://thenishaninternational.com',
     'https://www.thenishaninternational.com',
+    'https://www.partner.limpidtravels.com',
+    'https://partner.limpidtravels.com',
 ];

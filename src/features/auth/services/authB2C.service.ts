@@ -9,7 +9,10 @@ import {
 } from '../utils/types/authTypes';
 import Lib from '../../../utils/lib/lib';
 import PublicEmailOTPService from '../../public/services/publicEmailOTP.service';
-import { OTP_TYPES } from '../../../utils/miscellaneous/constants';
+import {
+  OTP_TYPES,
+  PROJECT_NAME,
+} from '../../../utils/miscellaneous/constants';
 import { ITokenParseUser } from '../../public/utils/types/publicCommon.types';
 import config from '../../../config/config';
 import { registrationVerificationTemplate } from '../../../utils/templates/registrationVerificationTemplate';
@@ -284,7 +287,7 @@ export default class AuthB2CService extends AbstractServices {
 
       await EmailSendLib.sendEmail({
         email,
-        emailSub: `Booking Expert User Registration Verification`,
+        emailSub: `${PROJECT_NAME} User Registration Verification`,
         emailBody: registrationVerificationTemplate(
           name,
           '/registration/verification?token=' + verificationToken
@@ -354,7 +357,7 @@ export default class AuthB2CService extends AbstractServices {
 
       await EmailSendLib.sendEmail({
         email,
-        emailSub: `Booking Expert User Registration Completed`,
+        emailSub: `${PROJECT_NAME} User Registration Completed`,
         emailBody: registrationVerificationCompletedTemplate(name, {
           email,
           password,

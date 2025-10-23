@@ -1,7 +1,7 @@
 import AbstractServices from '../../../abstract/abstract.service';
 import { Request } from 'express';
 import {
-  LOGO_ROOT_LINK_2,
+  LOGO_ROOT_LINK,
   OTP_EMAIL_SUBJECT,
   OTP_TYPES,
   SOURCE_SUB_AGENT,
@@ -21,7 +21,8 @@ export class SubAgentMainService extends AbstractServices {
   public async sendEmailOtp(req: Request) {
     return await this.db.transaction(async (trx) => {
       const { email, type } = req.body as ISendAgentB2CEmailOTPReqBody;
-      const { agency_id, agency_logo: main_agency_logo } = req.agencyB2CWhiteLabel;
+      const { agency_id, agency_logo: main_agency_logo } =
+        req.agencyB2CWhiteLabel;
 
       let OTP_FOR = '';
 
@@ -81,7 +82,7 @@ export class SubAgentMainService extends AbstractServices {
           emailBody: sendEmailOtpTemplate({
             otp,
             otpFor: OTP_FOR,
-            logo: `${LOGO_ROOT_LINK_2}${main_agency_logo}`,
+            logo: `${LOGO_ROOT_LINK}${main_agency_logo}`,
             project: siteData?.site_name,
           }),
         });

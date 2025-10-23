@@ -4,6 +4,7 @@ import config from '../../../config/config';
 import Lib from '../../../utils/lib/lib';
 import {
   OTP_TYPES,
+  PROJECT_NAME,
   SOURCE_AGENT,
   WHITE_LABEL_PERMISSIONS_MODULES,
 } from '../../../utils/miscellaneous/constants';
@@ -157,7 +158,7 @@ export default class AuthAgentService extends AbstractServices {
 
       await EmailSendLib.sendEmail({
         email,
-        emailSub: `Booking Expert Agency Registration Verification`,
+        emailSub: `${PROJECT_NAME} Agency Registration Verification`,
         emailBody: registrationVerificationTemplate(
           agency_name,
 
@@ -211,7 +212,7 @@ export default class AuthAgentService extends AbstractServices {
 
       await EmailSendLib.sendEmail({
         email,
-        emailSub: `Booking Expert Agency Registration Verification`,
+        emailSub: `${PROJECT_NAME} Agency Registration Verification`,
         emailBody: registrationVerificationCompletedTemplate(agency_name, {
           email,
           password,

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WHITE_LABEL_PERMISSIONS_MODULES = exports.DEPOSIT_STATUS_CANCELLED = exports.DEPOSIT_STATUS_REJECTED = exports.DEPOSIT_STATUS_APPROVED = exports.DEPOSIT_STATUS_PENDING = exports.SLUG_TYPE_BLOG = exports.SLUG_TYPE_UMRAH = exports.SLUG_TYPE_HOLIDAY = exports.SOURCE_ADMIN = exports.SOURCE_EXTERNAL = exports.SOURCE_B2C = exports.SOURCE_AGENT_B2C = exports.SOURCE_SUB_AGENT = exports.SOURCE_AGENT = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.TYPE_GROUP_FARE = exports.TYPE_UMRAH = exports.TYPE_HOLIDAY = exports.TYPE_VISA = exports.TYPE_HOTEL = exports.TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.LOGO_ROOT_LINK_2 = exports.LOGO_ROOT_LINK = exports.ADMIN_NOTIFY_EMAIL = exports.PROJECT_ADDRESS = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL = exports.B2C_PROJECT_LINK = exports.AGENT_PROJECT_LINK = exports.PROJECT_ICON = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.BKASH_PERCENTAGE = exports.BKASH_TOKEN_ENV = exports.TYPE_PAYMENT_GATEWAY_BKASH = exports.TYPE_PAYMENT_GATEWAY_SSL = exports.TYPE_EMAIL_SERVER_OTHER = exports.TYPE_EMAIL_SERVER_CPANEL = exports.TYPE_EMAIL_SERVER_ZOHO = exports.TYPE_EMAIL_SERVER_NAMECHEAP = exports.TYPE_EMAIL_SERVER_HOSTINGER = exports.TYPE_EMAIL_SERVER_GMAIL = exports.OTP_TYPES = void 0;
-exports.cors_origin_name = exports.UMRAH_BOOKING_STATUS_CANCELLED = exports.UMRAH_BOOKING_STATUS_CONFIRMED = exports.UMRAH_BOOKING_STATUS_PROCESSED = exports.UMRAH_BOOKING_STATUS_PROCESSING = exports.UMRAH_BOOKING_STATUS_PENDING = exports.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = exports.INVOICE_STATUS_TYPES = exports.INVOICE_TYPES = exports.MARKUP_MODE_DECREASE = exports.MARKUP_MODE_INCREASE = exports.MARKUP_TYPE_FLAT = exports.MARKUP_TYPE_PER = exports.PAYMENT_GATEWAYS = exports.GENERATE_AUTO_UNIQUE_ID = exports.FUNCTION_TYPE_BLOG = exports.FUNCTION_TYPE_GROUP = exports.FUNCTION_TYPE_UMRAH = exports.FUNCTION_TYPE_VISA = exports.FUNCTION_TYPE_HOLIDAY = exports.FUNCTION_TYPE_HOTEL = exports.FUNCTION_TYPE_FLIGHT = exports.CONTENT_TYPE_VIDEO = exports.CONTENT_TYPE_PHOTO = void 0;
+exports.CONTENT_TYPE_PHOTO = exports.WHITE_LABEL_PERMISSIONS_MODULES = exports.DEPOSIT_STATUS_CANCELLED = exports.DEPOSIT_STATUS_REJECTED = exports.DEPOSIT_STATUS_APPROVED = exports.DEPOSIT_STATUS_PENDING = exports.SLUG_TYPE_BLOG = exports.SLUG_TYPE_UMRAH = exports.SLUG_TYPE_HOLIDAY = exports.SOURCE_ADMIN = exports.SOURCE_EXTERNAL = exports.SOURCE_B2C = exports.SOURCE_AGENT_B2C = exports.SOURCE_SUB_AGENT = exports.SOURCE_AGENT = exports.ERROR_LEVEL_CRITICAL = exports.ERROR_LEVEL_ERROR = exports.ERROR_LEVEL_WARNING = exports.ERROR_LEVEL_INFO = exports.ERROR_LEVEL_DEBUG = exports.TYPE_GROUP_FARE = exports.TYPE_UMRAH = exports.TYPE_HOLIDAY = exports.TYPE_VISA = exports.TYPE_HOTEL = exports.TYPE_FLIGHT = exports.OTP_DEFAULT_EXPIRY = exports.DATA_LIMIT = exports.OTP_EMAIL_SUBJECT = exports.LOGO_ROOT_LINK = exports.ADMIN_NOTIFY_EMAIL = exports.PROJECT_ADDRESS = exports.PROJECT_NUMBER = exports.PROJECT_EMAIL = exports.B2C_PROJECT_LINK = exports.AGENT_PROJECT_LINK = exports.PROJECT_ICON = exports.PROJECT_LOGO = exports.PROJECT_NAME = exports.BKASH_PERCENTAGE = exports.BKASH_TOKEN_ENV = exports.TYPE_PAYMENT_GATEWAY_BKASH = exports.TYPE_PAYMENT_GATEWAY_SSL = exports.TYPE_EMAIL_SERVER_OTHER = exports.TYPE_EMAIL_SERVER_CPANEL = exports.TYPE_EMAIL_SERVER_ZOHO = exports.TYPE_EMAIL_SERVER_NAMECHEAP = exports.TYPE_EMAIL_SERVER_HOSTINGER = exports.TYPE_EMAIL_SERVER_GMAIL = exports.OTP_TYPES = void 0;
+exports.cors_origin_name = exports.UMRAH_BOOKING_STATUS_CANCELLED = exports.UMRAH_BOOKING_STATUS_CONFIRMED = exports.UMRAH_BOOKING_STATUS_PROCESSED = exports.UMRAH_BOOKING_STATUS_PROCESSING = exports.UMRAH_BOOKING_STATUS_PENDING = exports.FRONTEND_AGENT_FLIGHT_BOOKING_ENDPOINT = exports.INVOICE_STATUS_TYPES = exports.INVOICE_TYPES = exports.MARKUP_MODE_DECREASE = exports.MARKUP_MODE_INCREASE = exports.MARKUP_TYPE_FLAT = exports.MARKUP_TYPE_PER = exports.PAYMENT_GATEWAYS = exports.GENERATE_AUTO_UNIQUE_ID = exports.FUNCTION_TYPE_BLOG = exports.FUNCTION_TYPE_GROUP = exports.FUNCTION_TYPE_UMRAH = exports.FUNCTION_TYPE_VISA = exports.FUNCTION_TYPE_HOLIDAY = exports.FUNCTION_TYPE_HOTEL = exports.FUNCTION_TYPE_FLIGHT = exports.CONTENT_TYPE_VIDEO = void 0;
 // OTP types constants
 exports.OTP_TYPES = {
     reset_admin: 'reset_admin',
@@ -32,17 +32,16 @@ exports.TYPE_PAYMENT_GATEWAY_BKASH = 'BKASH';
 exports.BKASH_TOKEN_ENV = 'bkash_refresh_token';
 exports.BKASH_PERCENTAGE = 1.5;
 //Project Info
-exports.PROJECT_NAME = 'Booking Expert V2';
-exports.PROJECT_LOGO = 'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_logo.png';
-exports.PROJECT_ICON = 'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_icon.png';
-exports.AGENT_PROJECT_LINK = 'https://agent.bookingexpert.us';
-exports.B2C_PROJECT_LINK = 'https://bookingexpert.us';
-exports.PROJECT_EMAIL = 'support@bookingexpert.us';
+exports.PROJECT_NAME = 'T360 Tours And Travels';
+exports.PROJECT_LOGO = 'https://m360ict-data.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/t360_logo.png';
+exports.PROJECT_ICON = 'https://m360ict-data.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/t360_fab.png';
+exports.AGENT_PROJECT_LINK = 'https://agent.t360toursntravels.com';
+exports.B2C_PROJECT_LINK = 'https://t360toursntravels.com';
+exports.PROJECT_EMAIL = 'info@t360toursntravels.com';
 exports.PROJECT_NUMBER = '+880 1958-398347';
 exports.PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 exports.ADMIN_NOTIFY_EMAIL = 'ota.bookingexpert@gmail.com';
-exports.LOGO_ROOT_LINK = 'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/';
-exports.LOGO_ROOT_LINK_2 = 'https://m360ict-data.s3.ap-south-1.amazonaws.com/booking-expert-v2/';
+exports.LOGO_ROOT_LINK = 'https://m360ict-data.s3.ap-south-1.amazonaws.com/booking-expert-v2/';
 // Email subject
 exports.OTP_EMAIL_SUBJECT = 'Your One Time Password For Verification';
 // Default data get limit

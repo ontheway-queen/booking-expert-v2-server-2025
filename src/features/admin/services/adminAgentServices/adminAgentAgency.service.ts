@@ -18,6 +18,7 @@ import config from '../../../../config/config';
 import {
   ADMIN_NOTIFY_EMAIL,
   GENERATE_AUTO_UNIQUE_ID,
+  PROJECT_NAME,
   SOURCE_AGENT,
   TYPE_FLIGHT,
   TYPE_HOTEL,
@@ -753,7 +754,7 @@ export default class AdminAgentAgencyService extends AbstractServices {
 
       await EmailSendLib.sendEmail({
         email: `${body.email}, ${ADMIN_NOTIFY_EMAIL}`,
-        emailSub: `Booking Expert Agency Credentials`,
+        emailSub: `${PROJECT_NAME} Agency Credentials`,
         emailBody: registrationVerificationCompletedTemplate(body.agency_name, {
           email: body.email,
           password: password,

@@ -4,7 +4,6 @@ import config from '../../../config/config';
 import Lib from '../../../utils/lib/lib';
 import {
   LOGO_ROOT_LINK,
-  LOGO_ROOT_LINK_2,
   OTP_TYPES,
   SOURCE_SUB_AGENT,
   WHITE_LABEL_PERMISSIONS_MODULES,
@@ -229,7 +228,9 @@ export default class AuthSubAgentService extends AbstractServices {
         const otp = Lib.otpGenNumber(6);
         const hashed_otp = await Lib.hashValue(otp);
 
-        const whiteLabelPermissions = await AgentModel.getWhiteLabelPermission({ agency_id: main_agent });
+        const whiteLabelPermissions = await AgentModel.getWhiteLabelPermission({
+          agency_id: main_agent,
+        });
 
         await EmailSendLib.sendEmailAgent(trx, main_agent, {
           email,
@@ -238,7 +239,7 @@ export default class AuthSubAgentService extends AbstractServices {
             otpFor: 'Registration',
             project: main_agent_name,
             otp: otp,
-            logo: `${LOGO_ROOT_LINK_2}${main_agent_logo}`,
+            logo: `${LOGO_ROOT_LINK}${main_agent_logo}`,
           }),
         });
 
@@ -349,7 +350,11 @@ export default class AuthSubAgentService extends AbstractServices {
   public async login(req: Request) {
     return this.db.transaction(async (trx) => {
       const { password, user_or_email } = req.body as ILoginReqBody;
-      const { agency_id: main_agency_id, agency_name: main_agency_name, agency_logo: main_agency_logo } = req.agencyB2CWhiteLabel;
+      const {
+        agency_id: main_agency_id,
+        agency_name: main_agency_name,
+        agency_logo: main_agency_logo,
+      } = req.agencyB2CWhiteLabel;
       const AgentUserModel = this.Model.AgencyUserModel(trx);
 
       const checkUserAgency = await AgentUserModel.checkUser({
@@ -441,7 +446,7 @@ export default class AuthSubAgentService extends AbstractServices {
         const data = await new PublicEmailOTPService(trx).sendEmailOtp({
           email,
           type: OTP_TYPES.verify_agent,
-          logo: main_agency_logo ? `${LOGO_ROOT_LINK_2}${main_agency_logo}` : '',
+          logo: main_agency_logo ? `${LOGO_ROOT_LINK}${main_agency_logo}` : '',
           name: main_agency_name,
         });
 

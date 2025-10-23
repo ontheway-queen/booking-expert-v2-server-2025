@@ -139,7 +139,7 @@ class AuthAgentService extends abstract_service_1.default {
                 const verificationToken = lib_1.default.createToken({ agency_id: newAgency[0].id, email, user_id: newUser[0].id }, config_1.default.JWT_SECRET_AGENT + constants_1.OTP_TYPES.register_agent, '24h');
                 yield emailSendLib_1.default.sendEmail({
                     email,
-                    emailSub: `Booking Expert Agency Registration Verification`,
+                    emailSub: `${constants_1.PROJECT_NAME} Agency Registration Verification`,
                     emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(agency_name, '/sign-up/verification?token=' + verificationToken),
                 });
                 return {
@@ -176,7 +176,7 @@ class AuthAgentService extends abstract_service_1.default {
                 }, { agency_id, id: user_id });
                 yield emailSendLib_1.default.sendEmail({
                     email,
-                    emailSub: `Booking Expert Agency Registration Verification`,
+                    emailSub: `${constants_1.PROJECT_NAME} Agency Registration Verification`,
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(agency_name, {
                         email,
                         password,

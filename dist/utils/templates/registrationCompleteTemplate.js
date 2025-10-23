@@ -15,7 +15,7 @@ const registrationTemplate = (payload) => {
     <div style="max-width: 450px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); border: 1px solid #e7e9ec;">
         <!-- Header -->
         <div style="background-color: #ECECEC; color: rgb(29, 29, 29); padding: 20px; text-align: center;">
-            <img src="${constants_1.LOGO_ROOT_LINK_2}/${payload.logo}" alt="Logo" style="width: 120px; margin-bottom: 10px;">
+            <img src="${constants_1.LOGO_ROOT_LINK}/${payload.logo}" alt="Logo" style="width: 120px; margin-bottom: 10px;">
             <h1 style="font-size: 20px; margin: 0;">Welcome to ${payload.agency}!</h1>
         </div>  
 

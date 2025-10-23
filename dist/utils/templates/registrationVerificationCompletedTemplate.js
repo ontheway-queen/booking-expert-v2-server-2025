@@ -41,7 +41,9 @@ const registrationVerificationCompletedTemplate = (name, creds, agency) => {
               <td align="center" style="padding: 20px;">
                 <!-- Logo -->
                 <img
-                 src="${(agency === null || agency === void 0 ? void 0 : agency.logo) ? `${constants_1.LOGO_ROOT_LINK_2}/${agency.logo}` : `${constants_1.PROJECT_LOGO}`}"
+                 src="${(agency === null || agency === void 0 ? void 0 : agency.logo)
+        ? `${constants_1.LOGO_ROOT_LINK}/${agency.logo}`
+        : `${constants_1.PROJECT_LOGO}`}"
                   alt="${(agency === null || agency === void 0 ? void 0 : agency.name) || constants_1.PROJECT_NAME}"
                   style="display: block; width: 80px; margin-bottom: 10px;"
                 />
@@ -104,7 +106,11 @@ const registrationVerificationCompletedTemplate = (name, creds, agency) => {
                     margin: 20px 0;
                   "
                 >
-                ${agency ? (agency.url ? `${agency.url}/login` : 'N/A') : `${constants_1.AGENT_PROJECT_LINK}/login`}
+                ${agency
+        ? agency.url
+            ? `${agency.url}/login`
+            : 'N/A'
+        : `${constants_1.AGENT_PROJECT_LINK}/login`}
                 </div>
               </td>
             </tr>

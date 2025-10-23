@@ -225,7 +225,7 @@ class AuthB2CService extends abstract_service_1.default {
                 const verificationToken = lib_1.default.createToken({ email, user_id: newUser[0].id, username, name }, config_1.default.JWT_SECRET_USER + constants_1.OTP_TYPES.register_b2c, '24h');
                 yield emailSendLib_1.default.sendEmail({
                     email,
-                    emailSub: `Booking Expert User Registration Verification`,
+                    emailSub: `${constants_1.PROJECT_NAME} User Registration Verification`,
                     emailBody: (0, registrationVerificationTemplate_1.registrationVerificationTemplate)(name, '/registration/verification?token=' + verificationToken),
                 });
                 return {
@@ -275,7 +275,7 @@ class AuthB2CService extends abstract_service_1.default {
                 const AuthToken = lib_1.default.createToken(tokenData, config_1.default.JWT_SECRET_USER, '24h');
                 yield emailSendLib_1.default.sendEmail({
                     email,
-                    emailSub: `Booking Expert User Registration Completed`,
+                    emailSub: `${constants_1.PROJECT_NAME} User Registration Completed`,
                     emailBody: (0, registrationVerificationCompletedTemplate_1.registrationVerificationCompletedTemplate)(name, {
                         email,
                         password,

@@ -190,7 +190,9 @@ class AuthSubAgentService extends abstract_service_1.default {
                     }
                     const otp = lib_1.default.otpGenNumber(6);
                     const hashed_otp = yield lib_1.default.hashValue(otp);
-                    const whiteLabelPermissions = yield AgentModel.getWhiteLabelPermission({ agency_id: main_agent });
+                    const whiteLabelPermissions = yield AgentModel.getWhiteLabelPermission({
+                        agency_id: main_agent,
+                    });
                     yield emailSendLib_1.default.sendEmailAgent(trx, main_agent, {
                         email,
                         emailSub: `${main_agent_name} - Agency Registration Verification`,
@@ -198,7 +200,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                             otpFor: 'Registration',
                             project: main_agent_name,
                             otp: otp,
-                            logo: `${constants_1.LOGO_ROOT_LINK_2}${main_agent_logo}`,
+                            logo: `${constants_1.LOGO_ROOT_LINK}${main_agent_logo}`,
                         }),
                     });
                     yield commonModel.insertOTP({
@@ -287,7 +289,7 @@ class AuthSubAgentService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const { password, user_or_email } = req.body;
-                const { agency_id: main_agency_id, agency_name: main_agency_name, agency_logo: main_agency_logo } = req.agencyB2CWhiteLabel;
+                const { agency_id: main_agency_id, agency_name: main_agency_name, agency_logo: main_agency_logo, } = req.agencyB2CWhiteLabel;
                 const AgentUserModel = this.Model.AgencyUserModel(trx);
                 const checkUserAgency = yield AgentUserModel.checkUser({
                     username: user_or_email,
@@ -339,7 +341,7 @@ class AuthSubAgentService extends abstract_service_1.default {
                     const data = yield new publicEmailOTP_service_1.default(trx).sendEmailOtp({
                         email,
                         type: constants_1.OTP_TYPES.verify_agent,
-                        logo: main_agency_logo ? `${constants_1.LOGO_ROOT_LINK_2}${main_agency_logo}` : '',
+                        logo: main_agency_logo ? `${constants_1.LOGO_ROOT_LINK}${main_agency_logo}` : '',
                         name: main_agency_name,
                     });
                     if (data.success) {

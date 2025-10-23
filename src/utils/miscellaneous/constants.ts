@@ -32,21 +32,21 @@ export const BKASH_TOKEN_ENV = 'bkash_refresh_token';
 export const BKASH_PERCENTAGE = 1.5;
 
 //Project Info
-export const PROJECT_NAME = 'Booking Expert V2';
+export const PROJECT_NAME = 'T360 Tours And Travels';
 export const PROJECT_LOGO =
-  'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_logo.png';
+  'https://m360ict-data.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/t360_logo.png';
 export const PROJECT_ICON =
-  'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/be_icon.png';
-export const AGENT_PROJECT_LINK = 'https://agent.bookingexpert.us';
-export const B2C_PROJECT_LINK = 'https://bookingexpert.us';
-export const PROJECT_EMAIL = 'support@bookingexpert.us';
+  'https://m360ict-data.s3.ap-south-1.amazonaws.com/booking-expert-v2/main/t360_fab.png';
+
+export const AGENT_PROJECT_LINK = 'https://agent.t360toursntravels.com';
+export const B2C_PROJECT_LINK = 'https://t360toursntravels.com';
+export const PROJECT_EMAIL = 'info@t360toursntravels.com';
 export const PROJECT_NUMBER = '+880 1958-398347';
 export const PROJECT_ADDRESS = 'Block#H, Road#7, House#74, Banani, Dhaka';
 export const ADMIN_NOTIFY_EMAIL = 'ota.bookingexpert@gmail.com';
 export const LOGO_ROOT_LINK =
-  'https://m360-trabill.s3.ap-south-1.amazonaws.com/booking-expert-v2/';
-export const LOGO_ROOT_LINK_2 =
   'https://m360ict-data.s3.ap-south-1.amazonaws.com/booking-expert-v2/';
+
 // Email subject
 export const OTP_EMAIL_SUBJECT = 'Your One Time Password For Verification';
 
