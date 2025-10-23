@@ -21,17 +21,18 @@ class AgentSubAgentHotelService extends abstract_service_1.default {
     }
     getBooking(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { filter, from_date, limit, skip, to_date } = req.query;
+            const { filter, from_date, limit, skip, to_date, agent_id } = req.query;
             const { agency_id } = req.agencyUser;
             const hotelBookingModel = this.Model.HotelBookingModel();
-            const data = yield hotelBookingModel.getHotelBooking({
+            const data = yield hotelBookingModel.getAgentHotelBooking({
                 source_type: constants_1.SOURCE_SUB_AGENT,
                 filter,
                 from_date,
                 to_date,
                 limit,
                 skip,
-                source_id: agency_id,
+                source_id: Number(agent_id),
+                ref_agent_id: agency_id,
             }, true);
             return {
                 success: true,
@@ -50,8 +51,8 @@ class AgentSubAgentHotelService extends abstract_service_1.default {
             const hotelBookingModel = this.Model.HotelBookingModel();
             const data = yield hotelBookingModel.getSingleHotelBooking({
                 booking_id,
-                source_id: agency_id,
                 source_type: constants_1.SOURCE_SUB_AGENT,
+                ref_agent_id: agency_id,
             });
             if (!data) {
                 return {
@@ -80,9 +81,9 @@ class AgentSubAgentHotelService extends abstract_service_1.default {
                 const checkBooking = yield hotelBookingModel.getSingleHotelBooking({
                     booking_id,
                     source_type: constants_1.SOURCE_SUB_AGENT,
-                    source_id: agency_id,
+                    ref_agent_id: agency_id,
                 });
-                if (!checkBooking || Object.keys(checkBooking).length === 0) {
+                if (!checkBooking) {
                     return {
                         success: false,
                         code: this.StatusCode.HTTP_NOT_FOUND,

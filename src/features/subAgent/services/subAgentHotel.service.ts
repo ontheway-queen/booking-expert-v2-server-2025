@@ -17,6 +17,7 @@ import {
   INVOICE_STATUS_TYPES,
   INVOICE_TYPES,
   SOURCE_AGENT,
+  SOURCE_SUB_AGENT,
   TYPE_FLIGHT,
 } from '../../../utils/miscellaneous/constants';
 import {
@@ -280,7 +281,7 @@ export class SubAgentHotelService extends AbstractServices {
 
   public async hotelBooking(req: Request) {
     return this.db.transaction(async (trx) => {
-      const { agency_id, user_id, ref_agent_id, agency_type } = req.agencyUser;
+      const { agency_id, user_id, ref_agent_id } = req.agencyUser;
       const ctHotelSupport = new CTHotelSupportService(trx);
       const agencyModel = this.Model.AgencyModel(trx);
       const hotelBookingModel = this.Model.HotelBookingModel(trx);
@@ -318,21 +319,18 @@ export class SubAgentHotelService extends AbstractServices {
       }
 
       //get SUB AGENT markup
-      let markup_amount = undefined;
-      if (agency_type === 'SUB AGENT') {
-        markup_amount = await Lib.getSubAgentTotalMarkup({
-          trx,
-          type: 'Hotel',
-          agency_id,
-        });
+      let markup_amount = await Lib.getSubAgentTotalMarkup({
+        trx,
+        type: 'Hotel',
+        agency_id,
+      });
 
-        if (!markup_amount) {
-          return {
-            success: false,
-            code: this.StatusCode.HTTP_BAD_REQUEST,
-            message: 'Markup information is empty. Contact with the authority',
-          };
-        }
+      if (!markup_amount) {
+        return {
+          success: false,
+          code: this.StatusCode.HTTP_BAD_REQUEST,
+          message: 'Markup information is empty. Contact with the authority',
+        };
       }
 
       const files = (req.files as Express.Multer.File[]) || [];
@@ -483,7 +481,7 @@ export class SubAgentHotelService extends AbstractServices {
         hotel_extra_charges: JSON.stringify(recheck.hotel_extra_charges),
         free_cancellation:
           recheck.rates[0].cancellation_policy?.free_cancellation || false,
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_SUB_AGENT,
         status: 'PENDING',
         free_cancellation_last_date:
           recheck.rates[0].cancellation_policy?.free_cancellation_last_date,
@@ -594,7 +592,7 @@ export class SubAgentHotelService extends AbstractServices {
 
     const data = await hotelBookingModel.getHotelBooking(
       {
-        source_type: SOURCE_AGENT,
+        source_type: SOURCE_SUB_AGENT,
         filter,
         from_date,
         to_date,
@@ -618,10 +616,16 @@ export class SubAgentHotelService extends AbstractServices {
     const { id } = req.params;
 
     const booking_id = Number(id);
-
+    const { agency_id } = req.agencyUser;
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    const data = await hotelBookingModel.getSingleHotelBooking({ booking_id });
+    console.log({ booking_id, agency_id });
+
+    const data = await hotelBookingModel.getSingleHotelBooking({
+      booking_id,
+      source_type: SOURCE_SUB_AGENT,
+      source_id: agency_id,
+    });
 
     if (!data) {
       return {

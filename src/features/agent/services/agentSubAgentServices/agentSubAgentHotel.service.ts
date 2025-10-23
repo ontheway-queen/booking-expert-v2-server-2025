@@ -8,18 +8,19 @@ export class AgentSubAgentHotelService extends AbstractServices {
   }
 
   public async getBooking(req: Request) {
-    const { filter, from_date, limit, skip, to_date } = req.query as {
+    const { filter, from_date, limit, skip, to_date, agent_id } = req.query as {
       filter?: string;
       from_date?: string;
       to_date?: string;
       limit?: string;
       skip?: string;
+      agent_id?: string;
     };
 
     const { agency_id } = req.agencyUser;
     const hotelBookingModel = this.Model.HotelBookingModel();
 
-    const data = await hotelBookingModel.getHotelBooking(
+    const data = await hotelBookingModel.getAgentHotelBooking(
       {
         source_type: SOURCE_SUB_AGENT,
         filter,
@@ -27,7 +28,8 @@ export class AgentSubAgentHotelService extends AbstractServices {
         to_date,
         limit,
         skip,
-        source_id: agency_id,
+        source_id: Number(agent_id),
+        ref_agent_id: agency_id,
       },
       true
     );
@@ -51,8 +53,8 @@ export class AgentSubAgentHotelService extends AbstractServices {
 
     const data = await hotelBookingModel.getSingleHotelBooking({
       booking_id,
-      source_id: agency_id,
       source_type: SOURCE_SUB_AGENT,
+      ref_agent_id: agency_id,
     });
 
     if (!data) {
@@ -92,10 +94,10 @@ export class AgentSubAgentHotelService extends AbstractServices {
       const checkBooking = await hotelBookingModel.getSingleHotelBooking({
         booking_id,
         source_type: SOURCE_SUB_AGENT,
-        source_id: agency_id,
+        ref_agent_id: agency_id,
       });
 
-      if (!checkBooking || Object.keys(checkBooking).length === 0) {
+      if (!checkBooking) {
         return {
           success: false,
           code: this.StatusCode.HTTP_NOT_FOUND,

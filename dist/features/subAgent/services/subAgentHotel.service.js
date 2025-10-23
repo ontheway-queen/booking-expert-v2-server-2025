@@ -253,7 +253,7 @@ class SubAgentHotelService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             return this.db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 var _a, _b, _c;
-                const { agency_id, user_id, ref_agent_id, agency_type } = req.agencyUser;
+                const { agency_id, user_id, ref_agent_id } = req.agencyUser;
                 const ctHotelSupport = new ctHotelSupport_service_1.CTHotelSupportService(trx);
                 const agencyModel = this.Model.AgencyModel(trx);
                 const hotelBookingModel = this.Model.HotelBookingModel(trx);
@@ -285,20 +285,17 @@ class SubAgentHotelService extends abstract_service_1.default {
                     };
                 }
                 //get SUB AGENT markup
-                let markup_amount = undefined;
-                if (agency_type === 'SUB AGENT') {
-                    markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
-                        trx,
-                        type: 'Hotel',
-                        agency_id,
-                    });
-                    if (!markup_amount) {
-                        return {
-                            success: false,
-                            code: this.StatusCode.HTTP_BAD_REQUEST,
-                            message: 'Markup information is empty. Contact with the authority',
-                        };
-                    }
+                let markup_amount = yield lib_1.default.getSubAgentTotalMarkup({
+                    trx,
+                    type: 'Hotel',
+                    agency_id,
+                });
+                if (!markup_amount) {
+                    return {
+                        success: false,
+                        code: this.StatusCode.HTTP_BAD_REQUEST,
+                        message: 'Markup information is empty. Contact with the authority',
+                    };
                 }
                 const files = req.files || [];
                 const body = req.body;
@@ -413,7 +410,7 @@ class SubAgentHotelService extends abstract_service_1.default {
                     search_id: payload.search_id,
                     hotel_extra_charges: JSON.stringify(recheck.hotel_extra_charges),
                     free_cancellation: ((_a = recheck.rates[0].cancellation_policy) === null || _a === void 0 ? void 0 : _a.free_cancellation) || false,
-                    source_type: constants_1.SOURCE_AGENT,
+                    source_type: constants_1.SOURCE_SUB_AGENT,
                     status: 'PENDING',
                     free_cancellation_last_date: (_b = recheck.rates[0].cancellation_policy) === null || _b === void 0 ? void 0 : _b.free_cancellation_last_date,
                     rooms: JSON.stringify(recheck.rates[0].rooms),
@@ -505,7 +502,7 @@ class SubAgentHotelService extends abstract_service_1.default {
             const { filter, from_date, limit, skip, to_date } = req.query;
             const hotelBookingModel = this.Model.HotelBookingModel();
             const data = yield hotelBookingModel.getHotelBooking({
-                source_type: constants_1.SOURCE_AGENT,
+                source_type: constants_1.SOURCE_SUB_AGENT,
                 filter,
                 from_date,
                 to_date,
@@ -526,8 +523,14 @@ class SubAgentHotelService extends abstract_service_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const booking_id = Number(id);
+            const { agency_id } = req.agencyUser;
             const hotelBookingModel = this.Model.HotelBookingModel();
-            const data = yield hotelBookingModel.getSingleHotelBooking({ booking_id });
+            console.log({ booking_id, agency_id });
+            const data = yield hotelBookingModel.getSingleHotelBooking({
+                booking_id,
+                source_type: constants_1.SOURCE_SUB_AGENT,
+                source_id: agency_id,
+            });
             if (!data) {
                 return {
                     success: false,

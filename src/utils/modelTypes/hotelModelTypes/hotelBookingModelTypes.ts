@@ -51,6 +51,17 @@ export interface IInsertHotelBookingTravelerPayload {
   id_file?: string;
 }
 
+export interface IGetAgentBookingModelQuery {
+  from_date?: string;
+  to_date?: string;
+  filter?: string;
+  limit?: string;
+  skip?: string;
+  source_type: typeof SOURCE_AGENT | typeof SOURCE_SUB_AGENT;
+  source_id?: number;
+  user_id?: number;
+  ref_agent_id?: number;
+}
 export interface IGetBookingModelQuery {
   from_date?: string;
   to_date?: string;
